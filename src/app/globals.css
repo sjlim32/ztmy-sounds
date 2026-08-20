@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #050223;
+  --foreground: #ededed;
 }
 
 @theme inline {
@@ -12,15 +12,22 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse at center, transparent 0%, transparent 15%, var(--background) 90%), url("/ztmy_bg.jpg");
+  background-position: center, center;
+  /* 16:9 원본 비율(1920x1080)을 유지한 채 cover처럼 화면을 꽉 채우되,
+     두 레이어가 항상 같은 크기 공식을 쓰도록 해서 그라데이션이
+     이미지 테두리와 어긋나지 않게 함. */
+  background-size:
+    /* 화면 너비/높이(100vw/100vh) 또는, 화면이 세로/가로로 길어서 높이/너비가 기준이 될 때는 16:9 기준 그 높이/너비에 대응하는 너비(177.78vh) / 높이(56.25vw)  중 큰 값 */
+    /* 그라데이션 레이어 가로/세로 */
+    max(100vw, 177.78vh) max(56.25vw, 100vh),
+    max(100vw, 177.78vh) max(56.25vw, 100vh); /* 이미지 레이어 가로/세로: 그라데이션과 동일한 공식 (정렬을 맞추기 위함) */
+
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
