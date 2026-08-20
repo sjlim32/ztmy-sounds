@@ -23,6 +23,8 @@ interface YTStateChangeEvent extends YTPlayerEvent {
 
 interface YTPlayerOptions {
   videoId?: string;
+  width?: string;
+  height?: string;
   events?: {
     onReady?: (event: YTPlayerEvent) => void;
     onStateChange?: (event: YTStateChangeEvent) => void;
@@ -95,6 +97,8 @@ export function YouTubePlayer() {
       if (cancelled) return;
 
       playerRef.current = new window.YT!.Player(mountEl, {
+        width: "960",
+        height: "540",
         events: {
           onReady: () => {
             isReadyRef.current = true;
@@ -146,5 +150,16 @@ export function YouTubePlayer() {
     // isReady가 true로 바뀌는 순간 다시 실행됩니다.
   }, [activeSongId, isReady]);
 
-  return <div ref={containerRef} />;
+  useEffect(() => {
+    // 뒤로가기 등으로 목록 화면으로 돌아가 activeSongId가 비면 재생을 멈춥니다.
+    if (!isReady || activeSongId) return;
+    playerRef.current?.pauseVideo();
+  }, [activeSongId, isReady]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="aspect-video w-full max-w-2xl [&>iframe]:h-full [&>iframe]:w-full"
+    />
+  );
 }
