@@ -6,6 +6,7 @@ import type { Song } from "@/lib/guide/types";
 import { songs } from "@/data/songs";
 import { usePlayer } from "@/context/player-context";
 import { getActiveLineIndex } from "@/lib/guide/lyric-sync";
+import { parseTimestamp } from "@/lib/guide/timestamp";
 import { LyricLine } from "@/components/guide/LyricLine";
 
 function getNeighborIds(songId: string): { prevId: string | null; nextId: string | null } {
@@ -20,7 +21,7 @@ function getNeighborIds(songId: string): { prevId: string | null; nextId: string
 
 export function SongView({ song }: { song: Song }) {
   const router = useRouter();
-  const { activeSongId, currentTime, setActiveSongId } = usePlayer();
+  const { activeSongId, currentTime, setActiveSongId, seekTo } = usePlayer();
   const { prevId, nextId } = getNeighborIds(song.id);
 
   useEffect(() => {
@@ -49,7 +50,12 @@ export function SongView({ song }: { song: Song }) {
 
       <ol data-role="lyric-list">
         {song.lyrics.map((line, index) => (
-          <LyricLine key={line.time} line={line} isActive={index === activeLineIndex} />
+          <LyricLine
+            key={line.time}
+            line={line}
+            isActive={index === activeLineIndex}
+            onSelect={() => seekTo(parseTimestamp(line.time))}
+          />
         ))}
       </ol>
     </div>

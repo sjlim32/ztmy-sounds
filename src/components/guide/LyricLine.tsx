@@ -32,12 +32,15 @@ function LyricTextRenderer({ text, prefix }: { text: LyricText; prefix: string }
 export function LyricLine({
   line,
   isActive,
+  onSelect,
 }: {
   line: LyricLineData;
   isActive: boolean;
+  /** 줄을 클릭했을 때 호출됩니다 (예: 영상을 `line.time` 지점으로 이동). */
+  onSelect?: () => void;
 }) {
-  return (
-    <li data-active={isActive || undefined} data-time={line.time}>
+  const content = (
+    <>
       {line.original ? <p data-role="original">{line.original}</p> : null}
       {line.pronunciation ? (
         <p data-role="pronunciation">
@@ -50,6 +53,18 @@ export function LyricLine({
           <LyricTextRenderer text={line.background} prefix="bg" />
         </p>
       ) : null}
+    </>
+  );
+
+  return (
+    <li data-active={isActive || undefined} data-time={line.time}>
+      {onSelect ? (
+        <button type="button" onClick={onSelect}>
+          {content}
+        </button>
+      ) : (
+        content
+      )}
     </li>
   );
 }
