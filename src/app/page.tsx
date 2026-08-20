@@ -1,25 +1,21 @@
-import Link from "next/link";
 import { event } from "@/data/event";
+import { Header } from "@/components/home/Header";
 import { Countdown } from "@/components/guide/Countdown";
-import { InfoPanel } from "@/components/guide/InfoPanel";
 
 export default function Home() {
   return (
-    <main data-role="hero">
-      <p data-role="eyebrow">{event.tourName}</p>
-      <h1>{event.artist}</h1>
+    <>
+      <Header artist={event.artist} />
 
-      <Countdown targetIso={event.showDateTime} />
+      <main data-role="hero">
+        <p data-role="eyebrow">{event.tourName}</p>
 
-      <p data-role="show-meta">
-        {event.dateLabel} · {event.venue}
-      </p>
+        <Countdown targetIso={event.showDateTime} />
 
-      <nav>
-        <Link href="/guide">Call Guide</Link>
-      </nav>
-
-      <InfoPanel />
-    </main>
+        <p data-role="show-meta">
+          {event.dateLabel} · {event.venue}
+        </p>
+      </main>
+    </>
   );
 }

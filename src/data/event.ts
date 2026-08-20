@@ -8,7 +8,7 @@ export interface EventInfo {
 }
 
 export const event: EventInfo = {
-  artist: "ARTIST NAME",
+  artist: "ずっと真夜中でいいのに。(ZUTOMAYO)",
   tourName: "TOUR NAME 2026",
   showDateTime: "2026-12-31T18:00:00+09:00",
   venue: "VENUE NAME",
