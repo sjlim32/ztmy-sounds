@@ -99,3 +99,6 @@ thumb
 sketch
 **/*.backup.*
 **/*.back.*
+
+# custom
+.vscode
