@@ -57,7 +57,11 @@ export function LyricLine({
   );
 
   return (
-    <li data-active={isActive || undefined} data-time={line.time}>
+    <li
+      data-active={isActive || undefined}
+      data-time={line.time}
+      className={isActive ? "rounded bg-white/15 font-semibold" : undefined}
+    >
       {onSelect ? (
         <button type="button" onClick={onSelect}>
           {content}

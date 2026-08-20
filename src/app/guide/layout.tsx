@@ -1,11 +1,13 @@
 import { PlayerProvider } from "@/context/player-context";
-import { YouTubePlayer } from "@/components/guide/YouTubePlayer";
-import { GuideShell } from "@/components/guide/GuideShell";
+import { GuidePlayerArea } from "@/components/guide/GuidePlayerArea";
+import { SongPanel } from "@/components/guide/SongPanel";
 
 export default function GuideLayout({ children }: LayoutProps<"/guide">) {
   return (
     <PlayerProvider>
-      <GuideShell player={<YouTubePlayer />}>{children}</GuideShell>
+      <GuidePlayerArea />
+      <SongPanel />
+      {children}
     </PlayerProvider>
   );
 }
