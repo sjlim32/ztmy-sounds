@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getSong } from "@/data/songs";
 import { usePlayer } from "@/context/player-context";
 
@@ -70,21 +70,35 @@ function loadIframeApi(): Promise<void> {
  * client-side navigation between `/guide/[songId]` routes.
  */
 export function YouTubePlayer() {
-  const mountRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayer | null>(null);
+  // YT.Player 객체는 생성 즉시 존재하지만, getCurrentTime/loadVideoById 같은
+  // 실제 메서드는 onReady가 fire하기 전까지 붙지 않습니다. 아래 setInterval은
+  // 오래 살아있는 클로저라, state가 아니라 ref를 써야 항상 최신 값을 읽습니다.
+  const isReadyRef = useRef(false);
   const loadedSongIdRef = useRef<string | null>(null);
   const { activeSongId, setPlaying, setCurrentTime, registerApi } = usePlayer();
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     let pollId: ReturnType<typeof setInterval> | undefined;
 
-    loadIframeApi().then(() => {
-      if (cancelled || !mountRef.current) return;
+    // 유튜브 API가 이 엘리먼트를 직접 DOM 조작으로 <iframe>으로 바꿔치기합니다.
+    // React가 이 노드를 직접 렌더링/추적하면 이 교체 때문에 React의 가상 DOM과
+    // 실제 DOM이 어긋나서, 다음 리컨사일(예: 라우트 이동) 시 insertBefore
+    // 에러로 죽습니다. JSX 바깥에서 만들어야 React의 diffing에 안 걸립니다.
+    const mountEl = document.createElement("div");
+    containerRef.current?.appendChild(mountEl);
 
-      playerRef.current = new window.YT!.Player(mountRef.current, {
+    loadIframeApi().then(() => {
+      if (cancelled) return;
+
+      playerRef.current = new window.YT!.Player(mountEl, {
         events: {
           onReady: () => {
+            isReadyRef.current = true;
+            setIsReady(true);
             registerApi({
               seekTo: (seconds) => playerRef.current?.seekTo(seconds, true),
               play: () => playerRef.current?.playVideo(),
@@ -98,6 +112,7 @@ export function YouTubePlayer() {
       });
 
       pollId = setInterval(() => {
+        if (!isReadyRef.current) return;
         const time = playerRef.current?.getCurrentTime();
         if (typeof time === "number") {
           setCurrentTime(time);
@@ -108,16 +123,18 @@ export function YouTubePlayer() {
     return () => {
       cancelled = true;
       clearInterval(pollId);
+      isReadyRef.current = false;
       registerApi(null);
       playerRef.current?.destroy();
       playerRef.current = null;
+      mountEl.remove();
     };
     // Mounted once; the player instance itself is reused across song changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (!activeSongId || !playerRef.current) return;
+    if (!activeSongId || !isReady || !playerRef.current) return;
     if (loadedSongIdRef.current === activeSongId) return;
 
     const song = getSong(activeSongId);
@@ -125,7 +142,9 @@ export function YouTubePlayer() {
 
     playerRef.current.loadVideoById(song.youtubeId);
     loadedSongIdRef.current = activeSongId;
-  }, [activeSongId]);
+    // activeSongId가 플레이어 초기화 완료 전에 이미 세팅돼 있었더라도,
+    // isReady가 true로 바뀌는 순간 다시 실행됩니다.
+  }, [activeSongId, isReady]);
 
-  return <div ref={mountRef} />;
+  return <div ref={containerRef} />;
 }
