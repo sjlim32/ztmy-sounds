@@ -53,7 +53,7 @@ body {
       transparent 15%,
       var(--background) 90%
     ),
-    url("/ztmy_bg.jpg");
+    url("/bg/ztmy_bg.jpg");
   background-position: center, center;
   background-size:
     /* 화면 너비/높이(100vw/100vh) 또는, 화면이 세로/가로로 길어서 높이/너비가 기준이 될 때는 16:9 기준 그 높이/너비에 대응하는 너비(177.78vh) / 높이(56.25vw)  중 큰 값 */
@@ -65,4 +65,23 @@ body {
   background-attachment: fixed, fixed;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 모바일(tablet 브레이크포인트 미만)에서는 세로형 배경 이미지로 교체.
+   원본은 16:9 가로 이미지 기준으로 정밀 계산된 background-size라 세로
+   이미지엔 안 맞아서, 여기선 단순히 cover로 화면을 채웁니다. */
+@media (width < 33.75rem) {
+  body {
+    background-image:
+      radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        transparent 15%,
+        var(--background) 90%
+      ),
+      url("/bg/ztmy_bg_responsive.webp");
+    background-size:
+      cover,
+      cover;
+  }
 }
