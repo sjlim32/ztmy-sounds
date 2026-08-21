@@ -5,6 +5,8 @@ import clsx from "clsx";
 import type { Song } from "@/lib/guide/types";
 import { parseTimestamp } from "@/lib/guide/timestamp";
 import { LyricLine } from "@/components/guide/detail/LyricLine";
+import { AutoScrollToggle } from "@/components/guide/detail/AutoScrollToggle";
+import { useAutoScrollPreference } from "@/lib/guide/auto-scroll";
 
 export function LyricsView({
   song,
@@ -21,6 +23,7 @@ export function LyricsView({
   const bottomSentinelRef = useRef<HTMLLIElement>(null);
   // 목록 맨 아래 sentinel이 아직 안 보이면(교차 안 함) 더 스크롤할 게 남은 것.
   const [canScrollDown, setCanScrollDown] = useState(false);
+  const [autoScroll] = useAutoScrollPreference();
 
   useEffect(() => {
     const list = listRef.current;
@@ -35,6 +38,20 @@ export function LyricsView({
     return () => observer.disconnect();
     // song이 바뀌면 가사 줄 수/높이가 달라지므로 다시 관찰합니다.
   }, [song]);
+
+  useEffect(() => {
+    if (!autoScroll) return;
+
+    const list = listRef.current;
+    const activeEl = list?.children[activeLineIndex] as HTMLElement | undefined;
+    if (!list || !activeEl) return;
+
+    // 목록 중앙에 오도록 스크롤. 위쪽에 콘텐츠가 부족해 중앙에 못 맞추는
+    // 경우(target이 음수) scrollTo가 자연히 0으로 clamp하므로 별도 분기 불필요.
+    const target =
+      activeEl.offsetTop - list.clientHeight / 2 + activeEl.clientHeight / 2;
+    list.scrollTo({ top: target, behavior: "smooth" });
+  }, [song, activeLineIndex, autoScroll]);
 
   if (!song) return null;
 
@@ -81,6 +98,8 @@ export function LyricsView({
           </svg>
         </div>
       )}
+
+      {visible && <AutoScrollToggle />}
     </div>
   );
 }

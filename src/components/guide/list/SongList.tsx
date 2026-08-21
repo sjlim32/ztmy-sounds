@@ -11,7 +11,12 @@ interface SongListProps {
 export function SongList({ selectedSongId, visible }: SongListProps) {
   return (
     <>
-      <h2 className="p-2 text-center text-2xl font-bold text-gray-200">
+      <h2
+        className={clsx(
+          "overflow-hidden p-2 text-center text-2xl font-bold text-gray-200 transition-all duration-300",
+          selectedSongId ? "max-h-0 opacity-0" : "max-h-16 opacity-100",
+        )}
+      >
         떼창 가이드
       </h2>
 
@@ -40,13 +45,15 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                 className={clsx(
                   "block px-4 py-3",
                   isSelected
-                    ? "text-lg font-bold"
+                    ? "group hover:text-ztmy-purple hover:bg-ztmy-purple/10 text-lg font-bold"
                     : "transition-colors hover:bg-white/10",
                 )}
               >
                 <div className="flex items-end gap-2">
                   <span>{item.title.jp}</span>
-                  <span className="text-xs text-gray-300">{item.title.kr}</span>
+                  <span className="group-hover:text-ztmy-purple text-xs text-gray-300">
+                    {item.title.kr}
+                  </span>
                 </div>
               </Link>
             </li>
