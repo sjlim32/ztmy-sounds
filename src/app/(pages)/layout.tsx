@@ -49,11 +49,13 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     locale: "ko_KR",
     type: "website",
+    images: [{ url: "/og/og.webp", width: 600, height: 337, alt: SITE_NAME }],
   },
   twitter: {
     card: "summary_large_image",
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
+    images: ["/og/og.webp"],
   },
   robots: {
     index: true,

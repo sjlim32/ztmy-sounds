@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sips -g pixelWidth -g pixelHeight /Users/lsjoon/Documents/project/ztmy-sounds/public/og/og.webp)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"opengraph-image route now: %{http_code}\\\\n\" http://localhost:3000/opengraph-image)"
+    ]
+  }
+}
