@@ -46,7 +46,7 @@ function WaterBalloon({
   const waterY = 92 - fillFraction * 84;
 
   return (
-    <div className="relative h-24 w-24 shrink-0 overflow-visible">
+    <div className="relative h-16 w-16 shrink-0 overflow-visible tablet:h-24 tablet:w-24">
       <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible">
         <defs>
           <clipPath id="balloon-clip">
@@ -130,19 +130,19 @@ function WaterBalloon({
 
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         {isDone ? (
-          <span className="font-mono text-2xl font-bold text-white/60 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="font-mono text-base font-bold text-white/60 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tablet:text-2xl">
             -
           </span>
         ) : isToday ? (
-          <span className="font-mono text-lg font-bold tracking-widest text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="font-mono text-[10px] font-bold tracking-widest text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tablet:text-lg">
             TODAY
           </span>
         ) : (
           <>
-            <span className="font-mono text-2xl font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            <span className="font-mono text-base font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tablet:text-2xl">
               {remaining.days}
             </span>
-            <span className="text-[10px] tracking-widest text-white/80 uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            <span className="text-[7px] tracking-widest text-white/80 uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tablet:text-[10px]">
               일 남음
             </span>
           </>
@@ -160,43 +160,43 @@ export function Countdown({ event }: { event: VisitEvent }) {
   return (
     <div
       data-role="countdown"
-      className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/20 p-4 backdrop-blur-sm"
+      className="flex w-full items-center gap-2 rounded-2xl border border-white/10 bg-black/20 p-2.5 backdrop-blur-sm tablet:w-auto tablet:gap-4 tablet:p-4"
     >
       <WaterBalloon remaining={remaining} hoursSincePast={hoursSincePast} />
 
-      <div className="space-y-1">
+      <div className="space-y-0.5 tablet:space-y-1">
         {remaining.isPast ? (
-          <p className="text-sm font-medium text-white/80">
+          <p className="text-xs font-medium text-white/80 tablet:text-sm">
             {hoursSincePast < DONE_AFTER_HOURS
               ? "공연이 시작되었습니다"
               : "다음 내한을 기다려주세요 !"}
           </p>
         ) : (
           <>
-            <p className="text-xs tracking-widest text-white/40 uppercase">
+            <p className="text-[9px] tracking-widest text-white/40 uppercase tablet:text-xs">
               공연까지
             </p>
-            <p className="flex items-baseline gap-3 font-mono text-xl font-semibold text-white tabular-nums">
-              <span className="inline-flex items-baseline gap-1">
+            <p className="flex items-baseline gap-1.5 font-mono text-sm font-semibold text-white tabular-nums tablet:gap-3 tablet:text-xl">
+              <span className="inline-flex items-baseline gap-0.5 tablet:gap-1">
                 <span>
                   {String(remaining.days * 24 + remaining.hours).padStart(
                     2,
                     "0",
                   )}
                 </span>
-                <span className="text-[10px] font-normal text-white/50">
+                <span className="text-[8px] font-normal text-white/50 tablet:text-[10px]">
                   시
                 </span>
               </span>
-              <span className="inline-flex items-baseline gap-1">
+              <span className="inline-flex items-baseline gap-0.5 tablet:gap-1">
                 <span>{String(remaining.minutes).padStart(2, "0")}</span>
-                <span className="text-[10px] font-normal text-white/50">
+                <span className="text-[8px] font-normal text-white/50 tablet:text-[10px]">
                   분
                 </span>
               </span>
-              <span className="inline-flex items-baseline gap-1">
+              <span className="inline-flex items-baseline gap-0.5 tablet:gap-1">
                 <span>{String(remaining.seconds).padStart(2, "0")}</span>
-                <span className="text-[10px] font-normal text-white/50">
+                <span className="text-[8px] font-normal text-white/50 tablet:text-[10px]">
                   초
                 </span>
               </span>
