@@ -5,7 +5,7 @@ import type {
   LyricLine as LyricLineData,
   LyricText,
 } from "@/lib/guide/types";
-import { parseIconTokens } from "@/lib/guide/icon-tokens";
+import { parseEmphasis, parseIconTokens } from "@/lib/guide/icon-tokens";
 import { CallIcon } from "@/components/guide/detail/CallIcon";
 
 // 테두리색
@@ -22,32 +22,53 @@ const TAG_BACKGROUND_COLOR: Record<CallTag, string> = {
   clap: `${TAG_BORDER_COLOR.clap}30`,
 };
 
-function renderTextParts(text: string, key: string) {
-  return parseIconTokens(text).map((part, index) =>
-    part.type === "icon" ? (
-      <CallIcon key={`${key}-${index}`} name={part.value} />
-    ) : (
-      <Fragment key={`${key}-${index}`}>{part.value}</Fragment>
-    ),
-  );
+function renderTextParts(text: string, key: string, emphasisColor?: string) {
+  return parseIconTokens(text).map((part, index) => {
+    if (part.type === "icon") {
+      return <CallIcon key={`${key}-${index}`} name={part.value} />;
+    }
+
+    return (
+      <Fragment key={`${key}-${index}`}>
+        {parseEmphasis(part.value).map((seg, segIndex) =>
+          seg.type === "emphasis" ? (
+            <strong
+              key={`${key}-${index}-${segIndex}`}
+              style={emphasisColor ? { color: emphasisColor } : undefined}
+            >
+              {seg.value}
+            </strong>
+          ) : (
+            <Fragment key={`${key}-${index}-${segIndex}`}>{seg.value}</Fragment>
+          ),
+        )}
+      </Fragment>
+    );
+  });
 }
 
 function LyricTextRenderer({
   text,
   prefix,
+  emphasisColor,
 }: {
   text: LyricText;
   prefix: string;
+  emphasisColor?: string;
 }) {
   if (typeof text === "string") {
-    return <>{renderTextParts(text, prefix)}</>;
+    return <>{renderTextParts(text, prefix, emphasisColor)}</>;
   }
 
   return (
     <>
       {text.map((segment, index) => (
         <span key={`${prefix}-seg-${index}`} data-call-tag={segment.tag}>
-          {renderTextParts(segment.text, `${prefix}-seg-${index}`)}
+          {renderTextParts(
+            segment.text,
+            `${prefix}-seg-${index}`,
+            emphasisColor,
+          )}
         </span>
       ))}
     </>
@@ -71,28 +92,42 @@ function CheerText({ text, tag }: { text?: string; tag?: CallTag }) {
 function OriginalText({ text, tag }: { text: string; tag?: CallTag }) {
   if (!text && !tag) return null;
 
+  const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
+
   return (
-    <p data-role="original">
+    <p data-role="original" className="text-sm">
       {tag ? <CallIcon name={tag} /> : null}
-      {text}
+      {renderTextParts(text, "original", emphasisColor)}
     </p>
   );
 }
 
-function PronunciationText({ text }: { text: LyricText }) {
+function PronunciationText({ text, tag }: { text: LyricText; tag?: CallTag }) {
   if (!text) return null;
+
+  const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
 
   return (
-    <p data-role="pronunciation">
-      <LyricTextRenderer text={text} prefix="pron" />
+    <p data-role="pronunciation" className="text-lg">
+      <LyricTextRenderer
+        text={text}
+        prefix="pron"
+        emphasisColor={emphasisColor}
+      />
     </p>
   );
 }
 
-function TranslationText({ text }: { text: string }) {
+function TranslationText({ text, tag }: { text: string; tag?: CallTag }) {
   if (!text) return null;
 
-  return <p data-role="translation">{text}</p>;
+  const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
+
+  return (
+    <p data-role="translation" className="text-sm">
+      {renderTextParts(text, "translation", emphasisColor)}
+    </p>
+  );
 }
 
 export function LyricLine({
@@ -118,8 +153,8 @@ export function LyricLine({
     <>
       <CheerText text={cheerText} tag={lineTag} />
       <OriginalText text={line.original} tag={lineTag} />
-      <PronunciationText text={line.pronunciation} />
-      <TranslationText text={line.translation} />
+      <PronunciationText text={line.pronunciation} tag={lineTag} />
+      <TranslationText text={line.translation} tag={lineTag} />
     </>
   );
 
