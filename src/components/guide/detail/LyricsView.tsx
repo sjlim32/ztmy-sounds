@@ -57,13 +57,13 @@ export function LyricsView({
   if (!song) return null;
 
   return (
-    <div className="relative mt-2 min-h-0 flex-1">
+    <div className="tablet:order-0 relative order-3 min-h-0 flex-1">
       <ol
         ref={listRef}
         data-role="lyric-list"
         className={clsx(
           // bottom-12 = 스크롤 화살표 영역 확보
-          "absolute inset-x-0 top-0 bottom-12 scrollbar-none overflow-y-auto transition-opacity duration-500 [&::-webkit-scrollbar]:hidden",
+          "tablet:bottom-12 absolute inset-x-0 top-0 bottom-0 scrollbar-none overflow-y-auto py-10 transition-opacity duration-500 [&::-webkit-scrollbar]:hidden",
           visible ? "opacity-100" : "opacity-0",
         )}
       >

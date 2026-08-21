@@ -12,19 +12,21 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
     <>
       <h2
         className={clsx(
-          "overflow-hidden p-2 text-center text-2xl font-bold text-gray-200 transition-all duration-300",
+          "tablet:block hidden overflow-hidden p-2 text-center text-2xl font-bold text-gray-200 transition-all duration-300",
           selectedSongId ? "max-h-0 opacity-0" : "max-h-16 opacity-100",
         )}
       >
-        떼창 가이드
+        응원 가이드
       </h2>
 
       <ul
         data-role="song-panel-list"
         className={clsx(
           "flex flex-col divide-y divide-white/15 overflow-y-auto transition-[max-height,background-color] duration-1000",
-          selectedSongId ? "bg-transparent" : "bg-black/60",
-          visible ? "max-h-[66vh]" : "max-h-0",
+          selectedSongId ? "bg-transparent" : "tablet:bg-black/60",
+          visible ? "tablet:max-h-[66vh] max-h-dvh" : "max-h-0",
+          visible && !selectedSongId && "tablet:flex-none flex-1",
+          "tablet:order-0 order-1",
         )}
       >
         {songList.map((item) => {
@@ -36,13 +38,17 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
               key={item.id}
               className={clsx(
                 "overflow-hidden transition-all duration-600",
-                isCollapsed ? "max-h-0 opacity-0" : "max-h-16 opacity-100",
+                // divide-y가 만드는 border는 max-h-0으로도 안 없어져서(테두리는
+                // 콘텐츠 높이와 무관하게 그려짐) 접혔을 때 직접 0으로 제거.
+                isCollapsed
+                  ? "max-h-0 border-t-0! border-b-0! opacity-0"
+                  : "max-h-16 opacity-100",
               )}
             >
               <Link
                 href={isSelected ? "/guide" : `/guide/${item.id}`}
                 className={clsx(
-                  "group hover:text-ztmy-pink block px-4 py-3 transition-colors",
+                  "group hover:text-ztmy-pink tablet:py-3 block px-4 py-2 transition-colors",
                   isSelected && "hover:bg-ztmy-purple/10",
                 )}
               >
@@ -63,7 +69,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
       {!selectedSongId && (
         <Link
           href={"/"}
-          className="mx-auto my-2 flex justify-center duration-1000"
+          className="tablet:flex mx-auto my-2 hidden justify-center duration-1000"
         >
           <div className="hover:bg-ztmy-purple px-2 py-1 text-xs text-gray-300 transition-colors hover:text-gray-50 hover:underline">
             메인으로

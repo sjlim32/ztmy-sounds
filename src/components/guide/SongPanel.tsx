@@ -62,11 +62,16 @@ export function SongPanel() {
     <div
       data-role="song-panel"
       className={clsx(
-        // 1440px 미만: 고정폭(max-w-sm). 1440px 이상: 뷰포트의 30%(7:3 비율)로 확장
-        // — max-w-sm이 30vw보다 좁아서 그대로 두면 잘리므로 max-w-none으로 해제.
-        "fixed top-1/2 right-6 z-20 flex w-full max-w-sm -translate-y-1/2 flex-col transition-[height,opacity] duration-300 min-[1440px]:max-w-none min-[1440px]:w-[30vw]",
-        song ? "h-[88vh]" : "h-[40vh]",
-        isPanelVisible ? "opacity-100" : "opacity-0",
+        // 모바일: 자체 박스를 없애 SongList/LyricsView가 guide/layout.tsx의
+        // flex-col에 직접 노출되도록 함(각자 order-1/order-3로 위치 결정).
+        // 배경/투명도/애니메이션은 이제 SongList의 ul, LyricsView가 각자
+        // visible prop으로 자체 처리.
+        // tablet 이상: 기존 그대로 — 1440px 미만은 고정폭(max-w-sm), 1440px
+        // 이상은 뷰포트의 30%(7:3 비율)로 확장 — max-w-sm이 30vw보다 좁아서
+        // 그대로 두면 잘리므로 max-w-none으로 해제.
+        "contents tablet:fixed tablet:inset-x-auto tablet:top-1/2 tablet:right-6 tablet:z-20 tablet:flex tablet:w-full tablet:max-w-sm tablet:flex-col tablet:-translate-y-1/2 tablet:transition-[height,opacity] tablet:duration-300 min-[1440px]:w-[30vw] min-[1440px]:max-w-none",
+        song ? "tablet:h-[88vh]" : "tablet:h-[40vh]",
+        isPanelVisible ? "tablet:opacity-100" : "tablet:opacity-0",
       )}
     >
       <SongList selectedSongId={song?.id ?? null} visible={isPanelVisible} />
