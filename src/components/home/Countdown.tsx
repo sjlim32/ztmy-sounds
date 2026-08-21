@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getRemaining, type Remaining } from "@/lib/guide/countdown";
+import type { Remaining } from "@/lib/guide/countdown";
+import {
+  DONE_AFTER_HOURS,
+  useEventCountdown,
+} from "@/lib/guide/event-countdown";
 import type { VisitEvent } from "@/data/event";
 
 // "텅 빈" 상태의 기준이 되는 일수 — 이만큼 남아있으면 물이 거의 없고,
@@ -17,25 +20,34 @@ const WAVE_PATH =
   "Q 81.25 -3 87.5 0 Q 93.75 3 100 0 Q 106.25 -3 112.5 0 Q 118.75 3 125 0 " +
   "L 125 200 L -25 200 Z";
 
-function WaterBalloon({ remaining }: { remaining: Remaining }) {
-  // 24시간 이내(=날짜상 당일)로 남으면 무조건 가득 채우고 TODAY로 표시.
-  const isToday = remaining.days === 0;
+function WaterBalloon({
+  remaining,
+  hoursSincePast,
+}: {
+  remaining: Remaining;
+  hoursSincePast: number;
+}) {
+  // 공연 시작 2시간 후까지는 "당일"(TODAY) 취급, 그 이후엔 "종료".
+  const isDone = remaining.isPast && hoursSincePast >= DONE_AFTER_HOURS;
+  const isToday = !isDone && (remaining.days === 0 || remaining.isPast);
 
   const totalSeconds =
     remaining.days * 86400 +
     remaining.hours * 3600 +
     remaining.minutes * 60 +
     remaining.seconds;
-  const fillFraction = isToday
-    ? 1
-    : 1 - Math.min(totalSeconds / (EMPTY_AT_DAYS * 86400), 1);
+  const fillFraction = isDone
+    ? 0
+    : isToday
+      ? 1
+      : 1 - Math.min(totalSeconds / (EMPTY_AT_DAYS * 86400), 1);
 
   // 원(cx=50, cy=50, r=42)은 y=8~92 사이에 걸쳐 있음.
   const waterY = 92 - fillFraction * 84;
 
   return (
-    <div className="relative h-24 w-24 shrink-0">
-      <svg viewBox="0 0 100 100" className="h-full w-full">
+    <div className="relative h-24 w-24 shrink-0 overflow-visible">
+      <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible">
         <defs>
           <clipPath id="balloon-clip">
             <circle cx="50" cy="50" r="42" />
@@ -54,6 +66,20 @@ function WaterBalloon({ remaining }: { remaining: Remaining }) {
             <stop offset="0%" stopColor="var(--ztmy-pink)" />
             <stop offset="100%" stopColor="var(--ztmy-purple)" />
           </linearGradient>
+          {isToday && (
+            <linearGradient
+              id="fire-gradient"
+              gradientUnits="userSpaceOnUse"
+              x1="50"
+              y1="8"
+              x2="50"
+              y2="92"
+            >
+              <stop offset="0%" stopColor="#fde047" />
+              <stop offset="45%" stopColor="#f97316" />
+              <stop offset="100%" stopColor="#ef4444" />
+            </linearGradient>
+          )}
         </defs>
 
         <circle
@@ -73,7 +99,7 @@ function WaterBalloon({ remaining }: { remaining: Remaining }) {
               d={WAVE_PATH}
               fill="url(#water-gradient)"
               fillOpacity={0.5}
-              className="[animation:wave-flow_5s_linear_infinite_reverse]"
+              className="animate-[wave-flow_5s_linear_infinite_reverse]"
             />
           </g>
           {/* 앞쪽 웨이브 */}
@@ -81,7 +107,7 @@ function WaterBalloon({ remaining }: { remaining: Remaining }) {
             <path
               d={WAVE_PATH}
               fill="url(#water-gradient)"
-              className="[animation:wave-flow_3s_linear_infinite]"
+              className="animate-[wave-flow_3s_linear_infinite]"
             />
           </g>
         </g>
@@ -91,14 +117,23 @@ function WaterBalloon({ remaining }: { remaining: Remaining }) {
           cy="50"
           r="42"
           fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          className="text-white/20"
+          stroke={isToday ? "url(#fire-gradient)" : "currentColor"}
+          strokeWidth={isToday ? "3" : "2"}
+          strokeDasharray={isDone ? "4 3" : undefined}
+          className={
+            isToday
+              ? "animate-[fire-glow_1.4s_ease-in-out_infinite]"
+              : "text-white/20"
+          }
         />
       </svg>
 
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        {isToday ? (
+        {isDone ? (
+          <span className="font-mono text-2xl font-bold text-white/60 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            -
+          </span>
+        ) : isToday ? (
           <span className="font-mono text-lg font-bold tracking-widest text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             TODAY
           </span>
@@ -118,57 +153,56 @@ function WaterBalloon({ remaining }: { remaining: Remaining }) {
 }
 
 export function Countdown({ event }: { event: VisitEvent }) {
-  const [remaining, setRemaining] = useState<Remaining | null>(null);
-  // event.date("YYYY.MM.DD") + event.time("HH:mm")을 조합해 목표 시각을 계산
-  const targetIso = `${event.date.replace(/\./g, "-")}T${event.time}:00+09:00`;
-
-  useEffect(() => {
-    const tick = () => setRemaining(getRemaining(targetIso));
-    tick();
-    const intervalId = setInterval(tick, 1000);
-    return () => clearInterval(intervalId);
-  }, [targetIso]);
+  const { remaining, hoursSincePast } = useEventCountdown(event);
 
   if (!remaining) return null;
-
-  if (remaining.isPast) {
-    return (
-      <div
-        data-role="countdown"
-        className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-center text-white/80 backdrop-blur-md"
-      >
-        공연이 시작되었습니다
-      </div>
-    );
-  }
 
   return (
     <div
       data-role="countdown"
       className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/20 p-4 backdrop-blur-sm"
     >
-      <WaterBalloon remaining={remaining} />
+      <WaterBalloon remaining={remaining} hoursSincePast={hoursSincePast} />
 
       <div className="space-y-1">
-        <p className="text-xs tracking-widest text-white/40 uppercase">
-          공연까지
-        </p>
-        <p className="flex items-baseline gap-3 font-mono text-xl font-semibold text-white tabular-nums">
-          <span className="inline-flex items-baseline gap-1">
-            <span>
-              {String(remaining.days * 24 + remaining.hours).padStart(2, "0")}
-            </span>
-            <span className="text-[10px] font-normal text-white/50">시</span>
-          </span>
-          <span className="inline-flex items-baseline gap-1">
-            <span>{String(remaining.minutes).padStart(2, "0")}</span>
-            <span className="text-[10px] font-normal text-white/50">분</span>
-          </span>
-          <span className="inline-flex items-baseline gap-1">
-            <span>{String(remaining.seconds).padStart(2, "0")}</span>
-            <span className="text-[10px] font-normal text-white/50">초</span>
-          </span>
-        </p>
+        {remaining.isPast ? (
+          <p className="text-sm font-medium text-white/80">
+            {hoursSincePast < DONE_AFTER_HOURS
+              ? "공연이 시작되었습니다"
+              : "다음 내한을 기다려주세요 !"}
+          </p>
+        ) : (
+          <>
+            <p className="text-xs tracking-widest text-white/40 uppercase">
+              공연까지
+            </p>
+            <p className="flex items-baseline gap-3 font-mono text-xl font-semibold text-white tabular-nums">
+              <span className="inline-flex items-baseline gap-1">
+                <span>
+                  {String(remaining.days * 24 + remaining.hours).padStart(
+                    2,
+                    "0",
+                  )}
+                </span>
+                <span className="text-[10px] font-normal text-white/50">
+                  시
+                </span>
+              </span>
+              <span className="inline-flex items-baseline gap-1">
+                <span>{String(remaining.minutes).padStart(2, "0")}</span>
+                <span className="text-[10px] font-normal text-white/50">
+                  분
+                </span>
+              </span>
+              <span className="inline-flex items-baseline gap-1">
+                <span>{String(remaining.seconds).padStart(2, "0")}</span>
+                <span className="text-[10px] font-normal text-white/50">
+                  초
+                </span>
+              </span>
+            </p>
+          </>
+        )}
       </div>
     </div>
   );

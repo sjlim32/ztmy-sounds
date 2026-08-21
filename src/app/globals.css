@@ -17,6 +17,16 @@
   }
 }
 
+@keyframes fire-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2px #f97316) drop-shadow(0 0 5px #ef4444);
+  }
+  50% {
+    filter: drop-shadow(0 0 5px #fde047) drop-shadow(0 0 10px #f97316);
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
