@@ -1,16 +1,19 @@
-export interface EventInfo {
-  artist: string;
+export interface VisitEvent {
   tourName: string;
-  /** ISO 8601, e.g. "2026-12-31T18:00:00+09:00" */
-  showDateTime: string;
-  venue: string;
-  dateLabel: string;
+  tourImg: string;
+  tourUrl: string;
+  place: string;
+  placeUrl: string;
+  date: string;
+  time: string;
 }
 
-export const event: EventInfo = {
-  artist: "ずっと真夜中でいいのに。(ZUTOMAYO)",
-  tourName: "TOUR NAME 2026",
-  showDateTime: "2026-12-31T18:00:00+09:00",
-  venue: "VENUE NAME",
-  dateLabel: "12.31",
+export const visitEvent: VisitEvent = {
+  tourName: "사운드 플래닛 페스티널 2026",
+  tourImg: "/next_visit/sound-planet_3.webp",
+  tourUrl: "https://soundplanetfestival.co.kr/",
+  place: "PARADISE CITY",
+  placeUrl: "https://maps.app.goo.gl/TXhUQEc1cXpRPY1b8",
+  date: "2026.09.06",
+  time: "20:50",
 };

@@ -3,13 +3,24 @@
 :root {
   --background: #050223;
   --foreground: #ededed;
+  --ztmy-dark: #411d63;
   --ztmy-purple: #8d3cd4;
   --ztmy-pink: #e147bf;
+}
+
+@keyframes wave-flow {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-25px);
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-ztmy-dark: var(--ztmy-dark);
   --color-ztmy-purple: var(--ztmy-purple);
   --color-ztmy-pink: var(--ztmy-pink);
   --font-sans: var(--font-geist-sans);
