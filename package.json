@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "pages:deploy": "next build && wrangler pages deploy out"
   },
   "dependencies": {
@@ -15,6 +17,7 @@
     "@next/mdx": "^16.3.1",
     "@serwist/build": "^9.5.12",
     "@serwist/turbopack": "^9.5.12",
+    "clsx": "^2.1.1",
     "next": "16.3.2",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -29,6 +32,8 @@
     "esbuild": "^0.28.2",
     "eslint": "^9",
     "eslint-config-next": "16.3.2",
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "wrangler": "^4"
