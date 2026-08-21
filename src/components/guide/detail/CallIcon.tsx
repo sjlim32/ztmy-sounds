@@ -2,8 +2,8 @@ import Image from "next/image";
 import type { CallTag } from "@/lib/guide/types";
 
 const ICON_LABEL: Record<CallTag, string> = {
-  swing: "손 흔들기",
-  clap: "박수",
+  swing: "샤모지 흔들기",
+  clap: "샤모지 박수",
   call: "떼창",
 };
 
