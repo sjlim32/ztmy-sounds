@@ -19,7 +19,7 @@ export function InfoPanel() {
       {isOpen ? (
         <div
           data-role="info-content"
-          className="absolute right-0 top-full z-10 mt-2 w-72 rounded border border-white/30 bg-background p-4"
+          className="bg-background absolute top-full right-0 z-10 mt-2 w-72 rounded border border-white/30 p-4"
         >
           <InfoContent />
         </div>

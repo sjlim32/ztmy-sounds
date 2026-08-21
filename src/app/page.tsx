@@ -1,6 +1,6 @@
 import { event } from "@/data/event";
 import { Header } from "@/components/home/Header";
-import { Countdown } from "@/components/guide/Countdown";
+import { Countdown } from "@/components/home/Countdown";
 
 export default function Home() {
   return (
