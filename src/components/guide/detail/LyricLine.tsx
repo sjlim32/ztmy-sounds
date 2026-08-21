@@ -164,12 +164,12 @@ export function LyricLine({
       data-time={line.time}
       data-call-tag={lineTag}
       className={clsx(
-        "group px-3 transition-colors hover:bg-white/20",
+        "group px-3 transition-colors hover:bg-white/10",
         lineClick && "cursor-pointer",
         line.interlude ? "py-6 text-center" : "py-3 text-left",
         lineTag && "border border-(--tag-border) bg-(--tag-bg)", // 인라인 style로 backgroundColor를 직접 주면 hover:bg-* 클래스를 항상 덮어써버리므로, CSS 변수 + 임의값 클래스로 우회해 hover가 이길 수 있게 함
         isActive && "font-semibold",
-        isActive && !lineTag && "bg-black/60",
+        isActive && !lineTag && "border-ztmy-purple bg-ztmy-dark/80 border",
       )}
       style={lineStyle}
     >

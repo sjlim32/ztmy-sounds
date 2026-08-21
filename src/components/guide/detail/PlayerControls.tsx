@@ -30,7 +30,7 @@ export function PlayerControls() {
       data-role="player-controls"
       className="mt-2 flex items-center gap-4 text-xs"
     >
-      <Link href="/guide">뒤로가기</Link>
+      <Link href="/guide">노래 목록</Link>
       {prevId ? (
         <Link href={`/guide/${prevId}`}>이전곡</Link>
       ) : (

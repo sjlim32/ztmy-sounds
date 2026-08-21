@@ -4,8 +4,7 @@ import { songList } from "@/data/songs";
 
 interface SongListProps {
   selectedSongId: string | null;
-  /** true가 되는 순간 위에서 아래로 펼쳐지듯 나타납니다 (/guide 최초 진입 시). */
-  visible: boolean;
+  visible: boolean; // true가 되는 순간 위에서 아래로 펼쳐지듯 나타납니다 (/guide 최초 진입 시)
 }
 
 export function SongList({ selectedSongId, visible }: SongListProps) {
@@ -43,15 +42,15 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
               <Link
                 href={isSelected ? "/guide" : `/guide/${item.id}`}
                 className={clsx(
-                  "block px-4 py-3",
-                  isSelected
-                    ? "group hover:text-ztmy-purple hover:bg-ztmy-purple/10 text-lg font-bold"
-                    : "transition-colors hover:bg-white/10",
+                  "group hover:text-ztmy-pink block px-4 py-3 transition-colors",
+                  isSelected && "hover:bg-ztmy-purple/10",
                 )}
               >
                 <div className="flex items-end gap-2">
-                  <span>{item.title.jp}</span>
-                  <span className="group-hover:text-ztmy-purple text-xs text-gray-300">
+                  <span className={clsx(isSelected && "font-bold")}>
+                    {item.title.jp}
+                  </span>
+                  <span className="group-hover:text-ztmy-pink/60 mb-0.5 text-xs text-gray-400 transition-colors">
                     {item.title.kr}
                   </span>
                 </div>
@@ -62,8 +61,11 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
       </ul>
 
       {!selectedSongId && (
-        <Link href={"/"} className="my-2 flex justify-center duration-1000">
-          <div className="hover:bg-ztmy-purple/80 w-fit px-4 py-1 text-sm text-gray-300 underline transition-colors hover:text-gray-50">
+        <Link
+          href={"/"}
+          className="mx-auto my-2 flex justify-center duration-1000"
+        >
+          <div className="hover:bg-ztmy-purple px-2 py-1 text-xs text-gray-300 transition-colors hover:text-gray-50 hover:underline">
             메인으로
           </div>
         </Link>

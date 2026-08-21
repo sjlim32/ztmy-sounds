@@ -10,7 +10,15 @@ const song: Song = {
   id: "seigi",
   title: songTitle_04,
   youtubeId: "toiX8Wio6fQ",
-  lyrics: [],
+  lyrics: [
+    {
+      time: "4:59",
+      original: "준비 중",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+  ],
 };
 
 export default song;

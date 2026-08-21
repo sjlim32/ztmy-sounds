@@ -10,7 +10,15 @@ const song: Song = {
   id: "obenkyou-shitoiteyo",
   title: songTitle_03,
   youtubeId: "_WQNWVZqw4Q",
-  lyrics: [],
+  lyrics: [
+    {
+      time: "4:53",
+      original: "준비 중",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+  ],
 };
 
 export default song;

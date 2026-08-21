@@ -10,7 +10,15 @@ const song: Song = {
   id: "aitsura-zenin-dousoukai",
   title: songTitle_02,
   youtubeId: "o2tonXY8lCY",
-  lyrics: [],
+  lyrics: [
+    {
+      time: "4:22",
+      original: "준비 중",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+  ],
 };
 
 export default song;
