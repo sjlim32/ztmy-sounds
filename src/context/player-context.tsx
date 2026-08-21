@@ -43,8 +43,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     apiRef.current = api;
   }, []);
 
+  // 가사 클릭으로 이동 후 (seekTo) 재생을 함께 시작합니다.
   const seekTo = useCallback((seconds: number) => {
     apiRef.current?.seekTo(seconds);
+    apiRef.current?.play();
   }, []);
 
   const play = useCallback(() => {
