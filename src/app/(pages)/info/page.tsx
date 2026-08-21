@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import InfoContent from "@/content/info.mdx";
+import { visitEvent } from "@/data/event";
+
+export const metadata: Metadata = {
+  title: "공연 정보",
+  description: `${visitEvent.tourName} 공연 일정과 장소, 유의사항 안내.`,
+};
 
 export default function InfoPage() {
   return (
