@@ -32,14 +32,14 @@ export default function Home() {
             iPhone SE(375x667) 기준 스크롤 없이 다 보이도록 여백/글자를
             최대한 압축. 버튼은 화면 정중앙(absolute), NextVisit/Countdown은
             화면 하단(mt-auto)에 독립적으로 배치. */}
-        <div className="relative flex flex-1 flex-col tablet:hidden">
+        <div className="tablet:hidden relative flex flex-1 flex-col">
           <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
             <div className="flex w-full flex-col gap-1.5">
               <Link
                 href="/guide"
-                className="group hover:border-ztmy-pink/40 flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-1.5 backdrop-blur-sm transition-colors"
+                className="group hover:border-ztmy-pink/40 flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-3 backdrop-blur-sm transition-colors"
               >
-                <MicIcon className="group-hover:text-ztmy-pink h-3.5 w-3.5 text-white/60 transition-colors" />
+                <MicIcon className="group-hover:text-ztmy-pink h-5 w-5 text-white/60 transition-colors" />
                 <span className="group-hover:text-ztmy-pink text-sm font-medium text-white transition-colors">
                   콜가이드
                 </span>
@@ -47,9 +47,9 @@ export default function Home() {
 
               <Link
                 href="/info"
-                className="group hover:border-ztmy-pink/40 flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-1.5 backdrop-blur-sm transition-colors"
+                className="group hover:border-ztmy-pink/40 flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-3 backdrop-blur-sm transition-colors"
               >
-                <InfoIcon className="group-hover:text-ztmy-pink h-3.5 w-3.5 text-white/60 transition-colors" />
+                <InfoIcon className="group-hover:text-ztmy-pink h-5 w-5 text-white/60 transition-colors" />
                 <span className="group-hover:text-ztmy-pink text-sm font-medium text-white transition-colors">
                   공연 정보
                 </span>
@@ -63,11 +63,12 @@ export default function Home() {
             <Countdown event={visitEvent} />
           </div>
         </div>
+        {/* MOBILE END */}
 
         <section
           id="main-left"
           data-role="visit-info"
-          className="fixed top-1/2 left-10 hidden -translate-y-1/2 flex-col gap-6 tablet:flex"
+          className="tablet:flex fixed top-1/2 left-10 hidden -translate-y-1/2 flex-col gap-6"
         >
           <NextVisit event={visitEvent} />
 
@@ -77,7 +78,7 @@ export default function Home() {
         <nav
           id="main-right"
           data-role="site-nav"
-          className="fixed top-1/2 right-10 hidden -translate-y-1/2 flex-col items-end gap-3 tablet:flex"
+          className="tablet:flex fixed top-1/2 right-10 hidden -translate-y-1/2 flex-col items-end gap-3"
         >
           <Link
             href="/guide"

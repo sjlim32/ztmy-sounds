@@ -81,7 +81,7 @@ function CheerText({ text, tag }: { text?: string; tag?: CallTag }) {
   return (
     <p
       data-role="cheer"
-      className="text-sm"
+      className="tablet:text-sm text-xs"
       style={tag ? { color: TAG_BORDER_COLOR[tag] } : undefined}
     >
       {renderTextParts(text, "cheer")}
@@ -95,7 +95,7 @@ function OriginalText({ text, tag }: { text: string; tag?: CallTag }) {
   const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
 
   return (
-    <p data-role="original" className="text-sm">
+    <p data-role="original" className="tablet:text-sm text-xs">
       {tag ? <CallIcon name={tag} /> : null}
       {renderTextParts(text, "original", emphasisColor)}
     </p>
@@ -108,7 +108,7 @@ function PronunciationText({ text, tag }: { text: LyricText; tag?: CallTag }) {
   const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
 
   return (
-    <p data-role="pronunciation" className="text-lg">
+    <p data-role="pronunciation" className="tablet:text-lg text-base">
       <LyricTextRenderer
         text={text}
         prefix="pron"
