@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import type { Remaining } from "@/lib/guide/countdown";
 import {
   DONE_AFTER_HOURS,
@@ -45,18 +46,28 @@ function WaterBalloon({
   // 원(cx=50, cy=50, r=42)은 y=8~92 사이에 걸쳐 있음.
   const waterY = 92 - fillFraction * 84;
 
+  // Countdown이 모바일/데스크톱 레이아웃용으로 동시에 두 번 렌더링되기 때문에,
+  // clipPath/gradient id가 고정 문자열이면 문서 전체에서 중복돼 버립니다.
+  // 중복 id는 먼저 나온(그리고 반대쪽 브레이크포인트에서 display:none으로
+  // 숨겨질 수 있는) 요소를 참조하게 되어 물결이 안 보이는 원인이 되므로,
+  // 인스턴스마다 고유한 id를 만들어 사용합니다.
+  const uid = useId();
+  const balloonClipId = `balloon-clip-${uid}`;
+  const waterGradientId = `water-gradient-${uid}`;
+  const fireGradientId = `fire-gradient-${uid}`;
+
   return (
     <div className="relative h-16 w-16 shrink-0 overflow-visible tablet:h-24 tablet:w-24">
       <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible">
         <defs>
-          <clipPath id="balloon-clip">
+          <clipPath id={balloonClipId}>
             <circle cx="50" cy="50" r="42" />
           </clipPath>
           {/* 원(y=8~92) 고정 좌표 기준 그라데이션 — userSpaceOnUse가 아니면
               물결 도형 자체의 로컬 bbox 기준으로 계산돼서, 수위가 바뀔 때마다
               보이는 색 구간이 달라져 버립니다. */}
           <linearGradient
-            id="water-gradient"
+            id={waterGradientId}
             gradientUnits="userSpaceOnUse"
             x1="50"
             y1="8"
@@ -68,7 +79,7 @@ function WaterBalloon({
           </linearGradient>
           {isToday && (
             <linearGradient
-              id="fire-gradient"
+              id={fireGradientId}
               gradientUnits="userSpaceOnUse"
               x1="50"
               y1="8"
@@ -92,12 +103,12 @@ function WaterBalloon({
           className="text-white/10"
         />
 
-        <g clipPath="url(#balloon-clip)">
+        <g clipPath={`url(#${balloonClipId})`}>
           {/* 뒤쪽 웨이브: 살짝 투명하고 느리게, 앞쪽과 다른 위상으로 깊이감 */}
           <g style={{ transform: `translateY(${waterY - 1.5}px)` }}>
             <path
               d={WAVE_PATH}
-              fill="url(#water-gradient)"
+              fill={`url(#${waterGradientId})`}
               fillOpacity={0.5}
               className="animate-[wave-flow_5s_linear_infinite_reverse]"
             />
@@ -106,7 +117,7 @@ function WaterBalloon({
           <g style={{ transform: `translateY(${waterY}px)` }}>
             <path
               d={WAVE_PATH}
-              fill="url(#water-gradient)"
+              fill={`url(#${waterGradientId})`}
               className="animate-[wave-flow_3s_linear_infinite]"
             />
           </g>
@@ -117,7 +128,7 @@ function WaterBalloon({
           cy="50"
           r="42"
           fill="none"
-          stroke={isToday ? "url(#fire-gradient)" : "currentColor"}
+          stroke={isToday ? `url(#${fireGradientId})` : "currentColor"}
           strokeWidth={isToday ? "3" : "2"}
           strokeDasharray={isDone ? "4 3" : undefined}
           className={
