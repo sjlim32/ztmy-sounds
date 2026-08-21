@@ -53,7 +53,7 @@ body {
       transparent 15%,
       var(--background) 90%
     ),
-    url("/bg/ztmy_bg.jpg");
+    url("/bg/ztmy-bg.jpg");
   background-position: center, center;
   background-size:
     /* 화면 너비/높이(100vw/100vh) 또는, 화면이 세로/가로로 길어서 높이/너비가 기준이 될 때는 16:9 기준 그 높이/너비에 대응하는 너비(177.78vh) / 높이(56.25vw)  중 큰 값 */
@@ -79,9 +79,7 @@ body {
         transparent 15%,
         var(--background) 90%
       ),
-      url("/bg/ztmy_bg_responsive.webp");
-    background-size:
-      cover,
-      cover;
+      url("/bg/ztmy-bg-responsive.webp");
+    background-size: cover, cover;
   }
 }
