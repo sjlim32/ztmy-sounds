@@ -1,6 +1,5 @@
-export type CallTag = "chant" | "clap";
-
-export type CallIconName = "wave" | "clap" | "mic";
+export const CALL_TAGS = ["swing", "clap", "call"] as const;
+export type CallTag = (typeof CALL_TAGS)[number];
 
 export interface LyricSegment {
   text: string;
@@ -15,12 +14,19 @@ export interface LyricLine {
   original: string;
   pronunciation: LyricText;
   translation: string;
-  background?: LyricText;
+  cheer?: string | LyricSegment;
+  interlude?: boolean;
+}
+
+export interface SongTitle {
+  jp: string;
+  kr: string;
+  en: string;
 }
 
 export interface Song {
   id: string;
-  title: string;
+  title: SongTitle;
   youtubeId: string;
   lyrics: LyricLine[];
 }

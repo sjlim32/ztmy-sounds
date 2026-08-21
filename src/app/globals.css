@@ -3,11 +3,15 @@
 :root {
   --background: #050223;
   --foreground: #ededed;
+  --ztmy-purple: #411d64;
+  --ztmy-pink: #e147bf;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-ztmy-purple: var(--ztmy-purple);
+  --color-ztmy-pink: var(--ztmy-pink);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -15,11 +19,14 @@
 body {
   background-color: var(--background);
   background-image:
-    radial-gradient(ellipse at center, transparent 0%, transparent 15%, var(--background) 90%), url("/ztmy_bg.jpg");
+    radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      transparent 15%,
+      var(--background) 90%
+    ),
+    url("/ztmy_bg.jpg");
   background-position: center, center;
-  /* 16:9 원본 비율(1920x1080)을 유지한 채 cover처럼 화면을 꽉 채우되,
-     두 레이어가 항상 같은 크기 공식을 쓰도록 해서 그라데이션이
-     이미지 테두리와 어긋나지 않게 함. */
   background-size:
     /* 화면 너비/높이(100vw/100vh) 또는, 화면이 세로/가로로 길어서 높이/너비가 기준이 될 때는 16:9 기준 그 높이/너비에 대응하는 너비(177.78vh) / 높이(56.25vw)  중 큰 값 */
     /* 그라데이션 레이어 가로/세로 */

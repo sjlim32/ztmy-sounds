@@ -32,7 +32,10 @@ interface YTPlayerOptions {
 }
 
 interface YTNamespace {
-  Player: new (element: HTMLElement | string, options: YTPlayerOptions) => YTPlayer;
+  Player: new (
+    element: HTMLElement | string,
+    options: YTPlayerOptions,
+  ) => YTPlayer;
   PlayerState: { PLAYING: number; PAUSED: number };
 }
 
@@ -159,7 +162,7 @@ export function YouTubePlayer() {
   return (
     <div
       ref={containerRef}
-      className="aspect-video w-full max-w-2xl [&>iframe]:h-full [&>iframe]:w-full"
+      className="aspect-video w-[90%] [&>iframe]:h-full [&>iframe]:w-full"
     />
   );
 }

@@ -6,7 +6,10 @@ import { parseTimestamp } from "@/lib/guide/timestamp";
  * playback time — the last line whose `time` has already passed.
  * Returns -1 before the first line starts.
  */
-export function getActiveLineIndex(lyrics: LyricLine[], currentTime: number): number {
+export function getActiveLineIndex(
+  lyrics: LyricLine[],
+  currentTime: number,
+): number {
   let activeIndex = -1;
 
   for (let i = 0; i < lyrics.length; i++) {

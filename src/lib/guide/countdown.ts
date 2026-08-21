@@ -6,7 +6,10 @@ export interface Remaining {
   isPast: boolean;
 }
 
-export function getRemaining(targetIso: string, now: number = Date.now()): Remaining {
+export function getRemaining(
+  targetIso: string,
+  now: number = Date.now(),
+): Remaining {
   const diff = new Date(targetIso).getTime() - now;
 
   if (diff <= 0) {

@@ -1,16 +1,14 @@
-import type { CallIconName } from "@/lib/guide/types";
+import { CALL_TAGS, type CallTag } from "@/lib/guide/types";
 
 export type TextPart =
-  | { type: "text"; value: string }
-  | { type: "icon"; value: CallIconName };
+  { type: "text"; value: string } | { type: "icon"; value: CallTag };
 
-const ICON_NAMES: CallIconName[] = ["wave", "clap", "mic"];
-const TOKEN_PATTERN = new RegExp(`\\[(${ICON_NAMES.join("|")})\\]`, "g");
+const TOKEN_PATTERN = new RegExp(`\\[(${CALL_TAGS.join("|")})\\]`, "g");
 
 /**
- * Splits a lyric string on inline "[wave]" / "[clap]" / "[mic]" tokens so
+ * Splits a lyric string on inline "[swing]" / "[clap]" / "[call]" tokens so
  * they can be rendered as icons in place, e.g.
- * "[wave] hey hey" -> [{type:"icon",value:"wave"}, {type:"text",value:" hey hey"}]
+ * "[swing] hey hey" -> [{type:"icon",value:"swing"}, {type:"text",value:" hey hey"}]
  */
 export function parseIconTokens(text: string): TextPart[] {
   const parts: TextPart[] = [];
@@ -23,7 +21,7 @@ export function parseIconTokens(text: string): TextPart[] {
       parts.push({ type: "text", value: text.slice(lastIndex, index) });
     }
 
-    parts.push({ type: "icon", value: match[1] as CallIconName });
+    parts.push({ type: "icon", value: match[1] as CallTag });
     lastIndex = index + match[0].length;
   }
 
@@ -34,6 +32,6 @@ export function parseIconTokens(text: string): TextPart[] {
   return parts;
 }
 
-export function hasIconToken(text: string, name: CallIconName): boolean {
+export function hasIconToken(text: string, name: CallTag): boolean {
   return text.includes(`[${name}]`);
 }

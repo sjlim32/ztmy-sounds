@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import { getSong, songs } from "@/data/songs";
+import { getSong, songList } from "@/data/songs";
 
 export function generateStaticParams() {
-  return songs.map((song) => ({ songId: song.id }));
+  return songList.map((song) => ({ songId: song.id }));
 }
 
 // 실제 UI는 SongPanel(guide/layout.tsx에 상주)이 라우트 세그먼트를 보고 그립니다.

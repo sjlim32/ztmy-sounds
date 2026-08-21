@@ -1,5 +1,5 @@
 import { PlayerProvider } from "@/context/player-context";
-import { GuidePlayerArea } from "@/components/guide/GuidePlayerArea";
+import { GuidePlayerArea } from "@/components/guide/detail/GuidePlayerArea";
 import { SongPanel } from "@/components/guide/SongPanel";
 
 export default function GuideLayout({ children }: LayoutProps<"/guide">) {

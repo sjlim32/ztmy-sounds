@@ -23,7 +23,8 @@ interface PlayerContextValue {
   setActiveSongId: (songId: string | null) => void;
   setPlaying: (isPlaying: boolean) => void;
   setCurrentTime: (seconds: number) => void;
-  /** Registered by YouTubePlayer once the underlying player is ready. */
+
+  /** 유튜브 플레이어가 준비되면 YouTubePlayer가 이 함수로 API를 등록합니다. */
   registerApi: (api: PlayerApi | null) => void;
   seekTo: (seconds: number) => void;
   play: () => void;
@@ -67,17 +68,22 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       play,
       pause,
     }),
-    [activeSongId, isPlaying, currentTime, registerApi, seekTo, play, pause]
+    [activeSongId, isPlaying, currentTime, registerApi, seekTo, play, pause],
   );
 
-  return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;
+  return (
+    <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>
+  );
 }
 
 export function usePlayer(): PlayerContextValue {
   const context = useContext(PlayerContext);
 
   if (!context) {
-    throw new Error("usePlayer must be used within a PlayerProvider");
+    throw new Error(
+      "usePlayer()는 <PlayerProvider> 내부에서만 사용할 수 있습니다. " +
+        "src/app/guide/layout.tsx에서 이 컴포넌트가 <PlayerProvider>로 감싸져 있는지 확인하세요.",
+    );
   }
 
   return context;
