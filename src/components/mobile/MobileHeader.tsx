@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ARTIST } from "@/app/(pages)/page";
+import { ARTIST } from "@/data/artist";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { HomeIcon } from "@/components/icons/HomeIcon";
 import { MOBILE_HEADER_ROUTES } from "@/components/mobile/mobile-header.constants";

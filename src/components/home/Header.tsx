@@ -1,4 +1,4 @@
-import { artist } from "@/app/(pages)/page";
+import { artist } from "@/data/artist";
 
 export function Header({ artist }: { artist: artist }) {
   return (

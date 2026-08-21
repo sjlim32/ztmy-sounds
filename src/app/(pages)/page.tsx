@@ -1,26 +1,11 @@
 import Link from "next/link";
 import { visitEvent } from "@/data/event";
+import { ARTIST } from "@/data/artist";
 import { Header } from "@/components/home/Header";
 import { NextVisit } from "@/components/home/NextVisit";
 import { Countdown } from "@/components/home/Countdown";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
-
-export interface artist {
-  name: {
-    jp: string;
-    kr: string;
-    en: string;
-  };
-}
-
-export const ARTIST: artist = {
-  name: {
-    jp: "ずっと真夜中でいいのに。",
-    kr: "계속 한밤중이면 좋을 텐데",
-    en: "ZUTOMAYO",
-  },
-};
 
 export default function Home() {
   return (
@@ -41,7 +26,7 @@ export default function Home() {
               >
                 <MicIcon className="group-hover:text-ztmy-pink h-5 w-5 text-white/60 transition-colors" />
                 <span className="group-hover:text-ztmy-pink text-sm font-medium text-white transition-colors">
-                  콜가이드
+                  응원 가이드
                 </span>
               </Link>
 
@@ -86,7 +71,7 @@ export default function Home() {
           >
             <MicIcon className="group-hover:text-ztmy-pink h-4 w-4 text-white/60 transition-colors" />
             <span className="group-hover:text-ztmy-pink font-medium text-white transition-colors">
-              콜가이드
+              응원 가이드
             </span>
           </Link>
 

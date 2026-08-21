@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ARTIST } from "@/app/(pages)/page";
+import { ARTIST } from "@/data/artist";
 
 /**
  * 모바일 전용 전역 저작권 푸터. 고정/sticky가 아니라 각 페이지 콘텐츠
