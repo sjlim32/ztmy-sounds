@@ -3,6 +3,7 @@ import createMDX from "@next/mdx";
 import { withSerwist } from "@serwist/turbopack";
 
 const nextConfig: NextConfig = {
+  output: "export",
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
 };
 

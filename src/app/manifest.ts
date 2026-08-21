@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { event } from "@/data/event";
 
+export const dynamic = "force-static";
+
 // TODO: replace with real 192x192 / 512x512 PNG icons in /public before launch.
 export default function manifest(): MetadataRoute.Manifest {
   return {
