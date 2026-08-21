@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "cf-deploy": "next build && wrangler deploy"
+    "pages:deploy": "next build && wrangler pages deploy out"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
