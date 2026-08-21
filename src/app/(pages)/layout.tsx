@@ -4,6 +4,8 @@ import { SerwistProvider } from "@serwist/turbopack/react";
 import { GuideDimOverlay } from "@/components/GuideDimOverlay";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
 import { MobileFooter } from "@/components/mobile/MobileFooter";
+import { ARTIST } from "@/data/artist";
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -17,8 +19,46 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "콜가이드",
-  description: "콘서트 떼창/응원 가이드",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  keywords: [
+    ARTIST.name.jp,
+    ARTIST.name.kr,
+    ARTIST.name.en,
+    "내한",
+    "JPOP",
+    "제이팝",
+    "콜 가이드",
+    "떼창",
+    "응원법",
+    "콘서트 응원",
+    "공연 정보",
+    "샤모지",
+    "아카네",
+    "ACAね",
+    "ACA",
+  ],
+  openGraph: {
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    locale: "ko_KR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
