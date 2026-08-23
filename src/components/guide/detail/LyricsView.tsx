@@ -63,7 +63,8 @@ export function LyricsView({
         data-role="lyric-list"
         className={clsx(
           // bottom-12 = 스크롤 화살표 영역 확보
-          "tablet:bottom-12 absolute inset-x-0 top-0 bottom-0 scrollbar-none overflow-y-auto py-10 transition-opacity duration-500 [&::-webkit-scrollbar]:hidden",
+          "absolute inset-x-0 top-0 bottom-0 scrollbar-none overflow-y-auto py-10 transition-opacity duration-500 [&::-webkit-scrollbar]:hidden",
+          "tablet:bottom-12",
           visible ? "opacity-100" : "opacity-0",
         )}
       >

@@ -20,13 +20,14 @@
   --font-mkpop: var(--font-mkpop-101);
 }
 
-/* 반응형 Break Points 
-  - 모바일(640px)
-  - 태블릿(1080px)
+/* 반응형 Break Points
+  - 태블릿(800px)
+  - PC(1280px)
 */
 @theme {
-  --breakpoint-tablet: 40rem; /* 640px */
-  --breakpoint-pc: 67.5rem; /* 1080px */
+  --breakpoint-tablet: 50rem; /* 800px */
+  --breakpoint-pc: 67.5rem; /* 1280px */
+  --breakpoint-wide: 90rem; /* 1440px */
 }
 
 /* 모바일에서 NavButton 및 NextVisit 레이아웃 정렬용 (660px 이하에선 flex 적용) */

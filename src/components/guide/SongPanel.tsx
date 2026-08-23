@@ -69,7 +69,9 @@ export function SongPanel() {
         // tablet 이상: 기존 그대로 — 1440px 미만은 고정폭(max-w-sm), 1440px
         // 이상은 뷰포트의 30%(7:3 비율)로 확장 — max-w-sm이 30vw보다 좁아서
         // 그대로 두면 잘리므로 max-w-none으로 해제.
-        "contents tablet:fixed tablet:inset-x-auto tablet:top-1/2 tablet:right-6 tablet:z-20 tablet:flex tablet:w-full tablet:max-w-sm tablet:flex-col tablet:-translate-y-1/2 tablet:transition-[height,opacity] tablet:duration-300 min-[1440px]:w-[30vw] min-[1440px]:max-w-none",
+        "pc:w-[30vw] pc:max-w-none contents",
+        "tablet:fixed tablet:inset-x-auto tablet:top-1/2 tablet:right-6 tablet:z-20 tablet:flex tablet:w-full tablet:max-w-sm tablet:flex-col",
+        "tablet:-translate-y-1/2 tablet:transition-[height,opacity] tablet:duration-300",
         song ? "tablet:h-[88vh]" : "tablet:h-[40vh]",
         isPanelVisible ? "tablet:opacity-100" : "tablet:opacity-0",
       )}

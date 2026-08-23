@@ -8,8 +8,8 @@ const ICON_LABEL: Record<CallTag, string> = {
 };
 
 const ICON_SRC: Record<CallTag, string> = {
-  swing: "/song/swing.webp",
-  clap: "/song/clap.webp",
+  swing: "/song/swing-notext.webp",
+  clap: "/song/clap-notext.webp",
   call: "/song/call.svg",
 };
 
@@ -20,8 +20,8 @@ export function CallIcon({ name }: { name: CallTag }) {
       alt={ICON_LABEL[name]}
       title={ICON_LABEL[name]}
       data-call-icon={name}
-      width={20}
-      height={20}
+      width={24}
+      height={24}
       className="mr-1 inline-block align-middle"
     />
   );

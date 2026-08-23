@@ -82,7 +82,7 @@ function CheerText({ text, tag }: { text?: string; tag?: CallTag }) {
     <p
       data-role="cheer"
       className="tablet:text-sm text-xs"
-      style={tag ? { color: TAG_BORDER_COLOR[tag] } : undefined}
+      style={tag ? { color: TAG_BORDER_COLOR[tag] } : { color: "silver" }}
     >
       {renderTextParts(text, "cheer")}
     </p>
@@ -95,7 +95,7 @@ function OriginalText({ text, tag }: { text: string; tag?: CallTag }) {
   const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
 
   return (
-    <p data-role="original" className="tablet:text-sm text-xs">
+    <p data-role="original" className="wide:text-base pc:text-sm text-xs">
       {tag ? <CallIcon name={tag} /> : null}
       {renderTextParts(text, "original", emphasisColor)}
     </p>
@@ -108,7 +108,7 @@ function PronunciationText({ text, tag }: { text: LyricText; tag?: CallTag }) {
   const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
 
   return (
-    <p data-role="pronunciation" className="tablet:text-lg text-base">
+    <p data-role="pronunciation" className="wide:text-xl pc:text-base text-sm">
       <LyricTextRenderer
         text={text}
         prefix="pron"
@@ -124,7 +124,7 @@ function TranslationText({ text, tag }: { text: string; tag?: CallTag }) {
   const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
 
   return (
-    <p data-role="translation" className="text-sm">
+    <p data-role="translation" className="wide:text-base pc:text-sm text-xs">
       {renderTextParts(text, "translation", emphasisColor)}
     </p>
   );
@@ -164,12 +164,12 @@ export function LyricLine({
       data-time={line.time}
       data-call-tag={lineTag}
       className={clsx(
-        "group px-3 transition-colors hover:bg-white/10",
+        "group border border-transparent px-3 transition-colors hover:bg-white/10",
         lineClick && "cursor-pointer",
         line.interlude ? "py-6 text-center" : "py-3 text-left",
-        lineTag && "border border-(--tag-border) bg-(--tag-bg)", // 인라인 style로 backgroundColor를 직접 주면 hover:bg-* 클래스를 항상 덮어써버리므로, CSS 변수 + 임의값 클래스로 우회해 hover가 이길 수 있게 함
+        lineTag && "border-(--tag-border)! bg-(--tag-bg)", // 인라인 style로 backgroundColor를 직접 주면 hover:bg-* 클래스를 항상 덮어써버리므로, CSS 변수 + 임의값 클래스로 우회해 hover가 이길 수 있게 함
         isActive && "font-semibold",
-        isActive && !lineTag && "border-ztmy-purple bg-ztmy-dark/80 border",
+        isActive && !lineTag && "border-ztmy-purple! bg-ztmy-dark/80 border",
       )}
       style={lineStyle}
     >
