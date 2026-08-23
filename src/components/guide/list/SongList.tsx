@@ -12,7 +12,8 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
     <>
       <h2
         className={clsx(
-          "tablet:block hidden overflow-hidden p-2 text-center text-2xl font-bold text-gray-200 transition-all duration-300",
+          "hidden overflow-hidden p-2 text-center text-2xl font-bold text-gray-200 transition-all duration-300",
+          "tablet:block",
           selectedSongId ? "max-h-0 opacity-0" : "max-h-16 opacity-100",
         )}
       >
@@ -22,11 +23,12 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
       <ul
         data-role="song-panel-list"
         className={clsx(
-          "flex flex-col divide-y divide-white/15 overflow-y-auto transition-[max-height,background-color] duration-1000",
+          "order-1 flex max-h-dvh flex-col divide-y divide-white/15 overflow-y-auto transition-[opacity,background-color] duration-1000",
+          "tablet:order-0 tablet:max-h-[66vh]",
           selectedSongId ? "bg-transparent" : "tablet:bg-black/60",
-          visible ? "tablet:max-h-[66vh] max-h-dvh" : "max-h-0",
-          visible && !selectedSongId && "tablet:flex-none flex-1",
-          "tablet:order-0 order-1",
+          !selectedSongId && "flex-1",
+          !selectedSongId && "tablet:flex-none",
+          visible ? "opacity-100" : "opacity-0",
         )}
       >
         {songList.map((item) => {
@@ -48,7 +50,8 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
               <Link
                 href={isSelected ? "/guide" : `/guide/${item.id}`}
                 className={clsx(
-                  "group hover:text-ztmy-pink tablet:py-3 block px-4 py-2 transition-colors",
+                  "group hover:text-ztmy-pink block px-4 py-2 transition-colors",
+                  "tablet:py-3",
                   isSelected && "hover:bg-ztmy-purple/10",
                 )}
               >
@@ -69,7 +72,10 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
       {!selectedSongId && (
         <Link
           href={"/"}
-          className="tablet:flex mx-auto my-2 hidden justify-center duration-1000"
+          className={clsx(
+            "mx-auto my-2 hidden justify-center duration-1000",
+            "tablet:flex",
+          )}
         >
           <div className="hover:bg-ztmy-purple px-2 py-1 text-xs text-gray-300 transition-colors hover:text-gray-50 hover:underline">
             메인으로

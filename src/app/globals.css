@@ -30,8 +30,8 @@
   --breakpoint-wide: 90rem; /* 1440px */
 }
 
-/* 모바일에서 NavButton 및 NextVisit 레이아웃 정렬용 (660px 이하에선 flex 적용) */
-@custom-variant short (@media (max-height: 660px));
+/* 모바일에서 NavButton 및 NextVisit 레이아웃 정렬용 (680px 이하에선 flex 적용) */
+@custom-variant short (@media (max-height: 680px));
 
 body {
   background-color: var(--background);

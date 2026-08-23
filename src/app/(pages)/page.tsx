@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { visitEvent } from "@/data/event";
 import { ARTIST } from "@/data/artist";
 import { Header } from "@/components/home/Header";
@@ -14,9 +15,14 @@ export default function Home() {
 
       <main data-role="hero" className="flex flex-1 flex-col">
         {/* 모바일(640px): 세로 레이아웃 */}
-        <div className="tablet:hidden relative flex flex-1 flex-col">
-          {/* 660px 기준 - 이상 absolute, 이하 flex */}
-          <div className="short:static short:flex-1 absolute inset-0 flex flex-col items-center justify-center px-4">
+        <div className={clsx("relative flex flex-1 flex-col", "tablet:hidden")}>
+          {/* 높이 680px 기준 - 이상 absolute, 이하 flex */}
+          <div
+            className={clsx(
+              "absolute inset-0 flex flex-col items-center justify-center px-4",
+              "short:static short:flex-1 short:justify-end short:pb-6",
+            )}
+          >
             <div className="flex w-full flex-col gap-2">
               <MainNavLink
                 href="/guide"
@@ -46,7 +52,10 @@ export default function Home() {
         <section
           id="main-left"
           data-role="visit-info"
-          className="tablet:flex fixed top-1/2 left-10 hidden -translate-y-1/2 flex-col gap-6"
+          className={clsx(
+            "fixed top-1/2 left-10 hidden -translate-y-1/2 flex-col gap-6",
+            "tablet:flex",
+          )}
         >
           <NextVisit event={visitEvent} />
 
@@ -56,7 +65,10 @@ export default function Home() {
         <nav
           id="main-right"
           data-role="site-nav"
-          className="tablet:flex fixed top-1/2 right-20 hidden -translate-y-1/2 flex-col items-end gap-3"
+          className={clsx(
+            "fixed top-1/2 right-20 hidden -translate-y-1/2 flex-col items-end gap-3",
+            "tablet:flex",
+          )}
         >
           <MainNavLink
             href="/guide"
