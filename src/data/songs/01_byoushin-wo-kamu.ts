@@ -18,6 +18,10 @@ const song: Song = {
       pronunciation: "",
       translation: "",
       interlude: true,
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "0:29.2",
@@ -258,6 +262,13 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+    },
+    {
+      time: "2:46",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
     },
     //================ 3절 ================//
     {
