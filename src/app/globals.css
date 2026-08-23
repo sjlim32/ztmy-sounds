@@ -16,7 +16,21 @@
   --color-ztmy-pink: var(--ztmy-pink);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-rocknroll: var(--font-rocknroll-one);
+  --font-mkpop: var(--font-mkpop-101);
 }
+
+/* 반응형 Break Points 
+  - 모바일(640px)
+  - 태블릿(1080px)
+*/
+@theme {
+  --breakpoint-tablet: 40rem; /* 640px */
+  --breakpoint-pc: 67.5rem; /* 1080px */
+}
+
+/* 모바일에서 NavButton 및 NextVisit 레이아웃 정렬용 (660px 이하에선 flex 적용) */
+@custom-variant short (@media (max-height: 660px));
 
 body {
   background-color: var(--background);
@@ -41,10 +55,8 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* 모바일(tablet 브레이크포인트 미만)에서는 세로형 배경 이미지로 교체.
-   원본은 16:9 가로 이미지 기준으로 정밀 계산된 background-size라 세로
-   이미지엔 안 맞아서, 여기선 단순히 cover로 화면을 채웁니다. */
-@media (width < 33.75rem) {
+/* 모바일(tablet 브레이크포인트 미만)에서는 세로형 배경 이미지로 교체 */
+@media (width < 40rem) {
   body {
     background-image:
       radial-gradient(
@@ -68,7 +80,7 @@ body {
   }
 }
 
-/* Countdown 물풍선 Today 도달 시 테두리 animation*/
+/* Countdown 물풍선 Today 도달 시 테두리 animation */
 @keyframes fire-glow {
   0%,
   100% {
@@ -78,15 +90,3 @@ body {
     filter: drop-shadow(0 0 5px #fde047) drop-shadow(0 0 10px #f97316);
   }
 }
-
-/* 반응형 Break Points 
-  - 모바일(540px)
-  - 태블릿(1080px)
-*/
-@theme {
-  --breakpoint-tablet: 33.75rem; /* 540px */
-  --breakpoint-desktop: 67.5rem; /* 1080px */
-}
-
-/* 모바일에서 NavButton 및 NextVisit 레이아웃 정렬용 (660px 이하에선 flex 적용) */
-@custom-variant short (@media (max-height: 660px));

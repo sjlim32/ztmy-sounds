@@ -13,10 +13,9 @@ export default function Home() {
       <Header artist={ARTIST} />
 
       <main data-role="hero" className="flex flex-1 flex-col">
-        {/* 모바일(540px): 세로 레이아웃 */}
-
+        {/* 모바일(640px): 세로 레이아웃 */}
         <div className="tablet:hidden relative flex flex-1 flex-col">
-          {/* 660px 기준 -  absolute, 이후 flex */}
+          {/* 660px 기준 - 이상 absolute, 이하 flex */}
           <div className="short:static short:flex-1 absolute inset-0 flex flex-col items-center justify-center px-4">
             <div className="flex w-full flex-col gap-2">
               <MainNavLink

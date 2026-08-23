@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, RocknRoll_One } from "next/font/google";
+import localFont from "next/font/local";
 import { SerwistProvider } from "@serwist/turbopack/react";
 import { GuideDimOverlay } from "@/components/GuideDimOverlay";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
@@ -16,6 +17,18 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const rocknrollOne = RocknRoll_One({
+  variable: "--font-rocknroll-one",
+  weight: "400",
+  subsets: ["latin"],
+});
+
+const mkpop = localFont({
+  src: "../../../public/fonts/851MkPOP_101.ttf",
+  variable: "--font-mkpop-101",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -67,7 +80,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${rocknrollOne.variable} ${mkpop.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <GuideDimOverlay />
