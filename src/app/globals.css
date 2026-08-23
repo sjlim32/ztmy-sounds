@@ -8,32 +8,6 @@
   --ztmy-pink: #e147bf;
 }
 
-@keyframes wave-flow {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-25px);
-  }
-}
-
-@keyframes fire-glow {
-  0%,
-  100% {
-    filter: drop-shadow(0 0 2px #f97316) drop-shadow(0 0 5px #ef4444);
-  }
-  50% {
-    filter: drop-shadow(0 0 5px #fde047) drop-shadow(0 0 10px #f97316);
-  }
-}
-
-/* 모바일(기본, unprefixed) / 태블릿(540px+, PC 레이아웃을 그대로 축소) /
-   데스크톱(1080px+, 고정 코너 배치 레이아웃) 3단계 커스텀 브레이크포인트. */
-@theme {
-  --breakpoint-tablet: 33.75rem; /* 540px */
-  --breakpoint-desktop: 67.5rem; /* 1080px */
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -83,3 +57,36 @@ body {
     background-size: cover, cover;
   }
 }
+
+/* Countdown 물풍선 물결 무늬 animation */
+@keyframes wave-flow {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-25px);
+  }
+}
+
+/* Countdown 물풍선 Today 도달 시 테두리 animation*/
+@keyframes fire-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2px #f97316) drop-shadow(0 0 5px #ef4444);
+  }
+  50% {
+    filter: drop-shadow(0 0 5px #fde047) drop-shadow(0 0 10px #f97316);
+  }
+}
+
+/* 반응형 Break Points 
+  - 모바일(540px)
+  - 태블릿(1080px)
+*/
+@theme {
+  --breakpoint-tablet: 33.75rem; /* 540px */
+  --breakpoint-desktop: 67.5rem; /* 1080px */
+}
+
+/* 모바일에서 NavButton 및 NextVisit 레이아웃 정렬용 (660px 이하에선 flex 적용) */
+@custom-variant short (@media (max-height: 660px));
