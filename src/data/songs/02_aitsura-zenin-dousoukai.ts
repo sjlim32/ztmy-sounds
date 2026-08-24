@@ -76,7 +76,7 @@ const song: Song = {
       pronunciation: "모오 **단스단스단스** 다레모 키즈이테나이",
       translation: "이제 **댄스 댄스 댄스** 누구도 알지 못해",
       cheer: {
-        text: "'단스 단스 단스'에 박자에 맞춰",
+        text: "'단스 단스 단스' 박자에 맞춰",
         tag: "swing",
       },
     },
@@ -92,7 +92,7 @@ const song: Song = {
       pronunciation: "모오 **스테이 스테이 스테루** 시타즈미 세이기",
       translation: "이제 **스테이 스테이 버리는** 밑바닥 정의",
       cheer: {
-        text: "'스테이 스테이 스테루'에 박자에 맞춰",
+        text: "'스테이 스테이 스테루' 박자에 맞춰",
         tag: "swing",
       },
     },

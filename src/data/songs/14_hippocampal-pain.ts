@@ -1,7 +1,7 @@
 import type { Song, SongTitle } from "@/lib/guide/types";
 
 const songTitle_14: SongTitle = {
-  jp: "<海馬成長痛",
+  jp: "海馬成長痛",
   kr: "해마성장통",
   en: "Hippocampal Pain",
 };
