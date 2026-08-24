@@ -15,137 +15,25 @@ const TAG_BORDER_COLOR: Record<CallTag, string> = {
   clap: "#6dd6fc",
 };
 
-// 배경색 (테두리의 약 18%)
-const TAG_BACKGROUND_COLOR: Record<CallTag, string> = {
-  call: `${TAG_BORDER_COLOR.call}30`,
-  swing: `${TAG_BORDER_COLOR.swing}30`,
-  clap: `${TAG_BORDER_COLOR.clap}30`,
-};
-
-function renderTextParts(text: string, key: string, emphasisColor?: string) {
-  return parseIconTokens(text).map((part, index) => {
-    if (part.type === "icon") {
-      return <CallIcon key={`${key}-${index}`} name={part.value} />;
-    }
-
-    return (
-      <Fragment key={`${key}-${index}`}>
-        {parseEmphasis(part.value).map((seg, segIndex) =>
-          seg.type === "emphasis" ? (
-            <strong
-              key={`${key}-${index}-${segIndex}`}
-              style={emphasisColor ? { color: emphasisColor } : undefined}
-            >
-              {seg.value}
-            </strong>
-          ) : (
-            <Fragment key={`${key}-${index}-${segIndex}`}>{seg.value}</Fragment>
-          ),
-        )}
-      </Fragment>
-    );
-  });
+// 배경색 (테두리 색에 알파값만 추가) — 활성 줄은 18%, 비활성 줄은 6%
+function getTagBackgroundColor(tag: CallTag, isActive: boolean) {
+  return `${TAG_BORDER_COLOR[tag]}${isActive ? "30" : "10"}`;
 }
 
-function LyricTextRenderer({
-  text,
-  prefix,
-  emphasisColor,
-}: {
-  text: LyricText;
-  prefix: string;
-  emphasisColor?: string;
-}) {
-  if (typeof text === "string") {
-    return <>{renderTextParts(text, prefix, emphasisColor)}</>;
-  }
-
-  return (
-    <>
-      {text.map((segment, index) => (
-        <span key={`${prefix}-seg-${index}`} data-call-tag={segment.tag}>
-          {renderTextParts(
-            segment.text,
-            `${prefix}-seg-${index}`,
-            emphasisColor,
-          )}
-        </span>
-      ))}
-    </>
-  );
-}
-
-function CheerText({ text, tag }: { text?: string; tag?: CallTag }) {
-  if (!text) return null;
-
-  return (
-    <p
-      data-role="cheer"
-      className="tablet:text-sm text-xs"
-      style={tag ? { color: TAG_BORDER_COLOR[tag] } : { color: "silver" }}
-    >
-      {renderTextParts(text, "cheer")}
-    </p>
-  );
-}
-
-function OriginalText({ text, tag }: { text: string; tag?: CallTag }) {
-  if (!text && !tag) return null;
-
-  const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
-
-  return (
-    <p data-role="original" className="wide:text-base pc:text-sm text-xs">
-      {tag ? <CallIcon name={tag} /> : null}
-      {renderTextParts(text, "original", emphasisColor)}
-    </p>
-  );
-}
-
-function PronunciationText({ text, tag }: { text: LyricText; tag?: CallTag }) {
-  if (!text) return null;
-
-  const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
-
-  return (
-    <p data-role="pronunciation" className="wide:text-xl pc:text-base text-sm">
-      <LyricTextRenderer
-        text={text}
-        prefix="pron"
-        emphasisColor={emphasisColor}
-      />
-    </p>
-  );
-}
-
-function TranslationText({ text, tag }: { text: string; tag?: CallTag }) {
-  if (!text) return null;
-
-  const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
-
-  return (
-    <p data-role="translation" className="wide:text-base pc:text-sm text-xs">
-      {renderTextParts(text, "translation", emphasisColor)}
-    </p>
-  );
-}
-
-export function LyricLine({
-  line,
-  isActive,
-  lineClick,
-}: {
+interface lyricLineProps {
   line: LyricLineData;
   isActive: boolean;
   lineClick?: () => void; // 줄을 클릭했을 때 영상을 `line.time` 지점으로 이동
-}) {
+}
+
+export function LyricLine({ line, isActive, lineClick }: lyricLineProps) {
   const cheerText =
     typeof line.cheer === "string" ? line.cheer : line.cheer?.text;
   const lineTag = typeof line.cheer === "string" ? undefined : line.cheer?.tag;
   const lineStyle = lineTag
     ? ({
         "--tag-border": isActive ? TAG_BORDER_COLOR[lineTag] : "transparent",
-        "--tag-bg": TAG_BACKGROUND_COLOR[lineTag],
+        "--tag-bg": getTagBackgroundColor(lineTag, isActive),
       } as React.CSSProperties)
     : undefined;
 
@@ -189,4 +77,117 @@ export function LyricLine({
       )}
     </li>
   );
+}
+
+/****** 응원법 ******/
+function CheerText({ text, tag }: { text?: string; tag?: CallTag }) {
+  if (!text) return null;
+
+  return (
+    <p
+      data-role="cheer"
+      className="tablet:text-sm text-xs"
+      style={tag ? { color: TAG_BORDER_COLOR[tag] } : { color: "silver" }}
+    >
+      {renderTextParts(text, "cheer")}
+    </p>
+  );
+}
+
+/****** 일어 가사 ******/
+function OriginalText({ text, tag }: { text: string; tag?: CallTag }) {
+  if (!text && !tag) return null;
+
+  const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
+
+  return (
+    <p data-role="original" className="wide:text-base pc:text-sm text-xs">
+      {tag ? <CallIcon name={tag} /> : null}
+      {renderTextParts(text, "original", emphasisColor)}
+    </p>
+  );
+}
+
+/****** 발음 가사 ******/
+function PronunciationText({ text, tag }: { text: LyricText; tag?: CallTag }) {
+  if (!text) return null;
+
+  const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
+
+  return (
+    <p data-role="pronunciation" className="wide:text-xl pc:text-base text-sm">
+      <LyricTextRenderer
+        text={text}
+        prefix="pron"
+        emphasisColor={emphasisColor}
+      />
+    </p>
+  );
+}
+
+/****** 한국어 가사 ******/
+function TranslationText({ text, tag }: { text: string; tag?: CallTag }) {
+  if (!text) return null;
+
+  const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
+
+  return (
+    <p data-role="translation" className="wide:text-base pc:text-sm text-xs">
+      {renderTextParts(text, "translation", emphasisColor)}
+    </p>
+  );
+}
+
+// ==================== 텍스트 렌더링 헬퍼 ==================== //
+function LyricTextRenderer({
+  text,
+  prefix,
+  emphasisColor,
+}: {
+  text: LyricText;
+  prefix: string;
+  emphasisColor?: string;
+}) {
+  if (typeof text === "string") {
+    return <>{renderTextParts(text, prefix, emphasisColor)}</>;
+  }
+
+  return (
+    <>
+      {text.map((segment, index) => (
+        <span key={`${prefix}-seg-${index}`} data-call-tag={segment.tag}>
+          {renderTextParts(
+            segment.text,
+            `${prefix}-seg-${index}`,
+            emphasisColor,
+          )}
+        </span>
+      ))}
+    </>
+  );
+}
+
+function renderTextParts(text: string, key: string, emphasisColor?: string) {
+  return parseIconTokens(text).map((part, index) => {
+    if (part.type === "icon") {
+      return <CallIcon key={`${key}-${index}`} name={part.value} />;
+    }
+
+    return (
+      <Fragment key={`${key}-${index}`}>
+        {parseEmphasis(part.value).map((seg, segIndex) =>
+          seg.type === "emphasis" ? (
+            <strong
+              key={`${key}-${index}-${segIndex}`}
+              style={emphasisColor ? { color: emphasisColor } : undefined}
+            >
+              {seg.value}
+            </strong>
+          ) : (
+            <Fragment key={`${key}-${index}-${segIndex}`}>{seg.value}</Fragment>
+          ),
+        )}
+      </Fragment>
+    );
+  });
 }

@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 import { SerwistProvider } from "@serwist/turbopack/react";
 import { GuideDimOverlay } from "@/components/GuideDimOverlay";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
-import { MobileFooter } from "@/components/mobile/MobileFooter";
+import { Footer } from "@/components/home/Footer";
 import { ARTIST } from "@/data/artist";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 import "../globals.css";
@@ -88,7 +88,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <div className="relative z-10 flex min-h-full flex-1 flex-col">
             <MobileHeader />
             <div className="flex flex-1 flex-col">{children}</div>
-            <MobileFooter />
+            <Footer />
           </div>
         </SerwistProvider>
       </body>
