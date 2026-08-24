@@ -24,7 +24,13 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
         data-role="song-panel-list"
         className={clsx(
           "order-1 flex max-h-dvh flex-col divide-y divide-white/15 overflow-y-auto transition-[opacity,background-color] duration-1000",
-          "tablet:order-0 tablet:max-h-[66vh]",
+          // 곡 하나 높이(49px) * 8 — PC에서는 뷰포트 높이와 무관하게 항상
+          // 최대 8곡까지만 보이고 나머지는 스크롤.
+          "tablet:order-0 tablet:max-h-102",
+          // 스크롤바는 기본적으로 투명하게 숨겨뒀다가, 리스트에 마우스를
+          // 올렸을 때만 반투명하게 드러남(파이어폭스/웹킷 둘 다 대응).
+          "scrollbar-thin [scrollbar-color:transparent_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
+          "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
           selectedSongId ? "bg-transparent" : "tablet:bg-black/60",
           !selectedSongId && "flex-1",
           !selectedSongId && "tablet:flex-none",
@@ -39,7 +45,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
             <li
               key={item.id}
               className={clsx(
-                "overflow-hidden transition-all duration-600",
+                "shrink-0 overflow-hidden transition-all duration-600",
                 // divide-y가 만드는 border는 max-h-0으로도 안 없어져서(테두리는
                 // 콘텐츠 높이와 무관하게 그려짐) 접혔을 때 직접 0으로 제거.
                 isCollapsed
