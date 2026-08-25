@@ -12,6 +12,21 @@ const song: Song = {
   youtubeId: "DpiWOGjL3gc",
   lyrics: [
     {
+      time: "0:00",
+      original: "馴れ合いだ ~",
+      pronunciation: "나레아이다 ~",
+      translation: "",
+      interlude: true,
+    },
+    // 2초 추가
+    {
+      time: "0:04",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+    {
       time: "0:16",
       original: "",
       pronunciation: "",

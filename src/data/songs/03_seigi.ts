@@ -417,6 +417,7 @@ const song: Song = {
       original: "正義",
       pronunciation: "세이기",
       translation: "정의",
+      interlude: true,
     },
     {
       time: "3:52.2",

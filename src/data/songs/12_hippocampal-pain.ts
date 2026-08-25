@@ -12,11 +12,13 @@ const song: Song = {
   youtubeId: "1mSAnqZSNYQ",
   lyrics: [
     {
-      time: "0:02",
-      original: "",
+      time: "0:0",
+      original: "♫",
       pronunciation: "",
-      translation: "해마성장통",
+      translation: "",
+      interlude: true,
     },
+    // 42초 추가
     {
       time: "0:09",
       original: "",

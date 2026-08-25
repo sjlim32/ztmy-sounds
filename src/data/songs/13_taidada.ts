@@ -12,6 +12,13 @@ const song: Song = {
   youtubeId: "rdKOnKhK8GU",
   lyrics: [
     {
+      time: "0:0",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+    {
       time: "0:15",
       original: "",
       pronunciation: "",

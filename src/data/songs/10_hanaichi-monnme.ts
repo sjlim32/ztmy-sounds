@@ -11,6 +11,14 @@ const song: Song = {
   title: songTitle_11,
   youtubeId: "wEl8hIENFjE",
   lyrics: [
+    // 2초 추가
+    {
+      time: "0:0",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
     {
       time: "0:19",
       original: "",

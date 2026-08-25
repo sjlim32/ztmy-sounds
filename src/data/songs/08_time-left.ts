@@ -12,10 +12,18 @@ const song: Song = {
   youtubeId: "GNFjhvFnnDY",
   lyrics: [
     {
-      time: "0:01",
+      time: "0:00",
       original: "嫌いや",
       pronunciation: "이야",
       translation: "싫어",
+      interlude: true,
+    },
+    {
+      time: "0:01.1",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
     },
     {
       time: "0:14",
