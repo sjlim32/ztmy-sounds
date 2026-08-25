@@ -34,7 +34,7 @@ export const songList: Song[] = [
   hanaichiMonnme,
   cream,
   kiraKiller,
-  hippocampalPain
+  hippocampalPain,
 ];
 
 export function getSong(id: string): Song | null {

@@ -12,7 +12,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
     <>
       <h2
         className={clsx(
-          "hidden overflow-hidden p-2 text-center text-2xl font-bold text-gray-200 transition-all duration-300",
+          "hidden shrink-0 overflow-hidden p-2 text-center text-2xl font-bold text-gray-200 transition-all duration-300",
           "tablet:block",
           selectedSongId ? "max-h-0 opacity-0" : "max-h-16 opacity-100",
         )}
@@ -33,7 +33,11 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
           "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
           selectedSongId ? "bg-transparent" : "tablet:bg-black/60",
           !selectedSongId && "flex-1",
-          !selectedSongId && "tablet:flex-none",
+          // flex-none(flex:0 0 auto)이면 shrink도 0이 돼서, 화면이 짧아
+          // h2+목록이 패널 높이(40vh)를 넘칠 때 아무도 줄어들지 않고 부모
+          // 박스 밖으로(=Footer 위로) 넘쳐버립니다. shrink만 1로 켜서
+          // 평소엔 콘텐츠 높이만큼(안 늘어남), 공간이 부족할 때만 줄어들게.
+          !selectedSongId && "tablet:flex-[0_1_auto]",
           visible ? "opacity-100" : "opacity-0",
         )}
       >

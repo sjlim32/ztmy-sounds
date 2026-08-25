@@ -162,7 +162,7 @@ export function YouTubePlayer() {
   return (
     <div
       ref={containerRef}
-      className="aspect-video w-[90%] [&>iframe]:h-full [&>iframe]:w-full"
+      className="tablet:max-h-[calc(100dvh-4rem)] aspect-video max-w-[90%] [&>iframe]:h-full [&>iframe]:w-full"
     />
   );
 }
