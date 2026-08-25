@@ -1,18 +1,18 @@
 import type { Song } from "@/lib/guide/types";
 import byoushinWoKamu from "./01_byoushin-wo-kamu";
-import aitsuraZeninDousoukai from "./02_aitsura-zenin-dousoukai";
-import obenkyouShitoiteyo from "./03_obenkyou-shitoiteyo";
-import seigi from "./04_seigi";
-import taidada from "./05_taidata";
-import timeLeft from "./06_time-left";
-import milabo from "./07_milabo";
-import nouriuenoCraker from "./08_nouriueno-cracker";
-import nareaiserve from "./09_nareai-serve";
-import mirrorTune from "./10_mirror-tune";
-import hanaichiMonnme from "./11_hanaichi-monnme";
-import cream from "./12_cream";
-import kiraKiller from "./13_kira-killer";
-import hippocampalPain from "./14_hippocampal-pain";
+import nouriuenoCraker from "./02_nouriueno-cracker";
+import seigi from "./03_seigi";
+import obenkyouShitoiteyo from "./04_obenkyou-shitoiteyo";
+import milabo from "./05_milabo";
+import aitsuraZeninDousoukai from "./06_aitsura-zenin-dousoukai";
+import mirrorTune from "./07_mirror-tune";
+import timeLeft from "./08_time-left";
+import kiraKiller from "./09_kira-killer";
+import hanaichiMonnme from "./10_hanaichi-monnme";
+import nareaiserve from "./11_nareai-serve";
+import hippocampalPain from "./12_hippocampal-pain";
+import taidada from "./13_taidata";
+import cream from "./14_cream";
 
 /**
  * Each song's data lives in its own file under `src/data/songs/` (one file
@@ -22,19 +22,19 @@ import hippocampalPain from "./14_hippocampal-pain";
  */
 export const songList: Song[] = [
   byoushinWoKamu,
-  aitsuraZeninDousoukai,
-  obenkyouShitoiteyo,
-  seigi,
-  taidada,
-  timeLeft,
-  milabo,
   nouriuenoCraker,
-  nareaiserve,
+  seigi,
+  obenkyouShitoiteyo,
+  milabo,
+  aitsuraZeninDousoukai,
   mirrorTune,
-  hanaichiMonnme,
-  cream,
+  timeLeft,
   kiraKiller,
+  hanaichiMonnme,
+  nareaiserve,
   hippocampalPain,
+  taidada,
+  cream,
 ];
 
 export function getSong(id: string): Song | null {

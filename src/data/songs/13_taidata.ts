@@ -39,13 +39,7 @@ const song: Song = {
       time: "0:22",
       original: "",
       pronunciation: "",
-      translation: "부적 같은",
-    },
-    {
-      time: "0:23",
-      original: "",
-      pronunciation: "",
-      translation: "아주 약간의 공통점",
+      translation: "부적 같은 아주 약간의 공통점",
     },
     {
       time: "0:26",
@@ -369,7 +363,13 @@ const song: Song = {
       time: "3:04",
       original: "",
       pronunciation: "",
-      translation: "도망쳐도 한가할 뿐이니 싸우자",
+      translation: "도망쳐도 한가할 뿐이니",
+    },
+    {
+      time: "3:07",
+      original: "",
+      pronunciation: "",
+      translation: "싸우자",
     },
     {
       time: "3:10",

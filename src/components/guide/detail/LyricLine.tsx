@@ -17,7 +17,7 @@ const TAG_BORDER_COLOR: Record<CallTag, string> = {
 
 // 배경색 (테두리 색에 알파값만 추가) — 활성 줄은 18%, 비활성 줄은 6%
 function getTagBackgroundColor(tag: CallTag, isActive: boolean) {
-  return `${TAG_BORDER_COLOR[tag]}${isActive ? "30" : "10"}`;
+  return `${TAG_BORDER_COLOR[tag]}${isActive ? "35" : "20"}`;
 }
 
 interface lyricLineProps {
