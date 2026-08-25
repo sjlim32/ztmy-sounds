@@ -17,14 +17,14 @@ const ACCENT_CLASSES: Record<
   { badge: string; text: string; line: string }
 > = {
   purple: {
-    badge: "bg-[#8d3cd4]",
-    text: "group-hover:text-[#c299e8]",
-    line: "bg-[#8d3cd4]",
+    badge: "bg-ztmy-purple",
+    text: "group-hover:text-ztmy-purple",
+    line: "bg-ztmy-purple",
   },
   pink: {
-    badge: "bg-[#e147bf]",
-    text: "group-hover:text-[#f0a8dd]",
-    line: "bg-[#e147bf]",
+    badge: "bg-ztmy-magenta",
+    text: "group-hover:text-ztmy-pink",
+    line: "bg-ztmy-magenta",
   },
 };
 

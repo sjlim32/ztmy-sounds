@@ -1,31 +1,43 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import type { ComponentType } from "react";
 import { ARTIST } from "@/data/artist";
-import clsx from "clsx";
+import { GlobeIcon } from "@/components/icons/GlobeIcon";
+import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
+import { InstagramIcon } from "@/components/icons/InstagramIcon";
+import { XIcon } from "@/components/icons/XIcon";
+import { SpotifyIcon } from "@/components/icons/SpotifyIcon";
 
-type externalObj = {
+type SocialLink = {
   name: string;
   url: string;
+  icon: ComponentType<{ className?: string }>;
 };
 
-const EXT_OBJ: externalObj[] = [
-  { name: "OFFICIAL WEB", url: "https://zutomayo.net" },
+const SOCIAL_LINKS: SocialLink[] = [
+  { name: "OFFICIAL WEB", url: "https://zutomayo.net", icon: GlobeIcon },
   {
     name: "YOUTUBE",
     url: "https://www.youtube.com/channel/UCv6P5nsS9rP4tDtFlqLU_QQ",
+    icon: YouTubeIcon,
   },
-  { name: "INSTAGRAM", url: "https://www.instagram.com/zutomayo" },
-  { name: "X", url: "https://x.com/zutomayo" },
+  {
+    name: "INSTAGRAM",
+    url: "https://www.instagram.com/zutomayo",
+    icon: InstagramIcon,
+  },
+  { name: "X", url: "https://x.com/zutomayo", icon: XIcon },
   {
     name: "SPOTIFY",
     url: "https://open.spotify.com/artist/38WbKH6oKAZskBhqDFA8Uj?si=FaQ7gjMSQHyhYYjvebzajg",
+    icon: SpotifyIcon,
   },
 ];
 
 /**
- * 모바일 전용 전역 저작권 푸터. 고정/sticky가 아니라 각 페이지 콘텐츠
- * 맨 아래에 일반 흐름으로 붙습니다.
+ * 전역 저작권 푸터. 고정/sticky가 아니라 각 페이지 콘텐츠 맨 아래에
+ * 일반 흐름으로 붙습니다.
  * 노래 가사 페이지(/guide/[songId])는 화면을 전부 가사에 쓰므로 표시하지 않습니다.
  */
 export function Footer() {
@@ -33,56 +45,28 @@ export function Footer() {
   if (pathname.startsWith("/guide/")) return null;
 
   return (
-    <footer
-      className={clsx("", "tablet:items-end tablet:justify-end tablet:flex")}
-    >
-      {/* PC */}
-      <div className="tablet:flex hidden w-fit flex-col items-end justify-end p-3 text-xs text-gray-300">
-        <div className="mb-1 w-full border-b border-gray-400 pb-1 text-end tracking-[0.4rem]">
-          <span>© {ARTIST.name.jp}</span>
-          <span>UNOFFICIAL FAN PAGE</span>
-        </div>
+    <footer className="tablet:items-end tablet:border-t-0 tablet:text-end tablet:text-gray-300 flex flex-col items-center gap-2 border-t border-white/10 px-3 py-2 text-center text-xs text-white/50">
+      {/* PC 이상은 Header가 이미 "Fan Page"를 표시하므로 저작권 표시만 남김 */}
+      <p className="tablet:border-b tablet:border-gray-500 tablet:pb-1 tablet:tracking-[0.4rem] tracking-widest">
+        © {ARTIST.name.jp}
+        <span className="tablet:hidden"> Fan Page · </span>
+        <span>2026</span>
+      </p>
 
-        <nav className="flex gap-8">
-          {EXT_OBJ.map((obj) => (
-            <a
-              key={`${obj.name} ${obj.url}`}
-              href={obj.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={obj.name}
-              className="text-xs tracking-widest opacity-70 transition-opacity hover:opacity-100"
-            >
-              {obj.name}
-            </a>
-          ))}
-        </nav>
-      </div>
-
-      {/* Mobile */}
-      <div className="tablet:hidden flex flex-col justify-center gap-0.5 border-t border-white/10 py-1 text-center text-xs text-white/50">
-        <div className="flex justify-center gap-2 tracking-wide">
-          <span>© {ARTIST.name.jp}</span>
-          <span>UNOFFICIAL FAN PAGE</span>
-        </div>
-
-        <nav className="flex flex-wrap justify-center gap-x-4 px-2">
-          {EXT_OBJ.map((obj) => (
-            <a
-              key={`${obj.name} ${obj.url}`}
-              href={obj.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={obj.name}
-              className={clsx(
-                "text-xs tracking-widest opacity-70 transition-opacity hover:opacity-100",
-              )}
-            >
-              {obj.name}
-            </a>
-          ))}
-        </nav>
-      </div>
+      <nav className="flex items-center gap-4">
+        {SOCIAL_LINKS.map(({ name, url, icon: Icon }) => (
+          <a
+            key={url}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={name}
+            className="hover:text-ztmy-purple transition-colors"
+          >
+            <Icon className="h-4 w-4" />
+          </a>
+        ))}
+      </nav>
     </footer>
   );
 }

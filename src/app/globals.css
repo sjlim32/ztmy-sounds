@@ -5,7 +5,8 @@
   --foreground: #ededed;
   --ztmy-dark: #411d63;
   --ztmy-purple: #8d3cd4;
-  --ztmy-pink: #e147bf;
+  --ztmy-magenta: #e147bf;
+  --ztmy-pink: #dc83bc;
 }
 
 @theme inline {
@@ -13,6 +14,7 @@
   --color-foreground: var(--foreground);
   --color-ztmy-dark: var(--ztmy-dark);
   --color-ztmy-purple: var(--ztmy-purple);
+  --color-ztmy-magenta: var(--ztmy-magenta);
   --color-ztmy-pink: var(--ztmy-pink);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);

@@ -29,7 +29,10 @@ export function NextVisit({ event }: { event: VisitEvent }) {
           )}
         >
           <span
-            className={clsx("bg-ztmy-pink h-1 w-4 shrink-0", "tablet:w-6")}
+            className={clsx(
+              "from-ztmy-magenta to-ztmy-pink h-1 w-4 shrink-0 bg-linear-to-r",
+              "tablet:w-6",
+            )}
           />
           Next Visit
           <ChevronDownIcon
@@ -95,7 +98,7 @@ export function NextVisit({ event }: { event: VisitEvent }) {
                       className="font-mono text-sm font-bold text-white"
                     >
                       {event.date}
-                      <span className="ml-1.5 text-[10px] font-normal text-white/50">
+                      <span className="ml-1.5 text-xs font-normal text-white/70">
                         {event.time}
                       </span>
                     </p>
@@ -105,7 +108,7 @@ export function NextVisit({ event }: { event: VisitEvent }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       data-role="venue"
-                      className="hover:text-ztmy-pink inline-flex items-center gap-1 text-[10px] text-white/70 transition-colors hover:underline"
+                      className="hover:text-ztmy-pink inline-flex items-center gap-1 text-sm text-white transition-colors hover:underline"
                     >
                       {event.place}
                       <ExternalLinkIcon className="h-2.5 w-2.5" />
@@ -145,17 +148,17 @@ export function NextVisit({ event }: { event: VisitEvent }) {
                     />
                   </a>
 
-                  <div className="mt-4 space-y-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
+                  <div className="mt-4 drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
                     <span className="relative mb-2 block h-px w-full overflow-hidden bg-white/15">
-                      <span className="from-ztmy-pink to-ztmy-purple absolute inset-y-0 left-0 w-full bg-linear-to-r" />
+                      <span className="from-ztmy-magenta to-ztmy-purple absolute inset-y-0 left-0 w-full bg-linear-to-r" />
                     </span>
 
                     <p
                       data-role="date"
-                      className="font-mono text-2xl font-bold text-white"
+                      className="font-mono text-2xl font-normal text-white"
                     >
                       {event.date}
-                      <span className="ml-2 text-base font-normal text-white/50">
+                      <span className="ml-2 text-xl font-normal text-white/80">
                         {event.time}
                       </span>
                     </p>
@@ -165,7 +168,7 @@ export function NextVisit({ event }: { event: VisitEvent }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       data-role="venue"
-                      className="hover:text-ztmy-pink inline-flex items-center gap-1 text-sm text-white/70 transition-colors hover:underline"
+                      className="hover:text-ztmy-pink inline-flex items-center gap-1 text-xl text-white transition-colors hover:underline"
                     >
                       {event.place}
                       <ExternalLinkIcon className="h-3 w-3" />

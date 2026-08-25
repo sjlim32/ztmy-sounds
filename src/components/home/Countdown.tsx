@@ -101,7 +101,7 @@ export function Countdown({ event }: CountdownProps) {
               </span>
             </p>
             <span className="tablet:w-28 relative mt-1 block h-1 w-20 overflow-hidden bg-white/15">
-              <span className="from-ztmy-pink to-ztmy-purple absolute inset-y-0 left-0 w-full bg-linear-to-r" />
+              <span className="from-ztmy-magenta to-ztmy-purple absolute inset-y-0 left-0 w-full bg-linear-to-r" />
             </span>
           </>
         )}
@@ -160,7 +160,7 @@ function WaterBalloon({
             x2="50"
             y2="92"
           >
-            <stop offset="0%" stopColor="var(--ztmy-pink)" />
+            <stop offset="0%" stopColor="var(--ztmy-magenta)" />
             <stop offset="100%" stopColor="var(--ztmy-purple)" />
           </linearGradient>
           {isToday && (

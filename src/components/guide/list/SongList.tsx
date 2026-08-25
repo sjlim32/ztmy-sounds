@@ -60,7 +60,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
               <Link
                 href={isSelected ? "/guide" : `/guide/${item.id}`}
                 className={clsx(
-                  "group hover:text-ztmy-pink block px-4 py-2 transition-colors",
+                  "group hover:text-ztmy-magenta block px-4 py-2 transition-colors",
                   "tablet:py-3",
                   isSelected && "hover:bg-ztmy-purple/10",
                 )}
@@ -69,7 +69,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                   <span className={clsx(isSelected && "font-bold")}>
                     {item.title.jp}
                   </span>
-                  <span className="group-hover:text-ztmy-pink/60 mb-0.5 text-xs text-gray-400 transition-colors">
+                  <span className="group-hover:text-ztmy-magenta/60 mb-0.5 text-xs text-gray-400 transition-colors">
                     {item.title.kr}
                   </span>
                 </div>
