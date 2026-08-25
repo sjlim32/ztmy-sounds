@@ -82,12 +82,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ko"
       className={`${geistSans.variable} ${geistMono.variable} ${rocknrollOne.variable} ${mkpop.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex h-dvh flex-col overflow-hidden">
         <GuideDimOverlay />
         <SerwistProvider swUrl="/serwist/sw.js">
-          <div className="relative z-10 flex min-h-full flex-1 flex-col">
+          <div className="relative z-10 flex min-h-0 flex-1 flex-col">
             <MobileHeader />
-            <div className="flex flex-1 flex-col">{children}</div>
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              {children}
+            </div>
             <Footer />
           </div>
         </SerwistProvider>

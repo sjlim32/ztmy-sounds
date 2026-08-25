@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function InfoPage() {
   return (
-    <main className="tablet:max-w-2xl mx-auto w-full px-6 py-16">
+    <main className="tablet:max-w-2xl mx-auto min-h-0 w-full flex-1 overflow-y-auto px-6 py-16">
       <Link
         href="/"
         className="tablet:block hidden text-sm text-white/60 hover:text-white"
