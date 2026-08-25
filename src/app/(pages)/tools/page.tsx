@@ -158,7 +158,7 @@ export default function ToolsPage() {
               <span className="w-14 shrink-0 font-mono text-white/50">
                 {line.time}
               </span>
-              <span className="flex-1">{line.original}</span>
+              <span className="flex-1">{line.translation}</span>
             </li>
           ))}
         </ul>
