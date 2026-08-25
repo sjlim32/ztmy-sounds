@@ -11,7 +11,6 @@ import { SongList } from "@/components/guide/list/SongList";
 import { LyricsView } from "@/components/guide/detail/LyricsView";
 
 const LYRICS_ENTER_DELAY_MS = 600; // 목록 접힘 애니메이션(600ms)이 끝난 뒤 가사가 이어서 나타나도록 주는 지연
-const LYRICS_FADE_MS = 500; // 가사 opacity 트랜지션 시간과 맞춰서, 다 사라진 뒤에야 실제로 내용을 비움
 const PANEL_ENTER_DELAY_MS = 150; // GuideDimOverlay의 duration-700(화면이 어두워지는 시간)과 맞춰, 그 뒤에 패널이 나타나도록 주는 지연
 
 export function SongPanel() {
@@ -24,8 +23,6 @@ export function SongPanel() {
   const [visibleSongId, setVisibleSongId] = useState<string | null>(null);
   const [isPanelVisible, setIsPanelVisible] = useState(false);
 
-  if (song && renderedSong !== song) setRenderedSong(song);
-
   useEffect(() => {
     setActiveSongId(segment);
   }, [segment, setActiveSongId]);
@@ -37,19 +34,23 @@ export function SongPanel() {
     return () => clearTimeout(id);
   }, []);
 
-  useEffect(() => {
-    if (song) {
-      // 노래 선택 시 목록 접힌 뒤(300ms) 가사 보이도록 지연
-      const enterId = setTimeout(
-        () => setVisibleSongId(song.id),
-        LYRICS_ENTER_DELAY_MS,
-      );
-      return () => clearTimeout(enterId);
-    }
+  // 곡이 바뀌면 렌더 중에 즉시(트랜지션 없이) 이전 내용을 감추고 내용을
+  // 교체합니다 — 사라질 때는 애니메이션 없이 바로 사라지고, 나타날 때만
+  // 아래 effect에서 지연 후 fade-in.
+  if (song?.id !== renderedSong?.id) {
+    setRenderedSong(song);
+    if (visibleSongId !== null) setVisibleSongId(null);
+  }
 
-    // 노래 제거 시 fade-out 트랜지션이 끝난 뒤에야 실제로 내용을 비우도록 지연
-    const exitId = setTimeout(() => setRenderedSong(null), LYRICS_FADE_MS);
-    return () => clearTimeout(exitId);
+  useEffect(() => {
+    if (!song) return;
+
+    // 노래 선택 시 목록 접힘 애니메이션(600ms) 끝난 뒤 가사가 이어서 fade-in.
+    const showId = setTimeout(
+      () => setVisibleSongId(song.id),
+      LYRICS_ENTER_DELAY_MS,
+    );
+    return () => clearTimeout(showId);
   }, [song]);
 
   const lyricsVisible = !!song && visibleSongId === song.id;

@@ -40,6 +40,12 @@ export function LyricsView({
     // song이 바뀌면 가사 줄 수/높이가 달라지므로 다시 관찰합니다.
   }, [song]);
 
+  // 이전곡/다음곡·목록 선택 등으로 곡이 바뀌면, 이전 곡에서 남은 스크롤
+  // 위치가 아니라 항상 맨 위에서부터 보이도록 리셋합니다.
+  useEffect(() => {
+    listRef.current?.scrollTo({ top: 0 });
+  }, [song]);
+
   useEffect(() => {
     if (!autoScroll) return;
 
@@ -63,9 +69,12 @@ export function LyricsView({
         data-role="lyric-list"
         className={clsx(
           // bottom-12 = 스크롤 화살표 영역 확보
-          "absolute inset-x-0 top-0 bottom-0 scrollbar-none overflow-y-auto py-10 transition-opacity duration-500 [&::-webkit-scrollbar]:hidden",
+          "absolute inset-x-0 top-0 bottom-0 scrollbar-none overflow-y-auto py-10 [&::-webkit-scrollbar]:hidden",
           "tablet:bottom-12",
-          visible ? "opacity-100" : "opacity-0",
+          // 사라질 땐 트랜지션 없이 즉시, 나타날 때만 fade-in — 그래야 곡이
+          // 빠르게 연달아 바뀌어도 이미 교체된 다음 곡 내용이 fade-out
+          // 되는 것처럼 보이는 깜빡임이 생기지 않습니다.
+          visible ? "opacity-100 transition-opacity duration-500" : "opacity-0",
         )}
       >
         {song.lyrics.map((line, index) => (

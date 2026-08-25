@@ -11,7 +11,7 @@ import kiraKiller from "./09_kira-killer";
 import hanaichiMonnme from "./10_hanaichi-monnme";
 import nareaiserve from "./11_nareai-serve";
 import hippocampalPain from "./12_hippocampal-pain";
-import taidada from "./13_taidata";
+import taidada from "./13_taidada";
 import cream from "./14_cream";
 
 /**
