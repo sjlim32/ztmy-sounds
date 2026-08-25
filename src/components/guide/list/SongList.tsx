@@ -1,6 +1,7 @@
 import Link from "next/link";
 import clsx from "clsx";
 import { songList } from "@/data/songs";
+import { HomeIcon } from "@/components/icons/HomeIcon";
 
 interface SongListProps {
   selectedSongId: string | null;
@@ -12,12 +13,14 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
     <>
       <h2
         className={clsx(
-          "hidden shrink-0 overflow-hidden p-2 text-center text-2xl font-bold text-gray-200 transition-all duration-300",
-          "tablet:block",
+          "hidden shrink-0 items-center justify-center gap-2 overflow-hidden p-2 transition-all duration-300",
+          "tablet:flex",
           selectedSongId ? "max-h-0 opacity-0" : "max-h-16 opacity-100",
         )}
       >
-        응원 가이드
+        <span className="text-xl font-bold tracking-wide text-gray-100">
+          응원 가이드
+        </span>
       </h2>
 
       <ul
@@ -60,16 +63,25 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
               <Link
                 href={isSelected ? "/guide" : `/guide/${item.id}`}
                 className={clsx(
-                  "group hover:text-ztmy-magenta block px-4 py-2 transition-colors",
-                  "tablet:py-3",
+                  "group relative block px-4 py-2 transition-colors",
+                  "hover:text-ztmy-magenta/80 tablet:py-3",
                   isSelected && "hover:bg-ztmy-purple/10",
                 )}
               >
+                {/* 지금 보고 있는 곡을 표시하는 좌측 액센트 바. 선택 시 항상,
+                    그 외에는 hover 시에만 나타남 (사이트 그라데이션 시그니처). */}
+                <span
+                  className={clsx(
+                    "from-ztmy-pink to-ztmy-purple absolute inset-y-1 left-0 w-1 origin-top scale-y-0 bg-linear-to-b transition-transform duration-300",
+                    isSelected ? "scale-y-100" : "group-hover:scale-y-100",
+                  )}
+                />
+
                 <div className="flex items-end gap-2">
                   <span className={clsx(isSelected && "font-bold")}>
                     {item.title.jp}
                   </span>
-                  <span className="group-hover:text-ztmy-magenta/60 mb-0.5 text-xs text-gray-400 transition-colors">
+                  <span className="mb-0.5 text-xs text-gray-400 transition-colors group-hover:font-bold group-hover:text-white">
                     {item.title.kr}
                   </span>
                 </div>
@@ -83,13 +95,12 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
         <Link
           href={"/"}
           className={clsx(
-            "mx-auto my-2 hidden justify-center duration-1000",
+            "group mx-auto my-2 hidden items-center gap-1.5 text-xs text-gray-400 transition-colors hover:font-semibold hover:text-white",
             "tablet:flex",
           )}
         >
-          <div className="hover:bg-ztmy-purple px-2 py-1 text-xs text-gray-300 transition-colors hover:text-gray-50 hover:underline">
-            메인으로
-          </div>
+          <HomeIcon className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5" />
+          메인으로
         </Link>
       )}
     </>
