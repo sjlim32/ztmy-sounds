@@ -23,7 +23,6 @@ const song: Song = {
       original: "mirror mirror mirror tune ~",
       pronunciation: "미라 미라 미라 츈 ~",
       translation: "",
-      interlude: true,
     },
     {
       time: "0:08.4",
@@ -35,20 +34,14 @@ const song: Song = {
     {
       time: "0:13",
       original: "3 2 1",
-      pronunciation: "쓰리 투 원",
+      pronunciation: "",
       translation: "",
-      interlude: true,
-      cheer: {
-        text: "",
-        tag: "swing",
-      },
     },
     {
       time: "0:14.5",
       original: "mirror tune ~",
       pronunciation: "미라 츈 ~",
       translation: "",
-      interlude: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -59,7 +52,6 @@ const song: Song = {
       original: "mirror tune ~",
       pronunciation: "미라 츈 ~",
       translation: "",
-      interlude: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -68,9 +60,8 @@ const song: Song = {
     {
       time: "0:20.6",
       original: "3 2 1",
-      pronunciation: "쓰리 투 원",
+      pronunciation: "",
       translation: "",
-      interlude: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -81,7 +72,6 @@ const song: Song = {
       original: "mirror tune ~",
       pronunciation: "미라 츈 ~",
       translation: "",
-      interlude: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -92,7 +82,6 @@ const song: Song = {
       original: "mirror tune ~",
       pronunciation: "미라 츈 ~",
       translation: "",
-      interlude: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -101,9 +90,8 @@ const song: Song = {
     {
       time: "0:28",
       original: "3 2 1",
-      pronunciation: "쓰리 투 원",
+      pronunciation: "",
       translation: "",
-      interlude: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -178,11 +166,11 @@ const song: Song = {
     },
     {
       time: "1:00",
-      original: "もちろん問題は山積みですが **yey**",
+      original: "もちろん問題は山積みですが yey",
       pronunciation: "모치롱 몬다이와 야마즈미 데스가 **yey**",
-      translation: "당연히 문제는 산더미지만요 **yey**",
+      translation: "당연히 문제는 산더미지만요 yey",
       cheer: {
-        text: "색칠한 부분만",
+        text: '"yey"만',
         tag: "swing",
       },
     },
@@ -206,11 +194,11 @@ const song: Song = {
     },
     {
       time: "1:14",
-      original: "神秘的なミラーチューン **yey**",
+      original: "神秘的なミラーチューン yey",
       pronunciation: "심피테키나 미라츈 **yey**",
-      translation: "신비한 미러튠 **yey**",
+      translation: "신비한 미러튠 yey",
       cheer: {
-        text: "색칠한 부분만",
+        text: '"yey"만',
         tag: "swing",
       },
     },
@@ -348,11 +336,11 @@ const song: Song = {
     },
     {
       time: "2:23",
-      original: "もちろん引き下がりはしないですが **yey**",
+      original: "もちろん引き下がりはしないですが yey",
       pronunciation: "모치롱 히키사가리와 시나이데스가 **yey**",
-      translation: "물론 물러서지는 않겠지만 **yey**",
+      translation: "물론 물러서지는 않겠지만 yey",
       cheer: {
-        text: "색칠한 부분만",
+        text: '"yey"만',
         tag: "swing",
       },
     },
@@ -364,11 +352,11 @@ const song: Song = {
     },
     {
       time: "2:30",
-      original: "心意気やんちゃで危なっかしいけど **yey**",
+      original: "心意気やんちゃで危なっかしいけど yey",
       pronunciation: "코코로이키 얀챠데 아부낫카시이케도 **yey**",
-      translation: "마음만 넘쳐서 위태롭지만서도 **yey**",
+      translation: "마음만 넘쳐서 위태롭지만서도 yey",
       cheer: {
-        text: "색칠한 부분만",
+        text: '"yey"만',
         tag: "swing",
       },
     },
@@ -465,7 +453,7 @@ const song: Song = {
     {
       time: "4:02",
       original: "3 2 1",
-      pronunciation: "쓰리 투 원",
+      pronunciation: "",
       translation: "",
       interlude: true,
     },
@@ -529,7 +517,7 @@ const song: Song = {
       pronunciation: "우타우제 GACHI 포- 유-",
       translation: "노래할게 GACHI for you",
       cheer: {
-        text: "좌우로 반복 ~",
+        text: "",
         tag: "swing",
       },
     },
@@ -539,17 +527,17 @@ const song: Song = {
       pronunciation: "돈나 걋쿄오닷테 앗츄우맛다",
       translation: "어떤 역경도 순식간에 지나가",
       cheer: {
-        text: "좌우로 반복 ~",
+        text: "",
         tag: "swing",
       },
     },
     {
-      time: "4:32",
+      time: "4:33",
       original: "頑固な僕だって",
       pronunciation: "간코나 보쿠닷테",
       translation: "완고한 나조차도",
       cheer: {
-        text: "좌우로 반복 ~",
+        text: "",
         tag: "swing",
       },
     },
@@ -559,36 +547,39 @@ const song: Song = {
       pronunciation: "멘도쿠사이☆ 아키라메 와루이미타이",
       translation: "귀찮아☆라며 포기하지 못하는 것 같아",
       cheer: {
-        text: "좌우로 반복 ~",
+        text: "",
         tag: "swing",
       },
     },
     {
-      time: "4:37",
+      time: "4:37.3",
       original: "まだ準々決勝したい yey",
       pronunciation: "마다 쥰쥰켓쇼오 시타이 yey",
       translation: "아직 준준결승전을 하고 싶어 yey",
       cheer: {
-        text: "좌우로 반복 ~",
+        text: "",
         tag: "swing",
       },
     },
     {
-      time: "4:40",
+      time: "4:40.7",
       original: "染まらないよ心臓 揺るがないんだ",
       pronunciation: "소마라나이요 신조 유루가나인다",
       translation: "물들지 않아 심장은 흔들리지 않아",
       cheer: {
-        text: "좌우로 반복 ~",
+        text: "",
         tag: "swing",
       },
     },
     {
-      time: "4:53.6",
+      time: "4:53.8",
       original: "mirror tune ~",
       pronunciation: "미라 츈 ~",
       translation: "",
-      interlude: true,
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "4:54.5",
@@ -596,6 +587,10 @@ const song: Song = {
       pronunciation: "",
       translation: "",
       interlude: true,
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
   ],
 };
