@@ -40,13 +40,25 @@ export function LyricsView({
     // song이 바뀌면 가사 줄 수/높이가 달라지므로 다시 관찰합니다.
   }, [song]);
 
-  // 이전곡/다음곡·목록 선택 등으로 곡이 바뀌면, 이전 곡에서 남은 스크롤
-  // 위치가 아니라 항상 맨 위에서부터 보이도록 리셋합니다.
-  useEffect(() => {
-    listRef.current?.scrollTo({ top: 0 });
-  }, [song]);
+  const lastSongIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    const songChanged = lastSongIdRef.current !== (song?.id ?? null);
+    lastSongIdRef.current = song?.id ?? null;
+
+    if (songChanged) {
+      // 이전곡/다음곡·목록 선택 등으로 곡이 바뀌면, 이전 곡에서 남은 스크롤
+      // 위치가 아니라 항상 맨 위에서부터 보이도록 리셋합니다. 이 시점의
+      // activeLineIndex는 아직 이전 곡의 currentTime 기준으로 계산된 낡은
+      // 값일 수 있어서(영상이 아직 새 곡의 시간을 보고하기 전), 곧장
+      // 자동 스크롤로 넘어가면 엉뚱한 줄로 튀었다가 되돌아오는 깜빡임이
+      // 생깁니다. 그래서 곡이 바뀐 프레임에는 top 리셋만 하고 자동
+      // 스크롤은 건너뜁니다 — 진짜 activeLineIndex는 다음 갱신(같은 곡
+      // 내에서의 재생 진행)에서 반영됩니다.
+      listRef.current?.scrollTo({ top: 0 });
+      return;
+    }
+
     if (!autoScroll) return;
 
     const list = listRef.current;
