@@ -82,7 +82,7 @@ export function LyricsView({
         className={clsx(
           // bottom-12 = 스크롤 화살표 영역 확보
           "absolute inset-x-0 top-0 bottom-0 scrollbar-none overflow-y-auto py-10 [&::-webkit-scrollbar]:hidden",
-          "tablet:bottom-12",
+          "tablet:bottom-12 tablet:py-7",
           // 사라질 땐 트랜지션 없이 즉시, 나타날 때만 fade-in — 그래야 곡이
           // 빠르게 연달아 바뀌어도 이미 교체된 다음 곡 내용이 fade-out
           // 되는 것처럼 보이는 깜빡임이 생기지 않습니다.

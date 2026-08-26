@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import clsx from "clsx";
 import { songList } from "@/data/songs";
 import { HomeIcon } from "@/components/icons/HomeIcon";
@@ -8,88 +11,171 @@ interface SongListProps {
   visible: boolean; // true가 되는 순간 위에서 아래로 펼쳐지듯 나타납니다 (/guide 최초 진입 시)
 }
 
+const FADE_SIZE = "20px";
+
 export function SongList({ selectedSongId, visible }: SongListProps) {
+  const listRef = useRef<HTMLUListElement>(null);
+
+  // 스크롤이 위/아래 끝에 닿으면 그쪽 페이드를 꺼서(불투명 처리) "여기가
+  // 끝"임을 보여주고, 끝이 아니면 투명하게 페이드시켜 "더 있음"을 암시.
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+
+    const updateFade = () => {
+      const atTop = el.scrollTop <= 0;
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+      el.style.maskImage = `linear-gradient(to bottom, ${atTop ? "black" : "transparent"}, black ${FADE_SIZE}, black calc(100% - ${FADE_SIZE}), ${atBottom ? "black" : "transparent"})`;
+    };
+
+    updateFade();
+    el.addEventListener("scroll", updateFade);
+    const resizeObserver = new ResizeObserver(updateFade);
+    resizeObserver.observe(el);
+
+    return () => {
+      el.removeEventListener("scroll", updateFade);
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   return (
     <>
-      <h2
+      {/* 제목 + 목록을 하나의 비네트 배경으로 묶음 — tablet 미만에서는
+          contents로 사라져 mobile의 order-1 흐름에 영향을 주지 않음. */}
+      <div
         className={clsx(
-          "hidden shrink-0 items-center justify-center gap-2 overflow-hidden p-2 transition-all duration-300",
-          "tablet:flex",
-          selectedSongId ? "max-h-0 opacity-0" : "max-h-16 opacity-100",
+          "contents",
+          "tablet:relative tablet:flex tablet:flex-col tablet:overflow-hidden tablet:rounded-lg pl-3",
+          "tablet:bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.7)_0%,rgba(0,0,0,0.5)_55%,rgba(0,0,0,0.18)_100%)] tablet:backdrop-blur-xs",
+          // 좌우 여백은 래퍼가 아니라 Link 자체의 padding(tablet:px-7)으로
+          // 통일 — 래퍼에 padding을 주면 li/overflow-hidden 조상이 그 바깥
+          // 영역에서 Link의 호버 배경을 잘라내서(레이아웃 크기는 맞아도
+          // 실제로는 안 칠해짐) 곡 선택 시 패딩 영역이 안 채워지는 문제가
+          // 있었음. 위아래는 곡이 선택되면 제목 한 줄만 남으므로 여백 없이
+          // 배경이 딱 맞게 밀착되도록.
+          selectedSongId && "mb-3",
+          !selectedSongId && "tablet:flex-[0_1_auto] tablet:py-3",
         )}
       >
-        <span className="text-xl font-bold tracking-wide text-gray-100">
-          응원 가이드
-        </span>
-      </h2>
+        <h2
+          className={clsx(
+            "hidden shrink-0 flex-col items-center gap-1 overflow-hidden transition-all duration-300",
+            "tablet:flex",
+            // max-height만으로는 padding이 안 줄어들어(border-box라도 padding은
+            // 찌그러들지 않고 최소 높이를 차지함) 0으로 안 접히므로 padding도
+            // 함께 0으로.
+            selectedSongId
+              ? "max-h-0 p-0 opacity-0"
+              : "max-h-16 p-2 opacity-100",
+          )}
+        >
+          <span className="font-mono text-[10px] font-medium tracking-[0.3em] text-white/40 uppercase">
+            Guide
+          </span>
+          <span className="text-xl font-bold tracking-wide text-white">
+            응원 가이드
+          </span>
+        </h2>
 
-      <ul
-        data-role="song-panel-list"
-        className={clsx(
-          "order-1 flex max-h-dvh flex-col divide-y divide-white/15 overflow-y-auto transition-[opacity,background-color] duration-1000",
-          // 곡 하나 높이(49px) * 8 — PC에서는 뷰포트 높이와 무관하게 항상
-          // 최대 8곡까지만 보이고 나머지는 스크롤.
-          "tablet:order-0 tablet:max-h-102",
-          // 스크롤바는 기본적으로 투명하게 숨겨뒀다가, 리스트에 마우스를
-          // 올렸을 때만 반투명하게 드러남(파이어폭스/웹킷 둘 다 대응).
-          "scrollbar-thin [scrollbar-color:transparent_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
-          "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
-          selectedSongId ? "bg-transparent" : "tablet:bg-black/60",
-          !selectedSongId && "flex-1",
-          // flex-none(flex:0 0 auto)이면 shrink도 0이 돼서, 화면이 짧아
-          // h2+목록이 패널 높이(40vh)를 넘칠 때 아무도 줄어들지 않고 부모
-          // 박스 밖으로(=Footer 위로) 넘쳐버립니다. shrink만 1로 켜서
-          // 평소엔 콘텐츠 높이만큼(안 늘어남), 공간이 부족할 때만 줄어들게.
-          !selectedSongId && "tablet:flex-[0_1_auto]",
-          visible ? "opacity-100" : "opacity-0",
-        )}
-      >
-        {songList.map((item) => {
-          const isSelected = selectedSongId === item.id;
-          const isCollapsed = !!selectedSongId && !isSelected;
+        <ul
+          ref={listRef}
+          data-role="song-panel-list"
+          className={clsx(
+            "order-1 flex max-h-dvh flex-col divide-y divide-white/10 overflow-y-auto transition-opacity duration-1000",
+            // tablet 이상에서는 부모(위 비네트 래퍼)가 준 높이를 그대로 채우고,
+            // 넘치는 곡은 스크롤.
+            "tablet:order-0 tablet:max-h-full",
+            // 스크롤바는 기본적으로 투명하게 숨겨뒀다가, 리스트에 마우스를
+            // 올렸을 때만 반투명하게 드러남(파이어폭스/웹킷 둘 다 대응).
+            "scrollbar-thin [scrollbar-color:transparent_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
+            "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
+            !selectedSongId && "flex-1",
+            visible ? "opacity-100" : "opacity-0",
+          )}
+        >
+          {songList.map((item) => {
+            const isSelected = selectedSongId === item.id;
+            const isCollapsed = !!selectedSongId && !isSelected;
 
-          return (
-            <li
-              key={item.id}
-              className={clsx(
-                "shrink-0 overflow-hidden transition-all duration-600",
-                // divide-y가 만드는 border는 max-h-0으로도 안 없어져서(테두리는
-                // 콘텐츠 높이와 무관하게 그려짐) 접혔을 때 직접 0으로 제거.
-                isCollapsed
-                  ? "max-h-0 border-t-0! border-b-0! opacity-0"
-                  : "max-h-16 opacity-100",
-              )}
-            >
-              <Link
-                href={isSelected ? "/guide" : `/guide/${item.id}`}
+            return (
+              <li
+                key={item.id}
                 className={clsx(
-                  "group relative block px-4 py-2 transition-colors",
-                  "hover:text-ztmy-magenta/80 tablet:py-3",
-                  isSelected && "hover:bg-ztmy-purple/10",
+                  // li 자체(display:list-item)는 자식이 완전히 0/none이어도
+                  // 왜인지 1px 잔여 높이를 유지하는 경우가 있어서(자식 collapse
+                  // 만으로는 안 없어짐), li의 display 자체도 transition-discrete로
+                  // 함께 애니메이션시켜 접힘이 끝나면 진짜 display:none이 되도록.
+                  "min-h-0 shrink-0 overflow-hidden transition-[display] transition-discrete duration-600",
+                  // gap 대신 margin으로 간격을 줘야 접힌 항목이 많아도 그
+                  // 개수만큼 여백이 누적되지 않음. 곡이 선택된 상태에서는
+                  // 보이는 항목이 하나뿐이라 위쪽에 붙일 여백이 필요 없음 —
+                  // margin-top이 있으면 컴포넌트 상단에 빈 공간이 남음.
+                  isCollapsed ? "hidden" : !selectedSongId && "mt-1",
+                  // divide-y는 --tw-divide-y-reverse 기본값(0)에서 border-top이
+                  // 아니라 border-bottom에 적용됨 — 곡이 선택되면 선택된 항목
+                  // 아래에 어울리지 않는 구분선이 계속 남아있으므로(접힌 항목은
+                  // display:none이라 안 보이지만 선택된 항목은 계속 보임) 곡
+                  // 선택 시엔 모든 항목에서 제거.
+                  !!selectedSongId && "border-b-0!",
                 )}
               >
-                {/* 지금 보고 있는 곡을 표시하는 좌측 액센트 바. 선택 시 항상,
-                    그 외에는 hover 시에만 나타남 (사이트 그라데이션 시그니처). */}
-                <span
+                {/* grid-template-rows 0fr만으로는 접힌 상태에서도 display가
+                    계속 grid로 남아있어서(내용은 0px여도) 항목이 많으면
+                    서브픽셀 반올림 잔여치가 눈에 보일 만큼 쌓임 — display도
+                    transition-discrete로 함께 애니메이션시켜, 다 접힌 뒤엔
+                    실제로 display:none이 되어 완전히 0을 보장. */}
+                <div
                   className={clsx(
-                    "from-ztmy-pink to-ztmy-purple absolute inset-y-1 left-0 w-1 origin-top scale-y-0 bg-linear-to-b transition-transform duration-300",
-                    isSelected ? "scale-y-100" : "group-hover:scale-y-100",
+                    "transition-[grid-template-rows,opacity,display] transition-discrete duration-600 ease-out",
+                    "tablet:px-0 px-2",
+                    isCollapsed
+                      ? "hidden grid-rows-[0fr] opacity-0"
+                      : "grid grid-rows-[1fr] opacity-100 starting:grid-rows-[0fr] starting:opacity-0",
                   )}
-                />
+                >
+                  <div className="overflow-hidden">
+                    <Link
+                      href={isSelected ? "/guide" : `/guide/${item.id}`}
+                      className={clsx(
+                        "group relative block rounded-md px-4 py-2 transition-colors",
+                      )}
+                    >
+                      {/* 지금 보고 있는 곡을 표시하는 좌측 액센트 바. 선택 시
+                          항상, 그 외에는 hover 시에만 나타남 (사이트 그라데이션
+                          시그니처). */}
+                      <span
+                        className={clsx(
+                          "from-ztmy-pink to-ztmy-purple absolute inset-y-1 left-0 w-1 origin-top scale-y-0 rounded-full bg-linear-to-b transition-transform duration-300",
+                          isSelected
+                            ? "scale-y-100"
+                            : "group-hover:scale-y-100",
+                        )}
+                      />
 
-                <div className="flex items-end gap-2">
-                  <span className={clsx(isSelected && "font-bold")}>
-                    {item.title.jp}
-                  </span>
-                  <span className="mb-0.5 text-xs text-gray-400 transition-colors group-hover:font-bold group-hover:text-white">
-                    {item.title.kr}
-                  </span>
+                      <div className="flex flex-col gap-0.5">
+                        <span
+                          className={clsx(
+                            "font-mkpop tablet:text-2xl text-xl leading-tight transition-colors",
+                            isSelected
+                              ? "group-hover:text-ztmy-magenta/80 text-white"
+                              : "text-gray-100",
+                          )}
+                        >
+                          {item.title.jp}
+                        </span>
+                        <span className="text-sm leading-tight text-gray-400 transition-colors group-hover:text-white">
+                          {item.title.kr}
+                        </span>
+                      </div>
+                    </Link>
+                  </div>
                 </div>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
       {!selectedSongId && (
         <Link

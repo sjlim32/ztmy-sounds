@@ -25,7 +25,7 @@ export function NoticePanel() {
         "pc:pr-[calc(30vw+1.5rem)]",
       )}
     >
-      <div className="w-full max-w-xl">
+      <div className="pc:max-w-2xl w-full">
         <NoticeList />
       </div>
     </aside>

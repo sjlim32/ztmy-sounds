@@ -27,7 +27,7 @@ export function NoticeList() {
   const openId = manualOpenId === undefined ? defaultOpenId : manualOpenId;
 
   return (
-    <div data-role="notice-list" className="flex w-full flex-col gap-6">
+    <div data-role="notice-list" className="flex w-full flex-col gap-3">
       {noticeList.map((notice) => (
         <NoticeAccordionItem
           key={notice.id}

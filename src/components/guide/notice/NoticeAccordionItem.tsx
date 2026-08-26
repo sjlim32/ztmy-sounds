@@ -25,20 +25,42 @@ export function NoticeAccordionItem({
   return (
     <div
       data-role="notice-item"
-      className="w-full overflow-hidden rounded-xl bg-black/40 backdrop-blur-sm"
+      className="w-full overflow-hidden rounded-sm bg-black/50"
     >
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-semibold text-white"
+        className="group flex w-full flex-col gap-1.5 px-4 py-3 text-left focus-visible:outline-none"
       >
-        <span className="flex-1">{notice.title}</span>
-        <ChevronDownIcon
-          className={clsx(
-            "h-3 w-3 shrink-0 transition-transform",
-            !isOpen && "rotate-180",
-          )}
-        />
+        <span className="flex items-center justify-between">
+          <span
+            className={clsx(
+              "font-mono text-[10px] font-medium tracking-[0.3em] uppercase",
+              notice.isAlwaysOpen ? "text-ztmy-pink" : "text-white/40",
+            )}
+          >
+            {notice.isAlwaysOpen ? "Notice" : "Guide"}
+          </span>
+          <ChevronDownIcon
+            className={clsx(
+              "h-3 w-3 shrink-0 text-white/40 transition-transform group-hover:text-white/70",
+              !isOpen && "rotate-180",
+            )}
+          />
+        </span>
+
+        <span className="text-2xl leading-tight font-bold tracking-tight text-white">
+          {notice.title}
+        </span>
+
+        <span className="relative block h-px w-full overflow-hidden bg-white/15">
+          <span
+            className={clsx(
+              "from-ztmy-pink to-ztmy-purple absolute inset-y-0 left-0 w-full origin-left scale-x-0 bg-linear-to-r transition-transform duration-500 ease-out",
+              isOpen ? "scale-x-100" : "group-hover:scale-x-100",
+            )}
+          />
+        </span>
       </button>
 
       <div
@@ -48,7 +70,7 @@ export function NoticeAccordionItem({
         )}
       >
         <div className="overflow-hidden">
-          <div className="space-y-3 px-4 pb-4 text-sm text-white/70">
+          <div className="space-y-3 px-4 pb-4 text-sm leading-relaxed text-white/70 [&_strong]:text-white">
             <Content />
 
             {onDismissChange && (
