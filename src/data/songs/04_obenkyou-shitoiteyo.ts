@@ -18,6 +18,7 @@ const song: Song = {
       translation: "",
       interlude: true,
     },
+    //================ 1절 ================//
     {
       time: "0:15.6",
       original: "質のいい病み感情が 溢れた時の",
