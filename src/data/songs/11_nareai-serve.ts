@@ -147,7 +147,7 @@ const song: Song = {
       translation: "",
     },
     {
-      time: "0:00",
+      time: "1:27",
       original: "♫",
       pronunciation: "",
       translation: "",
