@@ -1,6 +1,6 @@
 import type { Song, SongTitle } from "@/lib/guide/types";
 
-const songTitle_01: SongTitle = {
+const byoushin: SongTitle = {
   jp: "秒針を噛む",
   kr: "초침을 깨물다",
   en: "byoushin wo kamu",
@@ -8,7 +8,7 @@ const songTitle_01: SongTitle = {
 
 const song: Song = {
   id: "byoushin-wo-kamu",
-  title: songTitle_01,
+  title: byoushin,
   youtubeId: "2Ux6BA8Jlr4",
   lyrics: [
     //================ 1절 ================//

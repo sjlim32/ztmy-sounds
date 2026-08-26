@@ -1,6 +1,6 @@
 import type { Song, SongTitle } from "@/lib/guide/types";
 
-const songTitle_05: SongTitle = {
+const taidada: SongTitle = {
   jp: "TAIDADA",
   kr: "타이다다",
   en: "",
@@ -8,7 +8,7 @@ const songTitle_05: SongTitle = {
 
 const song: Song = {
   id: "taidada",
-  title: songTitle_05,
+  title: taidada,
   youtubeId: "rdKOnKhK8GU",
   lyrics: [
     {

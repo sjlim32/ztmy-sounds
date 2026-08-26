@@ -1,6 +1,6 @@
 import type { Song, SongTitle } from "@/lib/guide/types";
 
-const songTitle_10: SongTitle = {
+const tune: SongTitle = {
   jp: "ミラーチューン",
   kr: "미러튠",
   en: "mirror tune",
@@ -8,7 +8,7 @@ const songTitle_10: SongTitle = {
 
 const song: Song = {
   id: "mirror-tune",
-  title: songTitle_10,
+  title: tune,
   youtubeId: "jd9tEPZVuy8",
   lyrics: [
     {
