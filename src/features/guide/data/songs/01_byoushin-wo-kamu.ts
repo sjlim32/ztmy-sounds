@@ -11,7 +11,6 @@ const song: Song = {
   title: byoushin,
   youtubeId: "2Ux6BA8Jlr4",
   lyrics: [
-    //================ 1절 ================//
     {
       time: "0:0",
       original: "♫",
@@ -23,6 +22,7 @@ const song: Song = {
         tag: "swing",
       },
     },
+    //================ 1절 ================//
     {
       time: "0:29.2",
       original: "生活の偽造 いつも通り 通り過ぎて",
