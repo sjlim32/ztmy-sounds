@@ -6,6 +6,8 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { songList } from "@/features/guide/data/songs";
 import { HomeIcon } from "@/components/icons/HomeIcon";
+import { CallIcon } from "@/features/guide/components/CallIcon";
+import { getSongCallTags } from "@/features/guide/lib/song-call-tags";
 
 interface SongListProps {
   selectedSongId: string | null;
@@ -113,7 +115,7 @@ const accentBarStyles = cva(
 );
 
 const itemTitleStyles = cva(
-  "font-mkpop tablet:text-2xl text-xl leading-tight transition-colors",
+  "font-mkpop tablet:text-2xl text-md leading-tight transition-colors",
   {
     variants: {
       selected: {
@@ -198,21 +200,33 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                   <div className="overflow-hidden">
                     <Link
                       href={isSelected ? "/guide" : `/guide/${item.id}`}
-                      className="group relative block rounded-md px-4 py-2 transition-colors"
+                      className={cn(
+                        "group tablet:py-2 relative block rounded-md px-4 transition-colors",
+                        isSelected ? "py-1" : "tablet:py-2",
+                      )}
                     >
                       <span
                         className={accentBarStyles({ selected: isSelected })}
                       />
 
-                      <div className="flex flex-col gap-0.5">
-                        <span
-                          className={itemTitleStyles({ selected: isSelected })}
-                        >
-                          {item.title.jp}
-                        </span>
-                        <span className="text-sm leading-tight text-gray-400 transition-colors group-hover:text-white">
-                          {item.title.kr}
-                        </span>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex flex-col gap-0.5">
+                          <span
+                            className={itemTitleStyles({
+                              selected: isSelected,
+                            })}
+                          >
+                            {item.title.jp}
+                          </span>
+                          <span className="text-xs leading-tight text-gray-400 transition-colors group-hover:text-white md:text-sm">
+                            {item.title.kr}
+                          </span>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-1">
+                          {getSongCallTags(item).map((tag) => (
+                            <CallIcon key={tag} name={tag} size={20} />
+                          ))}
+                        </div>
                       </div>
                     </Link>
                   </div>

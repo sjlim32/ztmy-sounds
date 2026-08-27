@@ -8,20 +8,26 @@ const ICON_LABEL: Record<CallTag, string> = {
 };
 
 const ICON_SRC: Record<CallTag, string> = {
-  swing: "/song/swing-notext.webp",
-  clap: "/song/clap-notext.webp",
-  call: "/song/call.svg",
+  swing: "/components/song/swing-notext.webp",
+  clap: "/components/song/clap-notext.webp",
+  call: "/components/song/call.svg",
 };
 
-export function CallIcon({ name }: { name: CallTag }) {
+export function CallIcon({
+  name,
+  size = 24,
+}: {
+  name: CallTag;
+  size?: number;
+}) {
   return (
     <Image
       src={ICON_SRC[name]}
       alt={ICON_LABEL[name]}
       title={ICON_LABEL[name]}
       data-call-icon={name}
-      width={24}
-      height={24}
+      width={size}
+      height={size}
       className="mr-1 inline-block align-middle"
     />
   );
