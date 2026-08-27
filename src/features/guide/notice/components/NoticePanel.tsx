@@ -2,7 +2,7 @@
 
 import { useSelectedLayoutSegment } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { NoticeList } from "@/components/guide/notice/NoticeList";
+import { NoticeList } from "@/features/guide/notice/components/NoticeList";
 
 /**
  * SongPanel 좌측의 빈 공간에 뜨는 안내문 패널. 곡이 선택되면(=상세보기)

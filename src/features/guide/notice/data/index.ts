@@ -1,4 +1,4 @@
-import type { Notice } from "@/lib/notice/types";
+import type { Notice } from "@/features/guide/notice/lib/types";
 import fanPageDisclaimer from "./01_fan-page-disclaimer";
 import fightTheShamoji from "./02_fight-the-shamoji";
 

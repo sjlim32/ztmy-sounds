@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { Notice } from "@/lib/notice/types";
+import type { Notice } from "@/features/guide/notice/lib/types";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 
 interface NoticeAccordionItemProps {

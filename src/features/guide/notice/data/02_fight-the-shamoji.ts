@@ -1,5 +1,5 @@
-import type { Notice } from "@/lib/notice/types";
-import FightTheShamojiContent from "@/content/notices/fight-the-shamoji.mdx";
+import type { Notice } from "@/features/guide/notice/lib/types";
+import FightTheShamojiContent from "@/features/guide/notice/content/fight-the-shamoji.mdx";
 
 const notice: Notice = {
   id: "fight-the-shamoji",
