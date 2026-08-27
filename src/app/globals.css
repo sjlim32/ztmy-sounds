@@ -59,7 +59,7 @@ body {
 }
 
 /* 모바일(tablet 브레이크포인트 미만)에서는 세로형 배경 이미지로 교체 */
-@media (width < 40rem) {
+@media (width < 50rem) {
   body {
     background-image:
       radial-gradient(

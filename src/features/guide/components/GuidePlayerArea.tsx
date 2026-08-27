@@ -3,11 +3,15 @@
 import { useSelectedLayoutSegment } from "next/navigation";
 import { cva } from "class-variance-authority";
 import { YouTubePlayer } from "@/features/guide/components/YouTubePlayer";
-import { PlayerControls } from "@/features/guide/components/PlayerControls";
+import {
+  PlayerPrevButton,
+  PlayerNextButton,
+} from "@/features/guide/components/PlayerControls";
 
 const playerAreaStyles = cva(
   [
-    "order-2 flex w-full shrink-0 flex-col items-center justify-center overflow-hidden px-2 py-2 transition-[max-height,opacity] duration-500",
+    "order-2 flex w-full shrink-0 flex-row flex-nowrap items-center justify-center gap-2 overflow-hidden px-2 py-2 transition-[max-height,opacity] duration-500",
+    "tablet:flex-wrap",
     // 1440px 미만: 패널 고정폭(w-full max-w-sm + right-6)에 맞춘 고정 여백.
     // 1440px 이상: 패널이 뷰포트의 30%(7:3 비율)로 커지므로 그만큼 동적으로 여백도 넓힘.
     "pc:pr-[calc(30vw+1.5rem)] tablet:fixed tablet:inset-0 tablet:h-auto tablet:max-h-none tablet:w-auto tablet:px-0 tablet:pr-108 tablet:pl-6",
@@ -51,8 +55,11 @@ export function GuidePlayerArea() {
         state: isSongSelected ? "open" : "closed",
       })}
     >
-      <YouTubePlayer />
-      <PlayerControls />
+      <PlayerPrevButton />
+      <div className="tablet:order-1 tablet:basis-full flex w-2/3 justify-center">
+        <YouTubePlayer />
+      </div>
+      <PlayerNextButton />
     </div>
   );
 }
