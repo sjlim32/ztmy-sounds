@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { getSong } from "@/data/songs";
-import { usePlayer } from "@/context/player-context";
+import { usePlayer } from "@/features/guide/player-context";
 
 interface YTPlayer {
   getCurrentTime: () => number;

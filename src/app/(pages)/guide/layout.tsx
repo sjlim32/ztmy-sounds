@@ -1,4 +1,4 @@
-import { PlayerProvider } from "@/context/player-context";
+import { PlayerProvider } from "@/features/guide/player-context";
 import { GuidePlayerArea } from "@/components/guide/detail/GuidePlayerArea";
 import { SongPanel } from "@/components/guide/SongPanel";
 import { NoticePanel } from "@/components/guide/notice/NoticePanel";
