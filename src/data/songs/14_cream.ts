@@ -24,7 +24,6 @@ const song: Song = {
       original: "C R **E A M**",
       pronunciation: "",
       translation: "",
-
       cheer: {
         text: '\"E A M\" 박자에 맞춰',
         tag: "clap",
@@ -42,7 +41,6 @@ const song: Song = {
       original: "C R **E A M**",
       pronunciation: "",
       translation: "",
-
       cheer: {
         text: '\"E A M\" 박자에 맞춰',
         tag: "clap",
@@ -60,7 +58,6 @@ const song: Song = {
       original: "C R **E A M**",
       pronunciation: "",
       translation: "",
-
       cheer: {
         text: '\"E A M\" 박자에 맞춰',
         tag: "clap",
@@ -78,7 +75,6 @@ const song: Song = {
       original: "C R **E A M**",
       pronunciation: "",
       translation: "",
-
       cheer: {
         text: '\"E A M\" 박자에 맞춰',
         tag: "clap",
@@ -114,7 +110,6 @@ const song: Song = {
       original: "C R **E A M**",
       pronunciation: "",
       translation: "",
-
       cheer: {
         text: '\"E A M\" 박자에 맞춰',
         tag: "clap",
@@ -134,7 +129,6 @@ const song: Song = {
       interlude: true,
     },
     //================ 1절 ================//
-    // 47초 추가
     {
       time: "0:46.8",
       original: "カスタードクリーム ハンドクリーム",
@@ -284,6 +278,7 @@ const song: Song = {
       translation: "",
       interlude: true,
     },
+    //================ 2절 ================//
     {
       time: "2:07.4",
       original: "逃れることも 時には賢く",
@@ -414,6 +409,7 @@ const song: Song = {
       translation: "",
       interlude: true,
     },
+    //================ 3절 ================//
     {
       time: "3:10.8",
       original: "全てを良く思えなくていい",
