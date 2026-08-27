@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { noticeList } from "@/features/guide/notice/data";
-import { NoticeAccordionItem } from "@/features/guide/notice/components/NoticeAccordionItem";
-import { useNoticeDismissal } from "@/features/guide/notice/lib/dismissal";
+import { noticeList } from "@/features/notice/data";
+import { NoticeAccordionItem } from "@/features/notice/components/NoticeAccordionItem";
+import { useNoticeDismissal } from "@/features/notice/lib/dismissal";
 
 /**
  * 안내문은 항상 최대 1개만 열려 있습니다 — 어떤 항목이 열려있는지를 여기서
