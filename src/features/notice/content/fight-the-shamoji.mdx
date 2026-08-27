@@ -2,26 +2,43 @@
 
 import Image from "next/image";
 
-응원법은 크게 두 가지예요. 샤모지를 위아래로 흔드는 **SWING**과, 짝짝 마주쳐서
-소리를 내는 **CLAP**. 곡마다 어느 타이밍에 어떤 동작을 하는지 가사 옆 아이콘으로
-표시되어 있으니 참고하세요.
+응원법은 크게 3가지로 나뉩니다. 세부적인 내용은 가사 위를 참고해주세요.
 
-<Image
-  src="/song/swing.webp"
-  alt="샤모지 흔들기"
-  width={96}
-  height={96}
-  className="rounded-lg"
-/>
+<section className="flex text-center justify-center gap-12">
+  <figure className="flex flex-col gap-0">
+    <Image
+      src="/components/song/swing.webp"
+      alt="샤모지 흔들기"
+      width={96}
+      height={96}
+      className="rounded-lg"
+    />
+    
+    <legend className="font-semibold">샤모지 흔들기</legend>
+  </figure>
 
-샤모지 흔들기
+<figure className="flex text-center flex-col gap-0">
+  <Image
+    src="/components/song/clap.webp"
+    alt="샤모지 박수"
+    width={96}
+    height={96}
+    className="rounded-lg"
+  />
 
-<Image
-  src="/song/clap.webp"
-  alt="샤모지 박수"
-  width={96}
-  height={96}
-  className="rounded-lg"
-/>
+  <legend className="font-semibold">샤모지 박수</legend>
+</figure>
 
-샤모지 박수
+<figure className="flex flex-col text-center gap-0">
+  <Image
+    src="/components/song/call.svg"
+    alt="샤모지 흔들기"
+    width={96}
+    height={96}
+    className="rounded-lg"
+  />
+
+  <legend className="font-semibold">떼창</legend>
+</figure>
+
+</section>

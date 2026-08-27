@@ -3,9 +3,11 @@ import FanPageDisclaimerContent from "@/features/notice/content/fan-page-disclai
 
 const notice: Notice = {
   id: "fan-page-disclaimer",
+  type: "notice",
   title: "안내",
   version: 1,
   content: FanPageDisclaimerContent,
+  visible: false,
   isAlwaysOpen: false,
 };
 

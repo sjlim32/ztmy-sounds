@@ -1,8 +1,52 @@
-사운드 플래닛 페스티벌에서 응원도구(샤모지)의 사용은 지양해주세요.
+import { NoticeImage } from "@/features/notice/components/NoticeImage";
 
-음악 페스티벌은 자고로 자신의 덕력을 뽐내는 곳이라고 알고 있습니다.
-즛토마요의 세번째 내한이자 한국에서 열리는 페스티벌의 첫 참가를, 그것도 헤드라이너로 한다는 소식에 다들 들뜨셨으리라 생각합니다. 물론 저도 그렇구요.
+export const description = `언제나 FIGHT THE SHAMOJI (샤모지) 애용해 주셔서 감사합니다.
+기본 페스에서는, 자신들만의 1인 라이브와는 다른 것도 있어,
+많은 사람들이라면, 저 녀석들 전원 동창회 측에 보여질까 생각해서,
+샤모지 비권장으로 하고 있습니다 (샤모지 모르는 처음 보는 분에게 폐가 되지 않도록, 맞아버린다든가)
+라고는 하지만 SNS등은 보지 않는 분도 있기 때문에, 부드럽게 퍼져 나갔으면 좋겠다고 생각하고 있습니다.
+특별히 주의하지 않아도 괜찮아. (샤모지를 가져오는 것 자체는 문제가 없어요)
+아무쪼록 아무쪼록입니다
+`;
 
-하지만 아티스트 측에서 여러 채널을 통해 페스티벌 등에선 타 아티스트의 팬들도 함께 즐길 수 있게 응원도구의 사용을 자제해달라고 당부해 온 만큼, 한국 즛토마로 여러분들도 샤모지와 링라이트는 집에 잠시 내려두고 다같이 온몸으로 축제를 마음껏 즐길 수 있는 자리가 되었으면 좋겠습니다.
+<strong className="tablet:text-2xl text-white">
+  페스티벌에서 응원도구(샤모지)의 사용은 지양해주세요.
+</strong>
+<br />
 
-https://x.com/zutomayo_staff/status/1748334509001691473
+음악 페스티벌은 자고로 자신의 덕력을 뽐내는 곳이라고 알고 있습니다. <br />
+ずっと真夜中でいいのに。의 세번째 내한이자 한국에서 열리는 페스티벌의 첫 참가를,
+그것도 헤드라이너로 한다는 소식에 다들 들뜨셨으리라 생각합니다.
+
+<br />
+하지만 아티스트 측에서 여러 채널을 통해 페스티벌 등에선
+
+<strong>
+  "타 아티스트의 팬들도 함께 즐길 수 있게 응원도구의 사용을 자제해달라"
+</strong>
+당부해 온 만큼, 한국 즛토마로 여러분들도 샤모지와 링라이트는 집에 잠시 내려두고
+다같이 온몸으로 축제를 마음껏 즐길 수 있는 자리가 되었으면 좋겠습니다.
+
+<div className="mt-3 flex flex-wrap gap-3">
+  <NoticeImage
+    src="/components/notice/festival/shamoji_acane.webp"
+    alt="아카네 인스타그램 스토리 캡처"
+    width={850}
+    height={1470}
+    thumbnailWidth={200}
+    thumbnailHeight={150}
+    thumbnailCrop="top"
+    caption={description}
+  />
+  <NoticeImage
+    src="/components/notice/festival/shamoji_staff.webp"
+    alt="즛토마요 스태프 공지 캡처"
+    width={594}
+    height={209}
+    thumbnailWidth={280}
+    thumbnailHeight={100}
+    caption="즛토마요 스태프 공지"
+    sourceHref="https://x.com/zutomayo_staff/status/1748334509001691473"
+    sourceLabel="출처"
+  />
+</div>
