@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
 import { visitEvent } from "@/data/event";
 import { ARTIST } from "@/data/artist";
-import { Header } from "@/components/home/Header";
-import { NextVisit } from "@/components/home/NextVisit";
-import { Countdown } from "@/components/home/Countdown";
-import { MainNavLink } from "@/components/home/MainNavLink";
+import { Header } from "@/features/home/components/Header";
+import { NextVisit } from "@/features/home/components/NextVisit";
+import { Countdown } from "@/features/home/components/Countdown";
+import { MainNavLink } from "@/features/home/components/MainNavLink";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
 
