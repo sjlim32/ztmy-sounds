@@ -8,9 +8,9 @@ const ICON_LABEL: Record<CallTag, string> = {
 };
 
 const ICON_SRC: Record<CallTag, string> = {
-  swing: "/components/song/swing-notext.webp",
-  clap: "/components/song/clap-notext.webp",
-  call: "/components/song/call.svg",
+  swing: "/assets/song/swing-notext.webp",
+  clap: "/assets/song/clap-notext.webp",
+  call: "/assets/song/call.svg",
 };
 
 export function CallIcon({

@@ -10,7 +10,7 @@ export interface VisitEvent {
 
 export const visitEvent: VisitEvent = {
   tourName: "사운드 플래닛 페스티널 2026",
-  tourImg: "/next_visit/sound-planet_3.webp",
+  tourImg: "/assets/next-visit/sound-planet-3.webp",
   tourUrl: "https://soundplanetfestival.co.kr/",
   place: "PARADISE CITY",
   placeUrl: "https://maps.app.goo.gl/TXhUQEc1cXpRPY1b8",
