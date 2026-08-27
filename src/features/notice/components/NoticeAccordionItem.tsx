@@ -49,7 +49,12 @@ export function NoticeAccordionItem({
           />
         </span>
 
-        <span className="text-2xl leading-tight font-bold tracking-tight text-white">
+        <span
+          className={cn(
+            "transi text-2xl leading-tight font-bold tracking-tight",
+            isOpen ? "text-white/60" : "text-white",
+          )}
+        >
           {notice.title}
         </span>
 
@@ -70,7 +75,7 @@ export function NoticeAccordionItem({
         )}
       >
         <div className="overflow-hidden">
-          <div className="space-y-3 px-4 pb-4 text-sm leading-relaxed text-white/70 [&_strong]:text-white">
+          <div className="tablet:text-lg space-y-3 px-4 pb-4 text-sm leading-relaxed [&_strong]:text-white">
             <Content />
 
             {onDismissChange && (

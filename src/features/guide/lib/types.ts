@@ -28,5 +28,6 @@ export interface Song {
   id: string;
   title: SongTitle;
   youtubeId: string;
+  tag: CallTag[];
   lyrics: LyricLine[];
 }

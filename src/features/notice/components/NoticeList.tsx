@@ -13,6 +13,7 @@ import { useNoticeDismissal } from "@/features/notice/lib/dismissal";
 export function NoticeList() {
   const alwaysOpenNotice =
     noticeList.find((notice) => notice.isAlwaysOpen) ?? null;
+  const filteredNotice = noticeList.filter((notice) => notice.visible);
   const [isDismissed, setDismissed] = useNoticeDismissal(
     alwaysOpenNotice?.id ?? "",
     alwaysOpenNotice?.version ?? 0,
@@ -28,7 +29,7 @@ export function NoticeList() {
 
   return (
     <div data-role="notice-list" className="flex w-full flex-col gap-3">
-      {noticeList.map((notice) => (
+      {filteredNotice.map((notice) => (
         <NoticeAccordionItem
           key={notice.id}
           notice={notice}
