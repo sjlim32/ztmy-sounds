@@ -83,6 +83,14 @@ src/
 - `pnpm format` (Prettier + `prettier-plugin-tailwindcss`)이 클래스 순서를 자동
   정렬합니다. 커밋 전에 한 번 돌리는 걸 권장합니다.
 
+## 정적 에셋
+
+- 컴포넌트가 참조하는 정적 에셋은 `public/assets/<feature>/...` 경로 컨벤션을
+  따릅니다 (예: `public/assets/notice/festival/*.webp`). `/assets` 접두사를
+  빠뜨리면 404가 납니다.
+- 배경 이미지는 `public/backgrounds/`, PWA/매니페스트 아이콘은 `public/icons/`,
+  Open Graph 이미지는 `public/og/`, 폰트는 `public/fonts/`에 둡니다.
+
 ## Git / 커밋
 
 - Conventional Commits 접두사를 사용합니다 (`feat:`, `fix:`, `chore:`, `docs:`,
