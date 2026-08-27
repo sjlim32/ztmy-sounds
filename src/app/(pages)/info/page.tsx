@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import InfoContent from "@/content/info.mdx";
+import InfoContent from "@/features/info/info.mdx";
 import { visitEvent } from "@/data/event";
 
 export const metadata: Metadata = {
