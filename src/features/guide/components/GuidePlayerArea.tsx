@@ -6,12 +6,17 @@ import { YouTubePlayer } from "@/features/guide/components/YouTubePlayer";
 import {
   PlayerPrevButton,
   PlayerNextButton,
+  PlayerSongListLink,
 } from "@/features/guide/components/PlayerControls";
 
 const playerAreaStyles = cva(
   [
     "order-2 flex w-full shrink-0 flex-row flex-nowrap items-center justify-center gap-2 overflow-hidden px-2 py-2 transition-[max-height,opacity] duration-500",
-    "tablet:flex-wrap",
+    // content-center를 명시하지 않으면 브라우저마다(특히 Safari) 줄바꿈된 두
+    // 줄(영상/컨트롤) 사이 여백을 다르게 계산해 영상과 컨트롤 사이가 크게
+    // 벌어질 수 있어 명시적으로 고정. center로 둬서 영상+컨트롤 묶음 전체가
+    // 화면 세로 중앙에 오도록 함.
+    "tablet:flex-wrap tablet:content-center",
     // 1440px 미만: 패널 고정폭(w-full max-w-sm + right-6)에 맞춘 고정 여백.
     // 1440px 이상: 패널이 뷰포트의 30%(7:3 비율)로 커지므로 그만큼 동적으로 여백도 넓힘.
     "pc:pr-[calc(30vw+1.5rem)] tablet:fixed tablet:inset-0 tablet:h-auto tablet:max-h-none tablet:w-auto tablet:px-0 tablet:pr-108 tablet:pl-6",
@@ -59,6 +64,7 @@ export function GuidePlayerArea() {
       <div className="tablet:order-1 tablet:basis-full flex w-2/3 justify-center">
         <YouTubePlayer />
       </div>
+      <PlayerSongListLink />
       <PlayerNextButton />
     </div>
   );

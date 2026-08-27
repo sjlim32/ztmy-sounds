@@ -60,7 +60,7 @@ export function PlayerNextButton() {
     <Link
       href={`/guide/${nextId}`}
       aria-label="다음곡"
-      className={cn(navButtonClass, "tablet:order-3")}
+      className={cn(navButtonClass, "tablet:order-4")}
     >
       <ChevronLeftIcon className="h-5 w-5 rotate-180" />
     </Link>
@@ -69,9 +69,24 @@ export function PlayerNextButton() {
       type="button"
       disabled
       aria-label="다음곡"
-      className={cn(navButtonClass, "tablet:order-3")}
+      className={cn(navButtonClass, "tablet:order-4")}
     >
       <ChevronLeftIcon className="h-5 w-5 rotate-180" />
     </button>
+  );
+}
+
+/** 노래 목록으로 돌아가는 링크 — 태블릿/PC에서만, 영상 바로 아래 이전/다음곡 버튼 사이에 표시. */
+export function PlayerSongListLink() {
+  const segment = useSelectedLayoutSegment();
+  if (!segment) return null;
+
+  return (
+    <Link
+      href="/guide"
+      className="hover:border-ztmy-magenta/60 tablet:order-3 hidden rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none tablet:inline-block"
+    >
+      노래 목록
+    </Link>
   );
 }
