@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { useAutoScrollPreference } from "@/features/guide/lib/auto-scroll";
-import { AutoScrollStatusIcon } from "@/components/guide/detail/AutoScrollStatusIcon";
+import { AutoScrollStatusIcon } from "@/features/guide/components/AutoScrollStatusIcon";
 
 export function AutoScrollToggle() {
   const [autoScroll, setAutoScroll] = useAutoScrollPreference();

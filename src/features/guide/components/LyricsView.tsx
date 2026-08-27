@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Song } from "@/features/guide/lib/types";
 import { parseTimestamp } from "@/features/guide/lib/timestamp";
-import { LyricLine } from "@/components/guide/detail/LyricLine";
-import { AutoScrollToggle } from "@/components/guide/detail/AutoScrollToggle";
+import { LyricLine } from "@/features/guide/components/LyricLine";
+import { AutoScrollToggle } from "@/features/guide/components/AutoScrollToggle";
 import { useAutoScrollPreference } from "@/features/guide/lib/auto-scroll";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 

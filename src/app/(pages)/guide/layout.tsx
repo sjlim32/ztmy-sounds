@@ -1,6 +1,6 @@
 import { PlayerProvider } from "@/features/guide/player-context";
-import { GuidePlayerArea } from "@/components/guide/detail/GuidePlayerArea";
-import { SongPanel } from "@/components/guide/SongPanel";
+import { GuidePlayerArea } from "@/features/guide/components/GuidePlayerArea";
+import { SongPanel } from "@/features/guide/components/SongPanel";
 import { NoticePanel } from "@/components/guide/notice/NoticePanel";
 
 export default function GuideLayout({ children }: LayoutProps<"/guide">) {

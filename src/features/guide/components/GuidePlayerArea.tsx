@@ -2,8 +2,8 @@
 
 import { useSelectedLayoutSegment } from "next/navigation";
 import { cva } from "class-variance-authority";
-import { YouTubePlayer } from "@/components/guide/detail/YouTubePlayer";
-import { PlayerControls } from "@/components/guide/detail/PlayerControls";
+import { YouTubePlayer } from "@/features/guide/components/YouTubePlayer";
+import { PlayerControls } from "@/features/guide/components/PlayerControls";
 
 const playerAreaStyles = cva(
   [

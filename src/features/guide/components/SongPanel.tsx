@@ -7,8 +7,8 @@ import type { Song } from "@/features/guide/lib/types";
 import { getSong } from "@/features/guide/data/songs";
 import { usePlayer } from "@/features/guide/player-context";
 import { getActiveLineIndex } from "@/features/guide/lib/lyric-sync";
-import { SongList } from "@/components/guide/list/SongList";
-import { LyricsView } from "@/components/guide/detail/LyricsView";
+import { SongList } from "@/features/guide/components/SongList";
+import { LyricsView } from "@/features/guide/components/LyricsView";
 
 const LYRICS_ENTER_DELAY_MS = 600; // 목록 접힘 애니메이션(600ms)이 끝난 뒤 가사가 이어서 나타나도록 주는 지연
 const PANEL_ENTER_DELAY_MS = 150; // GuideDimOverlay의 duration-700(화면이 어두워지는 시간)과 맞춰, 그 뒤에 패널이 나타나도록 주는 지연

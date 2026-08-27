@@ -9,7 +9,7 @@ import {
   parseEmphasis,
   parseIconTokens,
 } from "@/features/guide/lib/icon-tokens";
-import { CallIcon } from "@/components/guide/detail/CallIcon";
+import { CallIcon } from "@/features/guide/components/CallIcon";
 
 // 테두리색
 const TAG_BORDER_COLOR: Record<CallTag, string> = {
