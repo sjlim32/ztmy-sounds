@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getRemaining, type Remaining } from "@/lib/guide/countdown";
+import { getRemaining, type Remaining } from "@/features/home/lib/countdown";
 import type { VisitEvent } from "@/data/event";
 
 // 공연 시작 후 이 시간(시간 단위)까지는 "당일" 취급, 그 이후엔 "종료"로 취급.

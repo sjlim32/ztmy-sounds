@@ -1,11 +1,11 @@
 "use client";
 
 import { useId } from "react";
-import type { Remaining } from "@/lib/guide/countdown";
+import type { Remaining } from "@/features/home/lib/countdown";
 import {
   DONE_AFTER_HOURS,
   useEventCountdown,
-} from "@/lib/guide/event-countdown";
+} from "@/features/home/lib/event-countdown";
 import type { VisitEvent } from "@/data/event";
 import { cn } from "@/lib/utils";
 

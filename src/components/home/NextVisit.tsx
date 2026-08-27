@@ -8,7 +8,7 @@ import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import {
   DONE_AFTER_HOURS,
   useEventCountdown,
-} from "@/lib/guide/event-countdown";
+} from "@/features/home/lib/event-countdown";
 
 export function NextVisit({ event }: { event: VisitEvent }) {
   const { remaining, hoursSincePast } = useEventCountdown(event);
