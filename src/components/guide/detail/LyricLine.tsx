@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import type {
   CallTag,
   LyricLine as LyricLineData,
@@ -51,7 +51,7 @@ export function LyricLine({ line, isActive, lineClick }: lyricLineProps) {
       data-active={isActive || undefined}
       data-time={line.time}
       data-call-tag={lineTag}
-      className={clsx(
+      className={cn(
         "group border border-transparent px-3 transition-colors hover:bg-white/10",
         lineClick && "cursor-pointer",
         line.interlude ? "py-6 text-center" : "py-3 text-left",
@@ -65,7 +65,7 @@ export function LyricLine({ line, isActive, lineClick }: lyricLineProps) {
         <button
           type="button"
           onClick={lineClick}
-          className={clsx(
+          className={cn(
             "w-full group-hover:cursor-pointer",
             line.interlude ? "text-center" : "text-left",
           )}

@@ -1,6 +1,6 @@
 "use client";
 
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import type { Notice } from "@/lib/notice/types";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 
@@ -34,7 +34,7 @@ export function NoticeAccordionItem({
       >
         <span className="flex items-center justify-between">
           <span
-            className={clsx(
+            className={cn(
               "font-mono text-[10px] font-medium tracking-[0.3em] uppercase",
               notice.isAlwaysOpen ? "text-ztmy-pink" : "text-white/40",
             )}
@@ -42,7 +42,7 @@ export function NoticeAccordionItem({
             {notice.isAlwaysOpen ? "Notice" : "Guide"}
           </span>
           <ChevronDownIcon
-            className={clsx(
+            className={cn(
               "h-3 w-3 shrink-0 text-white/40 transition-transform group-hover:text-white/70",
               !isOpen && "rotate-180",
             )}
@@ -55,7 +55,7 @@ export function NoticeAccordionItem({
 
         <span className="relative block h-px w-full overflow-hidden bg-white/15">
           <span
-            className={clsx(
+            className={cn(
               "from-ztmy-pink to-ztmy-purple absolute inset-y-0 left-0 w-full origin-left scale-x-0 bg-linear-to-r transition-transform duration-500 ease-out",
               isOpen ? "scale-x-100" : "group-hover:scale-x-100",
             )}
@@ -64,7 +64,7 @@ export function NoticeAccordionItem({
       </button>
 
       <div
-        className={clsx(
+        className={cn(
           "grid transition-[grid-template-rows] duration-300 ease-out",
           isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
         )}

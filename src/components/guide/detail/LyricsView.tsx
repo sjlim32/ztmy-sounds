@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import type { Song } from "@/lib/guide/types";
 import { parseTimestamp } from "@/lib/guide/timestamp";
 import { LyricLine } from "@/components/guide/detail/LyricLine";
@@ -79,7 +79,7 @@ export function LyricsView({
       <ol
         ref={listRef}
         data-role="lyric-list"
-        className={clsx(
+        className={cn(
           // bottom-12 = 스크롤 화살표 영역 확보
           "absolute inset-x-0 top-0 bottom-0 scrollbar-none overflow-y-auto py-10 [&::-webkit-scrollbar]:hidden",
           "tablet:bottom-12 tablet:py-7",

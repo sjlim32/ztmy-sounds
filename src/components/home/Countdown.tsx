@@ -7,7 +7,7 @@ import {
   useEventCountdown,
 } from "@/lib/guide/event-countdown";
 import type { VisitEvent } from "@/data/event";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 interface CountdownProps {
   event: VisitEvent;
@@ -21,7 +21,7 @@ export function Countdown({ event }: CountdownProps) {
   return (
     <div
       data-role="countdown"
-      className={clsx(
+      className={cn(
         "flex w-full items-center justify-center gap-3 rounded-md bg-black/40 p-4",
         "tablet:gap-4 tablet:bg-transparent",
       )}
@@ -40,7 +40,7 @@ export function Countdown({ event }: CountdownProps) {
                 다음 내한을 기다려주세요 !
               </p>
               <p
-                className={clsx(
+                className={cn(
                   "mt-1 flex items-baseline gap-3 font-mono text-base font-bold text-white/60 tabular-nums",
                   "tablet:text-xl",
                 )}
@@ -71,7 +71,7 @@ export function Countdown({ event }: CountdownProps) {
               공연까지
             </p>
             <p
-              className={clsx(
+              className={cn(
                 "flex items-baseline gap-1.5 font-mono text-base font-bold text-white tabular-nums",
                 "tablet:gap-3 tablet:text-2xl",
               )}

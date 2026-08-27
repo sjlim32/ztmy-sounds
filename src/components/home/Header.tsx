@@ -1,10 +1,10 @@
 import { artist } from "@/data/artist";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 export function Header({ artist }: { artist: artist }) {
   return (
     <header
-      className={clsx(
+      className={cn(
         "hidden w-fit flex-col items-start",
         "tablet:absolute tablet:top-8 tablet:left-8 tablet:flex",
       )}
@@ -27,7 +27,7 @@ export function Header({ artist }: { artist: artist }) {
 
       {/* 메인 텍스트: 기존과 동일한 깔끔한 화이트 솔리드 */}
       <span
-        className={clsx(
+        className={cn(
           "font-mkpop leading-tight font-extrabold tracking-tight text-white",
           "pc:text-6xl tablet:text-5xl",
           "drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)]",

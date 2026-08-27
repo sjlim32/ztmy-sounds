@@ -2,7 +2,7 @@
 
 import { useSelectedLayoutSegment } from "next/navigation";
 import { useEffect, useState } from "react";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import type { Song } from "@/lib/guide/types";
 import { getSong } from "@/data/songs";
 import { usePlayer } from "@/context/player-context";
@@ -62,7 +62,7 @@ export function SongPanel() {
   return (
     <div
       data-role="song-panel"
-      className={clsx(
+      className={cn(
         // 모바일: 자체 박스를 없애 SongList/LyricsView가 guide/layout.tsx의
         // flex-col에 직접 노출되도록 함(각자 order-1/order-3로 위치 결정).
         // 배경/투명도/애니메이션은 이제 SongList의 ul, LyricsView가 각자

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 /**
  * 메인(/) 을 제외한 모든 페이지에서 화면을 어둡게, 메인으로 돌아가면 다시
@@ -18,7 +18,7 @@ export function GuideDimOverlay() {
   return (
     <div
       aria-hidden
-      className={clsx(
+      className={cn(
         "pointer-events-none fixed inset-0 z-0 bg-black/50 transition-opacity duration-700",
         isDimmed ? "opacity-100" : "opacity-0",
       )}

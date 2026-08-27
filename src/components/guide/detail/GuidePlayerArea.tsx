@@ -1,9 +1,30 @@
 "use client";
 
 import { useSelectedLayoutSegment } from "next/navigation";
-import clsx from "clsx";
+import { cva } from "class-variance-authority";
 import { YouTubePlayer } from "@/components/guide/detail/YouTubePlayer";
 import { PlayerControls } from "@/components/guide/detail/PlayerControls";
+
+const playerAreaStyles = cva(
+  [
+    "order-2 flex w-full shrink-0 flex-col items-center justify-center overflow-hidden px-2 py-2 transition-[max-height,opacity] duration-500",
+    // 1440px 미만: 패널 고정폭(w-full max-w-sm + right-6)에 맞춘 고정 여백.
+    // 1440px 이상: 패널이 뷰포트의 30%(7:3 비율)로 커지므로 그만큼 동적으로 여백도 넓힘.
+    "pc:pr-[calc(30vw+1.5rem)] tablet:fixed tablet:inset-0 tablet:h-auto tablet:max-h-none tablet:w-auto tablet:px-0 tablet:pr-108 tablet:pl-6",
+  ],
+  {
+    variants: {
+      state: {
+        // 모바일 높이는 뷰포트 vh가 아니라 콘텐츠(aspect-video 영상 + 컨트롤)
+        // 크기로 정해져야 너비가 바뀌어도 영상 비율이 안 깨지고 PlayerControls가
+        // 항상 영상 바로 아래에 옴 — max-height는 열림 애니메이션용 상한일 뿐,
+        // 실제 높이는 h-auto(기본값)로 콘텐츠에 맡김.
+        open: "tablet:bg-transparent max-h-dvh bg-black/50 opacity-100",
+        closed: "pointer-events-none max-h-0 opacity-0",
+      },
+    },
+  },
+);
 
 /**
  * 곡이 선택되지 않은 목록 화면(/guide)에서는 영상 영역을 fade-out합니다.
@@ -26,19 +47,9 @@ export function GuidePlayerArea() {
   return (
     <div
       data-role="guide-player-area"
-      className={clsx(
-        // 1440px 미만: 패널 고정폭(w-full max-w-sm + right-6)에 맞춘 고정 여백.
-        // 1440px 이상: 패널이 뷰포트의 30%(7:3 비율)로 커지므로 그만큼 동적으로 여백도 넓힘.
-        "order-2 flex w-full shrink-0 flex-col items-center justify-center overflow-hidden px-2 py-2 transition-[max-height,opacity] duration-500",
-        "pc:pr-[calc(30vw+1.5rem)] tablet:fixed tablet:inset-0 tablet:h-auto tablet:max-h-none tablet:w-auto tablet:px-0 tablet:pr-108 tablet:pl-6",
-        // 모바일 높이는 뷰포트 vh가 아니라 콘텐츠(aspect-video 영상 + 컨트롤)
-        // 크기로 정해져야 너비가 바뀌어도 영상 비율이 안 깨지고 PlayerControls가
-        // 항상 영상 바로 아래에 옴 — max-height는 열림 애니메이션용 상한일 뿐,
-        // 실제 높이는 h-auto(기본값)로 콘텐츠에 맡김.
-        isSongSelected
-          ? "tablet:bg-transparent max-h-dvh bg-black/50 opacity-100"
-          : "pointer-events-none max-h-0 opacity-0",
-      )}
+      className={playerAreaStyles({
+        state: isSongSelected ? "open" : "closed",
+      })}
     >
       <YouTubePlayer />
       <PlayerControls />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import type { VisitEvent } from "@/data/event";
 import { ExternalLinkIcon } from "@/components/icons/ExternalLinkIcon";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
@@ -17,26 +17,26 @@ export function NextVisit({ event }: { event: VisitEvent }) {
   const isDone = !!remaining?.isPast && hoursSincePast >= DONE_AFTER_HOURS;
 
   return (
-    <div data-role="next-visit" className={clsx("w-full", "tablet:w-80")}>
-      <div className={clsx("space-y-0", "tablet:space-y-4")}>
+    <div data-role="next-visit" className={cn("w-full", "tablet:w-80")}>
+      <div className={cn("space-y-0", "tablet:space-y-4")}>
         <button
           type="button"
           onClick={() => setIsOpen((open) => !open)}
-          className={clsx(
+          className={cn(
             isDone ? "tablet:flex hidden" : "flex",
             "h-10 w-full items-center justify-center gap-1.5 rounded-t-md bg-black/40 font-mono text-[9px] tracking-[0.3em] text-white/70 uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]",
             "tablet:h-auto tablet:bg-transparent tablet:pointer-events-none tablet:justify-start tablet:text-xs",
           )}
         >
           <span
-            className={clsx(
+            className={cn(
               "from-ztmy-magenta to-ztmy-pink h-1 w-4 shrink-0 bg-linear-to-r",
               "tablet:w-6",
             )}
           />
           Next Visit
           <ChevronDownIcon
-            className={clsx(
+            className={cn(
               "h-2.5 w-2.5 transition-transform",
               !isOpen && "rotate-180",
               "tablet:hidden",
@@ -47,7 +47,7 @@ export function NextVisit({ event }: { event: VisitEvent }) {
         {/* 배경(뱃지)이 확장되면서 열리는 느낌을 grid-template-rows 0fr→1fr 트랜지션으로 구현. 태블릿 이상은 항상 펼침. */}
         {!isDone && (
           <div
-            className={clsx(
+            className={cn(
               "grid rounded-b-md bg-black/40 transition-[grid-template-rows] duration-300 ease-out",
               isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
               "tablet:grid-rows-[1fr] tablet:bg-transparent",
@@ -55,13 +55,13 @@ export function NextVisit({ event }: { event: VisitEvent }) {
           >
             <div className="overflow-hidden">
               <div
-                className={clsx(
+                className={cn(
                   "space-y-1.5 pt-1.5",
                   "tablet:space-y-4 tablet:pt-0",
                 )}
               >
                 {/* 모바일 - 가로 레이아웃 */}
-                <div className={clsx("flex gap-3 px-2 pb-1", "tablet:hidden")}>
+                <div className={cn("flex gap-3 px-2 pb-1", "tablet:hidden")}>
                   <a
                     href={event.tourUrl}
                     target="_blank"
@@ -117,7 +117,7 @@ export function NextVisit({ event }: { event: VisitEvent }) {
                 </div>
 
                 {/* 태블릿 이상 - 세로 레이아웃 */}
-                <div className={clsx("hidden", "tablet:block")}>
+                <div className={cn("hidden", "tablet:block")}>
                   <a
                     href={event.tourUrl}
                     target="_blank"

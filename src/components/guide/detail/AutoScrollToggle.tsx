@@ -1,6 +1,6 @@
 "use client";
 
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import { useAutoScrollPreference } from "@/lib/guide/auto-scroll";
 import { AutoScrollStatusIcon } from "@/components/guide/detail/AutoScrollStatusIcon";
 
@@ -19,7 +19,7 @@ export function AutoScrollToggle() {
         AUTO SCROLL
       </span>
       <span
-        className={clsx(
+        className={cn(
           "relative h-5 w-9 shrink-0 rounded-full transition-colors duration-300",
           autoScroll ? "bg-ztmy-purple" : "bg-white/15",
         )}

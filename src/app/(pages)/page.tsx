@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import { visitEvent } from "@/data/event";
 import { ARTIST } from "@/data/artist";
 import { Header } from "@/components/home/Header";
@@ -15,10 +15,10 @@ export default function Home() {
 
       <main data-role="hero" className="flex flex-1 flex-col">
         {/* 모바일(640px): 세로 레이아웃 */}
-        <div className={clsx("relative flex flex-1 flex-col", "tablet:hidden")}>
+        <div className={cn("relative flex flex-1 flex-col", "tablet:hidden")}>
           {/* 높이 680px 기준 - 이상 absolute, 이하 flex */}
           <div
-            className={clsx(
+            className={cn(
               "absolute inset-0 flex flex-col items-center justify-center px-4",
               "short:static short:flex-1 short:justify-end short:pb-6",
             )}
@@ -52,7 +52,7 @@ export default function Home() {
         <section
           id="main-left"
           data-role="visit-info"
-          className={clsx(
+          className={cn(
             "fixed top-1/2 left-10 hidden -translate-y-1/2 flex-col gap-6",
             "tablet:flex",
           )}
@@ -65,7 +65,7 @@ export default function Home() {
         <nav
           id="main-right"
           data-role="site-nav"
-          className={clsx(
+          className={cn(
             "fixed top-1/2 right-20 hidden -translate-y-1/2 flex-col items-end gap-3",
             "tablet:flex",
           )}

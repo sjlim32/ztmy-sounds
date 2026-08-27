@@ -1,7 +1,7 @@
 "use client";
 
 import { useSelectedLayoutSegment } from "next/navigation";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 import { NoticeList } from "@/components/guide/notice/NoticeList";
 
 /**
@@ -19,7 +19,7 @@ export function NoticePanel() {
   return (
     <aside
       data-role="notice-panel"
-      className={clsx(
+      className={cn(
         "hidden",
         "tablet:fixed tablet:inset-0 tablet:z-10 tablet:flex tablet:items-center tablet:justify-center tablet:overflow-y-auto tablet:py-16 tablet:pr-108 tablet:pl-6",
         "pc:pr-[calc(30vw+1.5rem)]",
