@@ -15,7 +15,7 @@ import taidada from "./13_taidada";
 import cream from "./14_cream";
 
 /**
- * Each song's data lives in its own file under `src/data/songs/` (one file
+ * Each song's data lives in its own file under `src/features/guide/data/songs/` (one file
  * per song, matching its `id`) so a long lyric sheet doesn't bloat a single
  * shared array. This module just aggregates them for the list/lookup APIs
  * the guide routes rely on.

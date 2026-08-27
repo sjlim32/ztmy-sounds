@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { songList } from "@/data/songs";
+import { songList } from "@/features/guide/data/songs";
 import { SITE_URL } from "@/lib/seo";
 
 export const dynamic = "force-static";

@@ -4,7 +4,7 @@ import { useSelectedLayoutSegment } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Song } from "@/features/guide/lib/types";
-import { getSong } from "@/data/songs";
+import { getSong } from "@/features/guide/data/songs";
 import { usePlayer } from "@/features/guide/player-context";
 import { getActiveLineIndex } from "@/features/guide/lib/lyric-sync";
 import { SongList } from "@/components/guide/list/SongList";

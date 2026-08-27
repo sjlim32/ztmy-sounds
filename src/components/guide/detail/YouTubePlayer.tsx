@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { getSong } from "@/data/songs";
+import { getSong } from "@/features/guide/data/songs";
 import { usePlayer } from "@/features/guide/player-context";
 
 interface YTPlayer {

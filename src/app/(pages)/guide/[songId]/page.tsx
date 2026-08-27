@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getSong, songList } from "@/data/songs";
+import { getSong, songList } from "@/features/guide/data/songs";
 
 export function generateStaticParams() {
   return songList.map((song) => ({ songId: song.id }));

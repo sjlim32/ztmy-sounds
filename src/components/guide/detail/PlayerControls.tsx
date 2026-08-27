@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
-import { songList } from "@/data/songs";
+import { songList } from "@/features/guide/data/songs";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 
 function getNeighborIds(songId: string): {

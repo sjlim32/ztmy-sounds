@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { songList } from "@/data/songs";
+import { songList } from "@/features/guide/data/songs";
 import { HomeIcon } from "@/components/icons/HomeIcon";
 
 interface SongListProps {
