@@ -3,10 +3,10 @@
 import { useSelectedLayoutSegment } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import type { Song } from "@/lib/guide/types";
+import type { Song } from "@/features/guide/lib/types";
 import { getSong } from "@/data/songs";
 import { usePlayer } from "@/context/player-context";
-import { getActiveLineIndex } from "@/lib/guide/lyric-sync";
+import { getActiveLineIndex } from "@/features/guide/lib/lyric-sync";
 import { SongList } from "@/components/guide/list/SongList";
 import { LyricsView } from "@/components/guide/detail/LyricsView";
 

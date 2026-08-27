@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import type { Song } from "@/lib/guide/types";
-import { parseTimestamp } from "@/lib/guide/timestamp";
+import type { Song } from "@/features/guide/lib/types";
+import { parseTimestamp } from "@/features/guide/lib/timestamp";
 import { LyricLine } from "@/components/guide/detail/LyricLine";
 import { AutoScrollToggle } from "@/components/guide/detail/AutoScrollToggle";
-import { useAutoScrollPreference } from "@/lib/guide/auto-scroll";
+import { useAutoScrollPreference } from "@/features/guide/lib/auto-scroll";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 
 export function LyricsView({

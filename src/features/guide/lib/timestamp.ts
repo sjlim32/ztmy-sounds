@@ -1,4 +1,4 @@
-import type { Timestamp } from "@/lib/guide/types";
+import type { Timestamp } from "@/features/guide/lib/types";
 
 const TIMESTAMP_PATTERN = /^(\d+):(\d{1,2}(?:\.\d+)?)$/;
 

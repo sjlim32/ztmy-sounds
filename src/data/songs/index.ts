@@ -1,4 +1,4 @@
-import type { Song } from "@/lib/guide/types";
+import type { Song } from "@/features/guide/lib/types";
 import byoushinWoKamu from "./01_byoushin-wo-kamu";
 import nouriuenoCraker from "./02_nouriueno-cracker";
 import seigi from "./03_seigi";

@@ -1,4 +1,4 @@
-import type { Song, SongTitle } from "@/lib/guide/types";
+import type { Song, SongTitle } from "@/features/guide/lib/types";
 
 const cream: SongTitle = {
   jp: "クリームで会いにいけますか",

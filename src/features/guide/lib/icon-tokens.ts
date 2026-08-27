@@ -1,4 +1,4 @@
-import { CALL_TAGS, type CallTag } from "@/lib/guide/types";
+import { CALL_TAGS, type CallTag } from "@/features/guide/lib/types";
 
 export type TextPart =
   { type: "text"; value: string } | { type: "icon"; value: CallTag };

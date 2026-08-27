@@ -4,8 +4,11 @@ import type {
   CallTag,
   LyricLine as LyricLineData,
   LyricText,
-} from "@/lib/guide/types";
-import { parseEmphasis, parseIconTokens } from "@/lib/guide/icon-tokens";
+} from "@/features/guide/lib/types";
+import {
+  parseEmphasis,
+  parseIconTokens,
+} from "@/features/guide/lib/icon-tokens";
 import { CallIcon } from "@/components/guide/detail/CallIcon";
 
 // 테두리색

@@ -1,5 +1,5 @@
-import type { LyricLine } from "@/lib/guide/types";
-import { parseTimestamp } from "@/lib/guide/timestamp";
+import type { LyricLine } from "@/features/guide/lib/types";
+import { parseTimestamp } from "@/features/guide/lib/timestamp";
 
 /**
  * Returns the index of the line that should be highlighted for the given

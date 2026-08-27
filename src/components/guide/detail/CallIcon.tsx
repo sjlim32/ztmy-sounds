@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { CallTag } from "@/lib/guide/types";
+import type { CallTag } from "@/features/guide/lib/types";
 
 const ICON_LABEL: Record<CallTag, string> = {
   swing: "샤모지 흔들기",

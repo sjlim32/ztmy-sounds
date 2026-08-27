@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useAutoScrollPreference } from "@/lib/guide/auto-scroll";
+import { useAutoScrollPreference } from "@/features/guide/lib/auto-scroll";
 import { AutoScrollStatusIcon } from "@/components/guide/detail/AutoScrollStatusIcon";
 
 export function AutoScrollToggle() {
