@@ -4,7 +4,7 @@ import localFont from "next/font/local";
 import { SerwistProvider } from "@serwist/turbopack/react";
 import { GuideDimOverlay } from "@/components/GuideDimOverlay";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
-import { Footer } from "@/components/home/Footer";
+import { Footer } from "@/components/Footer";
 import { ARTIST } from "@/data/artist";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 import "../globals.css";
