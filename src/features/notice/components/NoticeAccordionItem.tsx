@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import type { Notice } from "@/features/notice/lib/types";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
+import { accentBarStyles } from "@/features/guide/components/list-entrance";
 
 interface NoticeAccordionItemProps {
   notice: Notice;
@@ -25,13 +26,26 @@ export function NoticeAccordionItem({
   return (
     <div
       data-role="notice-item"
-      className="w-full overflow-hidden rounded-sm bg-black/50"
+      // 모바일: 박스 없는 flat한 행(전체 화면에 GuideDimOverlay가 이미
+      // bg-black/50을 깔아줘서 항목별 배경이 따로 필요 없음, SongList
+      // 항목과 동일한 톤). tablet 이상: 기존 카드 박스 유지.
+      className={cn(
+        "w-full overflow-hidden",
+        "tablet:rounded-sm tablet:bg-black/50",
+      )}
     >
       <button
         type="button"
         onClick={onToggle}
-        className="group flex w-full flex-col gap-1.5 px-4 py-3 text-left focus-visible:outline-none"
+        className={cn(
+          "group relative flex w-full flex-col gap-1.5 px-2 py-3 text-left focus-visible:outline-none",
+          "tablet:px-4",
+        )}
       >
+        <span
+          className={cn(accentBarStyles({ selected: isOpen }), "tablet:hidden")}
+        />
+
         <span className="flex items-center justify-between">
           <span
             className={cn(
@@ -75,7 +89,12 @@ export function NoticeAccordionItem({
         )}
       >
         <div className="overflow-hidden">
-          <div className="tablet:text-lg space-y-3 px-4 pb-4 text-sm leading-relaxed [&_strong]:text-white">
+          <div
+            className={cn(
+              "space-y-3 px-2 pb-4 text-sm leading-relaxed [&_strong]:text-white",
+              "tablet:px-4 tablet:text-lg",
+            )}
+          >
             <Content />
 
             {onDismissChange && (

@@ -9,9 +9,9 @@ import { usePlayer } from "@/features/guide/player-context";
 import { getActiveLineIndex } from "@/features/guide/lib/lyric-sync";
 import { SongList } from "@/features/guide/components/SongList";
 import { LyricsView } from "@/features/guide/components/LyricsView";
+import { usePanelEntranceVisible } from "@/features/guide/components/list-entrance";
 
 const LYRICS_ENTER_DELAY_MS = 600; // 목록 접힘 애니메이션(600ms)이 끝난 뒤 가사가 이어서 나타나도록 주는 지연
-const PANEL_ENTER_DELAY_MS = 150; // GuideDimOverlay의 duration-700(화면이 어두워지는 시간)과 맞춰, 그 뒤에 패널이 나타나도록 주는 지연
 
 export function SongPanel() {
   const segment = useSelectedLayoutSegment(); // 레이아웃이 자식 세그먼트를 감지하여 목록 / 상세보기를 토글하기 위한 훅
@@ -21,18 +21,11 @@ export function SongPanel() {
 
   const [renderedSong, setRenderedSong] = useState<Song | null>(song);
   const [visibleSongId, setVisibleSongId] = useState<string | null>(null);
-  const [isPanelVisible, setIsPanelVisible] = useState(false);
+  const isPanelVisible = usePanelEntranceVisible();
 
   useEffect(() => {
     setActiveSongId(segment);
   }, [segment, setActiveSongId]);
-
-  useEffect(() => {
-    // 마운트(=/guide 진입) 시 한 번만 실행 — 화면이 다 어두워진 뒤에
-    // 패널이 이어서 서서히 나타나도록 지연.
-    const id = setTimeout(() => setIsPanelVisible(true), PANEL_ENTER_DELAY_MS);
-    return () => clearTimeout(id);
-  }, []);
 
   // 곡이 바뀌면 렌더 중에 즉시(트랜지션 없이) 이전 내용을 감추고 내용을
   // 교체합니다 — 사라질 때는 애니메이션 없이 바로 사라지고, 나타날 때만

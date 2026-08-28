@@ -1,16 +1,17 @@
 import { PlayerProvider } from "@/features/guide/player-context";
 import { GuidePlayerArea } from "@/features/guide/components/GuidePlayerArea";
+import { GuideListScroll } from "@/features/guide/components/GuideListScroll";
 import { SongPanel } from "@/features/guide/components/SongPanel";
 import { NoticePanel } from "@/features/notice/components/NoticePanel";
 
 export default function GuideLayout({ children }: LayoutProps<"/guide">) {
   return (
     <PlayerProvider>
-      <div className="tablet:contents flex min-h-0 flex-1 flex-col">
+      <GuideListScroll>
         <GuidePlayerArea />
         <SongPanel />
         <NoticePanel />
-      </div>
+      </GuideListScroll>
       {children}
     </PlayerProvider>
   );

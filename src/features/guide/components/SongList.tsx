@@ -1,20 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { songList } from "@/features/guide/data/songs";
 import { HomeIcon } from "@/components/icons/HomeIcon";
 import { CallIcon } from "@/features/guide/components/CallIcon";
 import { getSongCallTags } from "@/features/guide/lib/song-call-tags";
+import {
+  accentBarStyles,
+  useScrollFadeMask,
+} from "@/features/guide/components/list-entrance";
 
 interface SongListProps {
   selectedSongId: string | null;
   visible: boolean; // true가 되는 순간 위에서 아래로 펼쳐지듯 나타납니다 (/guide 최초 진입 시)
 }
-
-const FADE_SIZE = "20px";
 
 const wrapperStyles = cva(
   [
@@ -100,20 +101,6 @@ const itemInnerStyles = cva(
   },
 );
 
-// 지금 보고 있는 곡을 표시하는 좌측 액센트 바. 선택 시 항상, 그 외에는
-// hover 시에만 나타남 (사이트 그라데이션 시그니처).
-const accentBarStyles = cva(
-  "from-ztmy-pink to-ztmy-purple absolute inset-y-1 left-0 w-1 origin-top scale-y-0 rounded-full bg-linear-to-b transition-transform duration-300",
-  {
-    variants: {
-      selected: {
-        true: "scale-y-100",
-        false: "group-hover:scale-y-100",
-      },
-    },
-  },
-);
-
 const itemTitleStyles = cva(
   "font-mkpop tablet:text-2xl text-md leading-tight transition-colors",
   {
@@ -127,30 +114,9 @@ const itemTitleStyles = cva(
 );
 
 export function SongList({ selectedSongId, visible }: SongListProps) {
-  const listRef = useRef<HTMLUListElement>(null);
-
-  // 스크롤이 위/아래 끝에 닿으면 그쪽 페이드를 꺼서(불투명 처리) "여기가
-  // 끝"임을 보여주고, 끝이 아니면 투명하게 페이드시켜 "더 있음"을 암시.
-  useEffect(() => {
-    const el = listRef.current;
-    if (!el) return;
-
-    const updateFade = () => {
-      const atTop = el.scrollTop <= 0;
-      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-      el.style.maskImage = `linear-gradient(to bottom, ${atTop ? "black" : "transparent"}, black ${FADE_SIZE}, black calc(100% - ${FADE_SIZE}), ${atBottom ? "black" : "transparent"})`;
-    };
-
-    updateFade();
-    el.addEventListener("scroll", updateFade);
-    const resizeObserver = new ResizeObserver(updateFade);
-    resizeObserver.observe(el);
-
-    return () => {
-      el.removeEventListener("scroll", updateFade);
-      resizeObserver.disconnect();
-    };
-  }, []);
+  // tablet 이상에서는 이 ul 자체가 스크롤 컨테이너(모바일은 GuideListScroll이
+  // NoticeList와 함께 전담 — 아래 className 참고).
+  const listRef = useScrollFadeMask<HTMLUListElement>();
 
   return (
     <>
@@ -170,15 +136,17 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
           ref={listRef}
           data-role="song-panel-list"
           className={cn(
-            "order-1 flex max-h-dvh flex-col divide-y divide-white/10 overflow-y-auto transition-opacity duration-1000",
+            // 모바일: 자체 스크롤 없이 그냥 콘텐츠 높이만큼 — 스크롤은
+            // GuideListScroll이 NoticeList와 함께 하나로 전담.
+            "order-1 flex flex-col divide-y divide-white/10 transition-opacity duration-1000",
             // tablet 이상에서는 부모(위 비네트 래퍼)가 준 높이를 그대로 채우고,
-            // 넘치는 곡은 스크롤.
-            "tablet:order-0 tablet:max-h-full",
+            // 넘치는 곡은 이 ul 자체가 스크롤.
+            "tablet:order-0 tablet:max-h-full tablet:overflow-y-auto",
             // 스크롤바는 기본적으로 투명하게 숨겨뒀다가, 리스트에 마우스를
             // 올렸을 때만 반투명하게 드러남(파이어폭스/웹킷 둘 다 대응).
-            "scrollbar-thin [scrollbar-color:transparent_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
-            "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
-            !selectedSongId && "flex-1",
+            "tablet:scrollbar-thin tablet:[scrollbar-color:transparent_transparent] tablet:hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
+            "tablet:[&::-webkit-scrollbar]:w-1.5 tablet:[&::-webkit-scrollbar-thumb]:rounded-full tablet:[&::-webkit-scrollbar-thumb]:bg-transparent tablet:hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
+            !selectedSongId && "tablet:flex-1",
             visible ? "opacity-100" : "opacity-0",
           )}
         >

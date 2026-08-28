@@ -1,16 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 import { noticeList } from "@/features/notice/data";
 import { NoticeAccordionItem } from "@/features/notice/components/NoticeAccordionItem";
 import { useNoticeDismissal } from "@/features/notice/lib/dismissal";
+
+interface NoticeListProps {
+  // true가 되는 순간 fade-in — SongList와 동일한 진입 애니메이션(SongPanel/
+  // NoticePanel이 usePanelEntranceVisible로 같은 타이밍에 내려줌).
+  visible: boolean;
+}
 
 /**
  * 안내문은 항상 최대 1개만 열려 있습니다 — 어떤 항목이 열려있는지를 여기서
  * openId 하나로 관리하고, 각 NoticeAccordionItem은 open 여부를 prop으로
  * 받는 controlled 컴포넌트입니다.
  */
-export function NoticeList() {
+export function NoticeList({ visible }: NoticeListProps) {
   const alwaysOpenNotice =
     noticeList.find((notice) => notice.isAlwaysOpen) ?? null;
   const filteredNotice = noticeList.filter((notice) => notice.visible);
@@ -28,7 +35,18 @@ export function NoticeList() {
   const openId = manualOpenId === undefined ? defaultOpenId : manualOpenId;
 
   return (
-    <div data-role="notice-list" className="flex w-full flex-col gap-3">
+    <div
+      data-role="notice-list"
+      className={cn(
+        // 모바일: SongList 위(order-1)에 오도록 order-0, 카드 간격 대신
+        // divide-y로 구분(각 항목은 NoticeAccordionItem에서 모바일 전용
+        // flat 스타일로 렌더링됨).
+        "order-0 flex w-full flex-col divide-y divide-white/10 transition-opacity duration-1000",
+        // tablet 이상: 기존 카드 목록 — 구분선 대신 카드 사이 간격.
+        "tablet:gap-3 tablet:divide-y-0",
+        visible ? "opacity-100" : "opacity-0",
+      )}
+    >
       {filteredNotice.map((notice) => (
         <NoticeAccordionItem
           key={notice.id}
