@@ -21,7 +21,12 @@ export function NoticePanel() {
 
   return (
     <aside data-role="notice-panel" className="contents">
-      <div className={cn("contents", "tablet:w-full tablet:max-w-2xl")}>
+      <div
+        className={cn(
+          "contents",
+          "tablet:block tablet:w-full tablet:max-w-158",
+        )}
+      >
         <NoticeList visible={isPanelVisible} />
       </div>
     </aside>

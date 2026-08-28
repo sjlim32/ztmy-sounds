@@ -41,9 +41,9 @@ export function NoticeList({ visible }: NoticeListProps) {
         // 모바일: SongList 위(order-1)에 오도록 order-0, 카드 간격 대신
         // divide-y로 구분(각 항목은 NoticeAccordionItem에서 모바일 전용
         // flat 스타일로 렌더링됨).
-        "order-0 flex w-full flex-col divide-y divide-white/10 transition-opacity duration-1000",
+        "order-0 flex w-full flex-col divide-white/10 transition-opacity duration-1000",
         // tablet 이상: 기존 카드 목록 — 구분선 대신 카드 사이 간격.
-        "tablet:gap-3 tablet:divide-y-0",
+        "tablet:gap-3",
         visible ? "opacity-100" : "opacity-0",
       )}
     >

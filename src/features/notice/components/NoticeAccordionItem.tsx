@@ -38,8 +38,8 @@ export function NoticeAccordionItem({
         type="button"
         onClick={onToggle}
         className={cn(
-          "group relative flex w-full flex-col gap-1.5 px-2 py-3 text-left focus-visible:outline-none",
-          "tablet:px-4",
+          "group relative flex w-full flex-col gap-1.5 text-left focus-visible:outline-none",
+          "tablet:px-4 tablet:py-3",
         )}
       >
         <span
@@ -49,7 +49,8 @@ export function NoticeAccordionItem({
         <span className="flex items-center justify-between">
           <span
             className={cn(
-              "font-mono text-[10px] font-medium tracking-[0.3em] uppercase",
+              "px-6 font-mono text-[10px] font-medium tracking-[0.3em] uppercase",
+              "tablet:px-0",
               notice.isAlwaysOpen ? "text-ztmy-pink" : "text-white/40",
             )}
           >
@@ -65,7 +66,8 @@ export function NoticeAccordionItem({
 
         <span
           className={cn(
-            "transi text-2xl leading-tight font-bold tracking-tight",
+            "transi px-6 text-base leading-tight font-bold tracking-tight",
+            "tablet:text-2xl tablet:px-0",
             isOpen ? "text-white/60" : "text-white",
           )}
         >
@@ -91,8 +93,8 @@ export function NoticeAccordionItem({
         <div className="overflow-hidden">
           <div
             className={cn(
-              "space-y-3 px-2 pb-4 text-sm leading-relaxed [&_strong]:text-white",
-              "tablet:px-4 tablet:text-lg",
+              "space-y-3 border-b border-white/10 px-2 pb-4 text-sm leading-relaxed [&_strong]:text-white",
+              "tablet:px-4 tablet:text-lg tablet:border-b-0",
             )}
           >
             <Content />
