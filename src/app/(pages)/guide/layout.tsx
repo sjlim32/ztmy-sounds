@@ -23,7 +23,7 @@ export default function GuideLayout({ children }: LayoutProps<"/guide">) {
           <div
             className={cn(
               "contents",
-              "tablet:flex tablet:min-h-0 tablet:min-w-0 tablet:flex-1 tablet:flex-col tablet:items-center tablet:justify-center tablet:self-stretch tablet:overflow-y-auto tablet:py-16",
+              "tablet:flex tablet:min-h-0 tablet:min-w-0 tablet:flex-1 tablet:flex-col tablet:items-center tablet:justify-center tablet:self-stretch tablet:overflow-y-auto",
             )}
           >
             <GuidePlayerArea />
