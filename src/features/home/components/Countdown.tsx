@@ -2,20 +2,21 @@
 
 import { useId } from "react";
 import type { Remaining } from "@/features/home/lib/countdown";
-import {
-  DONE_AFTER_HOURS,
-  useEventCountdown,
-} from "@/features/home/lib/event-countdown";
-import type { VisitEvent } from "@/data/event";
+import { DONE_AFTER_HOURS } from "@/features/home/lib/event-countdown";
 import { cn } from "@/lib/utils";
 
 interface CountdownProps {
-  event: VisitEvent;
+  remaining: Remaining | null;
+  hoursSincePast: number;
 }
 
-export function Countdown({ event }: CountdownProps) {
-  const { remaining, hoursSincePast } = useEventCountdown(event);
-
+/**
+ * remaining/hoursSincePast를 직접 받습니다(event가 아니라) — 홈 화면에
+ * 모바일/데스크톱용으로 이 컴포넌트가 동시에 두 번 마운트되는데, 각자
+ * useEventCountdown을 부르면 1초 타이머가 두 개 따로 돌게 되므로, 부모
+ * (page.tsx)에서 한 번만 계산해 내려받습니다.
+ */
+export function Countdown({ remaining, hoursSincePast }: CountdownProps) {
   if (!remaining) return null;
 
   return (
