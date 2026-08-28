@@ -55,7 +55,7 @@ const song: Song = {
       pronunciation: "**카와카나이야** 사무가리나 키세츠니",
       translation: "마르지 않아 추운 계절에",
       cheer: {
-        text: "색칠된 부분 떼창",
+        text: '"카와카나이야" 떼창',
         tag: "call",
       },
     },
@@ -71,7 +71,7 @@ const song: Song = {
       pronunciation: "**야키야키다** 오시츠부사레루 무테키메",
       translation: "안절부절 못하지 짓눌리는 무적을",
       cheer: {
-        text: "색칠된 부분 떼창",
+        text: '"야키야키다" 떼창',
         tag: "call",
       },
     },
@@ -87,7 +87,7 @@ const song: Song = {
       pronunciation: "**카와카나이야** 츠요가리나 키세츠니",
       translation: "마르지 않아 허세 떠는 계절에",
       cheer: {
-        text: "색칠된 부분 떼창",
+        text: '"카와카나이야" 떼창',
         tag: "call",
       },
     },
@@ -103,7 +103,7 @@ const song: Song = {
       pronunciation: "**양키-양키-다** 겐죠-이지노 무테키메",
       translation: "양키 양키야 변하지 않는 무적을",
       cheer: {
-        text: "색칠된 부분 떼창",
+        text: '양키-양키-다" 떼창',
         tag: "call",
       },
     },
@@ -251,7 +251,7 @@ const song: Song = {
       pronunciation: "**카와카나이야** 사무가리나 키세츠니",
       translation: "마르지 않아 추운 계절에",
       cheer: {
-        text: "색칠된 부분 떼창",
+        text: '"카와카나이야" 떼창',
         tag: "call",
       },
     },
@@ -267,7 +267,7 @@ const song: Song = {
       pronunciation: "**야키야키다** 오시츠부사레루 무테키메",
       translation: "안절부절 못하지 짓눌리는 무적을",
       cheer: {
-        text: "색칠된 부분 떼창",
+        text: '"야키야키다" 떼창',
         tag: "call",
       },
     },
@@ -283,7 +283,7 @@ const song: Song = {
       pronunciation: "**카와카나이야** 츠요가리나 키세츠니",
       translation: "마르지 않아 허세 떠는 계절에",
       cheer: {
-        text: "색칠된 부분 떼창",
+        text: '"카와카나이야" 떼창',
         tag: "call",
       },
     },
@@ -299,7 +299,7 @@ const song: Song = {
       pronunciation: "**양키-양키-다** 겐죠-이지노 무테키메",
       translation: "양키 양키야 변하지 않는 무적을",
       cheer: {
-        text: "색칠된 부분 떼창",
+        text: '"양키-양키-다" 떼창',
         tag: "call",
       },
     },
