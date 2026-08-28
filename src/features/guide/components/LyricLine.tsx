@@ -1,10 +1,11 @@
-import { Fragment } from "react";
+import { Fragment, memo } from "react";
 import { cn } from "@/lib/utils";
 import type {
   CallTag,
   LyricLine as LyricLineData,
   LyricText,
 } from "@/features/guide/lib/types";
+import { parseTimestamp } from "@/features/guide/lib/timestamp";
 import {
   parseEmphasis,
   parseIconTokens,
@@ -35,10 +36,17 @@ function InlineCallIcon({ name }: { name: CallTag }) {
 interface lyricLineProps {
   line: LyricLineData;
   isActive: boolean;
-  lineClick?: () => void; // 줄을 클릭했을 때 영상을 `line.time` 지점으로 이동
+  /**
+   * 줄을 클릭했을 때 영상을 `line.time` 지점으로 이동. `seekTo`(초 단위)를
+   * 그대로 받아서 내부에서 변환합니다 — LyricsView가 매 렌더마다 새 클로저를
+   * 만들어 내려주면 아래 memo가 무력화되므로, 참조가 안정적인 함수를 그대로
+   * 전달받는 쪽이 활성 줄이 바뀔 때 이 줄만 리렌더되게 하는 데 필요합니다.
+   */
+  onSeek?: (seconds: number) => void;
 }
 
-export function LyricLine({ line, isActive, lineClick }: lyricLineProps) {
+function LyricLineComponent({ line, isActive, onSeek }: lyricLineProps) {
+  const lineClick = onSeek ? () => onSeek(parseTimestamp(line.time)) : undefined;
   const cheerText =
     typeof line.cheer === "string" ? line.cheer : line.cheer?.text;
   const lineTag = typeof line.cheer === "string" ? undefined : line.cheer?.tag;
@@ -90,6 +98,13 @@ export function LyricLine({ line, isActive, lineClick }: lyricLineProps) {
     </li>
   );
 }
+
+/**
+ * 재생 중 250ms마다 activeLineIndex가 갱신되며 LyricsView가 가사 줄 전체를
+ * 다시 렌더링하는데, isActive가 실제로 바뀐 1~2줄만 다시 그리도록
+ * memo로 막습니다 (line/onSeek는 참조가 안정적이라 얕은 비교로 충분).
+ */
+export const LyricLine = memo(LyricLineComponent);
 
 /****** 응원법 ******/
 function CheerText({ text, tag }: { text?: string; tag?: CallTag }) {

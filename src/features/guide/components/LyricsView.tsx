@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Song } from "@/features/guide/lib/types";
-import { parseTimestamp } from "@/features/guide/lib/timestamp";
 import { LyricLine } from "@/features/guide/components/LyricLine";
 import { AutoScrollToggle } from "@/features/guide/components/AutoScrollToggle";
 import { useAutoScrollPreference } from "@/features/guide/lib/auto-scroll";
@@ -94,7 +93,7 @@ export function LyricsView({
             key={line.time}
             line={line}
             isActive={index === activeLineIndex}
-            lineClick={() => seekTo(parseTimestamp(line.time))}
+            onSeek={seekTo}
           />
         ))}
 
