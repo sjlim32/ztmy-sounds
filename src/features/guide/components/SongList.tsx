@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { songList } from "@/features/guide/data/songs";
 import { HomeIcon } from "@/components/icons/HomeIcon";
 import { CallIcon } from "@/features/guide/components/CallIcon";
-import { getSongCallTags } from "@/features/guide/lib/song-call-tags";
+import { getCachedSongCallTags } from "@/features/guide/lib/song-call-tags";
 import {
   accentBarStyles,
   useScrollFadeMask,
@@ -191,7 +191,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                           </span>
                         </div>
                         <div className="flex shrink-0 items-center gap-1">
-                          {getSongCallTags(item).map((tag) => (
+                          {getCachedSongCallTags(item).map((tag) => (
                             <CallIcon key={tag} name={tag} size={20} />
                           ))}
                         </div>
