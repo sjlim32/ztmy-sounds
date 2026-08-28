@@ -74,6 +74,12 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  verification: {
+    google: "cNG2sZPOuRCDcSsSeizR7F3cCUGuEdzmRXN8l_g3v4c",
+    other: {
+      "naver-site-verification": "99ba30f0851f16dac1d6e66209b7ed899fd5c584",
+    },
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
