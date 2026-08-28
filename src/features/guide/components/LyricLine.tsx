@@ -23,6 +23,15 @@ function getTagBackgroundColor(tag: CallTag, isActive: boolean) {
   return `${TAG_BORDER_COLOR[tag]}${isActive ? "35" : "20"}`;
 }
 
+// CallIcon은 align-middle(=부모 baseline + x-height의 절반)로 정렬되는데,
+// 이 폰트에서는 그 기준점이 실제 글자의 시각적 중심보다 살짝 아래라서
+// (=텍스트가 살짝 높아 보임) 미세하게 내려서 보정. SongList 등 flex로
+// 정렬하는 곳은 이 오차가 없으므로 CallIcon 기본값은 그대로 두고, 텍스트와
+// 인라인으로 섞이는 이 파일의 호출부에서만 보정.
+function InlineCallIcon({ name }: { name: CallTag }) {
+  return <CallIcon name={name} className="relative top-[-0.08em]" />;
+}
+
 interface lyricLineProps {
   line: LyricLineData;
   isActive: boolean;
@@ -105,7 +114,7 @@ function OriginalText({ text, tag }: { text: string; tag?: CallTag }) {
 
   return (
     <p data-role="original" className="wide:text-base pc:text-sm text-xs">
-      {tag ? <CallIcon name={tag} /> : null}
+      {tag ? <InlineCallIcon name={tag} /> : null}
       {renderTextParts(text, "original", emphasisColor)}
     </p>
   );
@@ -173,7 +182,7 @@ function LyricTextRenderer({
 function renderTextParts(text: string, key: string, emphasisColor?: string) {
   return parseIconTokens(text).map((part, index) => {
     if (part.type === "icon") {
-      return <CallIcon key={`${key}-${index}`} name={part.value} />;
+      return <InlineCallIcon key={`${key}-${index}`} name={part.value} />;
     }
 
     return (

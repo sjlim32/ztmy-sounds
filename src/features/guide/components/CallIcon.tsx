@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 import type { CallTag } from "@/features/guide/lib/types";
 
 const ICON_LABEL: Record<CallTag, string> = {
@@ -16,9 +17,11 @@ const ICON_SRC: Record<CallTag, string> = {
 export function CallIcon({
   name,
   size = 24,
+  className,
 }: {
   name: CallTag;
   size?: number;
+  className?: string;
 }) {
   return (
     <Image
@@ -28,7 +31,7 @@ export function CallIcon({
       data-call-icon={name}
       width={size}
       height={size}
-      className="mr-1 inline-block align-middle"
+      className={cn("mr-1 inline-block align-middle", className)}
     />
   );
 }
