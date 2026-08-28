@@ -61,40 +61,43 @@ export function Footer() {
         <span>2026</span>
       </p>
 
-      <nav className="tablet:gap-6 flex items-center gap-4">
+      <div className="tablet:gap-4 flex flex-nowrap items-center justify-center gap-3">
         <a
           href={`https://tally.so/r/${TALLY_FORM_ID}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-ztmy-purple tablet:hidden underline underline-offset-2 transition-colors"
+          className="hover:border-ztmy-magenta/60 tablet:hidden rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
         >
           사이트 건의
         </a>
-
         <button
           type="button"
           data-tally-open={TALLY_FORM_ID}
           data-tally-emoji-text="👋"
           data-tally-emoji-animation="wave"
-          className="hover:text-ztmy-purple tablet:inline hidden underline underline-offset-2 transition-colors"
+          className="hover:border-ztmy-magenta/60 hidden rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none tablet:inline-block"
         >
           사이트 건의
         </button>
 
-        <div>Official Link</div>
-        {SOCIAL_LINKS.map(({ name, url, icon: Icon }) => (
-          <a
-            key={url}
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={name}
-            className="hover:text-ztmy-purple transition-colors"
-          >
-            <Icon className={cn("h-4 w-4", "tablet:h-6 tablet:w-6")} />
-          </a>
-        ))}
-      </nav>
+        <span className="tablet:inline-block hidden font-mono text-[10px] font-medium tracking-[0.3em] text-white/40 uppercase">
+          Official Link
+        </span>
+        <nav className="flex items-center gap-4 tablet:gap-6">
+          {SOCIAL_LINKS.map(({ name, url, icon: Icon }) => (
+            <a
+              key={url}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={name}
+              className="hover:text-ztmy-purple transition-colors"
+            >
+              <Icon className={cn("h-4 w-4", "tablet:h-6 tablet:w-6")} />
+            </a>
+          ))}
+        </nav>
+      </div>
 
       <Script
         src="https://tally.so/widgets/embed.js"
