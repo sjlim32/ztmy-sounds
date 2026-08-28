@@ -60,17 +60,18 @@ export function SongPanel() {
         // flex-col에 직접 노출되도록 함(각자 order-1/order-3로 위치 결정).
         // 배경/투명도/애니메이션은 이제 SongList의 ul, LyricsView가 각자
         // visible prop으로 자체 처리.
-        // tablet 이상: 기존 그대로 — 1440px 미만은 고정폭(max-w-sm), 1440px
-        // 이상은 뷰포트의 30%(7:3 비율)로 확장 — max-w-sm이 30vw보다 좁아서
-        // 그대로 두면 잘리므로 max-w-none으로 해제.
+        // tablet 이상: guide/layout.tsx의 flex row에서 사이드바 역할 —
+        // shrink-0으로 메인 영역(flex-1)에 폭을 뺏기지 않고, 세로 중앙
+        // 정렬은 그 flex row의 items-center가 대신 맡음. 1440px 미만은
+        // 고정폭(max-w-sm), 1440px 이상은 뷰포트의 30%(7:3 비율)로 확장 —
+        // max-w-sm이 30vw보다 좁아서 그대로 두면 잘리므로 max-w-none으로 해제.
         "pc:w-[30vw] pc:max-w-none contents",
-        "tablet:fixed tablet:inset-x-auto tablet:top-1/2 tablet:right-6 tablet:z-20 tablet:flex tablet:w-full tablet:max-w-sm tablet:flex-col",
-        "tablet:-translate-y-1/2 tablet:transition-[height,opacity] tablet:duration-300",
-        "wide:right-16",
+        "tablet:flex tablet:w-full tablet:max-w-sm tablet:shrink-0 tablet:flex-col",
+        "tablet:transition-[height,opacity] tablet:duration-300",
         song
           ? "tablet:h-[88vh]"
           : // 목록 화면(/guide)에는 하단에 Footer가 같이 떠 있어서, 패널이
-            // top-1/2로 중앙 정렬된 채 40vh를 그대로 쓰면 화면이 짧을 때
+            // 세로 중앙 정렬된 채 40vh를 그대로 쓰면 화면이 짧을 때
             // 아래쪽이 Footer 위로 겹칩니다. Footer 높이(~약 5rem)만큼을
             // 위아래로 두 번 뺀 값(10rem)과 40vh 중 더 작은 쪽을 사용.
             "tablet:h-[min(46vh,calc(140dvh-10rem))]",
