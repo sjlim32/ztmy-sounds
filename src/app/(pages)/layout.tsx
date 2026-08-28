@@ -26,7 +26,7 @@ const rocknrollOne = RocknRoll_One({
 });
 
 const mkpop = localFont({
-  src: "../../../public/fonts/851MkPOP_101.ttf",
+  src: "../../fonts/851MkPOP_101.ttf",
   variable: "--font-mkpop-101",
   display: "swap",
 });
