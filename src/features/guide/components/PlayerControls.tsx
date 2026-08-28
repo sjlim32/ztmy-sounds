@@ -84,7 +84,7 @@ export function PlayerSongListLink() {
   return (
     <Link
       href="/guide"
-      className="hover:border-ztmy-magenta/60 tablet:order-3 hidden rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none tablet:inline-block"
+      className="hover:border-ztmy-magenta/60 tablet:order-3 tablet:inline-block hidden rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
     >
       노래 목록
     </Link>
