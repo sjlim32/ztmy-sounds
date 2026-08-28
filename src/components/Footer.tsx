@@ -2,38 +2,36 @@
 
 import { usePathname } from "next/navigation";
 import Script from "next/script";
-import type { ComponentType } from "react";
 import { ARTIST } from "@/data/artist";
-import { GlobeIcon } from "@/components/icons/GlobeIcon";
-import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
-import { InstagramIcon } from "@/components/icons/InstagramIcon";
-import { XIcon } from "@/components/icons/XIcon";
-import { SpotifyIcon } from "@/components/icons/SpotifyIcon";
+import {
+  SOCIAL_PLATFORM_ICON,
+  type SocialPlatform,
+} from "@/lib/social-platform";
 import { cn } from "@/lib/utils";
 
 type SocialLink = {
   name: string;
   url: string;
-  icon: ComponentType<{ className?: string }>;
+  platform: SocialPlatform;
 };
 
 const SOCIAL_LINKS: SocialLink[] = [
-  { name: "OFFICIAL WEB", url: "https://zutomayo.net", icon: GlobeIcon },
+  { name: "OFFICIAL WEB", url: "https://zutomayo.net", platform: "web" },
   {
     name: "YOUTUBE",
     url: "https://www.youtube.com/channel/UCv6P5nsS9rP4tDtFlqLU_QQ",
-    icon: YouTubeIcon,
+    platform: "youtube",
   },
   {
     name: "INSTAGRAM",
     url: "https://www.instagram.com/zutomayo",
-    icon: InstagramIcon,
+    platform: "instagram",
   },
-  { name: "X", url: "https://x.com/zutomayo", icon: XIcon },
+  { name: "X", url: "https://x.com/zutomayo", platform: "x" },
   {
     name: "SPOTIFY",
     url: "https://open.spotify.com/artist/38WbKH6oKAZskBhqDFA8Uj?si=FaQ7gjMSQHyhYYjvebzajg",
-    icon: SpotifyIcon,
+    platform: "spotify",
   },
 ];
 
@@ -84,18 +82,21 @@ export function Footer() {
           Official Link
         </span>
         <nav className="flex items-center gap-4 tablet:gap-6">
-          {SOCIAL_LINKS.map(({ name, url, icon: Icon }) => (
-            <a
-              key={url}
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={name}
-              className="hover:text-ztmy-purple transition-colors"
-            >
-              <Icon className={cn("h-4 w-4", "tablet:h-6 tablet:w-6")} />
-            </a>
-          ))}
+          {SOCIAL_LINKS.map(({ name, url, platform }) => {
+            const Icon = SOCIAL_PLATFORM_ICON[platform];
+            return (
+              <a
+                key={url}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={name}
+                className="hover:text-ztmy-purple transition-colors"
+              >
+                <Icon className={cn("h-4 w-4", "tablet:h-6 tablet:w-6")} />
+              </a>
+            );
+          })}
         </nav>
       </div>
 

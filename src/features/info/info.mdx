@@ -1,9 +1,54 @@
+import { ZoomableImage } from "@/components/ZoomableImage";
+import { SiteLink } from "@/components/SiteLink";
+import { SOCIAL_PLATFORM_ICON } from "@/lib/social-platform";
+import { INFORMATION } from "./info";
+
+<h1 className="text-center text-3xl font-bold">공연 정보</h1>
+
+<div className="flex w-full justify-center">
+  <ZoomableImage
+    src={INFORMATION.img.main}
+    alt={INFORMATION.name}
+    thumbnailWidth={300}
+    thumbnailCrop="top"
+  />
+</div>
+
+<div className="text-center text-sm font-semibold text-white/60">
+  {"모든 이미지들은 클릭 시 확대됩니다."}
+</div>
+
+- 일시: **{INFORMATION.date}**
+- 장소: <SiteLink href={INFORMATION.url.place} className="font-semibold">{INFORMATION.place}</SiteLink>
+- 티켓: {INFORMATION.url.ticket.map((ticket) => <span key={ticket.href} ><SiteLink href={ticket.href} className="font-semibold mr-4">{ticket.name}</SiteLink></span>)}
+- 이동 방법 : {INFORMATION.url.sub?.map((sub) => (<SiteLink key={sub.href} href={sub.href} className="mr-4 font-semibold">{sub.name}</SiteLink>))}
+
+- 공식 사이트 : {INFORMATION.url.official.map((official) => { const Icon = SOCIAL_PLATFORM_ICON[official.platform]; return (<SiteLink key={official.href} href={official.href} noIcon={true} className="inline-flex align-middle mr-4 font-semibold"><Icon className="h-4 w-4" /></SiteLink>); })}
+
 ## 공연 정보
 
-- 일시: TBD
-- 장소: TBD
-- 티켓: TBD
+<div className="flex items-center justify-center gap-3">
+  {INFORMATION.img.sub?.slice(4, 6).map((img) => (
+    <ZoomableImage
+      key={img.asset}
+      src={img.asset}
+      alt={img.name}
+      thumbnailWidth={300}
+      thumbnailCrop="top"
+    />
+  ))}
+</div>
 
 ## 유의사항
 
-작성 중
+<div className="flex flex-col items-center gap-3">
+  {INFORMATION.img.sub?.slice(0, 3).map((img) => (
+    <ZoomableImage
+      key={img.asset}
+      src={img.asset}
+      alt={img.name}
+      thumbnailWidth={500}
+      thumbnailCrop="top"
+    />
+  ))}
+</div>

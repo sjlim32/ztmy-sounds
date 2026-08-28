@@ -1,7 +1,13 @@
 import type { MDXComponents } from "mdx/types";
 import { cn } from "@/lib/utils";
+import { SiteLink } from "@/components/SiteLink";
 
 const components: MDXComponents = {
+  a: ({ className, children, href, ...props }) => (
+    <SiteLink href={href} className={className} {...props}>
+      {children}
+    </SiteLink>
+  ),
   h2: ({ className, children, ...props }) => (
     <h2
       className={cn(
