@@ -149,9 +149,15 @@ export function YouTubePlayer() {
 
     playerRef.current.loadVideoById(song.youtubeId);
     loadedSongIdRef.current = activeSongId;
+    // loadVideoById 직후에도 getCurrentTime()이 잠깐 이전 곡의 마지막 값을
+    // 그대로 돌려줄 수 있어서(새 영상이 아직 자기 시간을 보고하기 전),
+    // 그 값을 이전/다음곡 화면에서 곧장 활성 줄 계산에 써버리면 가사
+    // 스크롤이 0으로 리셋된 직후 엉뚱한 줄로 다시 튀어버립니다. 새 곡의
+    // 실제 시간이 들어오기 전까지는 0으로 둬서 그 틈을 없앱니다.
+    setCurrentTime(0);
     // activeSongId가 플레이어 초기화 완료 전에 이미 세팅돼 있었더라도,
     // isReady가 true로 바뀌는 순간 다시 실행됩니다.
-  }, [activeSongId, isReady]);
+  }, [activeSongId, isReady, setCurrentTime]);
 
   useEffect(() => {
     // 뒤로가기 등으로 목록 화면으로 돌아가 activeSongId가 비면 재생을 멈춥니다.
