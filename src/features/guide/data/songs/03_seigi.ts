@@ -20,7 +20,7 @@ const song: Song = {
       interlude: true,
     },
     {
-      time: "0:48.1",
+      time: "0:48.2",
       original: "つま先だって わからないのさ",
       pronunciation: "츠마사키닷테 와카라나이노사",
       translation: "발끝이라도 모르는 거야",
@@ -53,7 +53,7 @@ const song: Song = {
       time: "1:04",
       original: "赤い瞳が ぼやける音",
       pronunciation: "아카이 히토미가 보야케루 오토  **『꽥 꽥』**",
-      translation: "붉은 눈동자가 희미해지는 소리 **『꽥 꽥』**",
+      translation: "붉은 눈동자가 희미해지는 소리 『꽥 꽥』",
       cheer: {
         text: "'꽥꽥' 박자에 맞춰",
         tag: "swing",
@@ -69,7 +69,7 @@ const song: Song = {
       time: "1:12",
       original: "深い昼寝の温度に慣れてくの？",
       pronunciation: "후카이 히루네노 온도니 나레테쿠노 **『꽥 꽥』**",
-      translation: "깊은 낮잠의 온도에 익숙해져 가는 거야? **『꽥 꽥』**",
+      translation: "깊은 낮잠의 온도에 익숙해져 가는 거야? 『꽥 꽥』",
       cheer: {
         text: "'꽥꽥' 박자에 맞춰",
         tag: "swing",
@@ -162,7 +162,7 @@ const song: Song = {
       time: "1:43.2",
       original: "近づいて遠のいて 探り合ってみたんだ",
       pronunciation: "**치카즈이테** 토-노이데 **사구리앗테** 미탄다",
-      translation: "**다가오고** 멀어지며 **살폈던** 거야",
+      translation: "다가오고 멀어지며 **살폈던** 거야",
       cheer: {
         text: "**앞** / 뒤로 스윙",
         tag: "swing",
@@ -192,7 +192,7 @@ const song: Song = {
       time: "1:54.8",
       original: "近づいて遠のいて 巡り合っていたんだ",
       pronunciation: "**치카즈이테** 토-노이데 **메구리앗테** 이탄다",
-      translation: "**다가오고** 멀어지며 **다시 만나게** 된 거야",
+      translation: "다가오고 멀어지며 **다시 만나게** 된 거야",
       cheer: {
         text: "**앞** / 뒤로 스윙",
         tag: "swing",
@@ -240,7 +240,7 @@ const song: Song = {
       time: "2:30.6",
       original: "悪いこと してなくても",
       pronunciation: "와루이 코토 시테나쿠테모 **『꽥 꽥』**",
-      translation: "나쁜 짓 하지 않아도 **『꽥 꽥』**",
+      translation: "나쁜 짓 하지 않아도 『꽥 꽥』",
       cheer: {
         text: "'꽥꽥' 박자에 맞춰",
         tag: "swing",
@@ -256,7 +256,7 @@ const song: Song = {
       time: "2:38.5",
       original: "青い風声鶴唳 押し込んで",
       pronunciation: "아오이 후세이카쿠레이 오시콘데 **『꽥 꽥』**",
-      translation: "푸른 풍성학려에 밀어넣어 **『꽥 꽥』**",
+      translation: "푸른 풍성학려에 밀어넣어 『꽥 꽥』",
       cheer: {
         text: "'꽥꽥' 박자에 맞춰",
         tag: "swing",
@@ -341,7 +341,7 @@ const song: Song = {
       },
     },
     {
-      time: "3:07.5",
+      time: "3:07.6",
       original: "生かされてた 浅い声の正義であるように",
       pronunciation: "이카사레테타 아사이 코에노 세이기데 아루요우니",
       translation: "이제껏 살아온 얕은 목소리의 정의인 것처럼",
@@ -364,25 +364,25 @@ const song: Song = {
       translation: "몇 번이고 이야기하려고 몇 번이고 감으려고 해도",
     },
     {
-      time: "3:31.5",
+      time: "3:31.4",
       original: "途端に真っ白くなって",
       pronunciation: "토탄니 맛시로쿠낫테",
       translation: "찰나에 새하얗게 되어",
     },
     {
-      time: "3:33.5",
+      time: "3:33.4",
       original: "途端に伝えすぎちゃうね",
       pronunciation: "토탄니 츠타에스기챠우네",
       translation: "찰나에 넘치게 전해버리네",
     },
     {
-      time: "3:35",
+      time: "3:35.3",
       original: "今は単純に散々に願うのさ",
       pronunciation: "이마와 단쥰니 산잔니 네가우노사",
       translation: "지금은 그저 필사적으로 바랄 뿐이야",
     },
     {
-      time: "3:37.3",
+      time: "3:37.7",
       original: "傲慢でも精一杯の",
       pronunciation: "고오만데모 세에잇파이노",
       translation: "오만해도 힘껏",
@@ -394,13 +394,13 @@ const song: Song = {
       translation: "「응응」이라며 너와 내가",
     },
     {
-      time: "3:41.2",
+      time: "3:41.3",
       original: "喋ったね、夢の話で",
       pronunciation: "샤벳타네 유메노 하나시데",
       translation: "말했어, 꿈의 얘기로",
     },
     {
-      time: "3:43",
+      time: "3:43.1",
       original: "くすぐったい笑みで今は全て",
       pronunciation: "쿠스굿타이 에미데 이마와 스베테",
       translation: "간지러운 미소로 지금은 전부",
@@ -413,14 +413,14 @@ const song: Song = {
       interlude: true,
     },
     {
-      time: "3:51.3",
+      time: "3:51.1",
       original: "正義",
       pronunciation: "세이기",
       translation: "정의",
       interlude: true,
     },
     {
-      time: "3:52.2",
+      time: "3:52.15",
       original: "♫",
       pronunciation: "",
       translation: "",
@@ -444,7 +444,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:05",
+      time: "4:04.9",
       original: "抱きしめたいように",
       pronunciation: "다키시메타이 요우니",
       translation: "끌어안고 싶은 듯이",
@@ -454,7 +454,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:06.7",
+      time: "4:06.6",
       original: "小さくなった声に 嘘がないように",
       pronunciation: "치이사쿠낫테 코에니 우소가 나이요우니",
       translation: "작아진 목소리에 거짓이 없도록",
@@ -474,7 +474,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:14",
+      time: "4:14.1",
       original: "手遅れた言葉 誓って",
       pronunciation: "테오쿠레타 코토바 치갓테",
       translation: "때 늦은 말에 맹세코",
@@ -536,7 +536,7 @@ const song: Song = {
     {
       time: "4:34.2",
       original: "チカヅイテ トーノイテ 巡り合っていたんだ",
-      pronunciation: "치카즈이테 토-노이테 메구리앗테 이탄다",
+      pronunciation: "치카즈이테 토-노이테 메구리앗테 이탄다", // TODO : "미탄다"인데 라이브에서 실수한건가?
       translation: "다가오고 멀어지며 만나게 된 거야",
       cheer: {
         text: "스윙하며 아카네의 지시에 따라 떼창",

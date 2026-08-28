@@ -93,9 +93,9 @@ const song: Song = {
     },
     {
       time: "0:52",
-      original: "**モットーもっと？** もう意外と辛いのに",
+      original: "モットーもっと？ もう意外と辛いのに",
       pronunciation: "**못토-못토?** 모오 이가이토 츠라이노니",
-      translation: "**좀 더- 좀 더?** 슬슬 생각보다 괴로운데",
+      translation: "좀 더- 좀 더? 슬슬 생각보다 괴로운데",
       cheer: {
         text: "",
         tag: "swing",
@@ -143,9 +143,9 @@ const song: Song = {
     },
     {
       time: "1:12",
-      original: "**試したいわ** あたたかくて",
+      original: "試したいわ あたたかくて",
       pronunciation: "**타메시타이와** 아타타카쿠테",
-      translation: "**시도해 보고 싶어** 따뜻하고",
+      translation: "시도해 보고 싶어 따뜻하고",
       cheer: {
         text: "",
         tag: "swing",
@@ -153,9 +153,9 @@ const song: Song = {
     },
     {
       time: "1:16",
-      original: "**絶対絶命な** 夜は気持ちい",
+      original: "絶対絶命な 夜は気持ちい",
       pronunciation: "**젯타이제츠메이나** 요루와 키모치이",
-      translation: "**절체절명인 밤은** 기분 좋아",
+      translation: "절체절명인 밤은 기분 좋아",
       cheer: {
         text: "",
         tag: "swing",
@@ -163,9 +163,9 @@ const song: Song = {
     },
     {
       time: "1:19",
-      original: "**平凡な生活** ゆめみたけど",
+      original: "平凡な生活 ゆめみたけど",
       pronunciation: "**헤이본나 세이카츠** 유메미타케도",
-      translation: "**평범한 생활을** 꿈꾸었지만",
+      translation: "평범한 생활을 꿈꾸었지만",
       cheer: {
         text: "",
         tag: "swing",
@@ -173,9 +173,9 @@ const song: Song = {
     },
     {
       time: "1:23",
-      original: "**先手必勝が** 気持ちいいな",
+      original: "先手必勝が 気持ちいいな",
       pronunciation: "**센테힛쇼오가** 키모치이이나",
-      translation: "**선수필승이** 기분 좋은걸",
+      translation: "선수필승이 기분 좋은걸",
       cheer: {
         text: "",
         tag: "swing",
@@ -233,9 +233,9 @@ const song: Song = {
     },
     {
       time: "1:53",
-      original: "**結局瞳孔**開いてしまうのに",
+      original: "結局瞳孔開いてしまうのに",
       pronunciation: "**켓쿄쿠 도오코오** 히라이테 시마우노니",
-      translation: "**결국 동공은** 풀어져 버릴 텐데",
+      translation: "결국 동공은 풀어져 버릴 텐데",
       cheer: {
         text: "",
         tag: "swing",
@@ -283,9 +283,9 @@ const song: Song = {
     },
     {
       time: "2:12",
-      original: "**試したいわ** あたたかくて",
+      original: "試したいわ あたたかくて",
       pronunciation: "**타메시타이와** 아타타카쿠테",
-      translation: "**시도해 보고 싶어** 따뜻하고",
+      translation: "시도해 보고 싶어 따뜻하고",
       cheer: {
         text: "",
         tag: "swing",
@@ -293,9 +293,9 @@ const song: Song = {
     },
     {
       time: "2:15",
-      original: "**絶対絶命な** 夜は気持ちい",
+      original: "絶対絶命な 夜は気持ちい",
       pronunciation: "**젯타이제츠메이나** 요루와 키모치이",
-      translation: "**절체절명인 밤은** 기분 좋아",
+      translation: "절체절명인 밤은 기분 좋아",
       cheer: {
         text: "",
         tag: "swing",
@@ -303,9 +303,9 @@ const song: Song = {
     },
     {
       time: "2:19",
-      original: "**平凡な生活** ゆめみたけど",
+      original: "平凡な生活 ゆめみたけど",
       pronunciation: "**헤이본나 세이카츠** 유메미타케도",
-      translation: "**평범한 생활을** 꿈꾸었지만",
+      translation: "평범한 생활을 꿈꾸었지만",
       cheer: {
         text: "",
         tag: "swing",
@@ -313,9 +313,9 @@ const song: Song = {
     },
     {
       time: "2:22",
-      original: "**先手必勝が** 気持ちいいな",
+      original: "先手必勝が 気持ちいいな",
       pronunciation: "**센테힛쇼오가** 키모치이이나",
-      translation: "**선수필승이** 기분 좋은걸",
+      translation: "선수필승이 기분 좋은걸",
       cheer: {
         text: "",
         tag: "swing",

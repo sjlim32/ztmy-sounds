@@ -79,9 +79,9 @@ const song: Song = {
     },
     {
       time: "1:02.5",
-      original: "白昼夢の中で **ガンガン**砕いた",
+      original: "白昼夢の中で ガンガン砕いた",
       pronunciation: "하쿠츄-무노 나카데 **간간** 쿠다이타",
-      translation: "백일몽 속에서 **땅땅** 부쉈어",
+      translation: "백일몽 속에서 땅땅 부쉈어",
       cheer: {
         text: "'간간' 부분만 리듬에 맞춰서",
         tag: "swing",
@@ -207,9 +207,9 @@ const song: Song = {
     },
     {
       time: "2:18.5",
-      original: "白昼夢の中で **ガンガン**砕いた",
+      original: "白昼夢の中で ガンガン砕いた",
       pronunciation: "하쿠츄-무노 나카데 **간간** 쿠다이타",
-      translation: "백일몽 속에서 **땅땅** 부쉈어",
+      translation: "백일몽 속에서 땅땅 부쉈어",
       cheer: {
         text: "'간간' 부분만 리듬에 맞춰서",
         tag: "swing",

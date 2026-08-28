@@ -74,7 +74,7 @@ const song: Song = {
       time: "0:30.7",
       original: "もうダンスダンスダンス 誰も気づいてない",
       pronunciation: "모오 **단스단스단스** 다레모 키즈이테나이",
-      translation: "이제 **댄스 댄스 댄스** 누구도 알지 못해",
+      translation: "이제 댄스 댄스 댄스 누구도 알지 못해",
       cheer: {
         text: "'단스 단스 단스' 박자에 맞춰",
         tag: "swing",
@@ -90,7 +90,7 @@ const song: Song = {
       time: "0:38",
       original: "もうステイステイ捨てる 下積み正義",
       pronunciation: "모오 **스테이 스테이 스테루** 시타즈미 세이기",
-      translation: "이제 **스테이 스테이 버리는** 밑바닥 정의",
+      translation: "이제 스테이 스테이 버리는 밑바닥 정의",
       cheer: {
         text: "'스테이 스테이 스테루' 박자에 맞춰",
         tag: "swing",
@@ -134,9 +134,9 @@ const song: Song = {
     },
     {
       time: "0:55",
-      original: "シャイな空騒**ぎ**",
+      original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**기**",
-      translation: "Shy한 헛소**동**",
+      translation: "Shy한 헛소동",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -175,9 +175,9 @@ const song: Song = {
     },
     {
       time: "1:02.3",
-      original: "身勝手な僕でい**い**",
+      original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**이**",
-      translation: "제멋대로인 나로 좋**아**",
+      translation: "제멋대로인 나로 좋아",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -215,9 +215,9 @@ const song: Song = {
     },
     {
       time: "1:09.6",
-      original: "シャイな空騒**ぎ**",
+      original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**기**",
-      translation: "Shy한 헛소**동**",
+      translation: "Shy한 헛소동",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -255,9 +255,9 @@ const song: Song = {
     },
     {
       time: "1:16.9",
-      original: "身勝手な僕でい**い**",
+      original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**이**",
-      translation: "제멋대로인 나로 좋**아**",
+      translation: "제멋대로인 나로 좋아",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -386,9 +386,9 @@ const song: Song = {
     },
     {
       time: "2:15.5",
-      original: "シャイな空騒**ぎ**",
+      original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**기**",
-      translation: "Shy한 헛소**동**",
+      translation: "Shy한 헛소동",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -426,9 +426,9 @@ const song: Song = {
     },
     {
       time: "2:22.9",
-      original: "身勝手な僕でい**い**",
+      original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**이**",
-      translation: "제멋대로인 나로 좋**아**",
+      translation: "제멋대로인 나로 좋아",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -466,9 +466,9 @@ const song: Song = {
     },
     {
       time: "2:30.3",
-      original: "シャイな空騒**ぎ**",
+      original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**기**",
-      translation: "Shy한 헛소**동**",
+      translation: "Shy한 헛소동",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -485,7 +485,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:33.8",
+      time: "2:33.9",
       original: "なりたい自分に 絡まる電柱",
       pronunciation: "나리타이 지분니 카라마루 덴츄우",
       translation: "되고 싶은 자신에게 얽히는 전신주",
@@ -506,9 +506,9 @@ const song: Song = {
     },
     {
       time: "2:37.5",
-      original: "身勝手な僕でい**い**",
+      original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**이**",
-      translation: "제멋대로인 나로 좋**아**",
+      translation: "제멋대로인 나로 좋아",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -647,9 +647,9 @@ const song: Song = {
     },
     {
       time: "3:17.8",
-      original: "シャイな空騒**ぎ**",
+      original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**기**",
-      translation: "Shy한 헛소**동**",
+      translation: "Shy한 헛소동",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -687,9 +687,9 @@ const song: Song = {
     },
     {
       time: "3:25.2",
-      original: "身勝手な僕でい**い**",
+      original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**이**",
-      translation: "제멋대로인 나로 좋**아**",
+      translation: "제멋대로인 나로 좋아",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -727,9 +727,9 @@ const song: Song = {
     },
     {
       time: "3:32.5",
-      original: "シャイな空騒**ぎ**",
+      original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**기**",
-      translation: "Shy한 헛소**동**",
+      translation: "Shy한 헛소동",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -767,9 +767,9 @@ const song: Song = {
     },
     {
       time: "3:39.8",
-      original: "身勝手な僕でい**い**",
+      original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**이**",
-      translation: "제멋대로인 나로 좋**아**",
+      translation: "제멋대로인 나로 좋아",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",

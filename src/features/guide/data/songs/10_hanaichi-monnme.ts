@@ -342,7 +342,7 @@ const song: Song = {
       pronunciation: "와라와레탓테 헤코무케도",
       translation: "비웃음당하면 우울해지지만",
       cheer: {
-        text: "샤모지를 머리 위로 원을 그리며 빙글빙글 돌리기",
+        text: "샤모지를 머리 위로 원을 그리며 빙글빙글 돌리기 (이후 반복)",
         tag: "swing",
       },
     },

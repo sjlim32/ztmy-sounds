@@ -168,9 +168,9 @@ const song: Song = {
     },
     {
       time: "1:22.8",
-      original: "**Don’t stop** 脳裏上に",
+      original: "Don’t stop 脳裏上に",
       pronunciation: "**Don’t stop** 노우리 우에니",
-      translation: "**Don’t stop** 뇌리 위에",
+      translation: "Don’t stop 뇌리 위에",
       cheer: {
         text: '"Don\'t"에 내리고, "stop"에 점프하듯 올리기',
         tag: "swing",
@@ -178,9 +178,9 @@ const song: Song = {
     },
     {
       time: "1:25.3",
-      original: "置いていたクラッカー打ち鳴らして**笑おう**",
+      original: "置いていたクラッカー打ち鳴らして笑おう",
       pronunciation: "오이테이타 쿠랏카- 우치나라시테 **와라오우**",
-      translation: "놓아 두었던 크래커 쏘아 올리면서 **웃자**",
+      translation: "놓아 두었던 크래커 쏘아 올리면서 웃자",
       cheer: {
         text: '"와라" 에 내리고, "오우"에 점프하듯 올리기',
         tag: "swing",
@@ -285,9 +285,9 @@ const song: Song = {
     },
     {
       time: "2:42",
-      original: "**Don’t stop** 脳裏上に",
+      original: "Don’t stop 脳裏上に",
       pronunciation: "**Don’t stop** 노우리 우에니",
-      translation: "**Don’t stop** 뇌리 위에",
+      translation: "Don’t stop 뇌리 위에",
       cheer: {
         text: '"Don\'t"에 내리고, "stop"에 점프하듯 올리기',
         tag: "swing",
@@ -295,9 +295,9 @@ const song: Song = {
     },
     {
       time: "2:44",
-      original: "置いていたクラッカー打ち鳴らして**笑おう**",
+      original: "置いていたクラッカー打ち鳴らして笑おう",
       pronunciation: "오이테이타 쿠랏카- 우치나라시테 **와라오우**",
-      translation: "놓아 두었던 크래커 쏘아 올리면서 **웃자**",
+      translation: "놓아 두었던 크래커 쏘아 올리면서 웃자",
       cheer: {
         text: '"와라" 에 내리고, "오우"에 점프하듯 올리기',
         tag: "swing",
@@ -377,9 +377,9 @@ const song: Song = {
     },
     {
       time: "3:55",
-      original: "**Don’t stop** 脳裏上に",
+      original: "Don’t stop 脳裏上に",
       pronunciation: "**Don’t stop** 노우리 우에니",
-      translation: "**Don’t stop** 뇌리 위에",
+      translation: "Don’t stop 뇌리 위에",
       cheer: {
         text: '"Don\'t"에 내리고, "stop"에 점프하듯 올리기',
         tag: "swing",
@@ -387,9 +387,9 @@ const song: Song = {
     },
     {
       time: "3:58",
-      original: "置いていたクラッカー打ち鳴らして**笑おう**",
+      original: "置いていたクラッカー打ち鳴らして笑おう",
       pronunciation: "오이테이타 쿠랏카- 우치나라시테 **와라오우**",
-      translation: "놓아 두었던 크래커 쏘아 올리면서 **웃자**",
+      translation: "놓아 두었던 크래커 쏘아 올리면서 웃자",
       cheer: {
         text: '"와라" 에 내리고, "오우"에 점프하듯 올리기',
         tag: "swing",

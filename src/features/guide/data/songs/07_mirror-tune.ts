@@ -263,7 +263,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:33",
+      time: "1:33.2",
       original: "止まらないよ心臓 揺るがないんだ",
       pronunciation: "토마라나이요 신조 유루가나인다",
       translation: "멈추지 않아 심장이 동요하지 않아",
