@@ -17,10 +17,6 @@ const song: Song = {
       pronunciation: "",
       translation: "",
       interlude: true,
-      cheer: {
-        text: "",
-        tag: "swing",
-      },
     },
     //================ 1절 ================//
     {

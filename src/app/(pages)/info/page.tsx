@@ -13,7 +13,8 @@ export default function InfoPage() {
   return (
     <main
       className={cn(
-        "tablet:max-w-4xl mx-auto min-h-0 w-full flex-1 overflow-y-auto px-6 py-16",
+        "mx-auto min-h-0 w-full flex-1 overflow-y-auto px-3 pt-2 pb-10",
+        "tablet:py-16 tablet:max-w-4xl tablet:px-6",
         "scrollbar-thin [scrollbar-color:transparent_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
         "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
       )}
