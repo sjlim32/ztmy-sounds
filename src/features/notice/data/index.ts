@@ -2,6 +2,7 @@ import type { Notice } from "@/features/notice/lib/types";
 import fanPageDisclaimer from "./fan-page-disclaimer";
 import fightTheShamoji from "./fight-the-shamoji";
 import festival from "./festival";
+import slamGuide from "./slam-guide";
 
 /**
  * 공지 하나 = 파일 하나 (곡 데이터와 동일한 컨벤션). 이 모듈이 모아서
@@ -10,6 +11,7 @@ import festival from "./festival";
 export const noticeList: Notice[] = [
   festival,
   fanPageDisclaimer,
+  slamGuide,
   fightTheShamoji,
 ];
 
