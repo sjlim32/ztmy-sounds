@@ -4,8 +4,10 @@ import InfoContent from "@/features/info/info.mdx";
 import { visitEvent } from "@/data/event";
 import { cn } from "@/lib/utils";
 import { buildMusicEventJsonLd } from "@/lib/structured-data";
+import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 
 const description = `${visitEvent.tourName} 공연 일정과 장소, 유의사항 안내.`;
+const SCROLL_CONTAINER_ID = "info-scroll-container";
 
 export const metadata: Metadata = {
   title: "공연 정보",
@@ -26,6 +28,7 @@ export const metadata: Metadata = {
 export default function InfoPage() {
   return (
     <main
+      id={SCROLL_CONTAINER_ID}
       className={cn(
         "mx-auto min-h-0 w-full flex-1 overflow-y-auto px-3 pt-2 pb-10",
         "tablet:py-16 tablet:max-w-4xl tablet:px-6",
@@ -33,6 +36,8 @@ export default function InfoPage() {
         "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
       )}
     >
+      <ScrollToTopButton containerId={SCROLL_CONTAINER_ID} />
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
