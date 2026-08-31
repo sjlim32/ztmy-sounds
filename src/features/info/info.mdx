@@ -44,3 +44,17 @@ import { INFORMATION } from "./info";
     />
   ))}
 </div>
+
+## 굿즈
+
+<div className="tablet:grid tablet:grid-cols-2 flex flex-col items-center gap-3">
+  {INFORMATION.img.sub?.slice(6, 12).map((img) => (
+    <ZoomableImage
+      key={img.asset}
+      src={img.asset}
+      alt={img.name}
+      thumbnailWidth={500}
+      thumbnailCrop="top"
+    />
+  ))}
+</div>

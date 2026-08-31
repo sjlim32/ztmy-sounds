@@ -60,6 +60,12 @@ export const INFORMATION: InfoEvent = {
       { name: "라인업", asset: "/assets/info/line-up.webp" },
       { name: "지도", asset: "/assets/info/map.webp" },
       { name: "타임테이블", asset: "/assets/info/time-table.webp" },
+      { name: "굿즈 사전구매", asset: "/assets/info/goods0.webp" },
+      { name: "굿즈 사전구매", asset: "/assets/info/goods1.webp" },
+      { name: "굿즈 사전구매", asset: "/assets/info/goods2.webp" },
+      { name: "굿즈 사전구매", asset: "/assets/info/goods3.webp" },
+      { name: "굿즈 사전구매", asset: "/assets/info/goods4.webp" },
+      { name: "굿즈 사전구매", asset: "/assets/info/goods5.webp" },
     ],
   },
 };
