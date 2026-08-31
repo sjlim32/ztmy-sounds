@@ -16,7 +16,7 @@ const ICON_SRC: Record<CallTag, string> = {
 
 export function CallIcon({
   name,
-  size = 24,
+  size = 22,
   className,
 }: {
   name: CallTag;
@@ -31,6 +31,7 @@ export function CallIcon({
       data-call-icon={name}
       width={size}
       height={size}
+      style={{ width: size, height: size, objectFit: "cover" }}
       className={cn("mr-1 inline-block align-middle", className)}
     />
   );
