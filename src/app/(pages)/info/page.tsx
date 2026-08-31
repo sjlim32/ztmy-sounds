@@ -3,10 +3,24 @@ import Link from "next/link";
 import InfoContent from "@/features/info/info.mdx";
 import { visitEvent } from "@/data/event";
 import { cn } from "@/lib/utils";
+import { buildMusicEventJsonLd } from "@/lib/structured-data";
+
+const description = `${visitEvent.tourName} 공연 일정과 장소, 유의사항 안내.`;
 
 export const metadata: Metadata = {
   title: "공연 정보",
-  description: `${visitEvent.tourName} 공연 일정과 장소, 유의사항 안내.`,
+  description,
+  openGraph: {
+    title: visitEvent.tourName,
+    description,
+    images: [{ url: visitEvent.tourImg }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: visitEvent.tourName,
+    description,
+    images: [visitEvent.tourImg],
+  },
 };
 
 export default function InfoPage() {
@@ -19,6 +33,13 @@ export default function InfoPage() {
         "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
       )}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(buildMusicEventJsonLd(visitEvent)),
+        }}
+      />
+
       <Link
         href="/"
         className="tablet:block hidden text-sm text-white/60 hover:text-white"

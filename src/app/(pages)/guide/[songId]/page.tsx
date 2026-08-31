@@ -14,9 +14,24 @@ export async function generateMetadata(
 
   if (!song) return {};
 
+  const title = `${song.title.jp} (${song.title.kr})`;
+  const description = `${song.title.kr} (${song.title.en}) 샤모지 콜가이드`;
+  const thumbnail = `https://img.youtube.com/vi/${song.youtubeId}/maxresdefault.jpg`;
+
   return {
-    title: `${song.title.jp} (${song.title.kr})`,
-    description: `${song.title.kr} (${song.title.en}) 샤모지 응원 및 떼창 가이드`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: thumbnail, width: 1280, height: 720 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [thumbnail],
+    },
   };
 }
 

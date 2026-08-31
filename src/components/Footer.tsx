@@ -3,37 +3,9 @@
 import { usePathname } from "next/navigation";
 import Script from "next/script";
 import { ARTIST } from "@/data/artist";
-import {
-  SOCIAL_PLATFORM_ICON,
-  type SocialPlatform,
-} from "@/lib/social-platform";
+import { SOCIAL_LINKS } from "@/data/social-links";
+import { SOCIAL_PLATFORM_ICON } from "@/lib/social-platform";
 import { cn } from "@/lib/utils";
-
-type SocialLink = {
-  name: string;
-  url: string;
-  platform: SocialPlatform;
-};
-
-const SOCIAL_LINKS: SocialLink[] = [
-  { name: "OFFICIAL WEB", url: "https://zutomayo.net", platform: "web" },
-  {
-    name: "YOUTUBE",
-    url: "https://www.youtube.com/channel/UCv6P5nsS9rP4tDtFlqLU_QQ",
-    platform: "youtube",
-  },
-  {
-    name: "INSTAGRAM",
-    url: "https://www.instagram.com/zutomayo",
-    platform: "instagram",
-  },
-  { name: "X", url: "https://x.com/zutomayo", platform: "x" },
-  {
-    name: "SPOTIFY",
-    url: "https://open.spotify.com/artist/38WbKH6oKAZskBhqDFA8Uj?si=FaQ7gjMSQHyhYYjvebzajg",
-    platform: "spotify",
-  },
-];
 
 const TALLY_FORM_ID = "814rXx";
 

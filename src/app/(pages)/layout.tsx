@@ -7,6 +7,7 @@ import { MobileHeader } from "@/components/mobile/MobileHeader";
 import { Footer } from "@/components/Footer";
 import { ARTIST } from "@/data/artist";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
+import { buildSiteJsonLdGraph } from "@/lib/structured-data";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -89,6 +90,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${rocknrollOne.variable} ${mkpop.variable} h-full antialiased`}
     >
       <body className="flex h-dvh flex-col overflow-hidden">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(buildSiteJsonLdGraph()),
+          }}
+        />
         <GuideDimOverlay />
         <SerwistProvider swUrl="/serwist/sw.js">
           <div className="relative z-10 flex min-h-0 flex-1 flex-col">

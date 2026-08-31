@@ -9,6 +9,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: `${ARTIST.name.kr} FAN PAGE`,
     short_name: `${ARTIST.name.en} FAN PAGE`,
     description: SITE_DESCRIPTION,
+    categories: ["music", "entertainment"],
     start_url: "/",
     display: "standalone",
     background_color: "#000000",
