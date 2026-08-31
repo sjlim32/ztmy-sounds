@@ -21,6 +21,20 @@
 
 ## 프로젝트 로그
 
+### 26.08.31
+
+- SEO 고도화
+  - 구조화 데이터(JSON-LD) 추가 (`WebSite`/`MusicGroup`은 전역, `MusicEvent`는 공연 정보 페이지)
+  - 곡 가이드·공연 정보 페이지별 OG·Twitter 공유 이미지 지정 (유튜브 썸네일 / 공연 포스터)
+  - `sitemap.xml`에 `lastModified`·`changeFrequency`·`priority` 추가
+  - 웹 매니페스트에 `categories` 추가
+  - Footer SNS 링크를 공용 데이터(`social-links.ts`)로 분리해 구조화 데이터와 공유
+- 공연 정보(`/info`) 페이지에 최상단 이동 플로팅 버튼 추가
+- 버그 수정
+  - 콜 아이콘(`CallIcon`)이 정사각형이 아닌 원본 비율로 찌그러져 보이던 문제 (Tailwind Preflight `height: auto`와 충돌)
+  - 모바일 홈 화면 공연 썸네일 너비 계산 오류 (`calc(dvw*30%)`는 무효한 CSS라 `30dvw`로 수정)
+  - Cloudflare Pages 정적 배포본에서 서비스워커가 루트(`/`) 스코프로 등록되지 않던 문제 (`Service-Worker-Allowed` 헤더를 `public/_headers`로 지정)
+
 ### 26.08.28
 
 - 버그 수정

@@ -1,4 +1,11 @@
-import { InfoEvent } from "./lib/types";
+import { InfoEvent } from "@/features/info/lib/types";
+
+export const INFO_SECTIONS = [
+  { id: "event-photos", label: "공연 정보" },
+  { id: "notice", label: "유의사항" },
+  { id: "goods", label: "굿즈" },
+  { id: "fnb", label: "F&B" },
+] as const;
 
 export const INFORMATION: InfoEvent = {
   id: "sound-planet",
@@ -54,18 +61,66 @@ export const INFORMATION: InfoEvent = {
   img: {
     main: "/assets/info/sound-planet-poster.webp",
     sub: [
-      { name: "오시는 길", asset: "/assets/info/how-to-come.webp" },
-      { name: "입장 안내", asset: "/assets/info/entrance-info.webp" },
-      { name: "반입 금지 물품", asset: "/assets/info/ban-list.webp" },
-      { name: "라인업", asset: "/assets/info/line-up.webp" },
-      { name: "지도", asset: "/assets/info/map.webp" },
-      { name: "타임테이블", asset: "/assets/info/time-table.webp" },
-      { name: "굿즈 사전구매", asset: "/assets/info/goods0.webp" },
-      { name: "굿즈 사전구매", asset: "/assets/info/goods1.webp" },
-      { name: "굿즈 사전구매", asset: "/assets/info/goods2.webp" },
-      { name: "굿즈 사전구매", asset: "/assets/info/goods3.webp" },
-      { name: "굿즈 사전구매", asset: "/assets/info/goods4.webp" },
-      { name: "굿즈 사전구매", asset: "/assets/info/goods5.webp" },
+      {
+        name: "오시는 길",
+        asset: "/assets/info/how-to-come.webp",
+        section: "notice",
+      },
+      {
+        name: "입장 안내",
+        asset: "/assets/info/entrance-info.webp",
+        section: "notice",
+      },
+      {
+        name: "반입 금지 물품",
+        asset: "/assets/info/ban-list.webp",
+        section: "notice",
+      },
+      {
+        name: "라인업",
+        asset: "/assets/info/line-up.webp",
+        section: "event-photos",
+      },
+      { name: "지도", asset: "/assets/info/map.webp", section: "event-photos" },
+      {
+        name: "타임테이블",
+        asset: "/assets/info/time-table.webp",
+        section: "event-photos",
+      },
+      {
+        name: "굿즈 사전구매",
+        asset: "/assets/info/goods0.webp",
+        section: "goods",
+      },
+      {
+        name: "굿즈 사전구매",
+        asset: "/assets/info/goods1.webp",
+        section: "goods",
+      },
+      {
+        name: "굿즈 사전구매",
+        asset: "/assets/info/goods2.webp",
+        section: "goods",
+      },
+      {
+        name: "굿즈 사전구매",
+        asset: "/assets/info/goods3.webp",
+        section: "goods",
+      },
+      {
+        name: "굿즈 사전구매",
+        asset: "/assets/info/goods4.webp",
+        section: "goods",
+      },
+      {
+        name: "굿즈 사전구매",
+        asset: "/assets/info/goods5.webp",
+        section: "goods",
+      },
+      { name: "fnb", asset: "/assets/info/fnb0.webp", section: "fnb" },
+      { name: "fnb", asset: "/assets/info/fnb1.webp", section: "fnb" },
+      { name: "fnb", asset: "/assets/info/fnb2.webp", section: "fnb" },
+      { name: "fnb", asset: "/assets/info/fnb3.webp", section: "fnb" },
     ],
   },
 };

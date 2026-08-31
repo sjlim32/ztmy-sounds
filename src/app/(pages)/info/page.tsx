@@ -30,8 +30,7 @@ export default function InfoPage() {
     <main
       id={SCROLL_CONTAINER_ID}
       className={cn(
-        "mx-auto min-h-0 w-full flex-1 overflow-y-auto px-3 pt-2 pb-10",
-        "tablet:py-16 tablet:max-w-4xl tablet:px-6",
+        "min-h-0 w-full flex-1 overflow-y-auto scroll-smooth",
         "scrollbar-thin [scrollbar-color:transparent_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
         "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
       )}
@@ -45,15 +44,22 @@ export default function InfoPage() {
         }}
       />
 
-      <Link
-        href="/"
-        className="tablet:block hidden text-sm text-white/60 hover:text-white"
+      <div
+        className={cn(
+          "mx-auto w-full px-3 pt-6 pb-10",
+          "tablet:max-w-4xl tablet:px-6 tablet:py-16",
+        )}
       >
-        ← 홈으로
-      </Link>
+        <Link
+          href="/"
+          className="tablet:block hidden text-sm text-white/60 hover:text-white"
+        >
+          ← 홈으로
+        </Link>
 
-      <div className="mt-6 space-y-6">
-        <InfoContent />
+        <div className="mt-6">
+          <InfoContent />
+        </div>
       </div>
     </main>
   );

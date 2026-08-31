@@ -1,8 +1,12 @@
 import { ZoomableImage } from "@/components/ZoomableImage";
-import { EventDetails } from "./components/EventDetails";
-import { INFORMATION } from "./info";
+import { EventDetails } from "@/features/info/components/EventDetails";
+import { TableOfContents } from "@/features/info/components/TableOfContents";
+import { groupImagesBySection } from "@/features/info/lib/group-images";
+import { INFORMATION } from "@/features/info/info";
 
-<div className="flex w-full justify-center">
+export const sections = groupImagesBySection(INFORMATION.img.sub);
+
+<div className="mb-1 flex w-full justify-center">
   <ZoomableImage
     src={INFORMATION.img.main}
     alt={INFORMATION.name}
@@ -11,16 +15,18 @@ import { INFORMATION } from "./info";
   />
 </div>
 
-<div className="text-center text-sm font-semibold text-white/60">
+<div className="tablet:mb-6 mb-3 text-center text-sm font-semibold text-white/60">
   {"모든 이미지들은 클릭 시 확대됩니다."}
 </div>
 
+<TableOfContents />
+
 <EventDetails event={INFORMATION} />
 
-## 공연 정보
+<h2 id="event-photos">공연 정보</h2>
 
 <div className="tablet:flex-row flex flex-col items-center justify-center gap-3">
-  {INFORMATION.img.sub?.slice(4, 6).map((img) => (
+  {sections["event-photos"].map((img) => (
     <ZoomableImage
       key={img.asset}
       src={img.asset}
@@ -31,10 +37,10 @@ import { INFORMATION } from "./info";
   ))}
 </div>
 
-## 유의사항
+<h2 id="notice">유의사항</h2>
 
-<div className="flex flex-col items-center gap-3">
-  {INFORMATION.img.sub?.slice(0, 3).map((img) => (
+<div className="tablet:grid tablet:grid-cols-2 flex flex-col items-center gap-3">
+  {sections["notice"].map((img) => (
     <ZoomableImage
       key={img.asset}
       src={img.asset}
@@ -45,10 +51,24 @@ import { INFORMATION } from "./info";
   ))}
 </div>
 
-## 굿즈
+<h2 id="goods">굿즈</h2>
 
 <div className="tablet:grid tablet:grid-cols-2 flex flex-col items-center gap-3">
-  {INFORMATION.img.sub?.slice(6, 12).map((img) => (
+  {sections["goods"].map((img) => (
+    <ZoomableImage
+      key={img.asset}
+      src={img.asset}
+      alt={img.name}
+      thumbnailWidth={500}
+      thumbnailCrop="top"
+    />
+  ))}
+</div>
+
+<h2 id="fnb">F&B</h2>
+
+<div className="tablet:grid tablet:grid-cols-2 flex flex-col items-center gap-3">
+  {sections["fnb"].map((img) => (
     <ZoomableImage
       key={img.asset}
       src={img.asset}
