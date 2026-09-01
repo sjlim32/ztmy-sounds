@@ -1,18 +1,18 @@
 import type { Song } from "@/features/guide/lib/types";
 import byoushinWoKamu from "./01_byoushin-wo-kamu";
 import nouriuenoCraker from "./02_nouriueno-cracker";
-import seigi from "./03_seigi";
-import obenkyouShitoiteyo from "./04_obenkyou-shitoiteyo";
-import milabo from "./05_milabo";
-import aitsuraZeninDousoukai from "./06_aitsura-zenin-dousoukai";
-import mirrorTune from "./07_mirror-tune";
-import timeLeft from "./08_time-left";
-import kiraKiller from "./09_kira-killer";
-import hanaichiMonnme from "./10_hanaichi-monnme";
-import nareaiserve from "./11_nareai-serve";
-import hippocampalPain from "./12_hippocampal-pain";
-import taidada from "./13_taidada";
-import cream from "./14_cream";
+import seigi from "./08_seigi";
+import obenkyouShitoiteyo from "./20_obenkyou-shitoiteyo";
+import milabo from "./21_milabo";
+import aitsuraZeninDousoukai from "./36_aitsura-zenin-dousoukai";
+import mirrorTune from "./42_mirror-tune";
+import timeLeft from "./45_time-left";
+import kiraKiller from "./46_kira-killer";
+import hanaichiMonnme from "./48_hanaichi-monnme";
+import nareaiserve from "./49_nareai-serve";
+import hippocampalPain from "./53_hippocampal-pain";
+import taidada from "./54_taidada";
+import cream from "./59_cream";
 
 /**
  * Each song's data lives in its own file under `src/features/guide/data/songs/` (one file
