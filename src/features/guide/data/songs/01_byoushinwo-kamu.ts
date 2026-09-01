@@ -3,11 +3,11 @@ import type { Song, SongTitle } from "@/features/guide/lib/types";
 const byoushin: SongTitle = {
   jp: "秒針を噛む",
   kr: "초침을 깨물다",
-  en: "byoushin wo kamu",
+  en: "Byoushinwo Kamu",
 };
 
 const song: Song = {
-  id: "byoushin-wo-kamu",
+  id: "byoushinwo-kamu",
   title: byoushin,
   youtubeId: "2Ux6BA8Jlr4",
   lyrics: [

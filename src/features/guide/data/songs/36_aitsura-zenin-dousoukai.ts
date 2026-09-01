@@ -3,7 +3,7 @@ import type { Song, SongTitle } from "@/features/guide/lib/types";
 const dousoukai: SongTitle = {
   jp: "あいつら全員同窓会",
   kr: "저 녀석들 전원 동창회",
-  en: "aitsura zenin dousoukai",
+  en: "Inside Joke",
 };
 
 const song: Song = {

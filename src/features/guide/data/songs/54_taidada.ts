@@ -3,7 +3,7 @@ import type { Song, SongTitle } from "@/features/guide/lib/types";
 const taidada: SongTitle = {
   jp: "TAIDADA",
   kr: "타이다다",
-  en: "",
+  en: "TAIDADA",
 };
 
 const song: Song = {

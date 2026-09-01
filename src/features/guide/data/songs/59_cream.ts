@@ -3,7 +3,7 @@ import type { Song, SongTitle } from "@/features/guide/lib/types";
 const cream: SongTitle = {
   jp: "クリームで会いにいけますか",
   kr: "크림으로 만나러 갈 수 있나요",
-  en: "cream",
+  en: "CREAM",
 };
 
 const song: Song = {
