@@ -3,7 +3,7 @@ import type { Song, SongTitle } from "@/features/guide/lib/types";
 const tune: SongTitle = {
   jp: "ミラーチューン",
   kr: "미러튠",
-  en: "mirror tune",
+  en: "Mirror Tune",
 };
 
 const song: Song = {
