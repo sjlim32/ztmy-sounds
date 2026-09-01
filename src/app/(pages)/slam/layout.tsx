@@ -6,15 +6,16 @@ import { SongPanel } from "@/features/guide/components/SongPanel";
 import { NoticePanel } from "@/features/notice/components/NoticePanel";
 import { cn } from "@/lib/utils";
 
-export default function GuideLayout({ children }: LayoutProps<"/guide">) {
+/**
+ * 응원 가이드(guide/layout.tsx)와 동일한 영상+가사 UI를 그대로 재사용하되,
+ * GuideModeProvider의 mode만 "slam"으로 둬서 슬램 태그 곡만 노출합니다.
+ * 자세한 배경은 guide/layout.tsx 주석 참고.
+ */
+export default function SlamLayout({ children }: LayoutProps<"/slam">) {
   return (
-    <GuideModeProvider mode="cheer">
+    <GuideModeProvider mode="slam">
       <PlayerProvider>
         <GuideListScroll>
-          {/* tablet 이상: 메인 영역(영상 또는 안내문) + SongPanel 사이드바를
-              실제 flex row로 배치 — SongPanel이 실제로 차지하는 폭/오프셋을
-              브라우저가 계산하므로, 예전처럼 그 폭을 pr-108 같은 매직 패딩값으로
-              양쪽(GuidePlayerArea/NoticePanel)에 따로 맞춰 넣을 필요가 없음. */}
           <div
             className={cn(
               "contents",

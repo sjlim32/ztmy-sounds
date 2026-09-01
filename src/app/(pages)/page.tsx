@@ -9,6 +9,7 @@ import { Countdown } from "@/features/home/components/Countdown";
 import { MainNavLink } from "@/features/home/components/MainNavLink";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
+import { FlagIcon } from "@/components/icons/FlagIcon";
 import { useEventCountdown } from "@/features/home/lib/event-countdown";
 
 export default function Home() {
@@ -37,6 +38,13 @@ export default function Home() {
                 label="응원 가이드"
                 icon={MicIcon}
                 accent="purple"
+              />
+              <MainNavLink
+                href="/slam"
+                eyebrow="Slam"
+                label="슬램 가이드"
+                icon={FlagIcon}
+                accent="magenta"
               />
               <MainNavLink
                 href="/info"
@@ -83,6 +91,13 @@ export default function Home() {
             label="응원 가이드"
             icon={MicIcon}
             accent="purple"
+          />
+          <MainNavLink
+            href="/slam"
+            eyebrow="Slam"
+            label="슬램 가이드"
+            icon={FlagIcon}
+            accent="magenta"
           />
           <MainNavLink
             href="/info"
