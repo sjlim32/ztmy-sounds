@@ -147,6 +147,7 @@ const song: Song = {
         text: "",
         tag: "call",
       },
+      slam: "떼창",
     },
     {
       time: "1:19.2",
@@ -163,6 +164,7 @@ const song: Song = {
         text: "",
         tag: "call",
       },
+      slam: "떼창",
     },
     {
       time: "1:22.9",
@@ -179,6 +181,7 @@ const song: Song = {
         text: "",
         tag: "call",
       },
+      slam: "떼창",
     },
     {
       time: "1:26.6",
@@ -326,6 +329,7 @@ const song: Song = {
       original: "あたしのこと知らないで",
       pronunciation: "아타시노 코토 시라나이데",
       translation: "나에 대해 모르면서,",
+      slam: "핏 벌리기",
     },
     {
       time: "2:17.7",
@@ -374,6 +378,7 @@ const song: Song = {
       original: "私のこと嫌わないで",
       pronunciation: "와타시노 코토 키라와나이데",
       translation: "날 미워하지 마",
+      slam: "3, 2, 1",
     },
     {
       time: "2:29.5",
@@ -395,6 +400,7 @@ const song: Song = {
         text: "좌우로 반복 ~",
         tag: "swing",
       },
+      slam: "슬램 !",
     },
     {
       time: "2:31",
