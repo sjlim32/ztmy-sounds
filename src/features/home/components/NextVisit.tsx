@@ -73,7 +73,7 @@ export function NextVisit({ event }: { event: VisitEvent }) {
                       src={event.tourImg}
                       alt={event.tourName}
                       loading="lazy"
-                      className="h-16 w-16 rounded-lg object-cover shadow-[0_4px_16px_rgba(0,0,0,0.6)] transition-opacity hover:opacity-80"
+                      className="h-full w-[30dvw] rounded-lg object-cover shadow-[0_4px_16px_rgba(0,0,0,0.6)] transition-opacity hover:opacity-80"
                     />
                   </a>
 

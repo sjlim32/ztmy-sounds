@@ -6,14 +6,9 @@ interface EventDetailsProps {
   event: InfoEvent;
 }
 
-/**
- * 일시/장소/티켓/이동 방법/공식 사이트를 한 줄씩 보여주는 목록. 모바일에선
- * 라벨과 값을 위아래로 분리하고, 값이 여러 개(티켓·이동 방법)면 wrap되도록
- * 처리해 링크가 길어져도 라벨과 어색하게 붙지 않습니다.
- */
 export function EventDetails({ event }: EventDetailsProps) {
   return (
-    <ul className="mt-3 space-y-2.5 text-white">
+    <ul className="space-y-2.5 text-white">
       <Field label="일시">
         <span className="font-semibold">{event.date}</span>
       </Field>
@@ -50,11 +45,17 @@ export function EventDetails({ event }: EventDetailsProps) {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <li className="flex gap-2 before:text-white/30 before:content-['-']">
-      <div className="flex flex-col gap-1 tablet:flex-row tablet:items-baseline tablet:gap-2">
-        <span className="shrink-0 tablet:w-20">{label}:</span>
+      <div className="tablet:flex-row tablet:items-baseline tablet:gap-2 flex flex-col gap-1">
+        <span className="tablet:w-20 shrink-0">{label}:</span>
         {children}
       </div>
     </li>

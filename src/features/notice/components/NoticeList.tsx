@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { noticeList } from "@/features/notice/data";
 import { NoticeAccordionItem } from "@/features/notice/components/NoticeAccordionItem";
 import { useNoticeDismissal } from "@/features/notice/lib/dismissal";
+import { useGuideMode } from "@/features/guide/guide-mode-context";
 
 interface NoticeListProps {
   // true가 되는 순간 fade-in — SongList와 동일한 진입 애니메이션(SongPanel/
@@ -18,9 +19,16 @@ interface NoticeListProps {
  * 받는 controlled 컴포넌트입니다.
  */
 export function NoticeList({ visible }: NoticeListProps) {
+  const { mode } = useGuideMode();
+  // 슬램 가이드(/slam)에서는 isSlamVisible인 공지만, 응원 가이드(/guide)에서는
+  // 그 외(false/미지정) 공지만 보여줍니다.
+  const filteredNotice = noticeList.filter(
+    (notice) =>
+      notice.visible &&
+      (mode === "slam" ? !!notice.isSlamVisible : !notice.isSlamVisible),
+  );
   const alwaysOpenNotice =
-    noticeList.find((notice) => notice.isAlwaysOpen) ?? null;
-  const filteredNotice = noticeList.filter((notice) => notice.visible);
+    filteredNotice.find((notice) => notice.isAlwaysOpen) ?? null;
   const [isDismissed, setDismissed] = useNoticeDismissal(
     alwaysOpenNotice?.id ?? "",
     alwaysOpenNotice?.version ?? 0,

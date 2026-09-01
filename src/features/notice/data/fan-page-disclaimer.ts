@@ -9,6 +9,7 @@ const notice: Notice = {
   content: FanPageDisclaimerContent,
   visible: false,
   isAlwaysOpen: false,
+  isSlamVisible: false,
 };
 
 export default notice;

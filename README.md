@@ -21,6 +21,25 @@
 
 ## 프로젝트 로그
 
+### 26.08.31
+
+- SEO 고도화
+  - 구조화 데이터(JSON-LD) 추가 (`WebSite`/`MusicGroup`은 전역, `MusicEvent`는 공연 정보 페이지)
+  - 곡 가이드·공연 정보 페이지별 OG·Twitter 공유 이미지 지정 (유튜브 썸네일 / 공연 포스터)
+  - `sitemap.xml`에 `lastModified`·`changeFrequency`·`priority` 추가
+  - 웹 매니페스트에 `categories` 추가
+  - Footer SNS 링크를 공용 데이터(`social-links.ts`)로 분리해 구조화 데이터와 공유
+- 공연 정보(`/info`) 페이지 개선
+  - 최상단 이동 플로팅 버튼 추가
+  - 화면 상단에 고정된 목차(`TableOfContents`) 추가, 클릭 시 해당 섹션으로 부드럽게 이동
+  - 서브 이미지 그룹핑을 인덱스 슬라이싱(`slice`)에서 `section` 필드 기반 동적 그룹핑으로 리팩토링
+  - 스크롤 영역을 화면 전체 폭으로 넓혀 마우스 위치와 무관하게 스크롤되도록 개선 (콘텐츠 너비는 유지)
+- 버그 수정
+  - 콜 아이콘(`CallIcon`)이 정사각형이 아닌 원본 비율로 찌그러져 보이던 문제 (Tailwind Preflight `height: auto`와 충돌)
+  - 모바일 NextVisit 공연 이미지 크기 최적화
+  - Cloudflare Pages 정적 배포본에서 서비스워커가 루트(`/`) 스코프로 등록되지 않던 문제
+    - `Service-Worker-Allowed` 헤더를 `public/_headers`로 지정
+
 ### 26.08.28
 
 - 버그 수정

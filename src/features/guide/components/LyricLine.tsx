@@ -11,12 +11,14 @@ import {
   parseIconTokens,
 } from "@/features/guide/lib/icon-tokens";
 import { CallIcon } from "@/features/guide/components/CallIcon";
+import { useGuideMode } from "@/features/guide/guide-mode-context";
 
 // 테두리색
 const TAG_BORDER_COLOR: Record<CallTag, string> = {
   call: "#f97316",
   swing: "#82fa2a",
   clap: "#6dd6fc",
+  slam: "#ef4444",
 };
 
 // 배경색 (테두리 색에 알파값만 추가) — 활성 줄은 18%, 비활성 줄은 6%
@@ -46,10 +48,32 @@ interface lyricLineProps {
 }
 
 function LyricLineComponent({ line, isActive, onSeek }: lyricLineProps) {
-  const lineClick = onSeek ? () => onSeek(parseTimestamp(line.time)) : undefined;
-  const cheerText =
-    typeof line.cheer === "string" ? line.cheer : line.cheer?.text;
-  const lineTag = typeof line.cheer === "string" ? undefined : line.cheer?.tag;
+  const { visibleTags } = useGuideMode();
+  const lineClick = onSeek
+    ? () => onSeek(parseTimestamp(line.time))
+    : undefined;
+
+  // cheer(swing/clap/call)와 slam은 서로 독립적인 필드라 한 줄에 둘 다 있을
+  // 수 있습니다 — 이 가이드 모드(visibleTags)가 어느 쪽을 보여줄 차례인지로
+  // 결정합니다. 두 모드의 visibleTags는 항상 겹치지 않으므로 동시에 둘 다
+  // 노출되는 경우는 없습니다.
+  const rawCheerTag =
+    typeof line.cheer === "string" ? undefined : line.cheer?.tag;
+  const cheerTagVisible = !!rawCheerTag && visibleTags.includes(rawCheerTag);
+  const slamVisible = line.slam !== undefined && visibleTags.includes("slam");
+
+  const lineTag: CallTag | undefined = cheerTagVisible
+    ? rawCheerTag
+    : slamVisible
+      ? "slam"
+      : undefined;
+  const cheerText = cheerTagVisible
+    ? typeof line.cheer === "string"
+      ? line.cheer
+      : line.cheer?.text
+    : slamVisible
+      ? line.slam
+      : undefined;
   const lineStyle = lineTag
     ? ({
         "--tag-border": isActive ? TAG_BORDER_COLOR[lineTag] : "transparent",
@@ -113,7 +137,7 @@ function CheerText({ text, tag }: { text?: string; tag?: CallTag }) {
   return (
     <p
       data-role="cheer"
-      className="tablet:text-sm text-xs"
+      className="tablet:text-sm text-xs font-bold"
       style={tag ? { color: TAG_BORDER_COLOR[tag] } : { color: "silver" }}
     >
       {renderTextParts(text, "cheer")}

@@ -11,8 +11,8 @@ import slamGuide from "./slam-guide";
 export const noticeList: Notice[] = [
   festival,
   fanPageDisclaimer,
-  slamGuide,
   fightTheShamoji,
+  slamGuide,
 ];
 
 if (process.env.NODE_ENV !== "production") {
