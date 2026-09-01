@@ -382,7 +382,7 @@ const song: Song = {
       original: "ただ走って 今は走ってるけど",
       pronunciation: "타다 하싯테 이마와 하싯테루케도",
       translation: "그저 달리고 지금은 달리고있지만",
-      slam: "3, 2, 1",
+      slam: "3, 2, 1 (슬램 준비)",
     },
     {
       time: "3:48",
