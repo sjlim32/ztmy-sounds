@@ -53,8 +53,8 @@ export const songList: Song[] = [
   taidada,
   shade, // TODO 전체 싱크 조절 필요
   cream,
-  medianoche, // TODO 전체 싱크 조절 필요
-  almostHuman, // TODO 전체 싱크 조절 필요
+  medianoche,
+  almostHuman, // TODO 전체 싱크 조절 필요 (1절 수정 완)
 ];
 
 export function getSong(id: string): Song | null {
