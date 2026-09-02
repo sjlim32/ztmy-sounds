@@ -46,6 +46,10 @@ function extractYoutubeId(input: string): string {
   return trimmed;
 }
 
+function collapseBlankLines(text: string): string {
+  return text.replace(/\r\n/g, "\n").replace(/\n{2,}/g, "\n");
+}
+
 function formatSeconds(totalSeconds: number): string {
   const clamped = Math.max(0, Math.round(totalSeconds));
   const minutes = Math.floor(clamped / 60);
@@ -163,7 +167,8 @@ export default function ToolsPage() {
       if (startIndex + 2 < textLines.length) {
         return {
           ...line,
-          original: textLines[startIndex].trim(),
+          // 　(전각 공백)가 섞여 들어오는 경우가 있어 일반 공백으로 치환합니다.
+          original: textLines[startIndex].trim().replace(/　/g, " "),
           pronunciation: textLines[startIndex + 1].trim(),
           translation: textLines[startIndex + 2].trim(),
         };
@@ -254,6 +259,23 @@ export default function ToolsPage() {
       <textarea
         value={textData}
         onChange={(e) => setTextData(e.target.value)}
+        onPaste={(e) => {
+          e.preventDefault();
+          const pasted = collapseBlankLines(
+            e.clipboardData.getData("text"),
+          );
+          const target = e.currentTarget;
+          const { selectionStart, selectionEnd, value } = target;
+          const next =
+            value.slice(0, selectionStart) +
+            pasted +
+            value.slice(selectionEnd);
+          setTextData(next);
+          requestAnimationFrame(() => {
+            const cursor = selectionStart + pasted.length;
+            target.setSelectionRange(cursor, cursor);
+          });
+        }}
         placeholder={"원문1\n발음1\n해석1\n원문2\n발음2\n해석2\n..."}
         spellCheck={false}
         className="h-56 w-full resize-y rounded-md border border-white/20 bg-black/40 p-3 font-mono text-xs text-white placeholder:text-white/30"
