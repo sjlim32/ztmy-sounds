@@ -1,6 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { parseTimestamp } from "@/features/guide/lib/timestamp";
+import type { Timestamp } from "@/features/guide/lib/types";
+
+const AUTO_TIME_STEP_SECONDS = 3;
 
 interface TranscriptLine {
   time: string;
@@ -42,12 +46,26 @@ function extractYoutubeId(input: string): string {
   return trimmed;
 }
 
+function collapseBlankLines(text: string): string {
+  return text.replace(/\r\n/g, "\n").replace(/\n{2,}/g, "\n");
+}
+
+function formatSeconds(totalSeconds: number): string {
+  const clamped = Math.max(0, Math.round(totalSeconds));
+  const minutes = Math.floor(clamped / 60);
+  const seconds = clamped % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
 export default function ToolsPage() {
   const [youtubeId, setYoutubeId] = useState("");
   const [isFetching, setIsFetching] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [raw, setRaw] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [rawCopied, setRawCopied] = useState(false);
+  const [textData, setTextData] = useState("");
+  const [mappedCopied, setMappedCopied] = useState(false);
+  const [offsetSeconds, setOffsetSeconds] = useState("");
 
   const handleFetch = async () => {
     const videoId = extractYoutubeId(youtubeId);
@@ -96,10 +114,81 @@ export default function ToolsPage() {
     }
   }, [raw]);
 
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(raw);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  // 자막 JSON을 안 가져왔어도 textData만 있으면, 0:00부터
+  // AUTO_TIME_STEP_SECONDS 간격으로 시간을 채운 목록을 자동으로 만듭니다.
+  const baseList = useMemo(() => {
+    if (lines.length > 0) return lines;
+    if (!textData.trim()) return [] as TranscriptLine[];
+
+    const textLineCount = textData
+      .split("\n")
+      .filter((line) => line.trim() !== "").length;
+    const count = Math.floor(textLineCount / 3);
+
+    return Array.from({ length: count }, (_, index) => ({
+      time: formatSeconds(index * AUTO_TIME_STEP_SECONDS),
+      original: "",
+      pronunciation: "",
+      translation: "",
+    }));
+  }, [lines, textData]);
+
+  // 시간초 입력값만큼 모든 time을 보정합니다. baseList 자체를 고치는 대신
+  // 매번 원본에서 다시 계산해서, 입력 중 값이 바뀌어도 누적으로 어긋나지
+  // 않습니다.
+  const shiftedBaseList = useMemo(() => {
+    const offset = Number(offsetSeconds);
+    if (!offsetSeconds.trim() || !Number.isFinite(offset) || offset === 0) {
+      return baseList;
+    }
+
+    return baseList.map((line) => {
+      try {
+        return {
+          ...line,
+          time: formatSeconds(parseTimestamp(line.time as Timestamp) + offset),
+        };
+      } catch {
+        return line;
+      }
+    });
+  }, [baseList, offsetSeconds]);
+
+  // shiftedBaseList에 textData(원문/발음/해석이 3줄 단위로 반복되는 텍스트)를
+  // 순서대로 3줄씩 잘라 매핑합니다. textData가 모자라면 남는 항목은 그대로
+  // 둡니다.
+  const mappedList = useMemo(() => {
+    if (!textData.trim() || shiftedBaseList.length === 0) return [];
+
+    const textLines = textData.split("\n").filter((line) => line.trim() !== "");
+
+    return shiftedBaseList.map((line, index) => {
+      const startIndex = index * 3;
+      if (startIndex + 2 < textLines.length) {
+        return {
+          ...line,
+          // 　(전각 공백)가 섞여 들어오는 경우가 있어 일반 공백으로 치환합니다.
+          original: textLines[startIndex].trim().replace(/　/g, " "),
+          pronunciation: textLines[startIndex + 1].trim(),
+          translation: textLines[startIndex + 2].trim(),
+        };
+      }
+      return line;
+    });
+  }, [shiftedBaseList, textData]);
+
+  const handleCopyRaw = async () => {
+    await navigator.clipboard.writeText(
+      JSON.stringify(shiftedBaseList, null, 2),
+    );
+    setRawCopied(true);
+    setTimeout(() => setRawCopied(false), 1500);
+  };
+
+  const handleCopyMapped = async () => {
+    await navigator.clipboard.writeText(JSON.stringify(mappedList, null, 2));
+    setMappedCopied(true);
+    setTimeout(() => setMappedCopied(false), 1500);
   };
 
   return (
@@ -139,29 +228,72 @@ export default function ToolsPage() {
       <div className="flex items-center gap-3">
         <button
           type="button"
-          onClick={handleCopy}
+          onClick={handleCopyRaw}
           disabled={!raw.trim()}
           className="bg-ztmy-purple rounded-md px-4 py-2 text-sm font-medium text-white transition-opacity disabled:opacity-40"
         >
-          {copied ? "복사됨!" : "복사"}
+          {rawCopied ? "복사됨!" : "원본 복사"}
         </button>
+        <div className="flex items-center gap-1">
+          <input
+            type="number"
+            value={offsetSeconds}
+            onChange={(e) => setOffsetSeconds(e.target.value)}
+            placeholder="±초"
+            className="w-16 rounded-md border border-white/20 bg-black/40 px-2 py-2 font-mono text-sm text-white placeholder:text-white/30"
+          />
+          <span className="text-sm text-white/50">초 보정</span>
+        </div>
         {error && <span className="text-sm text-red-400">{error}</span>}
         {!error && lines.length > 0 && (
           <span className="text-sm text-white/50">{lines.length}줄 파싱됨</span>
         )}
       </div>
 
-      {lines.length > 0 && (
-        <ul className="divide-y divide-white/10 rounded-md border border-white/10">
-          {lines.map((line, index) => (
-            <li key={index} className="flex gap-3 p-2 text-sm text-white">
-              <span className="w-14 shrink-0 font-mono text-white/50">
-                {line.time}
-              </span>
-              <span className="flex-1">{line.translation}</span>
-            </li>
-          ))}
-        </ul>
+      <p className="text-sm text-white/50">
+        원문/발음/해석을 3줄 단위로 반복해서 붙여넣으면, 위 목록에 순서대로
+        채워서 완전체 목록을 보여줍니다. 유튜브 자막 없이 텍스트만 채우면
+        0:00부터 {AUTO_TIME_STEP_SECONDS}초 간격으로 시간을 자동 생성합니다.
+      </p>
+
+      <textarea
+        value={textData}
+        onChange={(e) => setTextData(e.target.value)}
+        onPaste={(e) => {
+          e.preventDefault();
+          const pasted = collapseBlankLines(e.clipboardData.getData("text"));
+          const target = e.currentTarget;
+          const { selectionStart, selectionEnd, value } = target;
+          const next =
+            value.slice(0, selectionStart) + pasted + value.slice(selectionEnd);
+          setTextData(next);
+          requestAnimationFrame(() => {
+            const cursor = selectionStart + pasted.length;
+            target.setSelectionRange(cursor, cursor);
+          });
+        }}
+        placeholder={"원문1\n발음1\n해석1\n원문2\n발음2\n해석2\n..."}
+        spellCheck={false}
+        className="h-56 w-full resize-y rounded-md border border-white/20 bg-black/40 p-3 font-mono text-xs text-white placeholder:text-white/30"
+      />
+
+      {mappedList.length > 0 && (
+        <>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleCopyMapped}
+              className="bg-ztmy-pink rounded-md px-4 py-2 text-sm font-medium text-white"
+            >
+              {mappedCopied ? "복사됨!" : "완전체 복사"}
+            </button>
+            <span className="text-sm text-white/50">{mappedList.length}줄</span>
+          </div>
+
+          <pre className="max-h-96 overflow-auto rounded-md border border-white/10 bg-black/40 p-3 font-mono text-xs whitespace-pre-wrap text-white">
+            {JSON.stringify(mappedList, null, 2)}
+          </pre>
+        </>
       )}
     </div>
   );

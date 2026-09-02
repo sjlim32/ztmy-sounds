@@ -4,9 +4,10 @@ import localFont from "next/font/local";
 import { SerwistProvider } from "@serwist/turbopack/react";
 import { GuideDimOverlay } from "@/components/GuideDimOverlay";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
-import { MobileFooter } from "@/components/mobile/MobileFooter";
+import { Footer } from "@/components/Footer";
 import { ARTIST } from "@/data/artist";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
+import { buildSiteJsonLdGraph } from "@/lib/structured-data";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -26,7 +27,7 @@ const rocknrollOne = RocknRoll_One({
 });
 
 const mkpop = localFont({
-  src: "../../../public/fonts/851MkPOP_101.ttf",
+  src: "../../fonts/851MkPOP_101.ttf",
   variable: "--font-mkpop-101",
   display: "swap",
 });
@@ -74,6 +75,12 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  verification: {
+    google: "cNG2sZPOuRCDcSsSeizR7F3cCUGuEdzmRXN8l_g3v4c",
+    other: {
+      "naver-site-verification": "99ba30f0851f16dac1d6e66209b7ed899fd5c584",
+    },
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -82,13 +89,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ko"
       className={`${geistSans.variable} ${geistMono.variable} ${rocknrollOne.variable} ${mkpop.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex h-dvh flex-col overflow-hidden">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(buildSiteJsonLdGraph()),
+          }}
+        />
         <GuideDimOverlay />
         <SerwistProvider swUrl="/serwist/sw.js">
-          <div className="relative z-10 flex min-h-full flex-1 flex-col">
+          <div className="relative z-10 flex min-h-0 flex-1 flex-col">
             <MobileHeader />
-            <div className="flex flex-1 flex-col">{children}</div>
-            <MobileFooter />
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              {children}
+            </div>
+            <Footer />
           </div>
         </SerwistProvider>
       </body>

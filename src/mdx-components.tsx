@@ -1,20 +1,45 @@
 import type { MDXComponents } from "mdx/types";
+import { cn } from "@/lib/utils";
+import { SiteLink } from "@/components/SiteLink";
 
 const components: MDXComponents = {
-  h2: ({ children }) => (
-    <h2 className="mt-8 text-lg font-semibold text-white first:mt-0">
+  a: ({ className, children, href, ...props }) => (
+    <SiteLink href={href} className={className} {...props}>
+      {children}
+    </SiteLink>
+  ),
+  h2: ({ className, children, ...props }) => (
+    <h2
+      className={cn(
+        "mt-8 text-lg font-semibold text-white first:mt-0",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </h2>
   ),
-  ul: ({ children }) => (
-    <ul className="mt-3 space-y-1.5 text-white/70">{children}</ul>
+  ul: ({ className, children, ...props }) => (
+    <ul className={cn("mt-3 space-y-1.5 text-white", className)} {...props}>
+      {children}
+    </ul>
   ),
-  li: ({ children }) => (
-    <li className="flex gap-2 before:text-white/30 before:content-['-']">
+  li: ({ className, children, ...props }) => (
+    <li
+      className={cn(
+        "flex gap-2 before:text-white/30 before:content-['-']",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </li>
   ),
-  p: ({ children }) => <p className="mt-3 text-white/70">{children}</p>,
+  p: ({ className, children, ...props }) => (
+    <p className={cn("mt-3 text-white", className)} {...props}>
+      {children}
+    </p>
+  ),
 };
 
 export function useMDXComponents(): MDXComponents {

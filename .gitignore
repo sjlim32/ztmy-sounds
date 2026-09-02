@@ -105,3 +105,6 @@ sketch
 
 # custom
 .vscode
+
+# git worktrees (superpowers)
+.worktrees/

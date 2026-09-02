@@ -1,0 +1,598 @@
+import type { Song, SongTitle } from "@/features/guide/lib/types";
+
+const tune: SongTitle = {
+  jp: "ミラーチューン",
+  kr: "미러튠",
+  en: "Mirror Tune",
+};
+
+const song: Song = {
+  id: "mirror-tune",
+  title: tune,
+  youtubeId: "jd9tEPZVuy8",
+  lyrics: [
+    {
+      time: "0:0",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+    {
+      time: "0:06.6",
+      original: "mirror mirror mirror tune ~",
+      pronunciation: "미라 미라 미라 츈 ~",
+      translation: "",
+    },
+    {
+      time: "0:08.4",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+    {
+      time: "0:13",
+      original: "3 2 1",
+      pronunciation: "",
+      translation: "",
+    },
+    {
+      time: "0:14.5",
+      original: "mirror tune ~",
+      pronunciation: "미라 츈 ~",
+      translation: "",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "0:18.2",
+      original: "mirror tune ~",
+      pronunciation: "미라 츈 ~",
+      translation: "",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "0:20.6",
+      original: "3 2 1",
+      pronunciation: "",
+      translation: "",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "0:22",
+      original: "mirror tune ~",
+      pronunciation: "미라 츈 ~",
+      translation: "",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "0:25.8",
+      original: "mirror tune ~",
+      pronunciation: "미라 츈 ~",
+      translation: "",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "0:28",
+      original: "3 2 1",
+      pronunciation: "",
+      translation: "",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    //================ 1절 ================//
+    {
+      time: "0:30",
+      original: "抗い競り合い負けないよう",
+      pronunciation: "아라가이 세리아이 마케나이요우",
+      translation: "논쟁 경쟁에서 지지 않도록",
+    },
+    {
+      time: "0:32",
+      original: "知識が僕を震わせる",
+      pronunciation: "치시키가 보쿠오 후루와세루",
+      translation: "지식이 나를 떨게 해",
+    },
+    {
+      time: "0:33.8",
+      original: "葛藤リピートしている",
+      pronunciation: "캇토우 리피토 시테루",
+      translation: "갈등을 되풀이하고 있어",
+    },
+    {
+      time: "0:37.5",
+      original: "もっと教えてくれ",
+      pronunciation: "못토 오시에테쿠레",
+      translation: "좀 더 알려줘",
+    },
+    {
+      time: "0:40",
+      original: "有耶無耶な未知数",
+      pronunciation: "우야무야나 미치스우",
+      translation: "있는 듯 없는 듯한 미지수",
+    },
+    {
+      time: "0:42.8",
+      original: "戦ってくもの",
+      pronunciation: "타타캇테쿠 모노",
+      translation: "싸워가는 자",
+    },
+    {
+      time: "0:45",
+      original: "いつからだろう独壇",
+      pronunciation: "이츠카라다로오 도쿠단",
+      translation: "언제부터일까 홀로 무대에",
+    },
+    {
+      time: "0:47",
+      original: "思いやりよりずる賢さなんて",
+      pronunciation: "오모이야리요리 즈루가시코사 난테",
+      translation: "배려보다 교활함이라니",
+    },
+    {
+      time: "0:49.8",
+      original: "品がないし",
+      pronunciation: "힌가 나이시",
+      translation: "품위 없고",
+    },
+    {
+      time: "0:52.5",
+      original: "うんと やり切れない場面で",
+      pronunciation: "즛토 야리키레나이 바멘데",
+      translation: "잘 해낼 수 없는 상황에서",
+    },
+    {
+      time: "0:56",
+      original: "僕が 信じていたいもの",
+      pronunciation: "보쿠가 신지테 이타이 모노",
+      translation: "내가 믿고 싶은 것은",
+    },
+    {
+      time: "1:00",
+      original: "もちろん問題は山積みですが yey",
+      pronunciation: "모치롱 몬다이와 야마즈미 데스가 **yey**",
+      translation: "당연히 문제는 산더미지만요 yey",
+      cheer: {
+        text: '"yey"만',
+        tag: "swing",
+      },
+    },
+    {
+      time: "1:03.5",
+      original: "帰ってすぐ眠たいし",
+      pronunciation: "카엣테 스구 네무타이시",
+      translation: "돌아가서 빨리 자고싶고",
+    },
+    {
+      time: "1:07.3",
+      original: "何処へも行けないこんな",
+      pronunciation: "도코에모 이케나이 콘나",
+      translation: "어디로든 갈 수 없는 이런",
+    },
+    {
+      time: "1:09.2",
+      original: "夜更けも ずっと光り続けてる",
+      pronunciation: "요후케모 즛토 히카리 츠즈케테루",
+      translation: "깊은밤에도 계속 빛나고있어",
+    },
+    {
+      time: "1:14",
+      original: "神秘的なミラーチューン yey",
+      pronunciation: "심피테키나 미라츈 **yey**",
+      translation: "신비한 미러튠 yey",
+      cheer: {
+        text: '"yey"만',
+        tag: "swing",
+      },
+    },
+    {
+      time: "1:18",
+      original: "君がいなきゃ始まんない",
+      pronunciation: "키미가 이나캬 하지만나이",
+      translation: "네가 없으면 시작하지 않아",
+      cheer: {
+        text: "좌우로 반복 ~",
+        tag: "swing",
+      },
+    },
+    {
+      time: "1:20",
+      original: "繋ぐぜ笑っとく",
+      pronunciation: "츠나구제 와랏토쿠",
+      translation: "이어갈게 웃어 줘",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "1:22",
+      original: "どんな逆境だって 煮詰まった",
+      pronunciation: "돈나 걋쿄오닷테 니츠맛타",
+      translation: "어떤 역경이라도 견뎌낸",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "1:25",
+      original: "頑固な僕だって",
+      pronunciation: "간코나 보쿠닷테",
+      translation: "완고한 나조차도",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "1:27",
+      original: "めんどくさい☆諦め悪いみたい",
+      pronunciation: "멘도쿠사이☆ 아키라메 와루이미타이",
+      translation: "귀찮아☆라며 포기하지 못하는 것 같아",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "1:30",
+      original: "まだ重々謙遜したい yey",
+      pronunciation: "마다 쥬우쥬우 켄손시타이 yey",
+      translation: "아직 계속 겸손하고 싶어 yey",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "1:33.2",
+      original: "止まらないよ心臓 揺るがないんだ",
+      pronunciation: "토마라나이요 신조 유루가나인다",
+      translation: "멈추지 않아 심장이 동요하지 않아",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "1:38",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+    //================ 2절 ================//
+    {
+      time: "1:53",
+      original: "ねね 楽しめる主導権 握らせて",
+      pronunciation: "네네 타노시메루 슈도오켄 니기라세테",
+      translation: "즐길 수 있는 주도권을 쥐게 해 줘",
+    },
+    {
+      time: "1:56",
+      original: "情緒 高鳴る お互いに良き条件",
+      pronunciation: "죠오쇼 타카나루 오타가이니 요키 죠오켄",
+      translation: "감정이 고동치는 서로에게 좋은 조건",
+    },
+    {
+      time: "2:00",
+      original: "もう明るい関係選んでゆくんだ",
+      pronunciation: "모오 아카루이 칸케이 에란데 유쿤다",
+      translation: "더 나은 관계 선택하기 위해",
+    },
+    {
+      time: "2:05",
+      original: "通やしてたいもの",
+      pronunciation: "츠이야 시테타이 모노",
+      translation: "끝까지 써버리고 싶은 것",
+    },
+    {
+      time: "2:08",
+      original: "変身モード全開でクリアな情景",
+      pronunciation: "헨신모-도 젠카이데 쿠리아나 죠오케이",
+      translation: "변신 모드 전개로 깔끔한 광경",
+    },
+    {
+      time: "2:11",
+      original: "聴き倒したﾃﾞｨｽｹｯﾄ",
+      pronunciation: "키키타오시타 디스켓토",
+      translation: "몇 번이나 들은 디스켓",
+    },
+    {
+      time: "2:13",
+      original: "憧れはきっと超えてくもの ﾓｯﾄ",
+      pronunciation: "아코가레와 킷토 코에테쿠모노 못토",
+      translation: "동경은 분명 뛰어넘는 것 좀 더",
+    },
+    {
+      time: "2:16",
+      original: "ドキドキするほう優先しようよ",
+      pronunciation: "도키도키스루 호오 유우센시요우요",
+      translation: "두근두근거리는 걸 우선시하자",
+    },
+    {
+      time: "2:20",
+      original: "かぎりがあるもの",
+      pronunciation: "카기리가 아루 모노",
+      translation: "한계가 있는 것",
+    },
+    {
+      time: "2:23",
+      original: "もちろん引き下がりはしないですが yey",
+      pronunciation: "모치롱 히키사가리와 시나이데스가 **yey**",
+      translation: "물론 물러서지는 않겠지만 yey",
+      cheer: {
+        text: '"yey"만',
+        tag: "swing",
+      },
+    },
+    {
+      time: "2:26",
+      original: "好きになってはもらいたいし",
+      pronunciation: "스키니 낫테와 모라이타이시",
+      translation: "좋아해줬으면 하고",
+    },
+    {
+      time: "2:30",
+      original: "心意気やんちゃで危なっかしいけど yey",
+      pronunciation: "코코로이키 얀챠데 아부낫카시이케도 **yey**",
+      translation: "마음만 넘쳐서 위태롭지만서도 yey",
+      cheer: {
+        text: '"yey"만',
+        tag: "swing",
+      },
+    },
+    {
+      time: "2:34",
+      original: "確信に疑えてる",
+      pronunciation: "카쿠신니 우타가에테루",
+      translation: "확신하며 의심하고 있어",
+    },
+    {
+      time: "2:36.7",
+      original: "それは夢の space tune ~",
+      pronunciation: "소레와 유메노 space tune ~",
+      translation: "그건 꿈의 space tune ~",
+    },
+    {
+      time: "2:41",
+      original: "君がいなきゃ始まんない",
+      pronunciation: "키미가 이나캬 하지만나이",
+      translation: "네가 없으면 시작되지 않아",
+      cheer: {
+        text: "좌우로 반복 ~",
+        tag: "swing",
+      },
+    },
+    {
+      time: "2:43",
+      original: "繋ぐぜ笑っとく",
+      pronunciation: "츠나구제 와랏토쿠",
+      translation: "손 잡자 웃어 줘",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "2:45",
+      original: "どんな逆境だって 煮詰まった",
+      pronunciation: "돈나 걋쿄오닷테 니츠맛타",
+      translation: "어떤 역경이라도 견뎌낸",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "2:48",
+      original: "頑固な僕だって",
+      pronunciation: "간코나 보쿠닷테",
+      translation: "완고한 나조차도",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "2:50",
+      original: "めんどくさい☆諦め悪いみたい",
+      pronunciation: "멘도쿠사이☆ 아키라메 와루이미타이",
+      translation: "귀찮아☆라며 포기하지 못하는 것 같아",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "2:52",
+      original: "まだ重々謙遜したい yey",
+      pronunciation: "마다 쥰쥰켓쇼오 시타이 yey",
+      translation: "아직 계속 겸손해지고 싶어 yey",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "2:56",
+      original: "止まらないよ心臓 揺るがないんだ",
+      pronunciation: "토마라나이요 신조 유루가나인다",
+      translation: "멈추지 않아 심장이 동요하지 않아",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+
+    {
+      time: "3:00",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+    {
+      time: "4:02",
+      original: "3 2 1",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+    {
+      time: "4:04",
+      original: "とろけそうな月の狭間 毒だ",
+      pronunciation: "토로케소오나 츠키노 하자마 도쿠다",
+      translation: "녹을 것 같은 달 사이 독이야",
+    },
+    {
+      time: "4:08",
+      original: "甘酸っぱい絆を恐れてしまうような",
+      pronunciation: "아마즛파이 키즈나오 오소레테 시마우요우나",
+      translation: "새콤달콤한 인연을 깨뜨려버리는",
+    },
+    {
+      time: "4:11",
+      original: "未開拓な世界は 矛盾で不安定で",
+      pronunciation: "미가이타쿠나 세카이와 무쥰데 후안테이데",
+      translation: "개척되지 않은 세상은 모순으로 불안정해서",
+    },
+    {
+      time: "4:16",
+      original: "カラ元気だよ。。。",
+      pronunciation: "카라 겡키다요. . . .",
+      translation: "허세란 말야. . . .",
+    },
+    {
+      time: "4:19",
+      original: "ye ye ye yey",
+      pronunciation: "**ye ye ye yey**",
+      translation: "ye ye ye yey",
+      cheer: {
+        text: "박자에 맞춰",
+        tag: "swing",
+      },
+    },
+    {
+      time: "4:24.5",
+      original: "ye ye ye yey",
+      pronunciation: "**ye ye ye yey**",
+      translation: "ye ye ye yey",
+      cheer: {
+        text: "박자에 맞춰",
+        tag: "swing",
+      },
+    },
+    {
+      time: "4:26",
+      original: "君がいなきゃ始まんない",
+      pronunciation: "키미가 이나캬 하지만나이",
+      translation: "네가 없으면 시작되지 않아",
+      cheer: {
+        text: "좌우로 반복 ~",
+        tag: "swing",
+      },
+    },
+    {
+      time: "4:28",
+      original: "歌うぜ GACHIフォーㆍユー",
+      pronunciation: "우타우제 GACHI 포- 유-",
+      translation: "노래할게 GACHI for you",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "4:30",
+      original: "どんな逆境だってあっちゅう間だ",
+      pronunciation: "돈나 걋쿄오닷테 앗츄우맛다",
+      translation: "어떤 역경도 순식간에 지나가",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "4:33",
+      original: "頑固な僕だって",
+      pronunciation: "간코나 보쿠닷테",
+      translation: "완고한 나조차도",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "4:34.5",
+      original: "めんどくさい☆諦め悪いみたい",
+      pronunciation: "멘도쿠사이☆ 아키라메 와루이미타이",
+      translation: "귀찮아☆라며 포기하지 못하는 것 같아",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "4:37.3",
+      original: "まだ準々決勝したい yey",
+      pronunciation: "마다 쥰쥰켓쇼오 시타이 yey",
+      translation: "아직 준준결승전을 하고 싶어 yey",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "4:40.7",
+      original: "染まらないよ心臓 揺るがないんだ",
+      pronunciation: "소마라나이요 신조 유루가나인다",
+      translation: "물들지 않아 심장은 흔들리지 않아",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "4:53.8",
+      original: "mirror tune ~",
+      pronunciation: "미라 츈 ~",
+      translation: "",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+    {
+      time: "4:54.5",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
+    },
+  ],
+};
+
+export default song;
