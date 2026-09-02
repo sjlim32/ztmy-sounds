@@ -34,8 +34,8 @@ export const songList: Song[] = [
   seigi,
   kuyashiiwa,
   minority,
-  soudou, // 싱크 완
-  haze, // TODO 싱크 미세 조정 필요
+  soudou,
+  haze,
   obenkyouShitoiteyo,
   milabo,
   fastening, // TODO 전체 싱크 조절 필요
