@@ -38,9 +38,9 @@ export const songList: Song[] = [
   haze,
   obenkyouShitoiteyo,
   milabo,
-  fastening, // TODO 전체 싱크 조절 필요
-  jkBomber, // TODO 전체 싱크 조절 필요
-  darken, // TODO 전체 싱크 조절 필요
+  fastening,
+  jkBomber,
+  darken,
   haveA, // TODO 전체 싱크 조절 필요
   aitsuraZeninDousoukai,
   mirrorTune,
