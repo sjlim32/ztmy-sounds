@@ -35,6 +35,18 @@ function InlineCallIcon({ name }: { name: CallTag }) {
   return <CallIcon name={name} className="relative top-[-0.08em]" />;
 }
 
+/**
+ * pronunciation 등에 쓰는 ** / * / *** 강조 마커 중 지금 이 줄에서 실제로
+ * "켜져 있는" 강조 범위. lineTag가 swing/clap/call이면 cheer, "slam"이면
+ * slam, 태그가 없으면 어느 쪽도 강조하지 않습니다.
+ */
+type EmphasisScope = "cheer" | "slam";
+
+function getEmphasisScope(tag: CallTag | undefined): EmphasisScope | undefined {
+  if (!tag) return undefined;
+  return tag === "slam" ? "slam" : "cheer";
+}
+
 interface lyricLineProps {
   line: LyricLineData;
   isActive: boolean;
@@ -80,13 +92,22 @@ function LyricLineComponent({ line, isActive, onSeek }: lyricLineProps) {
         "--tag-bg": getTagBackgroundColor(lineTag, isActive),
       } as React.CSSProperties)
     : undefined;
+  const emphasisScope = getEmphasisScope(lineTag);
 
   const content = (
     <>
       <CheerText text={cheerText} tag={lineTag} />
-      <OriginalText text={line.original} tag={lineTag} />
-      <PronunciationText text={line.pronunciation} tag={lineTag} />
-      <TranslationText text={line.translation} tag={lineTag} />
+      <OriginalText text={line.original} tag={lineTag} scope={emphasisScope} />
+      <PronunciationText
+        text={line.pronunciation}
+        tag={lineTag}
+        scope={emphasisScope}
+      />
+      <TranslationText
+        text={line.translation}
+        tag={lineTag}
+        scope={emphasisScope}
+      />
     </>
   );
 
@@ -146,7 +167,15 @@ function CheerText({ text, tag }: { text?: string; tag?: CallTag }) {
 }
 
 /****** 일어 가사 ******/
-function OriginalText({ text, tag }: { text: string; tag?: CallTag }) {
+function OriginalText({
+  text,
+  tag,
+  scope,
+}: {
+  text: string;
+  tag?: CallTag;
+  scope?: EmphasisScope;
+}) {
   if (!text && !tag) return null;
 
   const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
@@ -154,13 +183,21 @@ function OriginalText({ text, tag }: { text: string; tag?: CallTag }) {
   return (
     <p data-role="original" className="wide:text-base pc:text-sm text-xs">
       {tag ? <InlineCallIcon name={tag} /> : null}
-      {renderTextParts(text, "original", emphasisColor)}
+      {renderTextParts(text, "original", scope, emphasisColor)}
     </p>
   );
 }
 
 /****** 발음 가사 ******/
-function PronunciationText({ text, tag }: { text: LyricText; tag?: CallTag }) {
+function PronunciationText({
+  text,
+  tag,
+  scope,
+}: {
+  text: LyricText;
+  tag?: CallTag;
+  scope?: EmphasisScope;
+}) {
   if (!text) return null;
 
   const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
@@ -170,6 +207,7 @@ function PronunciationText({ text, tag }: { text: LyricText; tag?: CallTag }) {
       <LyricTextRenderer
         text={text}
         prefix="pron"
+        scope={scope}
         emphasisColor={emphasisColor}
       />
     </p>
@@ -177,14 +215,22 @@ function PronunciationText({ text, tag }: { text: LyricText; tag?: CallTag }) {
 }
 
 /****** 한국어 가사 ******/
-function TranslationText({ text, tag }: { text: string; tag?: CallTag }) {
+function TranslationText({
+  text,
+  tag,
+  scope,
+}: {
+  text: string;
+  tag?: CallTag;
+  scope?: EmphasisScope;
+}) {
   if (!text) return null;
 
   const emphasisColor = tag ? TAG_BORDER_COLOR[tag] : undefined;
 
   return (
     <p data-role="translation" className="wide:text-base pc:text-sm text-xs">
-      {renderTextParts(text, "translation", emphasisColor)}
+      {renderTextParts(text, "translation", scope, emphasisColor)}
     </p>
   );
 }
@@ -193,14 +239,16 @@ function TranslationText({ text, tag }: { text: string; tag?: CallTag }) {
 function LyricTextRenderer({
   text,
   prefix,
+  scope,
   emphasisColor,
 }: {
   text: LyricText;
   prefix: string;
+  scope?: EmphasisScope;
   emphasisColor?: string;
 }) {
   if (typeof text === "string") {
-    return <>{renderTextParts(text, prefix, emphasisColor)}</>;
+    return <>{renderTextParts(text, prefix, scope, emphasisColor)}</>;
   }
 
   return (
@@ -210,6 +258,7 @@ function LyricTextRenderer({
           {renderTextParts(
             segment.text,
             `${prefix}-seg-${index}`,
+            scope,
             emphasisColor,
           )}
         </span>
@@ -218,7 +267,12 @@ function LyricTextRenderer({
   );
 }
 
-function renderTextParts(text: string, key: string, emphasisColor?: string) {
+function renderTextParts(
+  text: string,
+  key: string,
+  scope?: EmphasisScope,
+  emphasisColor?: string,
+) {
   return parseIconTokens(text).map((part, index) => {
     if (part.type === "icon") {
       return <InlineCallIcon key={`${key}-${index}`} name={part.value} />;
@@ -226,18 +280,37 @@ function renderTextParts(text: string, key: string, emphasisColor?: string) {
 
     return (
       <Fragment key={`${key}-${index}`}>
-        {parseEmphasis(part.value).map((seg, segIndex) =>
-          seg.type === "emphasis" ? (
+        {parseEmphasis(part.value).map((seg, segIndex) => {
+          if (seg.type !== "emphasis") {
+            return (
+              <Fragment key={`${key}-${index}-${segIndex}`}>
+                {seg.value}
+              </Fragment>
+            );
+          }
+
+          // 이 강조 마커가 감싼 범위(cheer/slam)가 지금 활성화된 가이드
+          // 모드와 다르면, 표시만 안 할 뿐 텍스트 자체는 평범하게 보여줍니다.
+          const applies =
+            scope === "cheer" ? seg.cheer : scope === "slam" ? seg.slam : false;
+
+          if (!applies) {
+            return (
+              <Fragment key={`${key}-${index}-${segIndex}`}>
+                {seg.value}
+              </Fragment>
+            );
+          }
+
+          return (
             <strong
               key={`${key}-${index}-${segIndex}`}
               style={emphasisColor ? { color: emphasisColor } : undefined}
             >
               {seg.value}
             </strong>
-          ) : (
-            <Fragment key={`${key}-${index}-${segIndex}`}>{seg.value}</Fragment>
-          ),
-        )}
+          );
+        })}
       </Fragment>
     );
   });

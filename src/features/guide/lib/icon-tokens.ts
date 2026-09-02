@@ -33,29 +33,49 @@ export function hasIconToken(text: string, name: CallTag): boolean {
 }
 
 export type EmphasisPart =
-  { type: "text"; value: string } | { type: "emphasis"; value: string };
+  | { type: "text"; value: string }
+  | { type: "emphasis"; value: string; cheer: boolean; slam: boolean };
 
-const EMPHASIS_PATTERN = /\*\*(.+?)\*\*/g;
-
-// 가사 문자열을 인라인 "**텍스트**" 마커 기준으로 나눠서, 감싼 부분을 강조
+/**
+ * "**텍스트**"(응원)와 "^텍스트^"(슬램)는 서로 다른 글자를 쓰는 독립된
+ * on/off 토글이라, 순서대로 등장한 마커 쌍이 서로 교차해도(예:
+ * "**Don't ^stop** 노우리^ 우에니") 정확히 처리됩니다 — "stop" 구간은
+ * 응원 마커가 열린 채로 슬램 마커도 열려서 둘 다 켜진 상태가 됩니다.
+ * ("**" 안에서 * 하나만 짝 없이 나오는 경우처럼) 단독 별표는 토글하지 않고
+ * 그냥 텍스트로 남겨둡니다 — 기존 "**텍스트**" 데이터와 호환하기 위함.
+ */
 export function parseEmphasis(text: string): EmphasisPart[] {
   const parts: EmphasisPart[] = [];
-  let lastIndex = 0;
+  let cheerOpen = false;
+  let slamOpen = false;
+  let buffer = "";
 
-  for (const match of text.matchAll(EMPHASIS_PATTERN)) {
-    const index = match.index ?? 0;
+  const flush = () => {
+    if (!buffer) return;
+    parts.push(
+      cheerOpen || slamOpen
+        ? { type: "emphasis", value: buffer, cheer: cheerOpen, slam: slamOpen }
+        : { type: "text", value: buffer },
+    );
+    buffer = "";
+  };
 
-    if (index > lastIndex) {
-      parts.push({ type: "text", value: text.slice(lastIndex, index) });
+  let i = 0;
+  while (i < text.length) {
+    if (text[i] === "*" && text[i + 1] === "*") {
+      flush();
+      cheerOpen = !cheerOpen;
+      i += 2;
+    } else if (text[i] === "^") {
+      flush();
+      slamOpen = !slamOpen;
+      i += 1;
+    } else {
+      buffer += text[i];
+      i += 1;
     }
-
-    parts.push({ type: "emphasis", value: match[1] });
-    lastIndex = index + match[0].length;
   }
-
-  if (lastIndex < text.length) {
-    parts.push({ type: "text", value: text.slice(lastIndex) });
-  }
+  flush();
 
   return parts;
 }
