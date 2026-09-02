@@ -227,8 +227,9 @@ const song: Song = {
     {
       time: "2:26",
       original: "​​​何処までも ただ 遠くへ",
-      pronunciation: "도코마데모 타다 토오쿠에",
+      pronunciation: "^도코마데모 타다 토오쿠에^",
       translation: "어디까지고 그저 저 멀리로",
+      slam: "핏 벌리기",
     },
     {
       time: "2:29",
@@ -247,6 +248,7 @@ const song: Song = {
       original: "​​明日にはもう 忘れてしまうのに",
       pronunciation: "아시타니와 모- 와스레테시마우노니",
       translation: "내일이 되면 이제 잊어버릴 텐데..",
+      slam: "하제 댄스",
     },
     {
       time: "2:40.4",
@@ -254,6 +256,7 @@ const song: Song = {
       pronunciation: "",
       translation: "",
       interlude: true,
+      slam: "하제 댄스",
     },
     //================ 3절 ================//
     {
@@ -261,24 +264,28 @@ const song: Song = {
       original: "何が抗うの",
       pronunciation: "나니가 아라가우노",
       translation: "무엇이 저항하는 걸까",
+      slam: "하제 댄스",
     },
     {
       time: "2:54",
       original: "何を憎めるの",
       pronunciation: "나니오 니쿠메루노",
       translation: "무엇을 미워하는 걸까",
+      slam: "하제 댄스",
     },
     {
       time: "2:59",
       original: "​​​預けないでいてよ",
       pronunciation: "아즈케나이데 이테요",
       translation: "맡겨두지 말아줘",
+      slam: "하제 댄스",
     },
     {
       time: "3:04",
       original: "​​​泳ぐ必要も 傷も無いのに",
-      pronunciation: "오요구 히츠요-모 키즈모 나이노니",
+      pronunciation: "^오요구 히츠요-모 키즈모 나이노니^",
       translation: "헤엄칠 필요도 상처도 없는데",
+      slam: "핏 벌리기 (재정비)",
     },
     {
       time: "3:08",
@@ -301,8 +308,9 @@ const song: Song = {
     {
       time: "3:18",
       original: "​​​綺麗事 言うよ 価値を値付けたまま",
-      pronunciation: "키레이고토 유우요 카치오 네츠케타마마",
+      pronunciation: "키레이고토 ^유우요^ 카치오 네츠케타마마",
       translation: "겉치레를 입에 담을 거야 값어치를 매긴 채로",
+      slam: "슬램 !",
     },
     {
       time: "3:22",

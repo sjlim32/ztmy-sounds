@@ -76,8 +76,9 @@ const song: Song = {
     {
       time: "1:03",
       original: "消え去りたいね",
-      pronunciation: "키에사리타이네",
+      pronunciation: "^키에사리타이네^",
       translation: "사라져 버리고 싶네",
+      slam: "핏 벌리기",
     },
     {
       time: "1:07",
@@ -112,12 +113,13 @@ const song: Song = {
     {
       time: "1:26.5",
       original: "紛らわして紛らわして 距離を取るほど",
-      pronunciation: "마기라와시테 마기라와시테 쿄리오 토루 호도",
+      pronunciation: "마기라와시테 ^마기라와시테^ 쿄리오 토루 호도",
       translation: "달래고 달래서 거리를 충분히 둘 정도로",
       cheer: {
         text: "",
         tag: "swing",
       },
+      slam: "슬램 !",
     },
     {
       time: "1:30.5",
@@ -268,8 +270,9 @@ const song: Song = {
     {
       time: "2:27.3",
       original: "確かめたくて",
-      pronunciation: "타시카메타쿠테",
+      pronunciation: "^타시카메타쿠테^",
       translation: "확인하고 싶어서",
+      slam: "핏 벌리기",
     },
     {
       time: "2:31.5",
@@ -304,12 +307,13 @@ const song: Song = {
     {
       time: "2:52.8",
       original: "​紛らわして紛らわして 距離を取るほど",
-      pronunciation: "마기라와시테 마기라와시테 쿄리오 토루 호도",
+      pronunciation: "마기라와시테 ^마기라와시테^ 쿄리오 토루 호도",
       translation: "달래고 달래서 거리를 충분히 둘 정도로",
       cheer: {
         text: "",
         tag: "swing",
       },
+      slam: "슬램 !",
     },
     {
       time: "2:56.3",
@@ -432,11 +436,13 @@ const song: Song = {
         tag: "swing",
       },
     },
+    //================ 3절 ================//
     {
       time: "3:40.4",
       original: "誰にも明かさずに超えてみたい",
-      pronunciation: "다레니모 아카사즈니 코에테 미타이",
+      pronunciation: "^다레니모^ 아카사즈니 코에테 미타이",
       translation: "아무에게도 밝히지 않고 뛰어넘어 보고 싶어",
+      slam: "핏 벌리기",
     },
     {
       time: "3:43.4",
@@ -468,6 +474,7 @@ const song: Song = {
       original: "紛らわして紛らわして 距離を取るほど",
       pronunciation: "마기라와시테 마기라와시테 쿄리오 토루 호도",
       translation: "달래고 달래서 거리를 충분히 둘 정도로",
+      slam: "(슬램 대기)",
     },
     {
       time: "4:19.1",
@@ -478,12 +485,13 @@ const song: Song = {
     {
       time: "4:24.8",
       original: "紛らわして紛らわして 距離を取るほど",
-      pronunciation: "마기라와시테 마기라와시테 쿄리오 토루 호도",
+      pronunciation: "마기라와시테 ^마기라와시테^ 쿄리오 토루 호도",
       translation: "달래고 달래서 거리를 충분히 둘 정도로",
       cheer: {
         text: "",
         tag: "swing",
       },
+      slam: "슬램 !",
     },
     {
       time: "4:28.1",

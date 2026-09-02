@@ -56,8 +56,9 @@ const song: Song = {
     {
       time: "0:42",
       original: "端ないほど集中力が",
-      pronunciation: "하시타나이호도 슈우츄우료쿠가",
+      pronunciation: "하시타나이호도 ^슈우츄우료쿠가^",
       translation: "추해보일 정도로 집중력이",
+      slam: "핏 벌리기",
     },
     {
       time: "0:45",
@@ -74,8 +75,9 @@ const song: Song = {
     {
       time: "0:57",
       original: "もう 勘が冴えて悔しわ",
-      pronunciation: "모우 칸가 사에테 쿠야시이와",
-      translation: "정말이지, 감이 좋아서[3] 분해",
+      pronunciation: "모우 ^칸가^ 사에테 쿠야시이와",
+      translation: "정말이지, 감이 좋아서 분해",
+      slam: "슬램 !",
     },
     {
       time: "1:00",
@@ -135,7 +137,8 @@ const song: Song = {
       time: "1:47",
       original: "興味ないなら ほっといてくれ",
       pronunciation: "쿄우미 나이나라 홋토이테쿠레",
-      translation: "흥미가 없다면 내버려둬 줘",
+      translation: "흥미가 없다면 ^내버려둬^ 줘",
+      slam: "핏 벌리기",
     },
     {
       time: "1:50",
@@ -152,8 +155,9 @@ const song: Song = {
     {
       time: "2:03",
       original: "もう 勘が冴えて悔しいわ",
-      pronunciation: "모우 칸가 사에테 쿠야시이와",
+      pronunciation: "모우 ^칸가^ 사에테 쿠야시이와",
       translation: "정말 감이 좋아서 분해",
+      slam: "슬램 !",
     },
     {
       time: "2:06",
@@ -195,8 +199,9 @@ const song: Song = {
       time: "2:35",
       original: "君がくれた毒苺 満たされてない君の一号を",
       pronunciation:
-        "키미가 쿠레타 도쿠이치고 미타사레테나이 키미노 이치고우오",
+        "^키미가 쿠레타 도쿠이치고^ 미타사레테나이 키미노 이치고우오",
       translation: "네가 주었던 독딸기 채워지지 않는 너의 1호를",
+      slam: "핏 벌리기",
     },
     {
       time: "2:48",
@@ -219,8 +224,9 @@ const song: Song = {
     {
       time: "3:05",
       original: "もう 勘が冴えて悔しいわ",
-      pronunciation: "모우 칸가 사에테 쿠야시이와",
+      pronunciation: "모우 ^칸가^ 사에테 쿠야시이와",
       translation: "정말 감이 좋아서 분해",
+      slam: "슬램 !",
     },
     {
       time: "3:08",

@@ -29,48 +29,56 @@ const song: Song = {
       original: "​合わせ合う為の相槌 いつまで",
       pronunciation: "아와세아우 타메노 아이즈치 이츠마데",
       translation: "서로를 맞추기 위한 맞장구, 언제까지",
+      slam: "박수",
     },
     {
       time: "0:29",
       original: "ここの正確に沿って",
       pronunciation: "코코노 세이카쿠니 솟테",
       translation: "여기에 정확하게 따르고",
+      slam: "박수",
     },
     {
       time: "0:31.5",
       original: "どこの性格が体に いいんだろう",
       pronunciation: "도코노 세이카쿠가 카라다니 이인다로-",
       translation: "어떤 방식이 내 몸에 맞는걸까",
+      slam: "박수",
     },
     {
       time: "0:34.5",
       original: "気の抜けた中華街を",
       pronunciation: "키노 누케타 츄-카가이오",
       translation: "맥이 빠진 차이나 타운을",
+      slam: "박수",
     },
     {
       time: "0:37",
       original: "涼しげに 意味 淀んだ挨拶だけ",
       pronunciation: "스즈시게니 이미 요돈나 아이사츠다케",
       translation: "서늘하게 의미 없는 인사만을 해",
+      slam: "박수",
     },
     {
       time: "0:40.4",
       original: "​なるべく音を消して",
       pronunciation: "나루베쿠 오토오 케시테",
       translation: "되도록 소리를 지우고",
+      slam: "박수",
     },
     {
       time: "0:43",
       original: "まるで 何かから逃げるみたいに",
       pronunciation: "마루데 난카라 니게루 미타이니",
       translation: "마치 무언가로부터 도망치는 것 처럼",
+      slam: "박수",
     },
     {
       time: "0:46.3",
       original: "​遮られてくみたい",
-      pronunciation: "사에기라레테쿠미타이",
+      pronunciation: "^사에기라레테쿠미타이^",
       translation: "방해받고 있는 것 같아",
+      slam: "핏 벌리기",
     },
     {
       time: "0:49.2",
@@ -93,8 +101,9 @@ const song: Song = {
     {
       time: "1:09.5",
       original: "​嫌われたくない会話から",
-      pronunciation: "키라와레타쿠 나이 카이와카라",
+      pronunciation: "^키라와레타쿠^ 나이 카이와카라",
       translation: "미움받고 싶지 않은 대화에서",
+      slam: "슬램 !",
     },
     {
       time: "1:12",
@@ -173,8 +182,9 @@ const song: Song = {
     {
       time: "2:11.7",
       original: "思っていたことと違っても 今更 引き返せないよ",
-      pronunciation: "오못테이타 코토토 치갓테모 이마사라 히키카에세나이요",
+      pronunciation: "^오못테이타 코토토 치갓테모^ 이마사라 히키카에세나이요",
       translation: "생각한 것과 다르더라도 이제 와서 되돌릴 수는 없어",
+      slam: "핏 벌리기",
     },
     {
       time: "2:18",
@@ -209,8 +219,9 @@ const song: Song = {
     {
       time: "2:37.1",
       original: "嫌われたくない会話から",
-      pronunciation: "키라와레타쿠 나이 카이와카라",
+      pronunciation: "키라와레타쿠^ 나이 카이와카라",
       translation: "미움받고 싶지 않은 대화에서",
+      slam: "슬램 !",
     },
     {
       time: "2:39.5",
@@ -275,8 +286,9 @@ const song: Song = {
     {
       time: "3:24",
       original: "​先手で理解できる",
-      pronunciation: "센테데 리카이 데키루",
+      pronunciation: "^센테데 리카이 데키루^",
       translation: "선수를 통해서 이해할 수 있어",
+      slam: "핏 벌리기",
     },
     {
       time: "3:29.7",
@@ -306,8 +318,9 @@ const song: Song = {
     {
       time: "3:53.15",
       original: "嫌われたくない会話から",
-      pronunciation: "키라와레타쿠 나이 카이와카라",
+      pronunciation: "^키라와레타쿠^ 나이 카이와카라",
       translation: "미움받고 싶지 않은 대화에서",
+      slam: "슬램 !",
     },
     {
       time: "3:55.8",

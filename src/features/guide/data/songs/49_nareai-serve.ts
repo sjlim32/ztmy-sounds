@@ -85,8 +85,9 @@ const song: Song = {
     {
       time: "0:52.7",
       original: "適当ラリー やりとりが",
-      pronunciation: "테키토오 라리- 야리토리가",
+      pronunciation: "^테키토오 라리- 야리토리가^",
       translation: "적당한 랠리 주고받기가",
+      slam: "핏 벌리기",
     },
     {
       time: "0:55.5",
@@ -119,8 +120,9 @@ const song: Song = {
     {
       time: "1:04.5",
       original: "適当ラリーが 気が短いやつと",
-      pronunciation: "테키토오 라리- 키가 미지카이 야츠토",
+      pronunciation: "테키토오 ^라리-^ 키가 미지카이 야츠토",
       translation: "적당한 랠리 성미가 급한 녀석과",
+      slam: "슬램 !",
     },
     {
       time: "1:08",
@@ -217,8 +219,9 @@ const song: Song = {
     {
       time: "2:42",
       original: "適当ラリー やりとりが",
-      pronunciation: "테키토오 라리- 야리토리가",
+      pronunciation: "^테키토오 라리- 야리토리가^",
       translation: "적당한 랠리 주고받기가",
+      slam: "핏 벌리기",
     },
     {
       time: "2:44.5",
@@ -251,8 +254,9 @@ const song: Song = {
     {
       time: "2:53.7",
       original: "適当ラリーが 気が短いやつと",
-      pronunciation: "테키토오 라리- 키가 미지카이 야츠토",
+      pronunciation: "테키토오 ^라리-^ 키가 미지카이 야츠토",
       translation: "적당한 랠리 성미가 급한 녀석과",
+      slam: "슬램 !",
     },
     {
       time: "2:57.1",

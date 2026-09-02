@@ -380,7 +380,7 @@ const song: Song = {
     {
       time: "3:43",
       original: "ただ走って 今は走ってるけど",
-      pronunciation: "타다 하싯테 이마와 ^하싯테^루케도",
+      pronunciation: "타다 하싯테 이마와 하싯테^루케도^",
       translation: "그저 달리고 지금은 달리고있지만",
       slam: "슬램 !",
     },

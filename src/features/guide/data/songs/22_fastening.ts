@@ -1,7 +1,7 @@
 import type { Song, SongTitle } from "@/features/guide/lib/types";
 
 const fastening: SongTitle = {
-  jp: "",
+  jp: "低血ボルト",
   kr: "저혈 볼트",
   en: "Fastening",
 };
@@ -26,8 +26,9 @@ const song: Song = {
     {
       time: "0:06",
       original: "権利を武器に変えて争うほど",
-      pronunciation: "켄리오 부키니 카에테 아라소- 호도",
+      pronunciation: "^켄리오 부키니 카에테 아라소- 호도^",
       translation: "권리를 무기로 삼아 저항할수록",
+      slam: "핏 벌리기",
     },
     {
       time: "0:09",
@@ -62,8 +63,9 @@ const song: Song = {
     {
       time: "0:24",
       original: "怖がることはもういーかい",
-      pronunciation: "코와가루 코토와 모-이-카이",
+      pronunciation: "^코와가루^ 코토와 모-이-카이",
       translation: "무서워하는 건 이제 됐어?",
+      slam: "슬램 !",
     },
     {
       time: "0:27",
@@ -110,8 +112,9 @@ const song: Song = {
     {
       time: "0:48",
       original: "時が経てば 自然に",
-      pronunciation: "토키가 타테바 시젠니",
+      pronunciation: "^토키가 타테바 시젠니^",
       translation: "시간이 지나면 자연스레",
+      slam: "핏 벌리기",
     },
     {
       time: "0:51",
@@ -136,42 +139,49 @@ const song: Song = {
       original: "たとえ否定しかしない誰かを",
       pronunciation: "타토에 히테이시카 시나이 다레카오",
       translation: "설령 부정밖에 안 하는 누군가를",
+      slam: "춤추기",
     },
     {
       time: "1:03",
       original: "正義まで押し付ける客観を",
       pronunciation: "세이기마데 오시츠케루 캿칸오",
       translation: "정의까지 밀어붙이는 객관을",
+      slam: "춤추기",
     },
     {
       time: "1:06",
       original: "見逃しは出来ないけど",
       pronunciation: "미노가시와 데키나이케도",
       translation: "못 본척해 줄 순 없지만",
+      slam: "춤추기",
     },
     {
       time: "1:09",
       original: "響かないから",
       pronunciation: "히비카나이카라",
       translation: "와닿지 않으니까",
+      slam: "춤추기",
     },
     {
       time: "1:12",
       original: "同調したって中身無くて",
       pronunciation: "도-쵸-시탓테 나카미 나쿠테",
       translation: "동조해봤자 실속은 없어서",
+      slam: "춤추기",
     },
     {
       time: "1:15",
       original: "正しさが正しくなれないほど",
       pronunciation: "타다시사가 타다시쿠 나레나이 호도",
       translation: "올바름이 올바라질 수 없을 정도로",
+      slam: "춤추기",
     },
     {
       time: "1:18",
       original: "簡単に僕らを表せないように",
       pronunciation: "칸탄니 보쿠라오 아라와세나이요-니",
       translation: "간단히 우리들을 나타낼 수 없도록",
+      slam: "춤추기",
     },
     {
       time: "1:21",
@@ -184,6 +194,7 @@ const song: Song = {
       original: "怖がることはもういーかい",
       pronunciation: "코와가루 코토와 모-이-카이",
       translation: "무서워하는 건 이제됐어?",
+      slam: "슬램 !",
     },
     {
       time: "1:27",
@@ -230,8 +241,9 @@ const song: Song = {
     {
       time: "1:48",
       original: "こわいよ",
-      pronunciation: "코와이요",
+      pronunciation: "^코와이요^",
       translation: "무서워",
+      slam: "핏 벌리기",
     },
     {
       time: "1:51",
@@ -266,8 +278,9 @@ const song: Song = {
     {
       time: "2:06",
       original: "怖がることを金輪際",
-      pronunciation: "코와가루 코토오 콘린자이",
+      pronunciation: "^코와가루^ 코토오 콘린자이",
       translation: "무서워하는 것을 앞으로 결단코",
+      slam: "슬램 !",
     },
     {
       time: "2:09",

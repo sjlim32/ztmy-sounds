@@ -88,8 +88,9 @@ const song: Song = {
     {
       time: "0:48",
       original: "くだらん口喧嘩でマシになんだ",
-      pronunciation: "쿠다란 쿠치겐카데 마시니 난다",
+      pronunciation: "^쿠다란 쿠치겐카데 마시니 난다^",
       translation: "시시한 말다툼으로 더 나아져",
+      slam: "핏 벌리기",
     },
     {
       time: "0:52",
@@ -104,12 +105,13 @@ const song: Song = {
     {
       time: "0:58",
       original: "うざいくらい叫んだって喰らったって",
-      pronunciation: "우자이쿠라이 사켄닷테 쿠랏탓테",
+      pronunciation: "^우자이쿠라이^ 사켄닷테 쿠랏탓테",
       translation: "짜증날 정도로 외쳐도 먹어 치워도",
       cheer: {
         text: "",
         tag: "swing",
       },
+      slam: "슬램 !",
     },
     {
       time: "1:00",
@@ -228,8 +230,9 @@ const song: Song = {
     {
       time: "1:50",
       original: "細かいご指摘も有難き",
-      pronunciation: "코마카이 고시테키모 아리가타키",
+      pronunciation: "^코마카이 고시테키모 아리가타키^",
       translation: "사소한 지적도 망극한 은혜",
+      slam: "핏 벌리기",
     },
     {
       time: "1:53",
@@ -244,12 +247,13 @@ const song: Song = {
     {
       time: "1:58",
       original: "うざいくらい叫んだって喰らったって",
-      pronunciation: "우자이쿠라이 사켄닷테 쿠랏탓테",
+      pronunciation: "^우자이쿠라이^ 사켄닷테 쿠랏탓테",
       translation: "짜증날 정도로 외쳐도 먹어 치워도",
       cheer: {
         text: "",
         tag: "swing",
       },
+      slam: "슬램 !",
     },
     {
       time: "2:00",
@@ -332,8 +336,9 @@ const song: Song = {
     {
       time: "2:39.2",
       original: "ただ穏やかでいたい",
-      pronunciation: "타다 오다야카데 이타이",
+      pronunciation: "^타다 오다야카데 이타이^",
       translation: "그저 여유롭게 살고 싶어",
+      slam: "핏 벌리기",
     },
     {
       time: "2:41.8",
@@ -352,16 +357,18 @@ const song: Song = {
       original: "単純明快でした",
       pronunciation: "탄쥰메이카이데시타",
       translation: "단순명료했습니다",
+      slam: "칼 들기",
     },
     {
       time: "2:58",
       original: "うざいくらい叫んだって喰らったって",
-      pronunciation: "우자이쿠라이 사켄닷테 쿠랏탓테",
+      pronunciation: "^우자이쿠라이^ 사켄닷테 쿠랏탓테",
       translation: "짜증날 정도로 외쳐도 먹어 치워도",
       cheer: {
         text: "",
         tag: "swing",
       },
+      slam: "슬램 !",
     },
     {
       time: "3:01",

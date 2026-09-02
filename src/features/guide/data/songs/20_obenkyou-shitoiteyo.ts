@@ -22,7 +22,7 @@ const song: Song = {
     {
       time: "0:15.6",
       original: "質のいい病み感情が 溢れた時の",
-      pronunciation: "시츠노 이이 야미 칸죠-가 아후레타 토키노",
+      pronunciation: "^시츠노 이이 야미 칸죠-가 아후레타 토키노^",
       translation: "질 좋은 병든 감정이 흘러넘쳤을 때에",
       slam: "핏 만들기",
     },
@@ -122,7 +122,7 @@ const song: Song = {
     {
       time: "1:14.6",
       original: "ファンキーな直感で",
-      pronunciation: "황키-나 춋칸데",
+      pronunciation: "황키^-나 춋칸데^",
       translation: "펑키한 직감으로",
       cheer: {
         text: "",
@@ -225,7 +225,7 @@ const song: Song = {
     {
       time: "1:59",
       original: "結局ここまで",
-      pronunciation: "켓쿄쿠 코코마데",
+      pronunciation: "^켓쿄쿠 코코마데^",
       translation: "결국 여기까지",
       slam: "핏 만들기",
     },
@@ -320,12 +320,12 @@ const song: Song = {
       original: "うおおおおお",
       pronunciation: "워어어어어",
       translation: "",
-      slam: "(트리플 플럭 후) 3, 2, 1",
+      slam: "(트리플 플럭 후)",
     },
     {
       time: "2:43.7",
       original: "ファンキーな直感で",
-      pronunciation: "황키-나 춋칸데",
+      pronunciation: "황키^-나 춋칸데^",
       translation: "펑키한 직감으로",
       cheer: {
         text: "",
@@ -446,7 +446,7 @@ const song: Song = {
     {
       time: "3:38.6",
       original: "しょうがないって イタいって",
-      pronunciation: "쇼-가나잇테 이타잇테",
+      pronunciation: "^쇼-가나잇테 이타잇테^",
       translation: "어쩔 수 없다고,  아프다고",
       slam: "핏 만들기",
     },
@@ -472,7 +472,6 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
-      slam: "대기",
     },
     {
       time: "3:51.4",
@@ -483,12 +482,11 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
-      slam: "3, 2, 1",
     },
     {
       time: "3:53.5",
       original: "損な理由で 飛び込んでみたいけど",
-      pronunciation: "손나 리유-데 토비콘데 미타이케도",
+      pronunciation: "^손나 리유-데^ 토비콘데 미타이케도",
       translation: "손해 볼 핑계로 뛰어들어 보고 싶지만",
       cheer: {
         text: "",
