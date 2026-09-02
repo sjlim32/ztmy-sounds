@@ -36,7 +36,7 @@ const song: Song = {
       translation: "안녕하세요 잘 있어요 과거여",
     },
     {
-      time: "0:12.7",
+      time: "0:13.5",
       original: "♫",
       pronunciation: "",
       translation: "",
@@ -148,7 +148,7 @@ const song: Song = {
       translation: "누구에게도 들어 맞지 않는 기준따윈 필요없어",
     },
     {
-      time: "1:24",
+      time: "1:26.5",
       original: "♫",
       pronunciation: "",
       translation: "",
@@ -271,7 +271,7 @@ const song: Song = {
       translation: "말할 수 있을까",
     },
     {
-      time: "2:45.5",
+      time: "2:46.5",
       original: "♫",
       pronunciation: "",
       translation: "",
@@ -378,7 +378,7 @@ const song: Song = {
       slam: "핏 러닝",
     },
     {
-      time: "3:45",
+      time: "3:49",
       original: "♫",
       pronunciation: "",
       translation: "",

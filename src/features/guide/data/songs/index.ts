@@ -30,10 +30,10 @@ import almostHuman from "./64_almost-human";
 export const songList: Song[] = [
   byoushinwoKamu,
   nouriuenoCraker,
-  humanoid, // TODO 싱크 미세 조정 필요
+  humanoid,
   seigi,
-  kuyashiiwa, // TODO 싱크 마세 조정 필요
-  minority, // Fin
+  kuyashiiwa,
+  minority,
   soudou, // 싱크 완
   haze, // TODO 싱크 미세 조정 필요
   obenkyouShitoiteyo,

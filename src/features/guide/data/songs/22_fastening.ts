@@ -9,7 +9,7 @@ const fastening: SongTitle = {
 const song: Song = {
   id: "fastening",
   title: fastening,
-  youtubeId: "COll6PdtI5w",
+  youtubeId: "NAiFq5AMlHw",
   lyrics: [
     {
       time: "0:00",
