@@ -30,17 +30,17 @@ import almostHuman from "./64_almost-human";
 export const songList: Song[] = [
   byoushinwoKamu,
   nouriuenoCraker,
-  humanoid, // TODO 싱크 미세 조정 필요
+  humanoid,
   seigi,
-  kuyashiiwa, // TODO 싱크 마세 조정 필요
-  minority, // Fin
-  soudou, // 싱크 완
-  haze, // TODO 싱크 미세 조정 필요
+  kuyashiiwa,
+  minority,
+  soudou,
+  haze,
   obenkyouShitoiteyo,
   milabo,
-  fastening, // TODO 전체 싱크 조절 필요
-  jkBomber, // TODO 전체 싱크 조절 필요
-  darken, // TODO 전체 싱크 조절 필요
+  fastening,
+  jkBomber,
+  darken,
   haveA, // TODO 전체 싱크 조절 필요
   aitsuraZeninDousoukai,
   mirrorTune,
@@ -53,8 +53,8 @@ export const songList: Song[] = [
   taidada,
   shade, // TODO 전체 싱크 조절 필요
   cream,
-  medianoche, // TODO 전체 싱크 조절 필요
-  almostHuman, // TODO 전체 싱크 조절 필요
+  medianoche,
+  almostHuman, // TODO 전체 싱크 조절 필요 (1절 수정 완)
 ];
 
 export function getSong(id: string): Song | null {

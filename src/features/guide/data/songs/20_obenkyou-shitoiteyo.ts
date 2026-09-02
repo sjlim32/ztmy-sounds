@@ -53,7 +53,7 @@ const song: Song = {
     {
       time: "0:46.4",
       original: "乾かないや 寒がりな季節に",
-      pronunciation: "**카와카나이야** 사무가리나 키세츠니",
+      pronunciation: "**^카와카나이야^** 사무가리나 키세츠니",
       translation: "마르지 않아 추운 계절에",
       cheer: {
         text: '"카와카나이야" 떼창',
@@ -70,7 +70,7 @@ const song: Song = {
     {
       time: "0:53.7",
       original: "焼き焼きだ 押し潰される無敵め",
-      pronunciation: "**야키야키다** 오시츠부사레루 무테키메",
+      pronunciation: "**^야키야키다^** 오시츠부사레루 무테키메",
       translation: "안절부절 못하지 짓눌리는 무적을",
       cheer: {
         text: '"야키야키다" 떼창',
@@ -87,7 +87,7 @@ const song: Song = {
     {
       time: "1:00.8",
       original: "乾かないや 強がりな季節に",
-      pronunciation: "**카와카나이야** 츠요가리나 키세츠니",
+      pronunciation: "**^카와카나이야^** 츠요가리나 키세츠니",
       translation: "마르지 않아 허세 떠는 계절에",
       cheer: {
         text: '"카와카나이야" 떼창',
@@ -104,7 +104,7 @@ const song: Song = {
     {
       time: "1:08.2",
       original: "ヤンキーヤンキーだ 現状維持の無敵め",
-      pronunciation: "**양키-양키-다** 겐죠-이지노 무테키메",
+      pronunciation: "**^양키-양키-다^** 겐죠-이지노 무테키메",
       translation: "양키 양키야 변하지 않는 무적을",
       cheer: {
         text: '"양키-양키-다" 떼창',
@@ -256,7 +256,7 @@ const song: Song = {
     {
       time: "2:15.3",
       original: "乾かないや 寒がりな季節に",
-      pronunciation: "**카와카나이야** 사무가리나 키세츠니",
+      pronunciation: "**^카와카나이야^** 사무가리나 키세츠니",
       translation: "마르지 않아 추운 계절에",
       cheer: {
         text: '"카와카나이야" 떼창',
@@ -273,7 +273,7 @@ const song: Song = {
     {
       time: "2:22.5",
       original: "焼き焼きだ 押し潰される無敵め",
-      pronunciation: "**야키야키다** 오시츠부사레루 무테키메",
+      pronunciation: "**^야키야키다^** 오시츠부사레루 무테키메",
       translation: "안절부절 못하지 짓눌리는 무적을",
       cheer: {
         text: '"야키야키다" 떼창',
@@ -290,7 +290,7 @@ const song: Song = {
     {
       time: "2:29.8",
       original: "乾かないや 強がりな季節に",
-      pronunciation: "**카와카나이야** 츠요가리나 키세츠니",
+      pronunciation: "**^카와카나이야^** 츠요가리나 키세츠니",
       translation: "마르지 않아 허세 떠는 계절에",
       cheer: {
         text: '"카와카나이야" 떼창',
@@ -307,7 +307,7 @@ const song: Song = {
     {
       time: "2:37.2",
       original: "ヤンキーヤンキーだ 現状維持の無敵め",
-      pronunciation: "**양키-양키-다** 겐죠-이지노 무테키메",
+      pronunciation: "**^양키-양키-다^** 겐죠-이지노 무테키메",
       translation: "양키 양키야 변하지 않는 무적을",
       cheer: {
         text: '"양키-양키-다" 떼창',
@@ -597,7 +597,7 @@ const song: Song = {
     {
       time: "4:21.1",
       original: "BE BE BE BE BE 勉",
-      pronunciation: "**BE BE BE BE BE 벤**",
+      pronunciation: "**^BE BE BE BE BE 벤^**",
       translation: "",
       cheer: {
         text: "박자에 맞춰서",
@@ -608,7 +608,7 @@ const song: Song = {
     {
       time: "4:28.3",
       original: "BE BE BE BE BE 勉",
-      pronunciation: "**BE BE BE BE BE 벤**",
+      pronunciation: "**^BE BE BE BE BE 벤^**",
       translation: "",
       cheer: {
         text: "박자에 맞춰서",
