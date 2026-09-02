@@ -28,34 +28,33 @@ import medianoche from "./61_medianoche";
 import almostHuman from "./64_almost-human";
 
 export const songList: Song[] = [
+  byoushinwoKamu,
+  nouriuenoCraker,
   humanoid, // TODO 싱크 미세 조정 필요
-  minority, // Fin
+  seigi,
   kuyashiiwa, // TODO 싱크 마세 조정 필요
+  minority, // Fin
   soudou, // 싱크 완
   haze, // TODO 싱크 미세 조정 필요
+  obenkyouShitoiteyo,
+  milabo,
   fastening, // TODO 전체 싱크 조절 필요
   jkBomber, // TODO 전체 싱크 조절 필요
   darken, // TODO 전체 싱크 조절 필요
   haveA, // TODO 전체 싱크 조절 필요
-  truth,
-  shade,
-  medianoche,
-  almostHuman,
-  //*** COMPLETE ***//
-  byoushinwoKamu,
-  nouriuenoCraker,
-  seigi,
-  obenkyouShitoiteyo,
-  milabo,
   aitsuraZeninDousoukai,
   mirrorTune,
   timeLeft,
   kiraKiller,
   hanaichiMonnme,
   nareaiserve,
+  truth, // TODO 전체 싱크 조절 필요
   hippocampalPain,
   taidada,
+  shade, // TODO 전체 싱크 조절 필요
   cream,
+  medianoche, // TODO 전체 싱크 조절 필요
+  almostHuman, // TODO 전체 싱크 조절 필요
 ];
 
 export function getSong(id: string): Song | null {
