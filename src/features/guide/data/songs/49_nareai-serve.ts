@@ -71,7 +71,7 @@ const song: Song = {
     {
       time: "0:38.2",
       original: "荒めのギターで 掻き消したいや",
-      pronunciation: "아라메노 기타-데 카키케시타이야",
+      pronunciation: "아라메노 기타ー데 카키케시타이야",
       translation: "조잡한 기타로 흔적도 없이 사라져버리고 싶어",
     },
     {
@@ -85,8 +85,8 @@ const song: Song = {
     {
       time: "0:52.7",
       original: "適当ラリー やりとりが",
-      pronunciation: "^테키토오 라리- 야리토리가^",
-      translation: "적당한 랠리 주고받기가",
+      pronunciation: "^테키토오 라리ー 야리토리가^",
+      translation: "적당한 랠리- 주고받기가",
       slam: "핏 벌리기",
     },
     {
@@ -104,7 +104,7 @@ const song: Song = {
     {
       time: "1:01.1",
       original: "馴れ合いサーブでしょ",
-      pronunciation: "나레아이 사-브데쇼",
+      pronunciation: "나레아이 사ー브데쇼",
       translation: "짜고 치는 서브잖아",
     },
     {
@@ -113,15 +113,15 @@ const song: Song = {
       pronunciation: "**아이 아이**",
       translation: "",
       cheer: {
-        text: "떼창 + 박자에 맞게 샤모지 흔들기 + 박자에 맞게 샤모지 흔들기",
+        text: "떼창 + 박자에 맞게 샤모지 흔들기",
         tag: "call",
       },
     },
     {
       time: "1:04.5",
       original: "適当ラリーが 気が短いやつと",
-      pronunciation: "테키토오 ^라리-^ 키가 미지카이 야츠토",
-      translation: "적당한 랠리 성미가 급한 녀석과",
+      pronunciation: "^테키토오 라리ー^ 키가 미지카이 야츠토",
+      translation: "적당한 랠리- 성미가 급한 녀석과",
       slam: "슬램 !",
     },
     {
@@ -187,14 +187,15 @@ const song: Song = {
     {
       time: "1:45",
       original: "誰からも 邪魔されない",
-      pronunciation: "다레카라모 쟈마사레나이",
+      pronunciation: "^다레카라모 쟈마사레나이^",
       translation: "누구에게도 방해받지 않는",
+      slam: "핏 벌리기",
     },
     {
       time: "1:49",
       original: "唯一唯一 集中すると自然なバリア",
       pronunciation: "유이이츠 유이이츠 슈우츄우스루토 시젠나 바리아",
-      translation: "유일유일 집중한다면 자연스러운(느껴지지 않는?) 방어막",
+      translation: "유일유일 집중한다면 자연스러운 방어막",
     },
     {
       time: "1:57",
@@ -219,9 +220,9 @@ const song: Song = {
     {
       time: "2:42",
       original: "適当ラリー やりとりが",
-      pronunciation: "^테키토오 라리- 야리토리가^",
-      translation: "적당한 랠리 주고받기가",
-      slam: "핏 벌리기",
+      pronunciation: "^테키토오 라리ー^ 야리토리가",
+      translation: "적당한 랠리- 주고받기가",
+      slam: "슬램 !",
     },
     {
       time: "2:44.5",
@@ -238,7 +239,7 @@ const song: Song = {
     {
       time: "2:50.8",
       original: "馴れ合いサーブでしょ",
-      pronunciation: "나레아이 사-브데쇼",
+      pronunciation: "나레아이 사ー브데쇼",
       translation: "짜고 치는 서브잖아",
     },
     {
@@ -254,9 +255,8 @@ const song: Song = {
     {
       time: "2:53.7",
       original: "適当ラリーが 気が短いやつと",
-      pronunciation: "테키토오 ^라리-^ 키가 미지카이 야츠토",
-      translation: "적당한 랠리 성미가 급한 녀석과",
-      slam: "슬램 !",
+      pronunciation: "테키토오 라리ー 키가 미지카이 야츠토",
+      translation: "적당한 랠리- 성미가 급한 녀석과",
     },
     {
       time: "2:57.1",
@@ -282,7 +282,7 @@ const song: Song = {
       pronunciation: "**아이 아이**",
       translation: "",
       cheer: {
-        text: "떼창 + 박자에 맞게 샤모지 흔들기 + 박자에 맞게 샤모지 흔들기 + 박자에 맞게 샤모지 흔들기",
+        text: "떼창 + 박자에 맞게 샤모지 흔들기",
         tag: "call",
       },
     },
