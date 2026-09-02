@@ -3,7 +3,7 @@ import type { Song, SongTitle } from "@/features/guide/lib/types";
 const kira: SongTitle = {
   jp: "綺羅キラー (feat. Mori Calliope)",
   kr: "키라 킬러",
-  en: "kira killer",
+  en: "Kira Killer",
 };
 
 const song: Song = {

@@ -3,7 +3,7 @@ import type { Song, SongTitle } from "@/features/guide/lib/types";
 const seigi: SongTitle = {
   jp: "正義",
   kr: "정의",
-  en: "seigi",
+  en: "Seigi",
 };
 
 const song: Song = {

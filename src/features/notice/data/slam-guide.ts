@@ -1,12 +1,12 @@
 import type { Notice } from "@/features/notice/lib/types";
-import SlamContent from "@/features/notice/content/slam.mdx";
+import slamContent from "@/features/notice/content/slam-guide.mdx";
 
 const notice: Notice = {
-  id: "slam",
+  id: "slam-guide",
   type: "guide",
-  title: "슬램 가이드",
+  title: "ZUTOMAYO 슬램 가이드",
   version: 1,
-  content: SlamContent,
+  content: slamContent,
   visible: true,
   isAlwaysOpen: false,
   isSlamVisible: true,
