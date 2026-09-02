@@ -132,13 +132,13 @@ const song: Song = {
     {
       time: "1:00",
       original: "情けないほどの雨降らしながら帰るよじゃあね",
-      pronunciation: "나사케나이 호도노 아메 후라시나가라 카에루요 **쟈-네**",
+      pronunciation: "나사케나이 호도노 아메 후라시나가라 카에루요 **^쟈-네^**",
       translation: "한심할 정도로 비를 뿌리며 돌아갈게 안녕",
       cheer: {
         text: '"쟈-네"에 샤모지 흔들며 인사',
         tag: "swing",
       },
-      slam: "인사(쟈-네)",
+      slam: "인사 (쟈-네)",
     },
     {
       time: "1:04.5",
@@ -174,24 +174,24 @@ const song: Song = {
     {
       time: "1:22.8",
       original: "Don’t stop 脳裏上に",
-      pronunciation: "**Don’t stop** 노우리 우에니",
+      pronunciation: "**^Don’t stop^** 노우리 우에니",
       translation: "Don’t stop 뇌리 위에",
       cheer: {
         text: '"Don\'t"에 내리고, "stop"에 점프하듯 올리기',
         tag: "swing",
       },
-      slam: "점프(Don't stop)",
+      slam: "점프 (Don't stop)",
     },
     {
       time: "1:25.3",
       original: "置いていたクラッカー打ち鳴らして笑おう",
-      pronunciation: "오이테이타 쿠랏카- 우치나라시테 **와라오우**",
+      pronunciation: "오이테이타 쿠랏카- 우치나라시테 **^와라오우^**",
       translation: "놓아 두었던 크래커 쏘아 올리면서 웃자",
       cheer: {
         text: '"와라" 에 내리고, "오우"에 점프하듯 올리기',
         tag: "swing",
       },
-      slam: "점프(와라오우)",
+      slam: "점프 (와라오우)",
     },
     {
       time: "1:30.2",
@@ -227,13 +227,13 @@ const song: Song = {
     {
       time: "1:57",
       original: "君に「すごいね」とは言わなかった 言えなかった",
-      pronunciation: "키미니「스고이네」토와 이와나캇타 **이에나캇타**",
+      pronunciation: "키미니「스고이네」토와 이와나캇타 **^이에나캇타^**",
       translation: "너에게「대단하네」라고는 말하지 않았어, 말할 수 없었어",
       cheer: {
         text: "",
         tag: "call",
       },
-      slam: "떼창(이에나캇타)",
+      slam: "떼창 (이에나캇타)",
     },
     {
       time: "2:00",
@@ -268,13 +268,13 @@ const song: Song = {
     {
       time: "2:19",
       original: "情けないほどの雨降らしながら帰るよじゃあね",
-      pronunciation: "나사케나이 호도노 아메 후라시나가라 카에루요 **쟈-네**",
+      pronunciation: "나사케나이 호도노 아메 후라시나가라 카에루요 **^쟈-네^**",
       translation: "한심할 정도로 비를 뿌리며 돌아갈게 안녕",
       cheer: {
         text: '"쟈-네"에 샤모지 흔들며 인사',
         tag: "swing",
       },
-      slam: "인사(쟈-네)",
+      slam: "인사 (쟈-네)",
     },
     {
       time: "2:26",
@@ -303,24 +303,24 @@ const song: Song = {
     {
       time: "2:42",
       original: "Don’t stop 脳裏上に",
-      pronunciation: "**Don’t stop** 노우리 우에니",
+      pronunciation: "**^Don’t stop^** 노우리 우에니",
       translation: "Don’t stop 뇌리 위에",
       cheer: {
         text: '"Don\'t"에 내리고, "stop"에 점프하듯 올리기',
         tag: "swing",
       },
-      slam: "점프(Don't stop)",
+      slam: "점프 (Don't stop)",
     },
     {
       time: "2:44",
       original: "置いていたクラッカー打ち鳴らして笑おう",
-      pronunciation: "오이테이타 쿠랏카- 우치나라시테 **와라오우**",
+      pronunciation: "오이테이타 쿠랏카- 우치나라시테 **^와라오우^**",
       translation: "놓아 두었던 크래커 쏘아 올리면서 웃자",
       cheer: {
         text: '"와라" 에 내리고, "오우"에 점프하듯 올리기',
         tag: "swing",
       },
-      slam: "점프(와라오우)",
+      slam: "점프 (와라오우)",
     },
     {
       time: "2:49",
@@ -361,7 +361,7 @@ const song: Song = {
     {
       time: "3:31",
       original: "なんで？隣にいなくても いいよ いいよ",
-      pronunciation: "난데? 토나리니 이나쿠테모 이이요 이이요",
+      pronunciation: "난데? ^토나리니^ 이나쿠테모 이이요 이이요",
       translation: "어째서? 곁에 없어도 괜찮아 괜찮아",
       slam: "핏 벌리기",
     },
@@ -380,16 +380,15 @@ const song: Song = {
     {
       time: "3:43",
       original: "ただ走って 今は走ってるけど",
-      pronunciation: "타다 하싯테 이마와 하싯테루케도",
+      pronunciation: "타다 하싯테 이마와 ^하싯테^루케도",
       translation: "그저 달리고 지금은 달리고있지만",
-      slam: "3, 2, 1",
+      slam: "슬램 !",
     },
     {
       time: "3:48",
       original: "意味ないことも わかってる わかってる",
       pronunciation: "이미나이 코토모 와캇테루 와캇테루",
       translation: "의미 없다는 것도 알고 있어 알고 있어",
-      slam: "슬램 !",
     },
     {
       time: "3:52",
@@ -400,7 +399,7 @@ const song: Song = {
     {
       time: "3:55",
       original: "Don’t stop 脳裏上に",
-      pronunciation: "**Don’t stop** 노우리 우에니",
+      pronunciation: "**^Don’t stop^** 노우리 우에니",
       translation: "Don’t stop 뇌리 위에",
       cheer: {
         text: '"Don\'t"에 내리고, "stop"에 점프하듯 올리기',
@@ -411,7 +410,7 @@ const song: Song = {
     {
       time: "3:58",
       original: "置いていたクラッカー打ち鳴らして笑おう",
-      pronunciation: "오이테이타 쿠랏카- 우치나라시테 **와라오우**",
+      pronunciation: "오이테이타 쿠랏카- 우치나라시테 **^와라오우^**",
       translation: "놓아 두었던 크래커 쏘아 올리면서 웃자",
       cheer: {
         text: '"와라" 에 내리고, "오우"에 점프하듯 올리기',
