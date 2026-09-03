@@ -26,19 +26,19 @@ const song: Song = {
       translation: "생각한 대로 일어날 수 없어",
     },
     {
-      time: "0:18",
+      time: "0:17.9",
       original: "急いで飲み込む 納豆巻き",
       pronunciation: "이소이데 노미코무 낫토마키",
       translation: "급하게 흡입하는 낫토김밥",
     },
     {
-      time: "0:20.1",
+      time: "0:20",
       original: "当たり障りのない 儀式みたいな",
       pronunciation: "아타리사와리노나이 기시키미타이나",
       translation: "지장 없는 의식같은",
     },
     {
-      time: "0:22.5",
+      time: "0:22.4",
       original: "お世話になってます",
       pronunciation: "**^오세와니 낫테마스^**",
       translation: "신세를 지고 있습니다",
@@ -60,7 +60,7 @@ const song: Song = {
       translation: "선배를 추월할 수 없는 논파와",
     },
     {
-      time: "0:27.4",
+      time: "0:27.3",
       original: "明る日も来る日も",
       pronunciation: "아카루히모 쿠루히모",
       translation: "오늘도 내일도",
@@ -98,7 +98,7 @@ const song: Song = {
       },
     },
     {
-      time: "0:42",
+      time: "0:41.7",
       original: "嫌味に費やすほど 人生長くないの",
       pronunciation: "이야미니 츠이야스호도 진세이 나가쿠나이노",
       translation: "불쾌한 말에 버릴 정도 인생 길지 않아",
@@ -145,7 +145,7 @@ const song: Song = {
       slam: '"기"에 Jump',
     },
     {
-      time: "0:57",
+      time: "0:56.9",
       original: "ねばった戦績 飛んでった",
       pronunciation: "네밧타 센세키 톤뎃타",
       translation: "견뎠던 전적 날렸어",
@@ -155,7 +155,7 @@ const song: Song = {
       },
     },
     {
-      time: "0:58.6",
+      time: "0:58.7",
       original: "なりたい自分に 絡まる電柱",
       pronunciation: "나리타이 지분니 카라마루 덴츄우",
       translation: "되고 싶은 자신에게 얽히는 전신주",
@@ -185,7 +185,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:04.1",
+      time: "1:04.2",
       original: "どうでもいいから 置いてった",
       pronunciation: "도오데모이이카라 오이텟타",
       translation: "어찌 되든 좋으니 던져뒀어",
@@ -205,7 +205,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:08",
+      time: "1:07.9",
       original: "ステンバイミー 自然体に",
       pronunciation: "스텐바이미 시젠타이니",
       translation: "Stand by me 자연스러운 모습에",
@@ -266,7 +266,7 @@ const song: Song = {
       slam: '"이"에 Jump',
     },
     {
-      time: "1:19",
+      time: "1:19.2",
       original: "♫",
       pronunciation: "",
       translation: "",
@@ -293,28 +293,28 @@ const song: Song = {
       time: "1:38.6",
       original: "誰を批判しなくたって",
       pronunciation: "다레오 히한시나쿠탓테",
-      translation: "누군가를 비판하고 싶지 않다고",
+      translation: "누군가를 비난하고 싶지 않다고",
     },
     {
-      time: "1:40.2",
+      time: "1:40.3",
       original: "発散できる言葉 探してる",
       pronunciation: "핫산데키루코토바 사가시테루",
-      translation: "발산할 수 있는 단어 찾고 있어",
+      translation: "발산할 수 있는 말을 찾고 있어",
     },
     {
       time: "1:42.8",
       original: "Hip hop蹴って",
       pronunciation: "Hip hop켓테",
-      translation: "힙합 걷어차고",
+      translation: "힙합을 걷어차고",
     },
     {
       time: "1:44",
       original: "濃いめの愛闇 拭って",
       pronunciation: "코이메노 아이샤도우 누굿테",
-      translation: "진한 아이섀도우 지우고",
+      translation: "진한 아이섀도우를 지우고",
     },
     {
-      time: "1:46",
+      time: "1:45.9",
       original: "誰を批判しなくたって",
       pronunciation: "다레모 히한시나쿠탓테",
       translation: "누구도 비판하고 싶지 않다고",
@@ -323,7 +323,7 @@ const song: Song = {
       time: "1:47.5",
       original: "発散できるファッション 探してる",
       pronunciation: "핫산데키루 파숀 사가시테루",
-      translation: "발산할 수 있는 fashion 찾고 있어",
+      translation: "발산할 수 있는 열정을 찾고 있어",
     },
     {
       time: "1:50",
@@ -332,13 +332,13 @@ const song: Song = {
       translation: "어떤 명언도 울리지 않는 나로부터",
     },
     {
-      time: "1:55.2",
+      time: "1:55.15",
       original: "何も生まれは しないけど",
       pronunciation: "나니모 우마레와 시나이케도",
-      translation: "무엇도 탄생하지는 않지만",
+      translation: "아무것도 만들어지지 않지만",
     },
     {
-      time: "1:57.3",
+      time: "1:57.15",
       original: "目に見える世界が 全てじゃないって",
       pronunciation: "메니 미에루 세카이가 스베테쟈나잇테",
       translation: "눈에 보이는 세계가 전부가 아니라고",
@@ -357,7 +357,7 @@ const song: Song = {
       interlude: true,
     },
     {
-      time: "2:10",
+      time: "2:10.2",
       original: "どうでもいいから 置いてった",
       pronunciation: "도오데모이이카라 오이텟타",
       translation: "어찌 되든 좋으니 던져뒀어",
@@ -367,7 +367,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:12",
+      time: "2:11.95",
       original: "あいつら全員同窓会",
       pronunciation: "아이츠라 젠인 도오소오카이",
       translation: "쟤네들 전부 동창회",
@@ -377,7 +377,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:14",
+      time: "2:13.8",
       original: "ステンバイミー 自然体に",
       pronunciation: "스텐바이미 시젠타이니",
       translation: "Stand by me 자연스러운 모습에",
@@ -387,7 +387,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:15.5",
+      time: "2:15.4",
       original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
@@ -398,7 +398,7 @@ const song: Song = {
       slam: '"기"에 Jump',
     },
     {
-      time: "2:17.7",
+      time: "2:17.5",
       original: "ねばった戦績 飛んでった",
       pronunciation: "네밧타 센세키 톤뎃타",
       translation: "견뎠던 전적 날렸어",
@@ -408,7 +408,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:19.4",
+      time: "2:19.3",
       original: "なりたい自分に 絡まる電柱",
       pronunciation: "나리타이 지분니 카라마루 덴츄우",
       translation: "되고 싶은 자신에게 얽히는 전신주",
@@ -428,7 +428,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:22.9",
+      time: "2:22.8",
       original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
@@ -449,7 +449,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:26.6",
+      time: "2:26.55",
       original: "あいつら全員同窓会",
       pronunciation: "아이츠라 젠인 도오소오카이",
       translation: "쟤네들 전부 동창회",
@@ -469,7 +469,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:30.3",
+      time: "2:30.2",
       original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
@@ -490,7 +490,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:33.9",
+      time: "2:33.85",
       original: "なりたい自分に 絡まる電柱",
       pronunciation: "나리타이 지분니 카라마루 덴츄우",
       translation: "되고 싶은 자신에게 얽히는 전신주",
@@ -610,19 +610,19 @@ const song: Song = {
     },
     //================ 3절 ================//
     {
-      time: "3:05",
+      time: "3:05.1",
       original: "どうでもいいから 置いてった",
       pronunciation: "도오데모이이카라 오이텟타",
       translation: "어찌 되든 좋으니 던져뒀어",
     },
     {
-      time: "3:09",
+      time: "3:08.8",
       original: "そうでもないから 飛んでった",
       pronunciation: "소오데모나이카라 톤뎃타",
       translation: "그런 것도 아니니까 날렸어",
     },
     {
-      time: "3:12.4",
+      time: "3:12.5",
       original: "どうでもいいから 置いてった",
       pronunciation: "도오데모이이카라 오이텟타",
       translation: "어찌 되든 좋으니 던져뒀어",
@@ -632,7 +632,7 @@ const song: Song = {
       },
     },
     {
-      time: "3:14.2",
+      time: "3:14.3",
       original: "あいつら全員同窓会",
       pronunciation: "아이츠라 젠인 도오소오카이",
       translation: "쟤네들 전부 동창회",
@@ -673,7 +673,7 @@ const song: Song = {
       },
     },
     {
-      time: "3:21.7",
+      time: "3:21.65",
       original: "なりたい自分に 絡まる電柱",
       pronunciation: "나리타이 지분니 카라마루 덴츄우",
       translation: "되고 싶은 자신에게 얽히는 전신주",
@@ -704,7 +704,7 @@ const song: Song = {
       slam: '"이"에 Jump',
     },
     {
-      time: "3:27",
+      time: "3:27.1",
       original: "どうでもいいから 置いてった",
       pronunciation: "도오데모이이카라 오이텟타",
       translation: "어찌 되든 좋으니 던져뒀어",
@@ -714,7 +714,7 @@ const song: Song = {
       },
     },
     {
-      time: "3:29",
+      time: "3:285",
       original: "あいつら全員同窓会",
       pronunciation: "아이츠라 젠인 도오소오카이",
       translation: "쟤네들 전부 동창회",
@@ -755,7 +755,7 @@ const song: Song = {
       },
     },
     {
-      time: "3:36.3",
+      time: "3:36.25",
       original: "なりたい自分に 絡まる電柱",
       pronunciation: "나리타이 지분니 카라마루 덴츄우",
       translation: "되고 싶은 자신에게 얽히는 전신주",

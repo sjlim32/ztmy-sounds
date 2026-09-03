@@ -50,38 +50,38 @@ const song: Song = {
       translation: "꺾어, 더 위로 흔들흔들 흔들면서",
     },
     {
-      time: "0:22",
+      time: "0:21.8",
       original: "すぐとらぶるぜ 過呼吸と心得",
       pronunciation: "스구 토라부루제 브레스토 코코로엣",
       translation: "금세 트러블이 생겨 과호흡과 수칙",
     },
     {
-      time: "0:23.6",
+      time: "0:23.5",
       original: "って原罪人生 盾と矛で 葛藤の活動がマスト",
       pronunciation:
         "테 겐자이 진세이 타테토 호코데 캇토우노 카츠도우가 마스토",
       translation: "원죄 인생, 방패와 창으로 갈등 활동이 필수",
     },
     {
-      time: "0:27",
+      time: "0:27.1",
       original: "締め切られなきゃ言葉が増殖",
       pronunciation: "시메키라레나캬 코토바가 조우쇼쿠",
       translation: "닫아 두지 않으면 말이 증식할 거야",
     },
     {
-      time: "0:30",
+      time: "0:30.2",
       original: "No thoughts, head empty 虚無で円陣",
       pronunciation: "No thoughts, head empty 쿄무데 엔진",
       translation: "No thoughts, head empty 둘러싼 허무",
     },
     {
-      time: "0:32",
+      time: "0:32.2",
       original: "Brought to you in chaos and serenity",
       pronunciation: "Brought to you in chaos and serenity",
       translation: "혼돈과 평온 속에서 네게로 가져온 것",
     },
     {
-      time: "0:34.5",
+      time: "0:33.4",
       original: "やめたいことをやらなきゃ満たされない僕",
       pronunciation: "야메타이 코토오 야라나캬 미타사레나이 보쿠",
       translation: "그만두고 싶은 것을 해야만 만족하는 나",
@@ -99,7 +99,7 @@ const song: Song = {
       translation: '"드림라이프?" 즐기고 있잖아',
     },
     {
-      time: "0:39",
+      time: "0:38.8",
       original: "“バイトだったらどこでもよくない？”",
       pronunciation: "바이토닷타라 도코데모 요쿠나이",
       translation: '"알바야 어디라도 상관 없지 않아?"',
@@ -125,7 +125,7 @@ const song: Song = {
       },
     },
     {
-      time: "0:45.4",
+      time: "0:45.3",
       original: "3.2.1で歪み合った",
       pronunciation: "3.2.1데 이가미앗타",
       translation: "3.2.1로 뒤틀려",
@@ -135,7 +135,7 @@ const song: Song = {
       },
     },
     {
-      time: "0:49",
+      time: "0:48.8",
       original: "君のその口 シガレット辛口",
       pronunciation: "키미노 소노 쿠치 시가렛토 카라쿠치",
       translation: "너의 그 입에 톡 쏘는 시가렛",
@@ -145,7 +145,7 @@ const song: Song = {
       },
     },
     {
-      time: "0:52",
+      time: "0:51.9",
       original: "割り切ったけど",
       pronunciation: "와리킷타케도",
       translation: "분명 체념했는데",
@@ -155,7 +155,7 @@ const song: Song = {
       },
     },
     {
-      time: "0:54",
+      time: "0:53.9",
       original: "知るか? 汁なら drink up we’re still tough",
       pronunciation: "시루카 시루나라 drink up we’re still tough",
       translation: "알 바야? 국이라면 drink up we’re still tough",
@@ -175,7 +175,7 @@ const song: Song = {
       },
     },
     {
-      time: "0:59",
+      time: "0:58.8",
       original: "揃ってるだけじゃつまらんし",
       pronunciation: "소롯테루 다케쟈 츠마란시",
       translation: "모여 있는 것만으론 재미가 없고",
@@ -185,7 +185,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:02.5",
+      time: "1:02.3",
       original: "繋いだって綻ぶし しょっぱいな鰹節",
       pronunciation: "츠나이닷테 호코로부시 숏파이나 가츠오부시",
       translation: "이어 봤자 풀리고 짭짤한 가다랑어포",
@@ -195,7 +195,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:05.5",
+      time: "1:05.45",
       original: "もっと甘えたいけどー？",
       pronunciation: "못토 아마에타이케도",
       translation: "좀 더 응석부리고 싶은데ー？",
@@ -215,7 +215,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:12.5",
+      time: "1:12.2",
       original: "落ち込んでる方が 進めるセオリー",
       pronunciation: "오치콘데루 호우가 스스메루 세오리",
       translation: "침울해하면 더 진행되는 시어리",
@@ -225,7 +225,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:15.5",
+      time: "1:15.6",
       original: "うpダウンな成長が いまひとつ",
       pronunciation: "앗푸다운나 세이쵸우가 이마 히토츠",
       translation: "업다운의 성장이 지금 하나",
@@ -235,32 +235,39 @@ const song: Song = {
       },
     },
     {
-      time: "1:19",
+      time: "1:19.1",
       original: "(底辺のてっぺんの味で 満たされたいわ)",
-      pronunciation: "테이헨노 텟펜노 아지데 미타사레타이와",
-      translation: "밑바닥 정상의 맛으로 충족되고 싶어",
+      pronunciation: "(테이헨노 텟펜노 아지데 미타사레타이와)",
+      translation: "(밑바닥 정상의 맛으로 충족되고 싶어)",
       cheer: {
         text: "",
         tag: "swing",
       },
     },
+    {
+      time: "1:25.6",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
     //================ RAP ================//
     {
       time: "1:36",
-      original: "I don’t wanna write, or hold a mic Feedback stopped me",
+      original: "",
       pronunciation: "I don’t wanna write, or hold a mic Feedback stopped me",
       translation:
         "글을 쓰거나 마이크를 잡고 싶은 게 아냐 피드백은 날 멈추게 했으니까",
     },
     {
       time: "1:38",
-      original: "I fell off, I gotta buy brand coffee",
+      original: "",
       pronunciation: "I fell off, I gotta buy brand coffee",
       translation: "떨어졌으니 커피나 사야겠어",
     },
     {
       time: "1:39.5",
-      original: "Figured the days of genre were long gone",
+      original: "",
       pronunciation: "Figured the days of genre were long gone",
       translation: "장르의 시대는 이미 지났다고 생각했는데",
     },
@@ -278,20 +285,19 @@ const song: Song = {
     },
     {
       time: "1:44.6",
-      original: "Throwin’ lyrics like expired canned food stuff",
+      original: "",
       pronunciation: "Throwin’ lyrics like expired canned food stuff",
       translation: "유통기한 지난 통조림 같은 가사",
     },
     {
-      time: "1:46.5",
-      original: "Average kid got too big, I’m toast",
+      time: "1:46.4",
+      original: "",
       pronunciation: "Average kid got too big, I’m toast",
       translation: "애들 평균이 너무 커졌어, 난 끝장이야",
     },
     {
       time: "1:47.9",
-      original:
-        "Litter the internet with bitter sentiment and move the goal post",
+      original: "",
       pronunciation:
         "Litter the internet with bitter sentiment and move the goal post",
       translation: "씁쓸한 마음으로 인터넷을 어지럽히고 규칙을 몰래 바꿔",
@@ -304,25 +310,25 @@ const song: Song = {
     },
     {
       time: "1:51.5",
-      original: "Nobody’s coming and still I’m crying “Red Rover” (What?)",
+      original: "",
       pronunciation: "Nobody’s coming and still I’m crying “Red Rover” (What?)",
       translation: '아무도 오지 않지만 여전히 "레드 로버"를 외쳐 (뭐?)',
     },
     {
       time: "1:53",
-      original: "Not every line hits",
+      original: "",
       pronunciation: "Not every line hits",
       translation: "모든 대사가 히트를 치진 않아",
     },
     {
       time: "1:54",
-      original: "Moments of “I miss…”",
+      original: "",
       pronunciation: "Moments of “I miss…”",
       translation: '"그리워…" 의 순간들',
     },
     {
       time: "1:54.9",
-      original: "Being nobody cuz nobody owns kindness",
+      original: "",
       pronunciation: "Being nobody cuz nobody owns kindness",
       translation: "누구도 아닌 이유는 누구도 다정을 소유할 수 없기 때문이지",
     },
@@ -334,13 +340,13 @@ const song: Song = {
     },
     {
       time: "1:57.9",
-      original: "Might go back to being unknown. Know what? Fine",
+      original: "",
       pronunciation: "Might go back to being unknown. Know what? Fine",
       translation: "다시 무명 신세가 될지도 몰라, 알지? 괜찮아",
     },
     {
       time: "1:59.7",
-      original: "In the grand scheme, man dreams, never needing sleep aid",
+      original: "",
       pronunciation: "In the grand scheme, man dreams, never needing sleep aid",
       translation:
         "원대한 계획에서 꿈꾸는 사람에겐, 절대 수면제가 필요하지 않아",
@@ -413,7 +419,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:18.6",
+      time: "2:18.5",
       original: "最低なコンプだし 最高の昆布だし",
       pronunciation: "사이테이나 콘푸다시 사이코우노 콘부다시",
       translation: "최악의 콤프고, 최고의 육수고",
@@ -433,7 +439,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:25.3",
+      time: "2:25.25",
       original: "繋いだって綻ぶし しょっぱいな鰹節",
       pronunciation: "츠나이닷테 호코로부시 숏파이나 가츠오부시",
       translation: "이어 봤자 풀리고 짭짤한 가다랑어포",
@@ -457,6 +463,7 @@ const song: Song = {
       original: "",
       pronunciation: "",
       translation: "주렁주렁",
+      interlude: true,
     },
     //================ 3절 ================//
     {
@@ -472,25 +479,25 @@ const song: Song = {
       translation: "배운 것 같으면서도 배우지 않은 목소리를 하고 있어",
     },
     {
-      time: "2:56.7",
+      time: "2:56.6",
       original: "期限切れ らいか ろんりねす 受け入れるよ",
       pronunciation: "키겐키레 라이카 론리네스 우케이레루요",
       translation: "지난 기한, 내년 여름, 외로움, 받아들일게",
     },
     {
-      time: "3:00.9",
+      time: "3:01",
       original: "素顔を君に送りたいけど",
       pronunciation: "스가오오 키미니 오쿠리타이케도",
       translation: "민낯을 네게 보내주고 싶은데",
     },
     {
-      time: "3:06.2",
+      time: "3:06",
       original: "飽きられてしまうから 糧にする",
       pronunciation: "아키라레테 시마우카라 카테니 스루",
       translation: "싫증날 테니까 밑거름 삼을게",
     },
     {
-      time: "3:10.3",
+      time: "3:10.1",
       original: "闇エネルギーは いつも助かってるんだよ",
       pronunciation: "야미- 에네르기-와 이츠모 타스캇테룬다요",
       translation: "어둠 에너지는 언제나 도움을 받고 있으니까",
@@ -536,7 +543,7 @@ const song: Song = {
       },
     },
     {
-      time: "3:27.7",
+      time: "3:27.5",
       original: "君のその口 シガレット辛口",
       pronunciation: "키미노 소노 쿠치 시가렛토 카라쿠치",
       translation: "너의 그 입에 톡 쏘는 시가렛",
@@ -546,7 +553,7 @@ const song: Song = {
       },
     },
     {
-      time: "3:30.9",
+      time: "3:30.8",
       original: "割り切ったけど",
       pronunciation: "와리킷타케도",
       translation: "분명 체념했는데",
@@ -606,10 +613,25 @@ const song: Song = {
       },
     },
     {
+      time: "3:49",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+    {
       time: "4:01.6",
       original: "",
       pronunciation: "",
       translation: "주렁주렁",
+      interlude: true,
+    },
+    {
+      time: "4:08.5",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
     },
   ],
 };
