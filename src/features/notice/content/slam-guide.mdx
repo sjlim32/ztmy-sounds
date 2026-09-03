@@ -1,6 +1,17 @@
-<a
-  href="https://docs.google.com/spreadsheets/d/1gkjRgOq6u08lHhVyPwjXGEC7Sh2oHsRxaaISqP2ykYo/edit?pli=1&gid=465881657#gid=465881657"
-  className="hover:text-ztmy-magenta underline"
->
-  슬램 가이드 링크
-</a>
+import { ZoomableImage } from "@/components/ZoomableImage";
+
+<div className="flex flex-col items-center gap-2">
+  <a
+    href="https://docs.google.com/spreadsheets/d/1gkjRgOq6u08lHhVyPwjXGEC7Sh2oHsRxaaISqP2ykYo/edit?pli=1&gid=465881657#gid=465881657"
+    className="hover:text-ztmy-magenta underline"
+  >
+    {"> 곡별 슬램가이드 액셀 링크 <"}
+  </a>
+
+  <ZoomableImage
+    src="/assets/notice/slam/slam-info-graphic.webp"
+    thumbnailWidth={800}
+    alt="슬램 인포그래픽"
+    caption={""}
+  />
+</div>
