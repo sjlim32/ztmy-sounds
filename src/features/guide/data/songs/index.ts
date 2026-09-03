@@ -41,20 +41,20 @@ export const songList: Song[] = [
   fastening,
   jkBomber,
   darken,
-  haveA, // TODO 싱크 미세 조정 필요
+  haveA,
   aitsuraZeninDousoukai,
   mirrorTune,
   timeLeft,
   kiraKiller,
   hanaichiMonnme,
   nareaiserve,
-  truth, // TODO 전체 싱크 조절 필요
+  truth,
   hippocampalPain,
   taidada,
-  shade, // TODO 전체 싱크 조절 필요
+  shade,
   cream,
   medianoche,
-  almostHuman, // TODO 전체 싱크 조절 필요 (1절 수정 완)
+  almostHuman,
 ];
 
 export function getSong(id: string): Song | null {

@@ -4,9 +4,9 @@ import { useSelectedLayoutSegment } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Song } from "@/features/guide/lib/types";
-import { getSong } from "@/features/guide/data/songs";
 import { usePlayer } from "@/features/guide/player-context";
 import { getActiveLineIndex } from "@/features/guide/lib/lyric-sync";
+import { getSongForVersion } from "@/features/guide/lib/song-version";
 import { SongList } from "@/features/guide/components/SongList";
 import { LyricsView } from "@/features/guide/components/LyricsView";
 import { usePanelEntranceVisible } from "@/features/guide/components/list-entrance";
@@ -15,9 +15,10 @@ const LYRICS_ENTER_DELAY_MS = 600; // 목록 접힘 애니메이션(600ms)이 �
 
 export function SongPanel() {
   const segment = useSelectedLayoutSegment(); // 레이아웃이 자식 세그먼트를 감지하여 목록 / 상세보기를 토글하기 위한 훅
-  const { activeSongId, currentTime, setActiveSongId, seekTo } = usePlayer();
+  const { activeSongId, songVersion, currentTime, setActiveSongId, seekTo } =
+    usePlayer();
 
-  const song = segment ? getSong(segment) : null;
+  const song = segment ? getSongForVersion(segment, songVersion) : null;
 
   const [renderedSong, setRenderedSong] = useState<Song | null>(song);
   const [visibleSongId, setVisibleSongId] = useState<string | null>(null);
@@ -27,10 +28,12 @@ export function SongPanel() {
     setActiveSongId(segment);
   }, [segment, setActiveSongId]);
 
-  // 곡이 바뀌면 렌더 중에 즉시(트랜지션 없이) 이전 내용을 감추고 내용을
-  // 교체합니다 — 사라질 때는 애니메이션 없이 바로 사라지고, 나타날 때만
-  // 아래 effect에서 지연 후 fade-in.
-  if (song?.id !== renderedSong?.id) {
+  // 곡이 바뀌면(또는 음원/라이브 버전이 바뀌면) 렌더 중에 즉시(트랜지션
+  // 없이) 이전 내용을 감추고 내용을 교체합니다 — 사라질 때는 애니메이션
+  // 없이 바로 사라지고, 나타날 때만 아래 effect에서 지연 후 fade-in.
+  // getSongForVersion()이 모듈 싱글턴 데이터를 반환하므로, 같은 id라도
+  // 버전이 다르면 참조가 달라져 정상적으로 감지됩니다.
+  if (song !== renderedSong) {
     setRenderedSong(song);
     if (visibleSongId !== null) setVisibleSongId(null);
   }
