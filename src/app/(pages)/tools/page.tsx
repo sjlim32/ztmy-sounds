@@ -13,6 +13,12 @@ interface TranscriptLine {
   translation?: string;
 }
 
+interface TranscriptTrack {
+  languageCode: string;
+  label: string;
+  isAuto: boolean;
+}
+
 function isTranscriptLine(value: unknown): value is TranscriptLine {
   if (!value || typeof value !== "object") return false;
   const line = value as Record<string, unknown>;
@@ -55,7 +61,10 @@ function formatSeconds(totalSeconds: number): string {
 
 export default function ToolsPage() {
   const [youtubeId, setYoutubeId] = useState("");
-  const [isFetching, setIsFetching] = useState(false);
+  const [tracks, setTracks] = useState<TranscriptTrack[]>([]);
+  const [isFetchingTracks, setIsFetchingTracks] = useState(false);
+  const [tracksError, setTracksError] = useState<string | null>(null);
+  const [fetchingLang, setFetchingLang] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [raw, setRaw] = useState("");
   const [rawCopied, setRawCopied] = useState(false);
@@ -63,16 +72,51 @@ export default function ToolsPage() {
   const [mappedCopied, setMappedCopied] = useState(false);
   const [offsetSeconds, setOffsetSeconds] = useState("");
 
-  const handleFetch = async () => {
+  const handleYoutubeIdChange = (value: string) => {
+    setYoutubeId(value);
+    // 목록은 이전 id에 대한 결과이므로, id가 바뀌면 다시 "가져오기"를
+    // 눌러야만 새 목록을 받도록 비워둡니다.
+    setTracks([]);
+    setTracksError(null);
+  };
+
+  const handleFetchTracks = async () => {
     const videoId = extractYoutubeId(youtubeId);
     if (!videoId) return;
 
-    setIsFetching(true);
+    setIsFetchingTracks(true);
+    setTracksError(null);
+    setTracks([]);
+
+    try {
+      const res = await fetch(
+        `/api/transcript/tracks?videoId=${encodeURIComponent(videoId)}`,
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        setTracksError(data.error ?? "언어 목록을 가져오지 못했습니다");
+        return;
+      }
+
+      setTracks(data.tracks ?? []);
+    } catch {
+      setTracksError("요청 중 오류가 발생했습니다");
+    } finally {
+      setIsFetchingTracks(false);
+    }
+  };
+
+  const handleFetchTranscript = async (lang: string) => {
+    const videoId = extractYoutubeId(youtubeId);
+    if (!videoId) return;
+
+    setFetchingLang(lang);
     setFetchError(null);
 
     try {
       const res = await fetch(
-        `/api/transcript?videoId=${encodeURIComponent(videoId)}`,
+        `/api/transcript?videoId=${encodeURIComponent(videoId)}&lang=${encodeURIComponent(lang)}`,
       );
       const data = await res.json();
 
@@ -85,7 +129,7 @@ export default function ToolsPage() {
     } catch {
       setFetchError("요청 중 오류가 발생했습니다");
     } finally {
-      setIsFetching(false);
+      setFetchingLang(null);
     }
   };
 
@@ -197,19 +241,38 @@ export default function ToolsPage() {
       <div className="flex gap-2">
         <input
           value={youtubeId}
-          onChange={(e) => setYoutubeId(e.target.value)}
+          onChange={(e) => handleYoutubeIdChange(e.target.value)}
           placeholder="youtubeId 또는 유튜브 링크"
           className="flex-1 rounded-md border border-white/20 bg-black/40 px-3 py-2 font-mono text-sm text-white placeholder:text-white/30"
         />
         <button
           type="button"
-          onClick={handleFetch}
-          disabled={!youtubeId.trim() || isFetching}
+          onClick={handleFetchTracks}
+          disabled={!youtubeId.trim() || isFetchingTracks}
           className="bg-ztmy-pink shrink-0 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
         >
-          {isFetching ? "가져오는 중…" : "가져오기"}
+          {isFetchingTracks ? "목록 가져오는 중…" : "가져오기"}
         </button>
       </div>
+      {tracksError && <p className="text-sm text-red-400">{tracksError}</p>}
+
+      {tracks.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {tracks.map((track) => (
+            <button
+              key={track.languageCode}
+              type="button"
+              onClick={() => handleFetchTranscript(track.languageCode)}
+              disabled={fetchingLang !== null}
+              className="rounded-md border border-white/20 bg-black/40 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/10 disabled:opacity-40"
+            >
+              {fetchingLang === track.languageCode
+                ? "가져오는 중…"
+                : track.label}
+            </button>
+          ))}
+        </div>
+      )}
       {fetchError && <p className="text-sm text-red-400">{fetchError}</p>}
 
       <textarea
