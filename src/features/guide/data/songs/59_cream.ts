@@ -160,7 +160,7 @@ const song: Song = {
       translation: "먼저 재미있어해",
     },
     {
-      time: "1:01.8",
+      time: "1:01.7",
       original: "ハテナ以前の否定って なんか不自然",
       pronunciation: "하테나 이젠노 히테잇테 난카 후시젠",
       translation: "물음표 이전에 부정문이라니 뭔가 부자연스러워",
@@ -222,7 +222,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:39.6",
+      time: "1:39.5",
       original: "クリームで会いにいけますか",
       pronunciation: "쿠리무데 아이니 이케마스카",
       translation: "크림으로 만나러 갈 수 있나요",
@@ -332,7 +332,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:41",
+      time: "2:40.9",
       original: "冷静に 白黒でもない",
       pronunciation: "레이세이니 시로쿠로데모 나이",
       translation: "냉정하게 흑백도 아니야",
@@ -362,7 +362,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:48.5",
+      time: "2:48.4",
       original: "創造に まるばつ なんてない",
       pronunciation: "소오조오니 마루바츠 난테 나이",
       translation: "창조에 OX 따윈 없어",
@@ -382,7 +382,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:52.8",
+      time: "2:52.7",
       original: "今なら会いにいけますか",
       pronunciation: "이마나라 아이니 이케마스카",
       translation: "지금이라면 만나러 갈 수 있나요",
@@ -417,13 +417,13 @@ const song: Song = {
       translation: "모든 것을 좋게 생각하지 않아도 좋아",
     },
     {
-      time: "3:15.2",
+      time: "3:15.1",
       original: "自ら不可思議 見つけたっていいんだ",
       pronunciation: "미즈카라 후카시기 미츠케탓테 이인다",
       translation: "스스로 불가사의를 찾아도 좋아",
     },
     {
-      time: "3:19",
+      time: "3:18.8",
       original: "グレーな選択も あるけれど",
       pronunciation: "구레에나 센타쿠모 아루케레도",
       translation: "회색빛 선택도 있지만",
@@ -435,7 +435,7 @@ const song: Song = {
       translation: "크림한 중앙이",
     },
     {
-      time: "3:24.6",
+      time: "3:24.65",
       original: "今はしっくり来てる",
       pronunciation: "이마와 싯쿠리 키테루",
       translation: "지금은 확 와 닿아",
@@ -489,7 +489,7 @@ const song: Song = {
       translation: "Ego도 아닌 감정의 규정",
     },
     {
-      time: "3:40",
+      time: "3:39.8",
       original: "クリームな解釈もいいじゃん",
       pronunciation: "쿠리무나 카이샤쿠모 이이쟝",
       translation: "크림한 해석도 좋잖아",
@@ -525,7 +525,7 @@ const song: Song = {
       },
     },
     {
-      time: "3:52.8",
+      time: "3:52.9",
       original: "何者でもない クリーミーさ",
       pronunciation: "나니모노데모 나이 쿠리이미이사",
       translation: "별거 아닌 크리미함이야",
@@ -555,7 +555,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:00.4",
+      time: "4:00.35",
       original: "今なら会いにいけますか？",
       pronunciation: "이마나라 아이니 이케마스카?",
       translation: "지금이라면 만나러 갈 수 있나요?",
