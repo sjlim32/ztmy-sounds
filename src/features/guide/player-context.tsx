@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import type { SongVersion } from "@/features/guide/lib/song-version";
 
 interface PlayerApi {
   seekTo: (seconds: number) => void;
@@ -18,9 +19,11 @@ interface PlayerApi {
 
 interface PlayerContextValue {
   activeSongId: string | null;
+  songVersion: SongVersion;
   isPlaying: boolean;
   currentTime: number;
   setActiveSongId: (songId: string | null) => void;
+  setSongVersion: (version: SongVersion) => void;
   setPlaying: (isPlaying: boolean) => void;
   setCurrentTime: (seconds: number) => void;
 
@@ -34,10 +37,18 @@ interface PlayerContextValue {
 const PlayerContext = createContext<PlayerContextValue | null>(null);
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
-  const [activeSongId, setActiveSongId] = useState<string | null>(null);
+  const [activeSongId, setActiveSongIdState] = useState<string | null>(null);
+  const [songVersion, setSongVersion] = useState<SongVersion>("live");
   const [isPlaying, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const apiRef = useRef<PlayerApi | null>(null);
+
+  // 곡이 바뀌면 이전 곡에서 골랐던 음원/라이브 선택이 새 곡에 그대로 이어지지
+  // 않도록 항상 라이브(기본값)로 되돌립니다.
+  const setActiveSongId = useCallback((songId: string | null) => {
+    setActiveSongIdState(songId);
+    setSongVersion("live");
+  }, []);
 
   const registerApi = useCallback((api: PlayerApi | null) => {
     apiRef.current = api;
@@ -60,9 +71,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const value = useMemo<PlayerContextValue>(
     () => ({
       activeSongId,
+      songVersion,
       isPlaying,
       currentTime,
       setActiveSongId,
+      setSongVersion,
       setPlaying,
       setCurrentTime,
       registerApi,
@@ -70,7 +83,17 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       play,
       pause,
     }),
-    [activeSongId, isPlaying, currentTime, registerApi, seekTo, play, pause],
+    [
+      activeSongId,
+      songVersion,
+      isPlaying,
+      currentTime,
+      setActiveSongId,
+      registerApi,
+      seekTo,
+      play,
+      pause,
+    ],
   );
 
   return (

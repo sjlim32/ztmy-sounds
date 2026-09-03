@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import type { Song } from "@/features/guide/lib/types";
 import { LyricLine } from "@/features/guide/components/LyricLine";
 import { AutoScrollToggle } from "@/features/guide/components/AutoScrollToggle";
+import { SongVersionToggle } from "@/features/guide/components/SongVersionToggle";
 import { useAutoScrollPreference } from "@/features/guide/lib/auto-scroll";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 
@@ -39,11 +40,13 @@ export function LyricsView({
     // song이 바뀌면 가사 줄 수/높이가 달라지므로 다시 관찰합니다.
   }, [song]);
 
-  const lastSongIdRef = useRef<string | null>(null);
+  const lastSongRef = useRef<Song | null>(null);
 
   useEffect(() => {
-    const songChanged = lastSongIdRef.current !== (song?.id ?? null);
-    lastSongIdRef.current = song?.id ?? null;
+    // song은 SongPanel에서 모듈 싱글턴 데이터로 계산되므로, 같은 id라도
+    // 음원/라이브 버전이 다르면 참조가 달라져 아래 비교로 정상 감지됩니다.
+    const songChanged = lastSongRef.current !== song;
+    lastSongRef.current = song;
 
     if (songChanged) {
       // 이전곡/다음곡·목록 선택 등으로 곡이 바뀌면, 이전 곡에서 남은 스크롤
@@ -109,7 +112,9 @@ export function LyricsView({
         </div>
       )}
 
-      {visible && <AutoScrollToggle />}
+      {/* 가사 fade 전환(곡 변경, 버전 토글)과 무관하게 항상 화면에 유지 */}
+      <SongVersionToggle />
+      <AutoScrollToggle />
     </div>
   );
 }

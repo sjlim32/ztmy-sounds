@@ -8,4 +8,5 @@ export interface Notice {
   content: ComponentType;
   visible: boolean;
   isAlwaysOpen?: boolean;
+  isSlamVisible?: boolean;
 }
