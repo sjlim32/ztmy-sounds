@@ -10,211 +10,358 @@ const song: Song = {
   id: "have-a",
   title: have,
   youtubeId: "Ws4OaBFAa_s",
-  lyrics: [],
+  lyrics: [
+    {
+      time: "0:00",
+      original: "この世でも 馴染めるのかな はう゛ぁ",
+      pronunciation: "코노 요데모 나지메루노카나 하부 아",
+      translation: "이 세상에도 익숙해지는 걸까, Have A",
+    },
+    {
+      time: "0:07.8",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+    //================ 1절 ================//
+    {
+      time: "0:20.8",
+      original: "目覚めた瞬間眩しいな",
+      pronunciation: "메자메타 슌칸 마부시이나",
+      translation: "눈을 뜬 순간 눈이 부셔 와",
+    },
+    {
+      time: "0:22.3",
+      original: "先手号泣必死に演技",
+      pronunciation: "센테 고우큐우 힛시니 엔기",
+      translation: "먼저 울며 떼를 쓰고, 필사적으로 연기하며",
+    },
+    {
+      time: "0:23.8",
+      original: "誰かみたいに誰かのせい",
+      pronunciation: "다레카미타이니 다레카노 세이",
+      translation: "누군가처럼 누군가의 탓을 하고",
+    },
+    {
+      time: "0:25.6",
+      original: "お祝いごっこの僕",
+      pronunciation: "오이와이 곳코노 보쿠",
+      translation: "축하 놀이를 하는 나",
+    },
+    {
+      time: "0:27.1",
+      original: "善人ぶって全放置",
+      pronunciation: "젠닌붓테 젠호우치",
+      translation: "좋은 사람인 척 모두를 방치하고",
+    },
+    {
+      time: "0:28.8",
+      original: "馬鹿なふりして住み放題",
+      pronunciation: "바카나 후리시테 스미 호우다이",
+      translation: "바보인 척 하며 멋대로 살아",
+    },
+    {
+      time: "0:30.3",
+      original: "誰も悪くない事ばかり",
+      pronunciation: "다레모 와루쿠 나이 코토 바카리",
+      translation: "아무도 잘못하지 않은 일들뿐",
+    },
+    {
+      time: "0:32",
+      original: "誰も得しない物語り",
+      pronunciation: "다레모 토쿠 시나이 모노가타리",
+      translation: "아무도 득을 보지 못하는 이야기",
+    },
+    {
+      time: "0:34.3",
+      original: "仕方ないじゃないかな",
+      pronunciation: "시카타나이쟈 나이카나",
+      translation: "어쩔 수 없는 게 아니려나",
+    },
+    {
+      time: "0:38.9",
+      original: "深呼吸したいな",
+      pronunciation: "^신코큐우 시타이나^",
+      translation: "심호흡을 하고 싶어",
+      slam: "핏 벌리기",
+    },
+    {
+      time: "0:40.8",
+      original: "一旦満足さ",
+      pronunciation: "잇탄 만조쿠사",
+      translation: "일단은 만족해",
+    },
+    {
+      time: "0:42.75",
+      original: "終わりはあるでしょう",
+      pronunciation: "오와리와 아루데쇼우",
+      translation: "끝은 있을 거잖아",
+    },
+    {
+      time: "0:45.2",
+      original: "尊敬できなくなる はう゛ぁ",
+      pronunciation: "손케이 데키나쿠나루 하부 아",
+      translation: "존경할 수 없게 돼, Have A",
+    },
+    {
+      time: "0:48.8",
+      original: "ゲームだけ返して",
+      pronunciation: "게-무다케 카에시테",
+      translation: "게임만을 되돌리며",
+    },
+    {
+      time: "0:51.25",
+      original: "深呼吸して今",
+      pronunciation: "신코큐우시테 이마",
+      translation: "심호흡을 하고, 지금",
+    },
+    {
+      time: "0:53.5",
+      original: "全クリさせたいわ",
+      pronunciation: "젠쿠리 사세타이와",
+      translation: "전부 클리어하고 싶어",
+    },
+    {
+      time: "0:55.45",
+      original: "言い返せるかも",
+      pronunciation: "이이카에세루카모",
+      translation: "되받아칠 수 있을지도 몰라",
+    },
+    {
+      time: "0:57.8",
+      original: "コンクリートの色違いを見つけて",
+      pronunciation: "콘쿠리-토노 이로치가이오 미츠케테",
+      translation: "콘크리트의 다른 색을 찾아내서",
+    },
+    {
+      time: "1:04.6",
+      original: "はう゛ぁ",
+      pronunciation: "^하부 아^",
+      translation: "Have A",
+      slam: "슬램 !",
+    },
+    {
+      time: "1:06",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+      slam: "",
+    },
+    //================ 2절 ================//
+    {
+      time: "1:17.7",
+      original: "沸騰させて文字通り",
+      pronunciation: "훗토우사세테 모지도오리",
+      translation: "끓여 놓고는, 글자 그대로",
+    },
+    {
+      time: "1:19.7",
+      original: "カップ麺ごと落っこっとしや",
+      pronunciation: "캇푸멘고토 옷코토시야",
+      translation: "컵라면 째로 떨어뜨리고",
+    },
+    {
+      time: "1:20.8",
+      original: "絶望＝開放的…",
+      pronunciation: "제츠보 카이호우테키",
+      translation: "절망＝개방적…",
+    },
+    {
+      time: "1:23.8",
+      original: "Tell me Tell me",
+      pronunciation: "​텔미 텔미",
+      translation: "",
+    },
+    {
+      time: "1:25.5",
+      original: "食わんし食わんし",
+      pronunciation: "쿠완시 쿠완시",
+      translation: "안 먹을 테고, 안 먹을 테고",
+    },
+    {
+      time: "1:27.2",
+      original: "不安視不安しぃ",
+      pronunciation: "후안시 후안시-",
+      translation: "불안한 시야, 불안하고",
+    },
+    {
+      time: "1:29.7",
+      original: "食わんしぃ悔しいな",
+      pronunciation: "쿠완시- 쿠야시이나",
+      translation: "안 먹을 테고 말이지, 억울하네",
+    },
+    {
+      time: "1:32.3",
+      original: "深呼吸したいな",
+      pronunciation: "^신코큐우 시타이나^",
+      translation: "심호흡을 하고 싶어",
+      slam: "핏 벌리기",
+    },
+    {
+      time: "1:33.9",
+      original: "一旦満足さ",
+      pronunciation: "잇탄 만조쿠사",
+      translation: "일단은 만족해",
+    },
+    {
+      time: "1:36",
+      original: "終わりはあるでしょう",
+      pronunciation: "오와리와 아루데쇼우",
+      translation: "끝은 있을 거잖아",
+    },
+    {
+      time: "1:39",
+      original: "尊敬できなくなる はう゛ぁ",
+      pronunciation: "손케이 데키나쿠나루 하부 아",
+      translation: "존경할 수 없게 돼, Have A",
+    },
+    {
+      time: "1:43",
+      original: "ゲームだけ返して",
+      pronunciation: "게-무다케 카에시테",
+      translation: "게임만을 되돌리며",
+    },
+    {
+      time: "1:45",
+      original: "深呼吸して今",
+      pronunciation: "신코큐우시테 이마",
+      translation: "심호흡을 하고, 지금",
+    },
+    {
+      time: "1:47",
+      original: "全クリさせたいわ",
+      pronunciation: "젠쿠리 사세타이와",
+      translation: "전부 클리어하고 싶어",
+    },
+    {
+      time: "1:49",
+      original: "言い返せるかも",
+      pronunciation: "이이카에세루카모",
+      translation: "되받아칠 수 있을지도 몰라",
+    },
+    {
+      time: "1:51",
+      original: "コンクリートの色違いを見つけて",
+      pronunciation: "콘쿠리-토노 이로치가이오 미츠케테",
+      translation: "콘크리트의 다른 색을 찾아내서",
+    },
+    {
+      time: "1:58.4",
+      original: "はう゛ぁ",
+      pronunciation: "하부 아",
+      translation: "Have A",
+    },
+    {
+      time: "2:00",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+      slam: "",
+    },
+    //================ 3절 ================//
+    {
+      time: "2:12.5",
+      original: "この世でも 馴染めるのかな",
+      pronunciation: "코노 요데모 나지메루노카나",
+      translation: "이 세상에도 익숙해지는 걸까",
+    },
+    {
+      time: "2:17.4",
+      original: "舌の色味が 赤くなるようだ",
+      pronunciation: "시타노 이로미가 아카쿠 나루 요우다",
+      translation: "혀의 색이 붉어지는 것 같아",
+    },
+    {
+      time: "2:24.8",
+      original: "水代わり ミルクを飲んで",
+      pronunciation: "미즈가와리 미루쿠오 논데",
+      translation: "물 대신 우유를 마시며",
+    },
+    {
+      time: "2:29.9",
+      original: "育てられたら 君と同じさ",
+      pronunciation: "소다테라레타라 키미토 오나지사",
+      translation: "길러진다면, 너와 똑같아",
+    },
+    {
+      time: "2:36",
+      original: "生きてて欲しいじゃん",
+      pronunciation: "이키테테 호시이쟌",
+      translation: "살아주기를 바라잖아",
+      slam: "핏 러닝",
+    },
+    {
+      time: "2:37.8",
+      original: "回数じゃないじゃん",
+      pronunciation: "카이스우쟈 나이쟌",
+      translation: "횟수같은 게 아니잖아",
+      slam: "핏 러닝",
+    },
+    {
+      time: "2:39.5",
+      original: "寂しくなるでしょう",
+      pronunciation: "사비시쿠 나루데쇼우",
+      translation: "외로워지는 거지",
+      slam: "핏 러닝",
+    },
+    {
+      time: "2:42",
+      original: "大きくって小さな 幅",
+      pronunciation: "오오키쿳테 치이사나 하바",
+      translation: "커다랗고도 작은 폭을",
+      slam: "핏 러닝",
+    },
+    {
+      time: "2:46",
+      original: "抱えるのも人生？",
+      pronunciation: "카카에루노모 진세이",
+      translation: "떠안는 것도 인생일까?",
+      slam: "핏 러닝",
+    },
+    {
+      time: "2:48",
+      original: "深呼吸して今",
+      pronunciation: "신코큐우시테 이마",
+      translation: "심호흡을 하고, 지금",
+      slam: "핏 러닝",
+    },
+    {
+      time: "2:50",
+      original: "息してるうちなら",
+      pronunciation: "이키시테루 우치나라",
+      translation: "숨을 쉬고 있는 사이에",
+      slam: "핏 러닝",
+    },
+    {
+      time: "2:52",
+      original: "言い返せるかも",
+      pronunciation: "이이카에세루카모",
+      translation: "되받아칠 수 있을지도 몰라",
+    },
+    {
+      time: "2:55",
+      original: "コンクリートの色違いを見つけて",
+      pronunciation: "콘쿠리-토노 이로치가이오 미츠케테",
+      translation: "콘크리트의 다른 색을 찾아내서",
+    },
+    {
+      time: "3:01.4",
+      original: "はう゛ぁ",
+      pronunciation: "^하부 아^",
+      translation: "Have A",
+      slam: "슬램 !",
+    },
+    {
+      time: "3:03.5",
+      original: "♫",
+      pronunciation: "",
+      translation: "",
+      interlude: true,
+    },
+  ],
 };
 
 export default song;
-
-/**
-この世でも馴染めるのかなはうぁ
-코노 요데모 나지메루노카나 하부 아
-이 세상에도 적응하게 될까, Have A
-​
-目覚めた瞬間眩しいな
-메자메타 슌칸 마부시이나
-눈을 뜬 순간 눈이 부셔 와
-​
-先手号泣必死に演技
-센테 고우큐우 힛시니 엔기
-먼저 울며 떼를 쓰고, 필사적으로 연기하며
-​
-誰かみたいに誰かのせい
-다레카미타이니 다레카노 세이
-누군가처럼 누군가의 탓을 하고
-​
-お祝いごっこの僕
-오이와이 곳코노 보쿠
-축하 놀이를 하는 나
-​
-善人ぶって全放置
-젠닌붓테 젠호우치
-좋은 사람인 척 모두를 방치하고
-​
-馬鹿なふりして住み放題
-바카나 후리시테 스미 호우다이
-바보인 척 마음대로 살고
-​
-誰も悪くない事ばかり
-다레모 와루쿠 나이 코토 바카리
-아무도 잘못하지 않은 일들뿐
-​
-誰も得しない物語り
-다레모 토쿠 시나이 모노가타리
-아무에게도 득이 없는 이야기를 하고
-​
-仕方ないじゃないかな
-시카타나이쟈 나이카나
-어쩔 수 없는 게 아니려나
-​
-深呼吸したいな
-신코큐우 시타이나
-심호흡을 하고 싶어
-​
-一旦満足さ
-잇탄 만조쿠사
-일단은 만족해
-​
-終わりはあるでしょう
-오와리와 아루데쇼우
-끝은 있을 거잖아
-​
-尊敬できなくなる　はう゛ぁ
-손케이 데키나쿠나루 하부 아
-존경할 수 없게 돼, Have A
-​
-ゲームだけ返して
-게-무다케 카에시테
-게임만을 되돌리며
-​
-深呼吸して今
-신코큐우시테 이마
-심호흡을 하고, 지금
-​
-全クリさせたいわ
-젠쿠리 사세타이와
-전부 클리어하고 싶어
-​
-言い返せるかも
-이이카에세루카모
-되받아칠 수 있을지도 몰라
-​
-コンクリートの色違いを見つけて
-콘쿠리-토노 이로치가이오 미츠케테
-콘크리트의 다른 색을 찾아내서
-​
-はう゛ぁ
-하부 아
-Have A
-​
-沸騰させて文字通り
-훗토우사세테 모지도오리
-끓여 놓고는, 글자 그대로
-​
-カップ麺ごと落っこっとしや
-캇푸멘고토 옷코토시야
-컵라면째로 떨어뜨리고
-​
-絶望＝開放的…
-제츠보우 카이호우테키
-절망＝개방적…
-
-Tell me Tell me
-​
-食わんし食わんし
-쿠완시 쿠완시
-안 먹을 테고, 안 먹을 테고
-​
-不安視不安しぃ
-후안시 후안시-
-불안한 시야, 불안하고
-​
-食わんしぃ悔しいな
-쿠완시- 쿠야시이나
-안 먹을 테고 말이지, 억울하네
-​
-深呼吸したい
-신코큐우 시타이나
-심호흡을 하고 싶어
-​
-一旦満足さ
-잇탄 만조쿠사
-일단은 만족해
-​
-終わりはあるでしょう
-오와리와 아루데쇼우
-끝은 있을 거잖아
-​
-尊敬できなくなる　はう゛ぁ
-손케이 데키나쿠나루 하부 아
-존경할 수 없게 돼, Have A
-​
-ゲームだけ返して
-게-무다케 카에시테
-게임만을 되돌리며
-​
-深呼吸して今
-신코큐우시테 이마
-심호흡을 하고, 지금
-​
-全クリさせたいわ
-젠쿠리 사세타이와
-전부 클리어하고 싶어
-​
-言い返せるかも
-이이카에세루카모
-되받아칠 수 있을지도 몰라
-​
-コンクリートの色違いを見つけて
-콘쿠리-토노 이로치가이오 미츠케테
-콘크리트의 다른 색을 찾아내서
-​
-はう゛ぁ
-하부 아
-Have A
-​
-この世でも　馴染めるのかな
-코노 요데모 나지메루노카나
-이 세상에도 익숙해지는 걸까
-​
-舌の色味が　赤くなるようだ
-시타노 이로미가 아카쿠 나루 요우다
-혀의 색이 붉어지는 것 같아
-​
-水代わり　ミルクを飲んで
-미즈가와리 미루쿠오 논데
-물 대신 우유를 마시며
-​
-育てられたら　君と同じさ
-소다테라레타라 키미토 오나지사
-길러진다면, 너와 똑같아
-​
-生きてて欲しいじゃん
-이키테테 호시이쟌
-살아주기를 바라잖아
-​
-回数じゃないじゃん
-카이스우쟈 나이쟌
-횟수같은 게 아니잖아
-​
-寂しくなるでしょう
-사비시쿠 나루데쇼우
-외로워지는 거지
-​
-大きくって小さな　幅
-오오키쿳테 치이사나 하바[3]
-커다랗고도 작은 폭을
-​
-抱えるのも人生？
-카카에루노모 진세이
-떠안는 것도 인생일까?
-​
-深呼吸して今
-신코큐우시테 이마
-심호흡을 하고, 지금
-​
-息してるうちなら
-이키시테루 우치나라
-숨을 쉬고 있는 사이에
-​
-言い返せるかも
-이이카에세루카모
-되받아칠 수 있을지도 몰라
-​
-コンクリートの色違いを見つけて
-콘쿠리-토노 이로치가이오 미츠케테
-콘크리트의 다른 색을 찾아내서
-​
-はう゛ぁ
-하부 아
-Have A
- */

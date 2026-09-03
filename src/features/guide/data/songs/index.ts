@@ -41,7 +41,7 @@ export const songList: Song[] = [
   fastening,
   jkBomber,
   darken,
-  haveA, // TODO 전체 싱크 조절 필요
+  haveA, // TODO 싱크 미세 조정 필요
   aitsuraZeninDousoukai,
   mirrorTune,
   timeLeft,
