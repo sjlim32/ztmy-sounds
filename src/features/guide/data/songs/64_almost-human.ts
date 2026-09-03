@@ -16,10 +16,6 @@ const song: Song = {
       original: "尖ってみたい脳 恨んでいたいのさ",
       pronunciation: "토갓테 미타이 노오 우란데 이타이노사",
       translation: "짜증내고 싶어하는 뇌로 계속 원망하고 싶어",
-      cheer: {
-        text: "",
-        tag: "swing",
-      },
     },
     {
       time: "0:03.9",
