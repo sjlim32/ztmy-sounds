@@ -49,6 +49,12 @@ export function ZoomableImage({
   sourceLabel,
 }: ZoomableImageProps) {
   const [isOpen, setOpen] = useState(false);
+  const [isZoomedIn, setZoomedIn] = useState(false);
+
+  const closeModal = () => {
+    setOpen(false);
+    setZoomedIn(false);
+  };
 
   // 둘 다 지정 → 그 크기로 크롭. 하나만 지정 → 나머지는 auto로 비율
   // 유지하며 크롭 없이 전체 표시. 둘 다 없음 → 기본 정사각형 크롭.
@@ -74,7 +80,7 @@ export function ZoomableImage({
     if (!isOpen) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") closeModal();
     };
     document.addEventListener("keydown", onKeyDown);
     document.body.style.overflow = "hidden";
@@ -116,14 +122,14 @@ export function ZoomableImage({
           <div
             role="dialog"
             aria-modal="true"
-            onClick={() => setOpen(false)}
-            className="fixed inset-0 z-50 flex flex-col items-center overflow-y-auto bg-black/80 p-6"
+            onClick={closeModal}
+            className="fixed inset-0 z-50 flex flex-col items-center overflow-auto bg-black/80 p-6"
           >
             {/* absolute가 아니라 fixed — 안내문이 길어 아래 콘텐츠가 스크롤될
                 때도 닫기 버튼이 뷰포트 모서리에 계속 붙어있도록. */}
             <button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={closeModal}
               aria-label="닫기"
               className="fixed top-4 right-4 text-white/60 hover:text-white"
             >
@@ -141,8 +147,16 @@ export function ZoomableImage({
                 alt={alt}
                 width={width}
                 height={height}
-                onClick={(event) => event.stopPropagation()}
-                className="max-h-[75vh] w-auto max-w-[90vw] rounded-lg object-contain"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setZoomedIn((prev) => !prev);
+                }}
+                className={cn(
+                  "rounded-lg object-contain",
+                  isZoomedIn
+                    ? "w-auto max-w-none cursor-zoom-out"
+                    : "max-h-[75vh] w-auto max-w-[90vw] cursor-zoom-in",
+                )}
               />
 
               {(caption || sourceHref) && (

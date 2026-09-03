@@ -74,7 +74,7 @@ export function SongPanel() {
             // 세로 중앙 정렬된 채 40vh를 그대로 쓰면 화면이 짧을 때
             // 아래쪽이 Footer 위로 겹칩니다. Footer 높이(~약 5rem)만큼을
             // 위아래로 두 번 뺀 값(10rem)과 40vh 중 더 작은 쪽을 사용.
-            "tablet:h-[min(46vh,calc(140dvh-10rem))]",
+            "tablet:h-[min(65vh,calc(140dvh-10rem))]",
         isPanelVisible ? "tablet:opacity-100" : "tablet:opacity-0",
       )}
     >

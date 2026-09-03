@@ -4,11 +4,11 @@ import slamContent from "@/features/notice/content/slam-guide.mdx";
 const notice: Notice = {
   id: "slam-guide",
   type: "guide",
-  title: "ZUTOMAYO 슬램 가이드",
+  title: "슬램핏 가이드",
   version: 1,
   content: slamContent,
   visible: true,
-  isAlwaysOpen: false,
+  isAlwaysOpen: true,
   isSlamVisible: true,
 };
 
