@@ -30,7 +30,7 @@ const song: Song = {
       translation: "미리 많이 자두는 게 의미 없다는 건 알아",
     },
     {
-      time: "0:45.2",
+      time: "0:45.1",
       original: "ぼーっと他人のダンス スクロール人生",
       pronunciation: "봇-토 타닌노 단스 스쿠로오루진세에",
       translation: "멍하게 다른 사람이 춤추는 걸 스크롤 하는 인생",
@@ -42,13 +42,13 @@ const song: Song = {
       translation: "타인에게 맞추려 해도 0점 변함없이 실점이야",
     },
     {
-      time: "0:52",
+      time: "0:51.9",
       original: "怠惰くるまって 論理集中プレイゲーム",
       pronunciation: "타이다 쿠루맛테 론리 슈우추우 푸레에게에무",
       translation: "태만을 몸에 두른 채 논리 집중 플레이 게임",
     },
     {
-      time: "0:55.8",
+      time: "0:55.5",
       original: "shiney like a ginger エール込みで 酩酊",
       pronunciation: "shiney like a ginger 에이루코미데 메이테에",
       translation: "shiney like a ginger 에일 담아 만취",
@@ -60,7 +60,7 @@ const song: Song = {
       translation: "춤춰버려 절정 답장 on the holic",
     },
     {
-      time: "1:02.5",
+      time: "1:02.4",
       original: "街灯の明かり 照らして my pain",
       pronunciation: "가이토오노 아카리 테라시테 my pain",
       translation: "거리의 불빛 비춰 줘 my pain",
@@ -84,13 +84,13 @@ const song: Song = {
       translation: "그렇다고 태양이 눈 부실 만큼",
     },
     {
-      time: "1:12.9",
+      time: "1:12.8",
       original: "体は だる重じゃん",
       pronunciation: "카라다와 다루오모쟝",
       translation: "몸은 나른하고 무거워",
     },
     {
-      time: "1:14.7",
+      time: "1:14.6",
       original: "ありがちな 感情モドキを",
       pronunciation: "아리가치나 칸조오모도키오",
       translation: "흔한 감정 비스무리한 것을",
@@ -102,7 +102,7 @@ const song: Song = {
       translation: "춤춘다고 뭐가 되는 것도 아니야",
     },
     {
-      time: "1:17.8",
+      time: "1:17.85",
       original: "でも今更 引き下がれない",
       pronunciation: "데모 이마사라 히키사가레나이",
       translation: "하지만 이제 와서 물러설 수는 없어",
@@ -149,7 +149,7 @@ const song: Song = {
     {
       time: "1:50.5",
       original: "ネット上で息してる 結んで開いて",
-      pronunciation: "넷토조오데 이키시테루 무슨-데 히라이테",
+      pronunciation: "넷토조오데 이키시테루 무슨ー데 히라이테",
       translation: "인터넷상에서 숨쉬고 있어 맺고 열며",
     },
     {
@@ -328,7 +328,7 @@ const song: Song = {
       translation: "기출문제만 풀어서 안다고 할 수 있을까",
     },
     {
-      time: "3:29.7",
+      time: "3:30.1",
       original: "夜明けのbrain ガイアだけhigh",
       pronunciation: "요아케노 brain 가이아다케 high",
       translation: "새벽녘의 brain 가이아 만이 high",
