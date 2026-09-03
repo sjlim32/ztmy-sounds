@@ -3,7 +3,10 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { songList } from "@/features/guide/data/songs";
 import type { CallTag, Song } from "@/features/guide/lib/types";
-import { getSongsWithTag } from "@/features/guide/lib/song-call-tags";
+import {
+  getSongsWithCheer,
+  getSongsWithTag,
+} from "@/features/guide/lib/song-call-tags";
 
 export type GuideMode = "cheer" | "slam";
 
@@ -54,7 +57,9 @@ export function GuideModeProvider({
   const value = useMemo<GuideModeContextValue>(() => {
     const { basePath, visibleTags, label } = MODE_CONFIG[mode];
     const songs =
-      mode === "cheer" ? songList : getSongsWithTag("slam", songList);
+      mode === "cheer"
+        ? getSongsWithCheer(songList)
+        : getSongsWithTag("slam", songList);
     return { mode, basePath, visibleTags, label, songs };
   }, [mode]);
 

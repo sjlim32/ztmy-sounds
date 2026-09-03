@@ -36,3 +36,23 @@ export function getCachedSongCallTags(song: Song): CallTag[] {
 export function getSongsWithTag(tag: CallTag, songs: Song[]): Song[] {
   return songs.filter((song) => getCachedSongCallTags(song).includes(tag));
 }
+
+/**
+ * 곡에 cheer가 붙은 라인이 하나라도 있는지 확인합니다. cheer는 태그 없는
+ * 순수 문자열로도 들어있을 수 있어 getSongCallTags(태그 기준)로는 못 잡으므로
+ * 필드 존재 여부만 따로 봅니다.
+ */
+function songHasCheer(song: Song): boolean {
+  return song.lyrics.some((line) => line.cheer !== undefined);
+}
+
+const SONGS_HAVE_CHEER_BY_ID = new Map<string, boolean>(
+  songList.map((song) => [song.id, songHasCheer(song)]),
+);
+
+/** cheer가 있는 곡만 골라냅니다 (예: 응원 가이드 목록). */
+export function getSongsWithCheer(songs: Song[]): Song[] {
+  return songs.filter(
+    (song) => SONGS_HAVE_CHEER_BY_ID.get(song.id) ?? songHasCheer(song),
+  );
+}
