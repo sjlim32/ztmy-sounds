@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { getSong } from "@/features/guide/data/songs";
 import { usePlayer } from "@/features/guide/player-context";
+import { getSongForVersion } from "@/features/guide/lib/song-version";
 
 interface YTPlayer {
   getCurrentTime: () => number;
@@ -81,8 +81,9 @@ export function YouTubePlayer() {
   // 실제 메서드는 onReady가 fire하기 전까지 붙지 않습니다. 아래 setInterval은
   // 오래 살아있는 클로저라, state가 아니라 ref를 써야 항상 최신 값을 읽습니다.
   const isReadyRef = useRef(false);
-  const loadedSongIdRef = useRef<string | null>(null);
-  const { activeSongId, setPlaying, setCurrentTime, registerApi } = usePlayer();
+  const loadedKeyRef = useRef<string | null>(null);
+  const { activeSongId, songVersion, setPlaying, setCurrentTime, registerApi } =
+    usePlayer();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -142,13 +143,16 @@ export function YouTubePlayer() {
 
   useEffect(() => {
     if (!activeSongId || !isReady || !playerRef.current) return;
-    if (loadedSongIdRef.current === activeSongId) return;
+    // 음원/라이브 토글도 곡 전환과 동일하게 새 영상을 로드해야 하므로
+    // activeSongId뿐 아니라 songVersion도 로드 키에 포함합니다.
+    const key = `${activeSongId}:${songVersion}`;
+    if (loadedKeyRef.current === key) return;
 
-    const song = getSong(activeSongId);
+    const song = getSongForVersion(activeSongId, songVersion);
     if (!song) return;
 
     playerRef.current.loadVideoById(song.youtubeId);
-    loadedSongIdRef.current = activeSongId;
+    loadedKeyRef.current = key;
     // loadVideoById 직후에도 getCurrentTime()이 잠깐 이전 곡의 마지막 값을
     // 그대로 돌려줄 수 있어서(새 영상이 아직 자기 시간을 보고하기 전),
     // 그 값을 이전/다음곡 화면에서 곧장 활성 줄 계산에 써버리면 가사
@@ -157,7 +161,7 @@ export function YouTubePlayer() {
     setCurrentTime(0);
     // activeSongId가 플레이어 초기화 완료 전에 이미 세팅돼 있었더라도,
     // isReady가 true로 바뀌는 순간 다시 실행됩니다.
-  }, [activeSongId, isReady, setCurrentTime]);
+  }, [activeSongId, songVersion, isReady, setCurrentTime]);
 
   useEffect(() => {
     // 뒤로가기 등으로 목록 화면으로 돌아가 activeSongId가 비면 재생을 멈춥니다.
