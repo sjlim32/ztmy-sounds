@@ -167,6 +167,10 @@ export function YouTubePlayer() {
     // 뒤로가기 등으로 목록 화면으로 돌아가 activeSongId가 비면 재생을 멈춥니다.
     if (!isReady || activeSongId) return;
     playerRef.current?.pauseVideo();
+    // loadedKeyRef를 비워서, 나중에 같은 곡(같은 key)으로 다시 들어와도
+    // 위 effect의 "이미 로드됨" 가드에 막히지 않고 항상 0초부터 다시
+    // 로드되도록 합니다 — 안 그러면 떠날 때 멈춘 시점 그대로 이어집니다.
+    loadedKeyRef.current = null;
   }, [activeSongId, isReady]);
 
   return (

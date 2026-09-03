@@ -51,7 +51,7 @@ export const songList: Song[] = [
   truth,
   hippocampalPain,
   taidada,
-  shade, // TODO 전체 싱크 조절 필요
+  shade,
   cream,
   medianoche,
   almostHuman,

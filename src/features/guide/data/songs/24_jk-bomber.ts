@@ -397,12 +397,20 @@ const song: Song = {
       original: "あったかく流れる 脈拍きみのだ",
       pronunciation: "앗타카쿠 나가레루 먀쿠하쿠 키미노다",
       translation: "뜨겁게 흐르는 맥박, 너의 맥박이야",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "3:30.1",
       original: "おでこに感じてた記憶",
       pronunciation: "오데코니 칸지테타 기오쿠",
       translation: "이마에 느꼈던 기억",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "3:33.9",
