@@ -9,6 +9,7 @@ const notice: Notice = {
   content: FightTheShamojiContent,
   visible: true,
   isAlwaysOpen: false,
+  isSlamVisible: false,
 };
 
 export default notice;

@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const videoId = searchParams.get("videoId");
   // lang을 안 주면 YouTube가 반환하는 첫 자막 트랙을 그냥 쓰게 되어 일본어가
   // 아닐 수 있어서, 기본값을 일본어(ja)로 고정합니다.
-  const lang = searchParams.get("lang") ?? "ko";
+  const lang = searchParams.get("lang") ?? "ja";
 
   if (!videoId) {
     return Response.json({ error: "videoId가 필요합니다" }, { status: 400 });

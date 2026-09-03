@@ -1,13 +1,19 @@
 import { songList } from "@/features/guide/data/songs";
 import { CALL_TAGS, type CallTag, type Song } from "@/features/guide/lib/types";
 
-/** 곡의 lyrics에서 실제 쓰인 응원(CallTag) 종류를 CALL_TAGS 순서로 뽑아냅니다. */
+/**
+ * 곡의 lyrics에서 실제 쓰인 응원(CallTag) 종류를 CALL_TAGS 순서로 뽑아냅니다.
+ * slam은 cheer.tag가 아니라 별도 필드(line.slam)로 표시되므로 따로 확인합니다.
+ */
 export function getSongCallTags(song: Song): CallTag[] {
   const used = new Set<CallTag>();
 
   for (const line of song.lyrics) {
     if (line.cheer && typeof line.cheer !== "string" && line.cheer.tag) {
       used.add(line.cheer.tag);
+    }
+    if (line.slam !== undefined) {
+      used.add("slam");
     }
   }
 
@@ -24,4 +30,29 @@ const SONG_CALL_TAGS_BY_ID = new Map<string, CallTag[]>(
 /** getSongCallTags(song)의 결과를 song.id로 캐시에서 조회합니다. */
 export function getCachedSongCallTags(song: Song): CallTag[] {
   return SONG_CALL_TAGS_BY_ID.get(song.id) ?? getSongCallTags(song);
+}
+
+/** 주어진 태그를 실제로 사용하는 곡만 골라냅니다 (예: 슬램 가이드 목록). */
+export function getSongsWithTag(tag: CallTag, songs: Song[]): Song[] {
+  return songs.filter((song) => getCachedSongCallTags(song).includes(tag));
+}
+
+/**
+ * 곡에 cheer가 붙은 라인이 하나라도 있는지 확인합니다. cheer는 태그 없는
+ * 순수 문자열로도 들어있을 수 있어 getSongCallTags(태그 기준)로는 못 잡으므로
+ * 필드 존재 여부만 따로 봅니다.
+ */
+function songHasCheer(song: Song): boolean {
+  return song.lyrics.some((line) => line.cheer !== undefined);
+}
+
+const SONGS_HAVE_CHEER_BY_ID = new Map<string, boolean>(
+  songList.map((song) => [song.id, songHasCheer(song)]),
+);
+
+/** cheer가 있는 곡만 골라냅니다 (예: 응원 가이드 목록). */
+export function getSongsWithCheer(songs: Song[]): Song[] {
+  return songs.filter(
+    (song) => SONGS_HAVE_CHEER_BY_ID.get(song.id) ?? songHasCheer(song),
+  );
 }

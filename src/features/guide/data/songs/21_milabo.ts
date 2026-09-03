@@ -147,6 +147,7 @@ const song: Song = {
         text: "",
         tag: "call",
       },
+      slam: "떼창",
     },
     {
       time: "1:19.2",
@@ -163,6 +164,7 @@ const song: Song = {
         text: "",
         tag: "call",
       },
+      slam: "떼창",
     },
     {
       time: "1:22.9",
@@ -179,6 +181,7 @@ const song: Song = {
         text: "",
         tag: "call",
       },
+      slam: "떼창",
     },
     {
       time: "1:26.6",
@@ -324,8 +327,9 @@ const song: Song = {
     {
       time: "2:16",
       original: "あたしのこと知らないで",
-      pronunciation: "아타시노 코토 시라나이데",
+      pronunciation: "^아타시노 코토 시라나이데^",
       translation: "나에 대해 모르면서,",
+      slam: "핏 벌리기",
     },
     {
       time: "2:17.7",
@@ -336,6 +340,7 @@ const song: Song = {
         text: "",
         tag: "call",
       },
+      slam: "떼창",
     },
     {
       time: "2:19.5",
@@ -352,6 +357,7 @@ const song: Song = {
         text: "",
         tag: "call",
       },
+      slam: "떼창",
     },
     {
       time: "2:23.3",
@@ -368,6 +374,7 @@ const song: Song = {
         text: "",
         tag: "call",
       },
+      slam: "떼창",
     },
     {
       time: "2:27.2",
@@ -399,12 +406,13 @@ const song: Song = {
     {
       time: "2:31",
       original: "仕草に揺れて 抑えきれないほどに",
-      pronunciation: "시구사니 유레테 오사에키레나이 호도니",
+      pronunciation: "^시구사니 유레테^ 오사에키레나이 호도니",
       translation: "몸짓에 흔들려 억누를 수 없을 정도로",
       cheer: {
         text: "",
         tag: "swing",
       },
+      slam: "슬램 !",
     },
     {
       time: "2:35",

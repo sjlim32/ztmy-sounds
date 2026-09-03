@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ComponentType } from "react";
 import { cva } from "class-variance-authority";
 
-type Accent = "purple" | "pink";
+type Accent = "purple" | "pink" | "magenta";
 
 interface MainNavLinkProps {
   href: string;
@@ -18,7 +18,8 @@ const badgeStyles = cva(
     variants: {
       accent: {
         purple: "bg-ztmy-purple",
-        pink: "bg-ztmy-magenta",
+        pink: "bg-ztmy-pink",
+        magenta: "bg-ztmy-magenta",
       } satisfies Record<Accent, string>,
     },
   },
@@ -31,6 +32,7 @@ const labelStyles = cva(
       accent: {
         purple: "group-hover:text-ztmy-purple",
         pink: "group-hover:text-ztmy-pink",
+        magenta: "group-hover:text-ztmy-magenta",
       } satisfies Record<Accent, string>,
     },
   },
@@ -42,7 +44,8 @@ const lineStyles = cva(
     variants: {
       accent: {
         purple: "bg-ztmy-purple",
-        pink: "bg-ztmy-magenta",
+        pink: "bg-ztmy-pink",
+        magenta: "bg-ztmy-magenta",
       } satisfies Record<Accent, string>,
     },
   },

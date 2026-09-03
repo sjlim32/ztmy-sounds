@@ -40,11 +40,12 @@ const song: Song = {
     {
       time: "0:22.5",
       original: "お世話になってます",
-      pronunciation: "오세와니 낫테마스",
+      pronunciation: "**^오세와니 낫테마스^**",
       translation: "신세를 지고 있습니다",
       cheer: {
         text: "👏 멈춰서 인사를 하는 경우도 있음. 박수로 호응",
       },
+      slam: "인사",
     },
     {
       time: "0:23.7",
@@ -135,14 +136,14 @@ const song: Song = {
     {
       time: "0:55",
       original: "シャイな空騒ぎ",
-      pronunciation: "샤이나 카라사와**기**",
+      pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
       },
+      slam: '"기"에 Jump',
     },
-
     {
       time: "0:57",
       original: "ねばった戦績 飛んでった",
@@ -176,7 +177,7 @@ const song: Song = {
     {
       time: "1:02.3",
       original: "身勝手な僕でいい",
-      pronunciation: "미갓테나 보쿠데이**이**",
+      pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
@@ -216,7 +217,7 @@ const song: Song = {
     {
       time: "1:09.6",
       original: "シャイな空騒ぎ",
-      pronunciation: "샤이나 카라사와**기**",
+      pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
@@ -256,12 +257,13 @@ const song: Song = {
     {
       time: "1:16.9",
       original: "身勝手な僕でいい",
-      pronunciation: "미갓테나 보쿠데이**이**",
+      pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
       },
+      slam: '"이"에 Jump',
     },
     {
       time: "1:19",
@@ -387,12 +389,13 @@ const song: Song = {
     {
       time: "2:15.5",
       original: "シャイな空騒ぎ",
-      pronunciation: "샤이나 카라사와**기**",
+      pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
       },
+      slam: '"기"에 Jump',
     },
     {
       time: "2:17.7",
@@ -427,12 +430,13 @@ const song: Song = {
     {
       time: "2:22.9",
       original: "身勝手な僕でいい",
-      pronunciation: "미갓테나 보쿠데이**이**",
+      pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
       },
+      slam: '"이"에 Jump',
     },
     {
       time: "2:24.8",
@@ -467,12 +471,13 @@ const song: Song = {
     {
       time: "2:30.3",
       original: "シャイな空騒ぎ",
-      pronunciation: "샤이나 카라사와**기**",
+      pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
       },
+      slam: '"기"에 Jump',
     },
     {
       time: "2:32.2",
@@ -507,12 +512,13 @@ const song: Song = {
     {
       time: "2:37.5",
       original: "身勝手な僕でいい",
-      pronunciation: "미갓테나 보쿠데이**이**",
+      pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
       },
+      slam: '"이"에 Jump',
     },
     //================ R A P ================//
     {
@@ -648,12 +654,13 @@ const song: Song = {
     {
       time: "3:17.8",
       original: "シャイな空騒ぎ",
-      pronunciation: "샤이나 카라사와**기**",
+      pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
       },
+      slam: '"기"에 Jump',
     },
     {
       time: "3:19.8",
@@ -688,12 +695,13 @@ const song: Song = {
     {
       time: "3:25.2",
       original: "身勝手な僕でいい",
-      pronunciation: "미갓테나 보쿠데이**이**",
+      pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
       },
+      slam: '"이"에 Jump',
     },
     {
       time: "3:27",
@@ -728,12 +736,13 @@ const song: Song = {
     {
       time: "3:32.5",
       original: "シャイな空騒ぎ",
-      pronunciation: "샤이나 카라사와**기**",
+      pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
       },
+      slam: '"기"에 Jump',
     },
     {
       time: "3:34.5",
@@ -768,12 +777,13 @@ const song: Song = {
     {
       time: "3:39.8",
       original: "身勝手な僕でいい",
-      pronunciation: "미갓테나 보쿠데이**이**",
+      pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
       },
+      slam: '"이"에 Jump',
     },
     //================ R A P ================//
     {
@@ -785,6 +795,7 @@ const song: Song = {
         text: "=== Rap Part ===",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "3:43.5",
@@ -795,6 +806,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "3:46.1",
@@ -805,6 +817,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "3:48.5",
@@ -815,6 +828,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "3:50.5",
@@ -825,6 +839,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "3:52.7",
@@ -835,6 +850,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "3:54.5",
@@ -845,6 +861,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "3:56.2",
@@ -855,6 +872,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "3:58",
@@ -865,6 +883,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "4:00",
@@ -875,6 +894,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "4:01.7",
@@ -885,6 +905,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "4:03.6",
@@ -895,6 +916,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "4:05.5",
@@ -905,6 +927,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "4:07.3",
@@ -915,6 +938,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "4:09.3",
@@ -925,6 +949,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      slam: "핏 러닝",
     },
     {
       time: "4:12",

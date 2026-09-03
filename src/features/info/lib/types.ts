@@ -1,4 +1,7 @@
 import type { SocialPlatform } from "@/lib/social-platform";
+import { INFO_SECTIONS } from "@/features/info/info";
+
+export type SectionId = (typeof INFO_SECTIONS)[number]["id"];
 
 export type InfoEvent = {
   id: string;
@@ -31,4 +34,5 @@ export type SocialUrl = Url & {
 export type Img = {
   name: string;
   asset: string;
+  section: SectionId;
 };

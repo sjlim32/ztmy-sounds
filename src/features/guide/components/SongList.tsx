@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { songList } from "@/features/guide/data/songs";
 import { HomeIcon } from "@/components/icons/HomeIcon";
 import { CallIcon } from "@/features/guide/components/CallIcon";
 import { getCachedSongCallTags } from "@/features/guide/lib/song-call-tags";
+import { useGuideMode } from "@/features/guide/guide-mode-context";
 import {
   accentBarStyles,
   useScrollFadeMask,
@@ -117,6 +117,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
   // tablet 이상에서는 이 ul 자체가 스크롤 컨테이너(모바일은 GuideListScroll이
   // NoticeList와 함께 전담 — 아래 className 참고).
   const listRef = useScrollFadeMask<HTMLUListElement>();
+  const { songs, basePath, visibleTags, label } = useGuideMode();
 
   return (
     <>
@@ -125,10 +126,10 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
       <div className={wrapperStyles({ compact: !!selectedSongId })}>
         <h2 className={titleStyles({ collapsed: !!selectedSongId })}>
           <span className="font-mono text-[10px] font-medium tracking-[0.3em] text-white/40 uppercase">
-            Guide
+            {label.eyebrow}
           </span>
           <span className="text-xl font-bold tracking-wide text-white">
-            응원 가이드
+            {label.title}
           </span>
         </h2>
 
@@ -150,7 +151,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
             visible ? "opacity-100" : "opacity-0",
           )}
         >
-          {songList.map((item) => {
+          {songs.map((item) => {
             const isSelected = selectedSongId === item.id;
             const isCollapsed = !!selectedSongId && !isSelected;
             const itemState = isCollapsed
@@ -167,7 +168,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                 <div className={itemInnerStyles({ collapsed: isCollapsed })}>
                   <div className="overflow-hidden">
                     <Link
-                      href={isSelected ? "/guide" : `/guide/${item.id}`}
+                      href={isSelected ? basePath : `${basePath}/${item.id}`}
                       className={cn(
                         "group tablet:py-2 relative block rounded-md px-4 transition-colors",
                         isSelected ? "py-1" : "tablet:py-2",
@@ -191,9 +192,11 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                           </span>
                         </div>
                         <div className="flex shrink-0 items-center gap-1">
-                          {getCachedSongCallTags(item).map((tag) => (
-                            <CallIcon key={tag} name={tag} size={20} />
-                          ))}
+                          {getCachedSongCallTags(item)
+                            .filter((tag) => visibleTags.includes(tag))
+                            .map((tag) => (
+                              <CallIcon key={tag} name={tag} size={20} />
+                            ))}
                         </div>
                       </div>
                     </Link>

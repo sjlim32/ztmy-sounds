@@ -22,8 +22,9 @@ const song: Song = {
     {
       time: "0:15.6",
       original: "質のいい病み感情が 溢れた時の",
-      pronunciation: "시츠노 이이 야미 칸죠-가 아후레타 토키노",
+      pronunciation: "^시츠노 이이 야미 칸죠-가 아후레타 토키노^",
       translation: "질 좋은 병든 감정이 흘러넘쳤을 때에",
+      slam: "핏 만들기",
     },
     {
       time: "0:21.9",
@@ -52,12 +53,13 @@ const song: Song = {
     {
       time: "0:46.4",
       original: "乾かないや 寒がりな季節に",
-      pronunciation: "**카와카나이야** 사무가리나 키세츠니",
+      pronunciation: "**^카와카나이야^** 사무가리나 키세츠니",
       translation: "마르지 않아 추운 계절에",
       cheer: {
         text: '"카와카나이야" 떼창',
         tag: "call",
       },
+      slam: '"카와카나이야" 떼창',
     },
     {
       time: "0:50.5",
@@ -68,12 +70,13 @@ const song: Song = {
     {
       time: "0:53.7",
       original: "焼き焼きだ 押し潰される無敵め",
-      pronunciation: "**야키야키다** 오시츠부사레루 무테키메",
+      pronunciation: "**^야키야키다^** 오시츠부사레루 무테키메",
       translation: "안절부절 못하지 짓눌리는 무적을",
       cheer: {
         text: '"야키야키다" 떼창',
         tag: "call",
       },
+      slam: '"야키야키다" 떼창',
     },
     {
       time: "0:57.7",
@@ -84,12 +87,13 @@ const song: Song = {
     {
       time: "1:00.8",
       original: "乾かないや 強がりな季節に",
-      pronunciation: "**카와카나이야** 츠요가리나 키세츠니",
+      pronunciation: "**^카와카나이야^** 츠요가리나 키세츠니",
       translation: "마르지 않아 허세 떠는 계절에",
       cheer: {
         text: '"카와카나이야" 떼창',
         tag: "call",
       },
+      slam: '"카와카나이야" 떼창',
     },
     {
       time: "1:05",
@@ -100,28 +104,31 @@ const song: Song = {
     {
       time: "1:08.2",
       original: "ヤンキーヤンキーだ 現状維持の無敵め",
-      pronunciation: "**양키-양키-다** 겐죠-이지노 무테키메",
+      pronunciation: "**^양키-양키-다^** 겐죠-이지노 무테키메",
       translation: "양키 양키야 변하지 않는 무적을",
       cheer: {
-        text: '양키-양키-다" 떼창',
+        text: '"양키-양키-다" 떼창',
         tag: "call",
       },
+      slam: '"양키-양키-다" 떼창',
     },
     {
       time: "1:12.2",
       original: "うおおお",
       pronunciation: "워어어",
       translation: "",
+      slam: "3, 2, 1",
     },
     {
       time: "1:14.6",
       original: "ファンキーな直感で",
-      pronunciation: "황키-나 춋칸데",
+      pronunciation: "황키^-나 춋칸데^",
       translation: "펑키한 직감으로",
       cheer: {
         text: "",
         tag: "swing",
       },
+      slam: "슬램 !",
     },
     {
       time: "1:16.8",
@@ -218,8 +225,9 @@ const song: Song = {
     {
       time: "1:59",
       original: "結局ここまで",
-      pronunciation: "켓쿄쿠 코코마데",
+      pronunciation: "^켓쿄쿠 코코마데^",
       translation: "결국 여기까지",
+      slam: "핏 만들기",
     },
     {
       time: "2:01",
@@ -248,12 +256,13 @@ const song: Song = {
     {
       time: "2:15.3",
       original: "乾かないや 寒がりな季節に",
-      pronunciation: "**카와카나이야** 사무가리나 키세츠니",
+      pronunciation: "**^카와카나이야^** 사무가리나 키세츠니",
       translation: "마르지 않아 추운 계절에",
       cheer: {
         text: '"카와카나이야" 떼창',
         tag: "call",
       },
+      slam: '"카와카나이야" 떼창',
     },
     {
       time: "2:19.5",
@@ -264,12 +273,13 @@ const song: Song = {
     {
       time: "2:22.5",
       original: "焼き焼きだ 押し潰される無敵め",
-      pronunciation: "**야키야키다** 오시츠부사레루 무테키메",
+      pronunciation: "**^야키야키다^** 오시츠부사레루 무테키메",
       translation: "안절부절 못하지 짓눌리는 무적을",
       cheer: {
         text: '"야키야키다" 떼창',
         tag: "call",
       },
+      slam: '"야키야키다" 떼창',
     },
     {
       time: "2:26.8",
@@ -280,12 +290,13 @@ const song: Song = {
     {
       time: "2:29.8",
       original: "乾かないや 強がりな季節に",
-      pronunciation: "**카와카나이야** 츠요가리나 키세츠니",
+      pronunciation: "**^카와카나이야^** 츠요가리나 키세츠니",
       translation: "마르지 않아 허세 떠는 계절에",
       cheer: {
         text: '"카와카나이야" 떼창',
         tag: "call",
       },
+      slam: '"카와카나이야" 떼창',
     },
     {
       time: "2:34",
@@ -296,28 +307,31 @@ const song: Song = {
     {
       time: "2:37.2",
       original: "ヤンキーヤンキーだ 現状維持の無敵め",
-      pronunciation: "**양키-양키-다** 겐죠-이지노 무테키메",
+      pronunciation: "**^양키-양키-다^** 겐죠-이지노 무테키메",
       translation: "양키 양키야 변하지 않는 무적을",
       cheer: {
         text: '"양키-양키-다" 떼창',
         tag: "call",
       },
+      slam: '"양키-양키-다" 떼창',
     },
     {
       time: "2:41",
       original: "うおおおおお",
       pronunciation: "워어어어어",
       translation: "",
+      slam: "(트리플 플럭 후)",
     },
     {
       time: "2:43.7",
       original: "ファンキーな直感で",
-      pronunciation: "황키-나 춋칸데",
+      pronunciation: "황키^-나 춋칸데^",
       translation: "펑키한 직감으로",
       cheer: {
         text: "",
         tag: "swing",
       },
+      slam: "슬램 !",
     },
     {
       time: "2:45.9",
@@ -432,8 +446,9 @@ const song: Song = {
     {
       time: "3:38.6",
       original: "しょうがないって イタいって",
-      pronunciation: "쇼-가나잇테 이타잇테",
+      pronunciation: "^쇼-가나잇테 이타잇테^",
       translation: "어쩔 수 없다고,  아프다고",
+      slam: "핏 만들기",
     },
     {
       time: "3:40.9",
@@ -471,12 +486,13 @@ const song: Song = {
     {
       time: "3:53.5",
       original: "損な理由で 飛び込んでみたいけど",
-      pronunciation: "손나 리유-데 토비콘데 미타이케도",
+      pronunciation: "^손나 리유-데^ 토비콘데 미타이케도",
       translation: "손해 볼 핑계로 뛰어들어 보고 싶지만",
       cheer: {
         text: "",
         tag: "swing",
       },
+      slam: "슬램 !",
     },
     {
       time: "3:56.6",
@@ -581,22 +597,24 @@ const song: Song = {
     {
       time: "4:21.1",
       original: "BE BE BE BE BE 勉",
-      pronunciation: "**BE BE BE BE BE 벤**",
+      pronunciation: "**^BE BE BE BE BE 벤^**",
       translation: "",
       cheer: {
         text: "박자에 맞춰서",
         tag: "swing",
       },
+      slam: "떼창",
     },
     {
       time: "4:28.3",
       original: "BE BE BE BE BE 勉",
-      pronunciation: "**BE BE BE BE BE 벤**",
+      pronunciation: "**^BE BE BE BE BE 벤^**",
       translation: "",
       cheer: {
         text: "박자에 맞춰서",
         tag: "swing",
       },
+      slam: "떼창",
     },
     {
       time: "4:30.2",

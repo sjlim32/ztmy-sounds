@@ -116,8 +116,9 @@ const song: Song = {
     {
       time: "1:22.9",
       original: "冴えないリズムで 踊り明かすからね",
-      pronunciation: "사에나이 리즈무데 오도리아카스카라네",
+      pronunciation: "^사에나이 리즈무데 오도리아카스카라네^",
       translation: "시원찮은 리듬에 맞춰 밤새 춤출 테니까",
+      slam: "댄스 핏",
     },
     {
       time: "1:26.8",
@@ -135,7 +136,7 @@ const song: Song = {
       time: "1:33.7",
       original: "夜は情け 肺が鳴け 廃",
       pronunciation: "요와 나사케 하이가나케 하이",
-      translation: "밤은 인정[人情]이 중요해 크게 소리 질러 Hi",
+      translation: "밤은 인정이 중요해 크게 소리 질러 Hi",
     },
     {
       time: "1:36.8",
@@ -171,9 +172,10 @@ const song: Song = {
     },
     {
       time: "2:03.8",
-      original: "はぁーーーー 綺羅キラ星だ",
-      pronunciation: "하아 키라키라보시다",
-      translation: "하아 곱게 반짝이는 별이다",
+      original: "はぁ ー 綺羅キラ星だ",
+      pronunciation: "^하아 ー 키라키라보시다^",
+      translation: "하아 ー 곱게 반짝이는 별이다",
+      slam: "핏 벌리기",
     },
     {
       time: "2:07.8",
@@ -202,8 +204,9 @@ const song: Song = {
     {
       time: "2:17.7",
       original: "冴えないリズムで 踊り明かすからね",
-      pronunciation: "사에나이 리즈무데 오도리아카스카라네",
+      pronunciation: "^사에나이 리즈무데^ 오도리아카스카라네",
       translation: "시원찮은 리듬에 맞춰 밤새 춤출 테니까",
+      slam: "슬램 !",
     },
     {
       time: "2:21.5",
@@ -221,7 +224,7 @@ const song: Song = {
       time: "2:28.5",
       original: "夜は情け 肺が鳴け 廃",
       pronunciation: "요와 나사케 하이가나케 하이",
-      translation: "밤은 인정[人情]이 중요해 크게 소리 질러 Hi",
+      translation: "밤은 인정이 중요해 크게 소리 질러 Hi",
     },
     {
       time: "2:31.8",
@@ -234,8 +237,9 @@ const song: Song = {
     {
       time: "2:45.3",
       original: "段々スタンスが雑",
-      pronunciation: "단단스탄스가 자츠",
+      pronunciation: "^단단스탄스가 자츠^",
       translation: "점점 자세가 엉망이 돼",
+      slam: "핏 벌리기",
     },
     {
       time: "2:46.9",
@@ -278,12 +282,14 @@ const song: Song = {
       original: '"葬 皆が寝静まれば 僕の出番来る"',
       pronunciation: '"소오 미나가 네시즈마레바 보쿠노 데반쿠루"',
       translation: '"그래 모두가 잠들면 내가 나설 차례야"',
+      slam: "히샤쿠 들기",
     },
     {
       time: "3:06",
       original: "冴えないリズムで 踊り明かすからね",
       pronunciation: "사에나이 리즈무데 오도리아카스카라네",
-      translation: "시원찮은 리듬에 맞춰 밤새 춤출 테니까",
+      translation: "^시원찮은 리듬^에 맞춰 밤새 춤출 테니까",
+      slam: "슬램 !",
     },
     {
       time: "3:9.5",

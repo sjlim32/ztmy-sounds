@@ -1,4 +1,4 @@
-export const CALL_TAGS = ["swing", "clap", "call"] as const;
+export const CALL_TAGS = ["swing", "clap", "call", "slam"] as const;
 export type CallTag = (typeof CALL_TAGS)[number];
 
 export interface LyricSegment {
@@ -15,6 +15,7 @@ export interface LyricLine {
   pronunciation: LyricText;
   translation: string;
   cheer?: string | LyricSegment;
+  slam?: string;
   interlude?: boolean;
 }
 
