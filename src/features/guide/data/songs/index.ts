@@ -54,7 +54,7 @@ export const songList: Song[] = [
   shade, // TODO 전체 싱크 조절 필요
   cream,
   medianoche,
-  almostHuman, // TODO 전체 싱크 조절 필요 (1절 수정 완)
+  almostHuman,
 ];
 
 export function getSong(id: string): Song | null {
