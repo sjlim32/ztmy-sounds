@@ -1,13 +1,13 @@
 import type { MetadataRoute } from "next";
-import { ARTIST } from "@/data/artist";
 import { SITE_DESCRIPTION } from "@/lib/seo";
+import { SITE_NAME } from "@/lib/seo";
 
 export const dynamic = "force-static";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${ARTIST.name.kr} FAN PAGE`,
-    short_name: `${ARTIST.name.en} FAN PAGE`,
+    name: `${SITE_NAME}`,
+    short_name: `${SITE_NAME}`,
     description: SITE_DESCRIPTION,
     categories: ["music", "entertainment"],
     start_url: "/",

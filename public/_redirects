@@ -1,0 +1,4 @@
+# public/_redirects
+
+https://ztmy-sounds.pages.dev/* https://ztmy-sounds.fans/:splat 301!
+https://www.ztmy-sounds.fans/* https://ztmy-sounds.fans/:splat 301!
