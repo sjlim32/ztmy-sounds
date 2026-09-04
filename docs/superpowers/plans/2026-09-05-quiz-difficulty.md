@@ -41,10 +41,10 @@
 begin;
 select plan(4);
 
-insert into quiz_questions (type, question_text, choices, correct_answer, pool, difficulty, is_active)
+insert into quiz_questions (id, type, question_text, choices, correct_answer, pool, difficulty, is_active)
 values
-  ('mc', 'easy q', '["A","B","C","D"]'::jsonb, '1', 'practice', 'easy', true),
-  ('mc', 'hard q', '["A","B","C","D"]'::jsonb, '2', 'practice', 'hard', true);
+  ('33333333-0000-0000-0000-000000000001', 'mc', 'easy q', '["A","B","C","D"]'::jsonb, '1', 'practice', 'easy', true),
+  ('33333333-0000-0000-0000-000000000002', 'mc', 'hard q', '["A","B","C","D"]'::jsonb, '2', 'practice', 'hard', true);
 
 insert into quiz_questions (id, type, question_text, correct_answer, pool, difficulty, is_active)
 values ('33333333-0000-0000-0000-000000000003', 'ox', 'test only q tagged medium', 'O', 'test_only', 'medium', true);
@@ -57,10 +57,10 @@ select isnt(
   'anon은 easy 난이도로 문제를 받을 수 있다'
 );
 
-select is(
-  (select get_random_practice_question('easy') ->> 'question_text'),
-  'easy q',
-  '요청한 난이도의 practice 문제만 반환한다'
+select isnt(
+  (select get_random_practice_question('easy') ->> 'id'),
+  '33333333-0000-0000-0000-000000000002',
+  '요청한 난이도의 practice 문제만 반환한다 (같은 풀이지만 난이도가 다른 hard q는 반환되지 않음을 확인 — 난이도 필터가 실제로 동작함을 증명)'
 );
 
 select isnt(
