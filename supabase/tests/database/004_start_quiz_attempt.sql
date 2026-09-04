@@ -1,9 +1,14 @@
 begin;
-select plan(5);
+select plan(6);
 
-insert into quiz_questions (id, type, question_text, correct_answer, is_active)
-select gen_random_uuid(), 'ox', 'q' || n, 'O', true
-from generate_series(1, 12) as n;
+insert into quiz_questions (id, type, question_text, correct_answer, pool, is_active)
+select gen_random_uuid(), 'ox', 'test-only-' || n, 'O', 'test_only', true
+from generate_series(1, 8) as n;
+
+insert into quiz_questions (id, type, question_text, correct_answer, pool, difficulty, is_active)
+select gen_random_uuid(), 'ox', 'hard-' || n, 'O', 'practice',
+  case when n % 2 = 0 then 'hard' else 'extreme' end, true
+from generate_series(1, 4) as n;
 
 insert into quiz_attempts (device_uuid, question_ids, status, score, total, submitted_at)
 values ('device-already', '[]'::jsonb, 'submitted', 7, 10, now());
@@ -18,13 +23,28 @@ select ok(
 select is(
   (select jsonb_array_length(start_quiz_attempt('device-new-2', null) -> 'questions')),
   10,
-  '실제 테스트는 활성 문제 풀에서 10문항을 랜덤 서브셋으로 뽑는다'
+  '실제 테스트는 test_only 8개 + practice hard/extreme 2개로 총 10문항을 구성한다'
 );
+
+reset role;
+
+select is(
+  (
+    select count(*)
+    from jsonb_array_elements(start_quiz_attempt('device-new-3', null) -> 'questions') as q
+    join quiz_questions qq on qq.id = (q ->> 'id')::uuid
+    where qq.pool = 'test_only'
+  ),
+  8::bigint,
+  '구성된 10문항 중 test_only 풀 출신이 정확히 8개다'
+);
+
+set local role anon;
 
 select ok(
   not (
     select bool_or(q ? 'correct_answer')
-    from jsonb_array_elements(start_quiz_attempt('device-new-3', null) -> 'questions') as q
+    from jsonb_array_elements(start_quiz_attempt('device-new-4', null) -> 'questions') as q
   ),
   '반환된 문제 목록에는 correct_answer가 포함되지 않는다'
 );
