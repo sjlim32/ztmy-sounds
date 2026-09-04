@@ -324,15 +324,11 @@ export default function ToolsPage() {
         onChange={(e) => setTextData(e.target.value)}
         onPaste={(e) => {
           e.preventDefault();
-          const pasted = collapseBlankLines(
-            e.clipboardData.getData("text"),
-          );
+          const pasted = collapseBlankLines(e.clipboardData.getData("text"));
           const target = e.currentTarget;
           const { selectionStart, selectionEnd, value } = target;
           const next =
-            value.slice(0, selectionStart) +
-            pasted +
-            value.slice(selectionEnd);
+            value.slice(0, selectionStart) + pasted + value.slice(selectionEnd);
           setTextData(next);
           requestAnimationFrame(() => {
             const cursor = selectionStart + pasted.length;
