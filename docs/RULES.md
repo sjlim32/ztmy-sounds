@@ -35,3 +35,8 @@
 - Tailwind Preflight가 `img { height: auto }`를 깔아둬서 `next/image`의 `height`
   prop을 덮어씁니다 — 크기 고정/크롭(`object-cover`)이 필요한 썸네일은 인라인
   `style={{ width, height }}`도 함께 지정하세요.
+- 퀴즈 기능은 `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_PUB_KEY` 환경변수가 없으면
+  `next build`(정적 export) 자체가 실패합니다 — `output: "export"`는 `"use client"`
+  컴포넌트도 빌드 타임에 프리렌더하기 때문에, 퀴즈 컴포넌트가 import하는 Supabase 클라이언트
+  초기화 실패가 사이트 전체 빌드를 죽입니다. Cloudflare Pages 배포 전 프로젝트 설정에 두
+  환경변수를 반드시 등록해야 합니다 (로컬 개발은 `.env.local`, `.env.example` 참고).
