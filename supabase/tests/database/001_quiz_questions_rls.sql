@@ -13,7 +13,8 @@ select is(
 );
 
 select is(
-  (select count(*) from quiz_questions_public)::int,
+  (select count(*) from quiz_questions_public
+   where id = '11111111-1111-1111-1111-111111111111')::int,
   1,
   'anon은 quiz_questions_public 뷰는 조회할 수 있다'
 );
