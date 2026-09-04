@@ -93,7 +93,7 @@ export function QuizAttempt() {
 
                 return (
                   <button
-                    key={option}
+                    key={index}
                     type="button"
                     onClick={() => handleAnswer(question.id, optionValue)}
                     className={cn(

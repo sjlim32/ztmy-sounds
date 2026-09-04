@@ -11,7 +11,7 @@ import type {
   RevealAnswerResult,
 } from "@/features/quiz/lib/types";
 
-type Phase = "loading" | "answering" | "revealed" | "error";
+type Phase = "loading" | "answering" | "revealed" | "error" | "empty";
 
 export function QuizPractice() {
   const [phase, setPhase] = useState<Phase>("loading");
@@ -22,6 +22,10 @@ export function QuizPractice() {
   const fetchQuestion = useCallback(() => {
     getRandomPracticeQuestion()
       .then((q) => {
+        if (!q) {
+          setPhase("empty");
+          return;
+        }
         setQuestion(q);
         setPhase("answering");
       })
@@ -44,7 +48,22 @@ export function QuizPractice() {
   }
 
   if (phase === "error") {
-    return <p className="text-ztmy-pink">문제를 불러오지 못했습니다.</p>;
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <p className="text-ztmy-pink">문제를 불러오지 못했습니다.</p>
+        <button
+          type="button"
+          onClick={loadQuestion}
+          className="w-fit rounded-sm border border-white/20 px-4 py-2 text-sm text-white hover:border-ztmy-purple"
+        >
+          다시 시도
+        </button>
+      </div>
+    );
+  }
+
+  if (phase === "empty") {
+    return <p className="text-white/60">출제된 문제가 없습니다.</p>;
   }
 
   if (!question) return null;
@@ -75,7 +94,7 @@ export function QuizPractice() {
 
           return (
             <button
-              key={option}
+              key={index}
               type="button"
               disabled={phase === "revealed"}
               onClick={() => handleSelect(optionValue)}

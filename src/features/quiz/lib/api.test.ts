@@ -26,7 +26,7 @@ describe("quiz api", () => {
     const result = await getRandomPracticeQuestion();
 
     expect(supabase.rpc).toHaveBeenCalledWith("get_random_practice_question");
-    expect(result.id).toBe("q1");
+    expect(result?.id).toBe("q1");
   });
 
   it("revealPracticeAnswer passes the question id", async () => {

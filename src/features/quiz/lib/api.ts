@@ -6,10 +6,10 @@ import type {
   SubmitAttemptResult,
 } from "./types";
 
-export async function getRandomPracticeQuestion(): Promise<PracticeQuestion> {
+export async function getRandomPracticeQuestion(): Promise<PracticeQuestion | null> {
   const { data, error } = await supabase.rpc("get_random_practice_question");
   if (error) throw error;
-  return data as PracticeQuestion;
+  return (data as PracticeQuestion | null) ?? null;
 }
 
 export async function revealPracticeAnswer(
