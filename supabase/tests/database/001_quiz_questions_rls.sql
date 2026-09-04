@@ -6,9 +6,9 @@ values ('11111111-1111-1111-1111-111111111111', 'ox', 'test question', null, 'X'
 
 set local role anon;
 
-select is(
-  (select count(*) from quiz_questions)::int,
-  0,
+prepare anon_select as select count(*) from quiz_questions;
+select throws_ok(
+  'anon_select', '42501', null,
   'anon은 quiz_questions 테이블을 직접 SELECT 할 수 없다'
 );
 
