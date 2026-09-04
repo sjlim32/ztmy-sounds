@@ -1,13 +1,18 @@
 import { supabase } from "@/lib/supabase/client";
 import type {
+  Difficulty,
   PracticeQuestion,
   RevealAnswerResult,
   StartAttemptResult,
   SubmitAttemptResult,
 } from "./types";
 
-export async function getRandomPracticeQuestion(): Promise<PracticeQuestion | null> {
-  const { data, error } = await supabase.rpc("get_random_practice_question");
+export async function getRandomPracticeQuestion(
+  difficulty: Difficulty,
+): Promise<PracticeQuestion | null> {
+  const { data, error } = await supabase.rpc("get_random_practice_question", {
+    p_difficulty: difficulty,
+  });
   if (error) throw error;
   return (data as PracticeQuestion | null) ?? null;
 }

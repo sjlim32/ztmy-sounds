@@ -17,15 +17,17 @@ describe("quiz api", () => {
     vi.mocked(supabase.rpc).mockReset();
   });
 
-  it("getRandomPracticeQuestion calls the RPC and returns data", async () => {
+  it("getRandomPracticeQuestion passes the difficulty and returns data", async () => {
     vi.mocked(supabase.rpc).mockResolvedValue({
       data: { id: "q1", type: "ox", question_text: "?", choices: null },
       error: null,
     } as never);
 
-    const result = await getRandomPracticeQuestion();
+    const result = await getRandomPracticeQuestion("easy");
 
-    expect(supabase.rpc).toHaveBeenCalledWith("get_random_practice_question");
+    expect(supabase.rpc).toHaveBeenCalledWith("get_random_practice_question", {
+      p_difficulty: "easy",
+    });
     expect(result?.id).toBe("q1");
   });
 
@@ -77,6 +79,6 @@ describe("quiz api", () => {
       error: new Error("boom"),
     } as never);
 
-    await expect(getRandomPracticeQuestion()).rejects.toThrow("boom");
+    await expect(getRandomPracticeQuestion("easy")).rejects.toThrow("boom");
   });
 });
