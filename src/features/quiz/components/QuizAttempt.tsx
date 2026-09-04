@@ -14,9 +14,11 @@ export function QuizAttempt() {
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [questions, setQuestions] = useState<PracticeQuestion[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [result, setResult] = useState<{ score: number; total: number } | null>(
-    null,
-  );
+  const [result, setResult] = useState<{
+    score: number;
+    total: number;
+    alreadySubmitted?: boolean;
+  } | null>(null);
 
   useEffect(() => {
     const deviceId = getDeviceId();
@@ -26,7 +28,11 @@ export function QuizAttempt() {
       .then((fingerprint) => startQuizAttempt(deviceId, fingerprint ?? null))
       .then((res) => {
         if (res.already_submitted) {
-          setResult({ score: res.score ?? 0, total: res.total ?? 0 });
+          setResult({
+            score: res.score ?? 0,
+            total: res.total ?? 0,
+            alreadySubmitted: true,
+          });
           setPhase("result");
           return;
         }
@@ -67,6 +73,9 @@ export function QuizAttempt() {
     return (
       <div className="flex flex-col items-center gap-2 rounded-sm border border-white/10 bg-black/40 p-6">
         <p className="text-sm text-white/60">결과</p>
+        {result.alreadySubmitted && (
+          <p className="text-sm text-white/50">이미 응시한 기록입니다.</p>
+        )}
         <p className="text-ztmy-purple text-3xl font-bold">
           {result.score} / {result.total}
         </p>
