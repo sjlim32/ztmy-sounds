@@ -310,7 +310,7 @@ begin
     v_ip := null;
   end;
 
-  select jsonb_agg(id) into v_question_ids
+  select jsonb_agg(id order by random()) into v_question_ids
   from (
     select id from (
       select id from quiz_questions
@@ -325,8 +325,7 @@ begin
       order by random()
       limit 2
     ) hard_subset
-  ) combined
-  order by random();
+  ) combined;
 
   insert into quiz_attempts (device_uuid, fingerprint_hash, ip, question_ids, status)
   values (p_device_uuid, p_fingerprint_hash, v_ip, v_question_ids, 'in_progress')
