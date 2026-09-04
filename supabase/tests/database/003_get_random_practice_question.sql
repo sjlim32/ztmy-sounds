@@ -19,8 +19,8 @@ select isnt(
 
 select isnt(
   (select get_random_practice_question('easy') ->> 'id'),
-  '33333333-0000-0000-0000-000000000003',
-  '요청한 난이도의 practice 문제만 반환한다 (test_only 풀의 문제를 반환하지 않음을 확인)'
+  '33333333-0000-0000-0000-000000000002',
+  '요청한 난이도의 practice 문제만 반환한다 (같은 풀이지만 난이도가 다른 hard q는 반환되지 않음을 확인 — 난이도 필터가 실제로 동작함을 증명)'
 );
 
 select isnt(
