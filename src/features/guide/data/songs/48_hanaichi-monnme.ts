@@ -65,7 +65,7 @@ const song: Song = {
     {
       time: "0:46.8",
       original: "僕が作るものは 既にあるものじゃーーん",
-      pronunciation: "보쿠가 츠쿠루모노와 스데니 아루 모노ーー쟝",
+      pronunciation: "보쿠가 츠쿠루모노와 스데니 아루 모노--쟝",
       translation: "내가 만드는 것은 이미 있는 거잖아",
     },
     {
@@ -211,7 +211,7 @@ const song: Song = {
     {
       time: "1:58.8",
       original: "僕が歌うものは 既にあるものじゃーーん",
-      pronunciation: "보쿠가 우타우모노와 스데니 아루 모노ーー쟝",
+      pronunciation: "보쿠가 우타우모노와 스데니 아루 모노--쟝",
       translation: "내가 노래하는 것은 이미 있는 거잖아",
     },
     {

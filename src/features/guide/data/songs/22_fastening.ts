@@ -71,7 +71,7 @@ const song: Song = {
     {
       time: "0:50.2",
       original: "怖がることはもういーかい",
-      pronunciation: "^코와가루^ 코토와 모우 이ー카이",
+      pronunciation: "^코와가루^ 코토와 모우 이-카이",
       translation: "무서워하는 건 이제 됐어?",
       slam: "슬램 !",
     },
@@ -208,7 +208,7 @@ const song: Song = {
     {
       time: "1:56.9",
       original: "怖がることはもういーかい",
-      pronunciation: "^코와가루^ 코토와 모우 이ー카이",
+      pronunciation: "^코와가루^ 코토와 모우 이-카이",
       translation: "무서워하는 건 이제 됐어?",
       slam: "슬램 !",
     },
