@@ -1,9 +1,13 @@
 begin;
-select plan(5);
+select plan(6);
 
-insert into quiz_questions (id, type, question_text, correct_answer, is_active)
-select gen_random_uuid(), 'ox', 'q' || n, 'O', true
-from generate_series(1, 12) as n;
+insert into quiz_questions (id, type, question_text, correct_answer, pool, is_active)
+select gen_random_uuid(), 'ox', 'test-only-' || n, 'O', 'test_only', true
+from generate_series(1, 8) as n;
+
+insert into quiz_questions (id, type, question_text, correct_answer, pool, difficulty, is_active)
+select gen_random_uuid(), 'ox', 'hard-' || n, 'O', 'practice', 'hard', true
+from generate_series(1, 4) as n;
 
 set local role anon;
 
@@ -31,32 +35,42 @@ select isnt(
 
 reset role;
 
-update quiz_questions set is_active = false
-where id not in (select id from quiz_questions order by id limit 3);
+update quiz_questions set is_active = false where pool = 'test_only';
 
 set local role anon;
 
-prepare small_pool as select start_quiz_attempt('device-small-pool', null);
+prepare small_test_pool as select start_quiz_attempt('device-small-test-pool', null);
 select throws_ok(
-  'small_pool', null, null,
-  '활성 문제가 10개 미만이면 실제 테스트를 시작할 수 없다'
+  'small_test_pool', null, null,
+  'test_only 활성 문제가 8개 미만이면 실제 테스트를 시작할 수 없다'
 );
 
 reset role;
 
-update quiz_questions set is_active = true;
+update quiz_questions set is_active = true where pool = 'test_only';
+update quiz_questions set difficulty = null where pool = 'practice';
+
+set local role anon;
+
+prepare small_hard_pool as select start_quiz_attempt('device-small-hard-pool', null);
+select throws_ok(
+  'small_hard_pool', null, null,
+  'practice hard/extreme 활성 문제가 2개 미만이면 실제 테스트를 시작할 수 없다'
+);
+
+reset role;
 
 insert into quiz_attempts (id, device_uuid, question_ids, status, score, total, submitted_at)
 values (
   gen_random_uuid(), 'device-double-submit',
-  (select jsonb_agg(id) from (select id from quiz_questions where is_active limit 10) s),
+  (select jsonb_agg(id) from (select id from quiz_questions where pool = 'test_only' limit 8) s),
   'submitted', 7, 10, now()
 );
 
 insert into quiz_attempts (id, device_uuid, question_ids, status)
 values (
   '99999999-9999-9999-9999-999999999999', 'device-double-submit',
-  (select jsonb_agg(id) from (select id from quiz_questions where is_active limit 10) s),
+  (select jsonb_agg(id) from (select id from quiz_questions where pool = 'test_only' limit 8) s),
   'in_progress'
 );
 
