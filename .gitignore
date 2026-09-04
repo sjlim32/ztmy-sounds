@@ -108,3 +108,4 @@ sketch
 
 # git worktrees (superpowers)
 .worktrees/
+.superpowers/
