@@ -44,6 +44,11 @@
   - Supabase DB에는 도감의 메타 데이터(이름, 설명, 속성 등)와 함께 **Cloudflare R2에 업로드된 이미지의 URL 주소 텍스트만 저장**합니다.
 - **이미지 서빙 최적화:**
   - 이미지는 Supabase가 아닌 Cloudflare R2 및 글로벌 CDN을 통해 유저에게 직접 전송되어 트래픽 비용을 원천 차단합니다.
+- **이미지 저장 전략 (물리/논리 분리):**
+  - R2(물리 저장소)의 오브젝트 키는 발급 후 **불변/불투명**하게 둡니다 (예: `<uuid>.webp`, 또는 `2026-09/<uuid>.webp`). R2도 S3처럼 진짜 rename이 없어(내부적으로 copy+delete) 폴더 재정리를 물리 파일 이동으로 하지 않습니다.
+  - "폴더/경로/태그"처럼 사람이 보는 조직화는 전부 Supabase `images` 테이블(논리 저장소)의 컬럼(`r2_key`(불변), `folder`, `tags`, `display_order`, `alt_text` 등)로만 관리합니다. 폴더 이동은 `UPDATE images SET folder = ...` 한 줄로 끝나고 물리 파일은 전혀 건드리지 않습니다.
+  - 업로드/삭제 같은 실제 R2 쓰기 작업은 어드민 브라우저가 R2 시크릿을 직접 들지 않도록, presigned URL을 발급하는 서버 함수(Pages Function 또는 Supabase Edge Function)를 경유합니다.
+  - 공개 서빙은 R2에 커스텀 도메인(예: `cdn.ztmy-sounds.fans`)을 연결해서 사용하고, `r2.dev` 서브도메인은 프로덕션에서 쓰지 않습니다.
 
 ---
 
