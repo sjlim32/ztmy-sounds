@@ -19,10 +19,7 @@ export function QuizPractice() {
   const [selected, setSelected] = useState<string | null>(null);
   const [reveal, setReveal] = useState<RevealAnswerResult | null>(null);
 
-  const loadQuestion = useCallback(() => {
-    setPhase("loading");
-    setSelected(null);
-    setReveal(null);
+  const fetchQuestion = useCallback(() => {
     getRandomPracticeQuestion()
       .then((q) => {
         setQuestion(q);
@@ -31,9 +28,16 @@ export function QuizPractice() {
       .catch(() => setPhase("error"));
   }, []);
 
+  const loadQuestion = useCallback(() => {
+    setPhase("loading");
+    setSelected(null);
+    setReveal(null);
+    fetchQuestion();
+  }, [fetchQuestion]);
+
   useEffect(() => {
-    loadQuestion();
-  }, [loadQuestion]);
+    fetchQuestion();
+  }, [fetchQuestion]);
 
   if (phase === "loading") {
     return <p className="text-white/60">문제를 불러오는 중...</p>;
