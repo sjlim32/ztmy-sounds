@@ -1,5 +1,5 @@
 begin;
-select plan(4);
+select plan(5);
 
 insert into quiz_questions (id, type, question_text, correct_answer, is_active)
 select gen_random_uuid(), 'ox', 'q' || n, 'O', true
@@ -20,6 +20,16 @@ select is(
   1,
   'in_progress 상태에서 반복 호출해도 행이 하나만 생기고 새 서브셋을 다시 뽑지 않는다'
 );
+
+set local role anon;
+
+select isnt(
+  (select (start_quiz_attempt('device-collide-a', 'fp-shared') ->> 'attempt_id')),
+  (select (start_quiz_attempt('device-collide-b', 'fp-shared') ->> 'attempt_id')),
+  '같은 fingerprint_hash를 공유하는 서로 다른 device_uuid는 같은 in_progress attempt를 받지 않는다 (충돌 시 막다른 길 방지)'
+);
+
+reset role;
 
 update quiz_questions set is_active = false
 where id not in (select id from quiz_questions order by id limit 3);

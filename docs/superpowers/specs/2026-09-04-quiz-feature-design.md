@@ -52,7 +52,11 @@ create view quiz_questions_public as
   where is_active;
 
 grant select on quiz_questions_public to anon;
+```
 
+> **후속 수정**: `get_random_practice_question`/`start_quiz_attempt` 두 RPC 모두 결국 이 뷰가 아니라 `quiz_questions` 원본 테이블을 직접 조회하도록 구현되어, 앱에서 이 뷰를 소비하는 코드가 하나도 없다. 게다가 Supabase가 뷰 생성 시 기본으로 부여하는 권한이 SELECT뿐 아니라 INSERT/UPDATE/DELETE까지 포함되어 있어 anon이 문제 은행을 훼손할 수 있는 의도치 않은 구멍이었다. 이후 마이그레이션에서 `revoke all on quiz_questions_public from anon, authenticated`로 접근을 전면 차단했다 (뷰 정의 자체는 향후 재사용을 위해 남겨둠).
+
+```sql
 -- 응시 기록 — anon 직접 접근 전면 차단, RPC로만 조작
 create table quiz_attempts (
   id              uuid primary key default gen_random_uuid(),
