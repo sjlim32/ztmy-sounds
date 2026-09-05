@@ -6,6 +6,7 @@ import {
   getRandomPracticeQuestion,
   revealPracticeAnswer,
 } from "@/features/quiz/lib/api";
+import { getDeviceId } from "@/features/quiz/lib/device-id";
 import type {
   Difficulty,
   PracticeQuestion,
@@ -75,7 +76,7 @@ export function QuizPractice({ difficulty }: { difficulty: Difficulty }) {
   const handleSelect = (optionValue: string) => {
     if (phase !== "answering") return;
     setSelected(optionValue);
-    revealPracticeAnswer(question.id)
+    revealPracticeAnswer(question.id, getDeviceId())
       .then((result) => {
         setReveal(result);
         setPhase("revealed");

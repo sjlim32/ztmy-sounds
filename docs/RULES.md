@@ -40,3 +40,11 @@
   컴포넌트도 빌드 타임에 프리렌더하기 때문에, 퀴즈 컴포넌트가 import하는 Supabase 클라이언트
   초기화 실패가 사이트 전체 빌드를 죽입니다. Cloudflare Pages 배포 전 프로젝트 설정에 두
   환경변수를 반드시 등록해야 합니다 (로컬 개발은 `.env.local`, `.env.example` 참고).
+- 퀴즈 실제 테스트(`start_quiz_attempt`)가 동작하려면 `quiz_questions`에 활성
+  (`is_active`) 상태로 `pool = 'test_only'` 문제가 최소 8개, `pool = 'practice'`
+  이면서 `difficulty in ('hard', 'extreme')`인 문제가 합쳐서 최소 2개 있어야
+  합니다. 부족하면 `start_quiz_attempt`가 예외를 던져 실제 테스트 자체가 시작되지
+  않습니다. 연습 모드 난이도 선택 화면은 4개 난이도(easy/medium/hard/extreme)를
+  항상 노출하므로, 각 난이도별로 `pool = 'practice'` 활성 문제가 최소 1개씩은
+  있어야 특정 난이도를 골랐을 때 "출제된 문제가 없습니다" 막다른 화면을 피할 수
+  있습니다.

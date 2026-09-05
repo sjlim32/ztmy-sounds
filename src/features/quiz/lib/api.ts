@@ -19,9 +19,11 @@ export async function getRandomPracticeQuestion(
 
 export async function revealPracticeAnswer(
   questionId: string,
+  deviceUuid: string,
 ): Promise<RevealAnswerResult> {
   const { data, error } = await supabase.rpc("reveal_practice_answer", {
     p_question_id: questionId,
+    p_device_uuid: deviceUuid,
   });
   if (error) throw error;
   return data as RevealAnswerResult;

@@ -31,16 +31,17 @@ describe("quiz api", () => {
     expect(result?.id).toBe("q1");
   });
 
-  it("revealPracticeAnswer passes the question id", async () => {
+  it("revealPracticeAnswer passes the question id and device id", async () => {
     vi.mocked(supabase.rpc).mockResolvedValue({
       data: { correct_answer: "O", explanation: "설명" },
       error: null,
     } as never);
 
-    await revealPracticeAnswer("q1");
+    await revealPracticeAnswer("q1", "device-1");
 
     expect(supabase.rpc).toHaveBeenCalledWith("reveal_practice_answer", {
       p_question_id: "q1",
+      p_device_uuid: "device-1",
     });
   });
 

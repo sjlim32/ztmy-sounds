@@ -41,7 +41,7 @@ set local role anon;
 
 prepare small_test_pool as select start_quiz_attempt('device-small-test-pool', null);
 select throws_ok(
-  'small_test_pool', null, null,
+  'small_test_pool', null, 'test_only pool has fewer than 8 active questions (found 0)',
   'test_only 활성 문제가 8개 미만이면 실제 테스트를 시작할 수 없다'
 );
 
@@ -54,7 +54,7 @@ set local role anon;
 
 prepare small_hard_pool as select start_quiz_attempt('device-small-hard-pool', null);
 select throws_ok(
-  'small_hard_pool', null, null,
+  'small_hard_pool', null, 'practice hard/extreme pool has fewer than 2 active questions (found 0)',
   'practice hard/extreme 활성 문제가 2개 미만이면 실제 테스트를 시작할 수 없다'
 );
 

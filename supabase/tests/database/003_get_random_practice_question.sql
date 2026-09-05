@@ -4,7 +4,8 @@ select plan(4);
 insert into quiz_questions (id, type, question_text, choices, correct_answer, pool, difficulty, is_active)
 values
   ('33333333-0000-0000-0000-000000000001', 'mc', 'easy q', '["A","B","C","D"]'::jsonb, '1', 'practice', 'easy', true),
-  ('33333333-0000-0000-0000-000000000002', 'mc', 'hard q', '["A","B","C","D"]'::jsonb, '2', 'practice', 'hard', true);
+  ('33333333-0000-0000-0000-000000000002', 'mc', 'hard q', '["A","B","C","D"]'::jsonb, '2', 'practice', 'hard', true),
+  ('33333333-0000-0000-0000-000000000004', 'mc', 'medium q', '["A","B","C","D"]'::jsonb, '3', 'practice', 'medium', true);
 
 insert into quiz_questions (id, type, question_text, correct_answer, pool, difficulty, is_active)
 values ('33333333-0000-0000-0000-000000000003', 'ox', 'test only q tagged medium', 'O', 'test_only', 'medium', true);
@@ -17,17 +18,29 @@ select isnt(
   'anon은 easy 난이도로 문제를 받을 수 있다'
 );
 
-select isnt(
-  (select get_random_practice_question('easy') ->> 'id'),
-  '33333333-0000-0000-0000-000000000002',
-  '요청한 난이도의 practice 문제만 반환한다 (같은 풀이지만 난이도가 다른 hard q는 반환되지 않음을 확인 — 난이도 필터가 실제로 동작함을 증명)'
+reset role;
+
+select is(
+  (
+    select pool || '/' || difficulty
+    from quiz_questions
+    where id = ((select get_random_practice_question('easy')) ->> 'id')::uuid
+  ),
+  'practice/easy',
+  '요청한 난이도의 practice 문제만 반환된다 (반환된 id를 직접 조회해 풀·난이도를 결정론적으로 검증 — 같은 풀의 다른 난이도(hard q, medium q)가 섞이면 즉시 실패)'
 );
 
-select isnt(
-  (select get_random_practice_question('medium') ->> 'id'),
-  '33333333-0000-0000-0000-000000000003',
-  'test_only 풀 문제는 difficulty가 일치해도 practice 필터에 걸려 반환되지 않는다 (자기 자신의 id가 반환되지 않음을 확인 — 다른 practice/medium 문제가 이미 존재하더라도 성립하는 검증)'
+select is(
+  (
+    select pool || '/' || difficulty
+    from quiz_questions
+    where id = ((select get_random_practice_question('medium')) ->> 'id')::uuid
+  ),
+  'practice/medium',
+  'test_only 풀에 같은 난이도(medium) 문제가 있어도 practice 풀 문제만 반환된다 (반환된 id를 직접 조회해 풀·난이도를 결정론적으로 검증 — test_only/medium 행이 반환되면 즉시 실패)'
 );
+
+set local role anon;
 
 select ok(
   not ((select get_random_practice_question('easy')) ? 'correct_answer'),

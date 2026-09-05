@@ -1,3 +1,8 @@
+-- 주의: 이 버전의 셔플(맨 아래 SELECT의 바깥쪽 ORDER BY)은 죽은 코드입니다 —
+-- 단일 행으로 collapse되는 집계 쿼리에서 바깥쪽 ORDER BY는 집계에 아무 영향을
+-- 주지 못합니다. 50초 뒤 20260905100250_fix_start_quiz_attempt_shuffle.sql이
+-- 이 함수를 완전히 대체합니다. 이 파일을 새 마이그레이션의 템플릿으로 복사하지
+-- 마세요 — 대신 100250을 참고하세요.
 create or replace function start_quiz_attempt(
   p_device_uuid text,
   p_fingerprint_hash text default null
