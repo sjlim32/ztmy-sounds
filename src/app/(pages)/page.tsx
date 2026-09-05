@@ -10,6 +10,7 @@ import { MainNavLink } from "@/features/home/components/MainNavLink";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
 import { FlagIcon } from "@/components/icons/FlagIcon";
+import { QuizIcon } from "@/components/icons/QuizIcon";
 import { useEventCountdown } from "@/features/home/lib/event-countdown";
 
 export default function Home() {
@@ -37,13 +38,20 @@ export default function Home() {
                 eyebrow="Guide"
                 label="응원 가이드"
                 icon={MicIcon}
-                accent="purple"
+                accent="dark"
               />
               <MainNavLink
                 href="/slam"
                 eyebrow="Slam"
                 label="슬램 가이드"
                 icon={FlagIcon}
+                accent="purple"
+              />
+              <MainNavLink
+                href="/quiz"
+                eyebrow="Quiz"
+                label="퀴즈"
+                icon={QuizIcon}
                 accent="magenta"
               />
               <MainNavLink
@@ -90,13 +98,20 @@ export default function Home() {
             eyebrow="Guide"
             label="응원 가이드"
             icon={MicIcon}
-            accent="purple"
+            accent="dark"
           />
           <MainNavLink
             href="/slam"
             eyebrow="Slam"
             label="슬램 가이드"
             icon={FlagIcon}
+            accent="purple"
+          />
+          <MainNavLink
+            href="/quiz"
+            eyebrow="Quiz"
+            label="퀴즈"
+            icon={QuizIcon}
             accent="magenta"
           />
           <MainNavLink
