@@ -7,20 +7,21 @@ import {
   revealPracticeAnswer,
 } from "@/features/quiz/lib/api";
 import type {
+  Difficulty,
   PracticeQuestion,
   RevealAnswerResult,
 } from "@/features/quiz/lib/types";
 
 type Phase = "loading" | "answering" | "revealed" | "error" | "empty";
 
-export function QuizPractice() {
+export function QuizPractice({ difficulty }: { difficulty: Difficulty }) {
   const [phase, setPhase] = useState<Phase>("loading");
   const [question, setQuestion] = useState<PracticeQuestion | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [reveal, setReveal] = useState<RevealAnswerResult | null>(null);
 
   const fetchQuestion = useCallback(() => {
-    getRandomPracticeQuestion()
+    getRandomPracticeQuestion(difficulty)
       .then((q) => {
         if (!q) {
           setPhase("empty");
@@ -30,7 +31,7 @@ export function QuizPractice() {
         setPhase("answering");
       })
       .catch(() => setPhase("error"));
-  }, []);
+  }, [difficulty]);
 
   const loadQuestion = useCallback(() => {
     setPhase("loading");
@@ -54,7 +55,7 @@ export function QuizPractice() {
         <button
           type="button"
           onClick={loadQuestion}
-          className="w-fit rounded-sm border border-white/20 px-4 py-2 text-sm text-white hover:border-ztmy-purple"
+          className="hover:border-ztmy-purple w-fit rounded-sm border border-white/20 px-4 py-2 text-sm text-white"
         >
           다시 시도
         </button>
