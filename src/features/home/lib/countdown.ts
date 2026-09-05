@@ -21,3 +21,14 @@ export function getRemaining(
 
   return { days, hours, minutes, seconds, isPast: diff <= 0 };
 }
+
+const KST_DATE_FORMATTER = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Asia/Seoul",
+});
+
+// getRemaining()의 days는 시간 차이를 단순히 24시간 단위로 나눈 값이라,
+// 자정을 넘기기 전엔 실제로 하루 전(전날)인데도 0으로 나옵니다. "당일" 여부는
+// 남은 시간이 아니라 KST 기준 날짜(연-월-일)가 실제로 같은지로 판단해야 합니다.
+export function isSameKstDate(a: number, b: number): boolean {
+  return KST_DATE_FORMATTER.format(a) === KST_DATE_FORMATTER.format(b);
+}

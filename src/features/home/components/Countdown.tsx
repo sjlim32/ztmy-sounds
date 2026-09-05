@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 interface CountdownProps {
   remaining: Remaining | null;
   hoursSincePast: number;
+  isEventDay: boolean;
 }
 
 /**
@@ -16,7 +17,11 @@ interface CountdownProps {
  * useEventCountdown을 부르면 1초 타이머가 두 개 따로 돌게 되므로, 부모
  * (page.tsx)에서 한 번만 계산해 내려받습니다.
  */
-export function Countdown({ remaining, hoursSincePast }: CountdownProps) {
+export function Countdown({
+  remaining,
+  hoursSincePast,
+  isEventDay,
+}: CountdownProps) {
   if (!remaining) return null;
 
   return (
@@ -27,7 +32,11 @@ export function Countdown({ remaining, hoursSincePast }: CountdownProps) {
         "tablet:gap-4 tablet:bg-transparent",
       )}
     >
-      <WaterBalloon remaining={remaining} hoursSincePast={hoursSincePast} />
+      <WaterBalloon
+        remaining={remaining}
+        hoursSincePast={hoursSincePast}
+        isEventDay={isEventDay}
+      />
 
       <div className="tablet:space-y-1 space-y-0.5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
         {remaining.isPast ? (
@@ -118,13 +127,15 @@ const EMPTY_AT_DAYS = 90; // 물풍선이 다 차기까지 걸리는 시간
 function WaterBalloon({
   remaining,
   hoursSincePast,
+  isEventDay,
 }: {
   remaining: Remaining;
   hoursSincePast: number;
+  isEventDay: boolean;
 }) {
   // 공연 시작 2시간 후까지는 "당일"(TODAY) 취급, 그 이후엔 "종료".
   const isDone = remaining.isPast && hoursSincePast >= DONE_AFTER_HOURS;
-  const isToday = !isDone && (remaining.days === 0 || remaining.isPast);
+  const isToday = !isDone && (isEventDay || remaining.isPast);
 
   const totalSeconds =
     remaining.days * 86400 +
