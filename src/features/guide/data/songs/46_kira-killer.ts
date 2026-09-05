@@ -197,8 +197,8 @@ const song: Song = {
     {
       time: "1:05.45",
       original: "もっと甘えたいけどー？",
-      pronunciation: "못토 아마에타이케도",
-      translation: "좀 더 응석부리고 싶은데ー？",
+      pronunciation: "못토 아마에타이케도-?",
+      translation: "좀 더 응석부리고 싶은데-？",
       cheer: {
         text: "",
         tag: "swing",
@@ -217,7 +217,7 @@ const song: Song = {
     {
       time: "1:12.2",
       original: "落ち込んでる方が 進めるセオリー",
-      pronunciation: "오치콘데루 호우가 스스메루 세오리",
+      pronunciation: "오치콘데루 호우가 스스메루 세오리-",
       translation: "침울해하면 더 진행되는 시어리",
       cheer: {
         text: "",
@@ -451,8 +451,8 @@ const song: Song = {
     {
       time: "2:28.5",
       original: "もっと甘えたいけどー？",
-      pronunciation: "못토 아마에타이케도",
-      translation: "좀 더 응석부리고 싶은데ー？",
+      pronunciation: "못토 아마에타이케도-?",
+      translation: "좀 더 응석부리고 싶은데-？",
       cheer: {
         text: "",
         tag: "swing",
@@ -525,8 +525,8 @@ const song: Song = {
     {
       time: "3:21",
       original: "きらーーいなんて序の口 そう思うと楽だし",
-      pronunciation: "키라-이난테 죠노 쿠치 소우 오모우토 라쿠다시",
-      translation: "싫ーー어한다는 건 시작에 불과해 그렇게 생각하면 편해",
+      pronunciation: "키라--이난테 죠노 쿠치 소우 오모우토 라쿠다시",
+      translation: "싫어한다는 건 시작에 불과해 그렇게 생각하면 편해",
       cheer: {
         text: "",
         tag: "swing",
@@ -605,8 +605,8 @@ const song: Song = {
     {
       time: "3:44.7",
       original: "もっと甘えたいけどーー？",
-      pronunciation: "못토 아마에타이케도",
-      translation: "좀 더 응석부리고 싶은데ーー？",
+      pronunciation: "못토 아마에타이케도--?",
+      translation: "좀 더 응석부리고 싶은데--？",
       cheer: {
         text: "",
         tag: "swing",

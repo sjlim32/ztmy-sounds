@@ -94,8 +94,8 @@ const song: Song = {
     {
       time: "0:41",
       original: "人類なんだしー 自由自在のはずが",
-      pronunciation: "진루이난다시ー 지유ー지자이노 하즈가",
-      translation: "인류니까 ー 자유자재여야 하는데",
+      pronunciation: "진루이난다시- 지유-지자이노 하즈가",
+      translation: "인류니까 자유자재여야 하는데",
       cheer: {
         text: "",
         tag: "swing",
@@ -342,8 +342,8 @@ const song: Song = {
     {
       time: "1:59.3",
       original: "人類なんだしー 自由自在のはずが",
-      pronunciation: "진루이난다시ー 지유ー지자이노 하즈가",
-      translation: "인류니까 ー 자유자재여야 하는데",
+      pronunciation: "진루이난다시- 지유-지자이노 하즈가",
+      translation: "인류니까 자유자재여야 하는데",
       cheer: {
         text: "",
         tag: "swing",

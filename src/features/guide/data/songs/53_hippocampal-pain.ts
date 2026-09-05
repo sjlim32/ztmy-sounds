@@ -68,7 +68,7 @@ const song: Song = {
     {
       time: "1:05.7",
       original: "誰かのハッピー 祝ってる 僻んで",
-      pronunciation: "다레카노 핫피이 이왓테루 히간데",
+      pronunciation: "다레카노 핫피- 이왓테루 히간데",
       translation: "누군가의 행복을 축하해 비꼬면서",
     },
     {
@@ -173,8 +173,8 @@ const song: Song = {
     {
       time: "2:03.8",
       original: "はぁ ー 綺羅キラ星だ",
-      pronunciation: "^하아 ー 키라키라보시다^",
-      translation: "하아 ー 곱게 반짝이는 별이다",
+      pronunciation: "^하아 - 키라키라보시다^",
+      translation: "하아 - 곱게 반짝이는 별이다",
       slam: "핏 벌리기",
     },
     {

@@ -40,7 +40,7 @@ const song: Song = {
     {
       time: "0:27.6",
       original: "きつく締め付けられてくfingerわいやー",
-      pronunciation: "키츠쿠 시메츠케라레테쿠 휜가아 와이야",
+      pronunciation: "키츠쿠 시메츠케라레테쿠 휜가아 와이야-",
       translation: "꽉 죄어드는 손가락이야",
     },
     {
