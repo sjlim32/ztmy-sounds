@@ -2,6 +2,7 @@ import { InfoEvent } from "@/features/info/lib/types";
 
 export const INFO_SECTIONS = [
   { id: "event-photos", label: "공연 정보" },
+  { id: "event-details", label: "공연 공지" },
   { id: "notice", label: "유의사항" },
   { id: "goods", label: "굿즈" },
   { id: "fnb", label: "F&B" },
@@ -67,19 +68,14 @@ export const INFORMATION: InfoEvent = {
         section: "notice",
       },
       {
-        name: "입장 안내",
-        asset: "/assets/info/entrance-info.webp",
+        name: "셔틀1",
+        asset: "/assets/info/shuttle1.webp",
         section: "notice",
       },
       {
-        name: "반입 금지 물품",
-        asset: "/assets/info/ban-list.webp",
+        name: "셔틀2",
+        asset: "/assets/info/shuttle2.webp",
         section: "notice",
-      },
-      {
-        name: "라인업",
-        asset: "/assets/info/line-up.webp",
-        section: "event-photos",
       },
       { name: "지도", asset: "/assets/info/map.webp", section: "event-photos" },
       {
@@ -88,32 +84,63 @@ export const INFORMATION: InfoEvent = {
         section: "event-photos",
       },
       {
-        name: "굿즈 사전구매",
-        asset: "/assets/info/goods0.webp",
-        section: "goods",
+        name: "반입 금지 물품",
+        asset: "/assets/info/ban-list.webp",
+        section: "event-photos",
       },
       {
-        name: "굿즈 사전구매",
+        name: "공연 정보",
+        asset: "/assets/info/info1.webp",
+        section: "event-details",
+      },
+      {
+        name: "공연 정보",
+        asset: "/assets/info/info2.webp",
+        section: "event-details",
+      },
+      {
+        name: "공연 정보",
+        asset: "/assets/info/info3.webp",
+        section: "event-details",
+      },
+      {
+        name: "공연 정보",
+        asset: "/assets/info/info4.webp",
+        section: "event-details",
+      },
+      {
+        name: "공연 정보",
+        asset: "/assets/info/info5.webp",
+        section: "event-details",
+      },
+      {
+        name: "공연 정보",
+        asset: "/assets/info/info6.webp",
+        section: "event-details",
+      },
+
+      {
+        name: "굿즈",
         asset: "/assets/info/goods1.webp",
         section: "goods",
       },
       {
-        name: "굿즈 사전구매",
+        name: "굿즈",
         asset: "/assets/info/goods2.webp",
         section: "goods",
       },
       {
-        name: "굿즈 사전구매",
+        name: "굿즈",
         asset: "/assets/info/goods3.webp",
         section: "goods",
       },
       {
-        name: "굿즈 사전구매",
+        name: "굿즈",
         asset: "/assets/info/goods4.webp",
         section: "goods",
       },
       {
-        name: "굿즈 사전구매",
+        name: "굿즈",
         asset: "/assets/info/goods5.webp",
         section: "goods",
       },

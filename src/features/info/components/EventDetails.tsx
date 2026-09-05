@@ -73,3 +73,11 @@ function LinkList({ items }: { items: Url[] }) {
     </span>
   );
 }
+
+export function ImageLabel({ id, label }: { id: string; label: string }) {
+  return (
+    <h2 id={id} className="mt-6 mb-3 text-xl font-bold">
+      {label}
+    </h2>
+  );
+}
