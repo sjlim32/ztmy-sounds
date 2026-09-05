@@ -26,9 +26,17 @@ const KST_DATE_FORMATTER = new Intl.DateTimeFormat("en-CA", {
   timeZone: "Asia/Seoul",
 });
 
-// getRemaining()의 days는 시간 차이를 단순히 24시간 단위로 나눈 값이라,
-// 자정을 넘기기 전엔 실제로 하루 전(전날)인데도 0으로 나옵니다. "당일" 여부는
-// 남은 시간이 아니라 KST 기준 날짜(연-월-일)가 실제로 같은지로 판단해야 합니다.
-export function isSameKstDate(a: number, b: number): boolean {
-  return KST_DATE_FORMATTER.format(a) === KST_DATE_FORMATTER.format(b);
+// getRemaining()의 days는 시간 차이를 단순히 24시간 단위로 나눈 값이라, 자정을
+// 넘기기 전엔 실제로 하루 전(전날)인데도 0으로 나옵니다(예: 공연 20:50인데
+// 지금이 전날 23:57이면 20시간 53분 차이라 0일로 계산됨). "당일"이나 "D-day"
+// 표시는 남은 시간이 아니라 KST 기준 날짜(연-월-일)의 차이로 판단해야 합니다.
+// target이 now보다 하루 늦으면 1, 같은 날이면 0, 하루 이르면 -1을 반환합니다.
+export function getKstDayDiff(targetMs: number, nowMs: number): number {
+  const targetMidnight = new Date(
+    `${KST_DATE_FORMATTER.format(targetMs)}T00:00:00Z`,
+  ).getTime();
+  const nowMidnight = new Date(
+    `${KST_DATE_FORMATTER.format(nowMs)}T00:00:00Z`,
+  ).getTime();
+  return Math.round((targetMidnight - nowMidnight) / 86_400_000);
 }

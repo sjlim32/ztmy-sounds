@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   getRemaining,
-  isSameKstDate,
+  getKstDayDiff,
   type Remaining,
 } from "@/features/home/lib/countdown";
 import type { VisitEvent } from "@/data/event";
@@ -20,15 +20,17 @@ export function useEventCountdown(event: VisitEvent): {
   remaining: Remaining | null;
   hoursSincePast: number;
   isEventDay: boolean;
+  daysUntilEvent: number;
 } {
   const [remaining, setRemaining] = useState<Remaining | null>(null);
   // 공연 시작 후 경과 시간(시간 단위). getRemaining()은 지난 뒤엔 전부 0을
   // 반환하므로 별도로 계산합니다.
   const [hoursSincePast, setHoursSincePast] = useState(0);
-  // 남은 시간(remaining.days === 0)이 아니라 KST 날짜가 실제로 같은 날인지로
-  // "당일"을 판단합니다. 그렇지 않으면 공연 전날 자정 근처(24시간 이내지만
-  // 날짜는 다른 날)에도 당일로 표시되는 버그가 생깁니다.
+  // 남은 시간(remaining.days === 0)이 아니라 KST 날짜 차이로 "당일"/D-day를
+  // 판단합니다. 그렇지 않으면 공연 전날 자정 근처(24시간 이내지만 날짜는 다른
+  // 날)에도 당일 또는 "0일 남음"으로 잘못 표시되는 버그가 생깁니다.
   const [isEventDay, setIsEventDay] = useState(false);
+  const [daysUntilEvent, setDaysUntilEvent] = useState(0);
   const targetIso = `${event.date.replace(/\./g, "-")}T${event.time}:00+09:00`;
 
   useEffect(() => {
@@ -37,12 +39,14 @@ export function useEventCountdown(event: VisitEvent): {
       const now = Date.now();
       setRemaining(getRemaining(targetIso, now));
       setHoursSincePast((now - targetMs) / 3_600_000);
-      setIsEventDay(isSameKstDate(now, targetMs));
+      const dayDiff = getKstDayDiff(targetMs, now);
+      setDaysUntilEvent(dayDiff);
+      setIsEventDay(dayDiff === 0);
     };
     tick();
     const intervalId = setInterval(tick, 1000);
     return () => clearInterval(intervalId);
   }, [targetIso]);
 
-  return { remaining, hoursSincePast, isEventDay };
+  return { remaining, hoursSincePast, isEventDay, daysUntilEvent };
 }

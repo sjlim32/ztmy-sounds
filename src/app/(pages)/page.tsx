@@ -15,7 +15,7 @@ import { useEventCountdown } from "@/features/home/lib/event-countdown";
 export default function Home() {
   // 모바일/데스크톱용으로 Countdown이 아래에서 두 번 렌더링되는데, 타이머가
   // 두 개 따로 돌지 않도록 여기서 한 번만 계산해서 내려줍니다.
-  const { remaining, hoursSincePast, isEventDay } =
+  const { remaining, hoursSincePast, isEventDay, daysUntilEvent } =
     useEventCountdown(visitEvent);
 
   return (
@@ -64,6 +64,7 @@ export default function Home() {
               remaining={remaining}
               hoursSincePast={hoursSincePast}
               isEventDay={isEventDay}
+              daysUntilEvent={daysUntilEvent}
             />
           </div>
         </div>
@@ -83,6 +84,7 @@ export default function Home() {
             remaining={remaining}
             hoursSincePast={hoursSincePast}
             isEventDay={isEventDay}
+            daysUntilEvent={daysUntilEvent}
           />
         </section>
 

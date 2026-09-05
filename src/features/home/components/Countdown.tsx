@@ -9,6 +9,7 @@ interface CountdownProps {
   remaining: Remaining | null;
   hoursSincePast: number;
   isEventDay: boolean;
+  daysUntilEvent: number;
 }
 
 /**
@@ -21,6 +22,7 @@ export function Countdown({
   remaining,
   hoursSincePast,
   isEventDay,
+  daysUntilEvent,
 }: CountdownProps) {
   if (!remaining) return null;
 
@@ -36,6 +38,7 @@ export function Countdown({
         remaining={remaining}
         hoursSincePast={hoursSincePast}
         isEventDay={isEventDay}
+        daysUntilEvent={daysUntilEvent}
       />
 
       <div className="tablet:space-y-1 space-y-0.5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
@@ -128,10 +131,12 @@ function WaterBalloon({
   remaining,
   hoursSincePast,
   isEventDay,
+  daysUntilEvent,
 }: {
   remaining: Remaining;
   hoursSincePast: number;
   isEventDay: boolean;
+  daysUntilEvent: number;
 }) {
   // 공연 시작 2시간 후까지는 "당일"(TODAY) 취급, 그 이후엔 "종료".
   const isDone = remaining.isPast && hoursSincePast >= DONE_AFTER_HOURS;
@@ -233,7 +238,7 @@ function WaterBalloon({
         ) : (
           <>
             <span className="tablet:text-2xl font-mono text-base font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-              {remaining.days}
+              {daysUntilEvent}
             </span>
             <span className="tablet:text-[10px] text-[7px] tracking-widest text-white/80 uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
               일 남음
