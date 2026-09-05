@@ -7,6 +7,8 @@
   --ztmy-purple: #8d3cd4;
   --ztmy-magenta: #e147bf;
   --ztmy-pink: #dc83bc;
+  --ztmy-sky: #8fe0f5;
+  --ztmy-sun: #ffdd7a;
 }
 
 @theme inline {
@@ -16,6 +18,8 @@
   --color-ztmy-purple: var(--ztmy-purple);
   --color-ztmy-magenta: var(--ztmy-magenta);
   --color-ztmy-pink: var(--ztmy-pink);
+  --color-ztmy-sky: var(--ztmy-sky);
+  --color-ztmy-sun: var(--ztmy-sun);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-rocknroll: var(--font-rocknroll-one);

@@ -2,27 +2,32 @@
 
 import { useId } from "react";
 import type { Remaining } from "@/features/home/lib/countdown";
-import { DONE_AFTER_HOURS } from "@/features/home/lib/event-countdown";
+import { EMPTY_AT_DAYS } from "@/features/home/lib/event-countdown";
+import type { Event } from "@/data/event";
 import { cn } from "@/lib/utils";
+import { MoonPhase } from "@/features/home/components/MoonPhase";
 
 interface CountdownProps {
   remaining: Remaining | null;
-  hoursSincePast: number;
   isEventDay: boolean;
   daysUntilEvent: number;
+  isDone: boolean;
+  accent: Event["accent"];
 }
 
 /**
- * remaining/hoursSincePast를 직접 받습니다(event가 아니라) — 홈 화면에
+ * remaining 등을 event가 아니라 미리 계산된 값으로 직접 받습니다 — 홈 화면에
  * 모바일/데스크톱용으로 이 컴포넌트가 동시에 두 번 마운트되는데, 각자
  * useEventCountdown을 부르면 1초 타이머가 두 개 따로 돌게 되므로, 부모
- * (page.tsx)에서 한 번만 계산해 내려받습니다.
+ * (page.tsx)에서 한 번만 계산해 내려받습니다. accent에 따라 남은 기간을
+ * 물풍선(내한)/달의 위상(원정)으로 다르게 시각화합니다.
  */
 export function Countdown({
   remaining,
-  hoursSincePast,
   isEventDay,
   daysUntilEvent,
+  isDone,
+  accent,
 }: CountdownProps) {
   if (!remaining) return null;
 
@@ -30,20 +35,32 @@ export function Countdown({
     <div
       data-role="countdown"
       className={cn(
-        "flex w-full items-center justify-center gap-3 rounded-md bg-black/40 p-4",
-        "tablet:gap-4 tablet:bg-transparent",
+        "flex w-full items-center justify-center gap-3 rounded-lg bg-black/30 py-1 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
+        "tablet:gap-4 tablet:p-4",
       )}
     >
-      <WaterBalloon
-        remaining={remaining}
-        hoursSincePast={hoursSincePast}
-        isEventDay={isEventDay}
-        daysUntilEvent={daysUntilEvent}
-      />
+      {/* 위쪽 날짜/장소 티켓 스텁과 같은 chrome(둥근 어두운 박스)을 써서 한
+      세트처럼 보이도록 맞췄습니다. accent는 따로 띠를 얹지 않고, 이미 그
+      자체로 색이 다른 물풍선/달 아이콘이 전달합니다. */}
+      {accent === "away" ? (
+        <MoonPhase
+          remaining={remaining}
+          isEventDay={isEventDay}
+          daysUntilEvent={daysUntilEvent}
+          isDone={isDone}
+        />
+      ) : (
+        <WaterBalloon
+          remaining={remaining}
+          isEventDay={isEventDay}
+          daysUntilEvent={daysUntilEvent}
+          isDone={isDone}
+        />
+      )}
 
       <div className="tablet:space-y-1 space-y-0.5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
         {remaining.isPast ? (
-          hoursSincePast < DONE_AFTER_HOURS ? (
+          !isDone ? (
             <p className="tablet:text-sm text-xs font-medium text-white">
               공연이 시작되었습니다 !!
             </p>
@@ -113,9 +130,6 @@ export function Countdown({
                 </span>
               </span>
             </p>
-            <span className="tablet:w-28 relative mt-1 block h-1 w-20 overflow-hidden bg-white/15">
-              <span className="from-ztmy-magenta to-ztmy-purple absolute inset-y-0 left-0 w-full bg-linear-to-r" />
-            </span>
           </>
         )}
       </div>
@@ -123,23 +137,20 @@ export function Countdown({
   );
 }
 
-/*====================== 남은 기간 물풍선 ======================*/
-
-const EMPTY_AT_DAYS = 90; // 물풍선이 다 차기까지 걸리는 시간
+/*====================== 남은 기간 물풍선 (내한) ======================*/
 
 function WaterBalloon({
   remaining,
-  hoursSincePast,
   isEventDay,
   daysUntilEvent,
+  isDone,
 }: {
   remaining: Remaining;
-  hoursSincePast: number;
   isEventDay: boolean;
   daysUntilEvent: number;
+  isDone: boolean;
 }) {
   // 공연 시작 2시간 후까지는 "당일"(TODAY) 취급, 그 이후엔 "종료".
-  const isDone = remaining.isPast && hoursSincePast >= DONE_AFTER_HOURS;
   const isToday = !isDone && (isEventDay || remaining.isPast);
 
   const totalSeconds =
@@ -232,18 +243,13 @@ function WaterBalloon({
             -
           </span>
         ) : isToday ? (
-          <span className="tablet:text-lg font-mono text-[10px] font-bold tracking-widest text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-            TODAY
+          <span className="tablet:text-xl font-mono text-xs font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            D-DAY
           </span>
         ) : (
-          <>
-            <span className="tablet:text-2xl font-mono text-base font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-              {daysUntilEvent}
-            </span>
-            <span className="tablet:text-[10px] text-[7px] tracking-widest text-white/80 uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-              일 남음
-            </span>
-          </>
+          <span className="tablet:text-xl font-mono text-xs font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            D-{daysUntilEvent}
+          </span>
         )}
       </div>
     </div>

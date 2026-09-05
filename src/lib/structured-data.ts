@@ -1,6 +1,10 @@
 import { ARTIST } from "@/data/artist";
 import { SOCIAL_LINKS } from "@/data/social-links";
-import type { VisitEvent } from "@/data/event";
+import {
+  getEventStartDate,
+  getEventEndDate,
+  type Event,
+} from "@/data/event";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 
 const OFFICIAL_URL = "https://zutomayo.net";
@@ -40,12 +44,19 @@ function toKstIsoString(date: string, time: string) {
   return `${year}-${month}-${day}T${time}:00+09:00`;
 }
 
-export function buildMusicEventJsonLd(event: VisitEvent) {
+export function buildMusicEventJsonLd(event: Event) {
+  const startDate = getEventStartDate(event);
+  const endDate = getEventEndDate(event);
+
   return {
     "@context": "https://schema.org",
     "@type": "MusicEvent",
     name: event.tourName,
-    startDate: toKstIsoString(event.date, event.time),
+    startDate: toKstIsoString(startDate, event.time),
+    // 다일차 공연(시작일 !== 종료일)일 때만 endDate를 포함합니다.
+    ...(startDate !== endDate && {
+      endDate: toKstIsoString(endDate, event.time),
+    }),
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     eventStatus: "https://schema.org/EventScheduled",
     url: event.tourUrl,
