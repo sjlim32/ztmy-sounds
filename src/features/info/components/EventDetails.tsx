@@ -66,7 +66,12 @@ function LinkList({ items }: { items: Url[] }) {
   return (
     <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
       {items.map((item) => (
-        <SiteLink key={item.href} href={item.href} className="font-semibold">
+        <SiteLink
+          key={item.href}
+          href={item.href}
+          className="font-semibold"
+          disabled={item.disabled}
+        >
           {item.name}
         </SiteLink>
       ))}

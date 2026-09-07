@@ -1,4 +1,5 @@
 import { ZoomableImage } from "@/components/ZoomableImage";
+import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import {
   EventDetails,
   ImageLabel,
@@ -7,7 +8,12 @@ import { TableOfContents } from "@/features/info/components/TableOfContents";
 import { groupImagesBySection } from "@/features/info/lib/group-images";
 import { INFORMATION } from "@/features/info/info";
 
-export const sections = groupImagesBySection(INFORMATION.img.sub);
+export const sections = groupImagesBySection(
+  INFORMATION.img.sub,
+  INFORMATION.sections,
+);
+export const toGroupImages = (imgs) =>
+  imgs.map((img) => ({ src: img.asset, alt: img.name }));
 
 <div className="mb-1 flex w-full justify-center">
   <ZoomableImage
@@ -22,76 +28,69 @@ export const sections = groupImagesBySection(INFORMATION.img.sub);
   {"모든 이미지들은 클릭 시 확대됩니다."}
 </div>
 
-<TableOfContents />
+<TableOfContents sections={INFORMATION.sections} />
 
 <EventDetails event={INFORMATION} />
 
-<ImageLabel id="event-photos" label="공연 정보" />
-
 <section className="flex flex-col gap-3">
-  <div className="tablet:flex-row flex flex-col items-center justify-center gap-3">
-    {sections["event-photos"].map((img) => (
-      <ZoomableImage
-        key={img.asset}
-        src={img.asset}
-        alt={img.name}
-        thumbnailWidth={300}
-        thumbnailCrop="top"
-      />
-    ))}
+  <ImageLabel id="event-photos" label="일정" />
+
+  <div className="flex flex-col">
+    <h3 className="font-bold text-ztmy-magenta">[ZUTOMAYO PREMIUM] 최속 선행 [마감]</h3>
+    <span> 접수 : 6/17(수) 21:30 ~ 7/5(일) 23:59 </span>
+    <span> 발표 및 지불 : 7/8(수) 18:00 ~ 7/11(토) 23:59 </span>
+    <span> 금액 : 최소 ¥ 12,000 </span>
+    <span className="text-sm text-white/60"> 유의 사항 : 1인 4매, 동행자는 비회원도 가능 (1-2인: 회원 1명, 3-4인: 회원 2명 필요)</span>
   </div>
   
-    <div className="tablet:grid tablet:grid-cols-3 flex flex-col items-center gap-3">
-    {sections["event-details"].map((img) => (
-      <ZoomableImage
-        key={img.asset}
-        src={img.asset}
-        alt={img.name}
-        thumbnailWidth={300}
-        thumbnailCrop="top"
-      />
-    ))}
+  <div className="flex flex-col">
+    <h3 className="font-bold text-ztmy-magenta">[ZUTOMAYO PREMIUM] 한정 2차 선행 [마감]</h3>
+    <span> 접수 : 7/8(수) 18:00 ~ 7/12(일) 23:59 </span>
+    <span> 발표 및 지불 : 7/16(목) 18:00 ~ 7/19(일) 23:59 </span>
+    <span> 금액 : 최소 ¥ 12,000 </span>
+    <span className="text-sm text-white/60">유의 사항 : Premium Area 업그레이드 신청 불가</span>
+  </div>
+  
+  <div className="flex flex-col">
+    <h3 className="font-bold text-ztmy-magenta">[ZUTOMAYO PREMIUM] Premium Area Upgrade 신청 [마감]</h3>
+    <span> 접수 : 8/26(수) 18:00 ~ 8/30(일) 23:59</span>
+    <span> 발표 및 지불 : 9/5(토) 18:00 ~ 9/7(월) 23:59 </span>
+    <span> 금액 : 최소 ¥ 3,000 </span>
+    <span className="text-sm text-white/60"> 유의 사항 : 양일은 각 공연마다 신청 필요, 선행 당첨 매수와 업그레이드 신청 매수가 동일하지 않으면 즉시 낙선</span>
+  </div>
+  
+  <div className="flex flex-col">
+    <h3 className="font-bold text-ztmy-pink">일반 최속 선행 [마감]</h3>
+    <span> 접수 : 7/16(목) 18:00 ~ 7/26(일) 23:59 </span>
+    <span> 발표 및 지불 : 7/30(목) 18:00 ~ 8/2(일) 23:59 </span>
+    <span> 금액 : 최소 ¥ 12,000 </span>
+    <span className="text-sm text-white/60">유의 사항 : 1인 4매, Standard Area 한정</span>
+  </div>
+  
+  <div className="flex flex-col">
+    <h3 className="font-bold text-ztmy-pink">일반 판매</h3>
+    <span> 판매일자 : 9/19(토)~ </span>
+    <span> 금액 : Standard Area 최소 ¥ 12,000 / 후방 Free Area 최소 ¥ 6,500 (나라현 주민 ¥ 5,500 )</span>
+    <span className="text-sm text-white/60"> 유의사항 : 선착순 판매, Standard Area 및 후방 Free Area 한정 </span>
+  </div>
+</section>
+
+<section className="flex flex-col gap-3">
+  <ImageLabel id="notice" label="공연 정보" />
+  <div className="tablet:flex-row flex flex-col items-center justify-center gap-3">
+    <ZoomableImageGroup
+      images={toGroupImages(sections["notice"])}
+      thumbnailWidth={600}
+      thumbnailCrop="top"
+    />
   </div>
 
-<ImageLabel id="notice" label="유의 사항" />
-
-<div className="tablet:grid tablet:grid-cols-3 flex flex-col items-center gap-3">
-  {sections["notice"].map((img) => (
-    <ZoomableImage
-      key={img.asset}
-      src={img.asset}
-      alt={img.name}
+<ImageLabel id="map" label="지도" />
+  <div className="tablet:flex-row flex flex-col items-center justify-center gap-3">
+    <ZoomableImageGroup
+      images={toGroupImages(sections["map"])}
       thumbnailWidth={500}
       thumbnailCrop="top"
     />
-  ))}
-</div>
-
-<ImageLabel id="goods" label="굿즈" />
-
-<div className="tablet:grid tablet:grid-cols-2 flex flex-col items-center gap-3">
-  {sections["goods"].map((img) => (
-    <ZoomableImage
-      key={img.asset}
-      src={img.asset}
-      alt={img.name}
-      thumbnailWidth={500}
-      thumbnailCrop="top"
-    />
-  ))}
-</div>
-
-<ImageLabel id="fnb" label="F & B" />
-
-  <div className="tablet:grid tablet:grid-cols-2 flex flex-col items-center gap-3">
-    {sections["fnb"].map((img) => (
-      <ZoomableImage
-        key={img.asset}
-        src={img.asset}
-        alt={img.name}
-        thumbnailWidth={500}
-        thumbnailCrop="top"
-      />
-    ))}
   </div>
 </section>

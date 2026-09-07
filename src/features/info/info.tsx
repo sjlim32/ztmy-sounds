@@ -1,153 +1,44 @@
 import { InfoEvent } from "@/features/info/lib/types";
 
-export const INFO_SECTIONS = [
-  { id: "event-photos", label: "공연 정보" },
-  { id: "event-details", label: "공연 공지" },
-  { id: "notice", label: "유의사항" },
-  { id: "goods", label: "굿즈" },
-  { id: "fnb", label: "F&B" },
-] as const;
-
 export const INFORMATION: InfoEvent = {
   id: "sound-planet",
-  name: "사운드 플래닛 페스티벌 2026",
-  date: "2026년 9월 6일, 20시 50분",
-  place: "영종도 파라다이스 시티",
+  name: "LEGACY ZOMBIE LABO 「문화전뢰(文禍伝雷)」",
+  date: "2026년 10월 10일·11일, 17시 30분",
+  place: "헤이조궁터 역사공원 (平城宮跡歴史公園)",
+  sections: [
+    { id: "notice", label: "공연 정보" },
+    { id: "map", label: "지도" },
+  ],
   url: {
-    main: "https://soundplanetfestival.co.kr/",
-    place: "https://maps.app.goo.gl/dbGofxRv5T7SbDBG8",
+    main: "https://zutomayo.net/bunka-denrai/",
+    place: "https://maps.app.goo.gl/A4VAKugihbhTjSg48",
     ticket: [
       {
-        name: "멜론 티켓",
-        href: "https://ticket.melon.com/performance/index.htm?prodId=213174",
-      },
-      {
-        name: "카카오톡 선물하기",
-        href: "https://gift.kakao.com/search/result?query=%EC%82%AC%EC%9A%B4%EB%93%9C%ED%94%8C%EB%9E%98%EB%8B%9B&searchType=search_typing_keyword",
+        name: "공식 홈페이지",
+        href: "https://zutomayo.net/bunka-denrai/",
       },
     ],
     official: [
       {
         name: "홈페이지",
-        href: "https://soundplanetfestival.co.kr/",
+        href: "https://zutomayo.net/bunka-denrai/",
         platform: "web",
-      },
-      {
-        name: "X",
-        href: "https://x.com/soundplanetfest?s=20",
-        platform: "x",
-      },
-      {
-        name: "인스타그램",
-        href: "https://www.instagram.com/soundplanetfestival?utm_source=ig_web_button_share_sheet&igsi=ZDNlZDc0MzIxNw==",
-        platform: "instagram",
-      },
-      {
-        name: "유튜브",
-        href: "https://www.youtube.com/@soundplanetfestival",
-        platform: "youtube",
-      },
-    ],
-    sub: [
-      {
-        name: "인천공항 리무진",
-        href: "https://www.airport.kr/ap_ko/976/subview.do",
-      },
-      {
-        name: "공식 셔틀(퀸즈 스마일)",
-        href: "https://intro.queenssmile.co.kr/?pathname=/shop/festival/Mzc5/&search=",
       },
     ],
   },
   img: {
-    main: "/assets/info/sound-planet-poster.webp",
+    main: "/assets/next-stage/bunka-denrai.webp",
     sub: [
       {
-        name: "오시는 길",
-        asset: "/assets/info/how-to-come.webp",
+        name: "티켓 정보",
+        asset: "/assets/info/ticket.webp",
         section: "notice",
       },
       {
-        name: "셔틀1",
-        asset: "/assets/info/shuttle1.webp",
-        section: "notice",
+        name: "지도",
+        asset: "/assets/info/heijyoukyo-map-0617.webp",
+        section: "map",
       },
-      {
-        name: "셔틀2",
-        asset: "/assets/info/shuttle2.webp",
-        section: "notice",
-      },
-      { name: "지도", asset: "/assets/info/map.webp", section: "event-photos" },
-      {
-        name: "타임테이블",
-        asset: "/assets/info/time-table.webp",
-        section: "event-photos",
-      },
-      {
-        name: "반입 금지 물품",
-        asset: "/assets/info/ban-list.webp",
-        section: "event-photos",
-      },
-      {
-        name: "공연 정보",
-        asset: "/assets/info/info1.webp",
-        section: "event-details",
-      },
-      {
-        name: "공연 정보",
-        asset: "/assets/info/info2.webp",
-        section: "event-details",
-      },
-      {
-        name: "공연 정보",
-        asset: "/assets/info/info3.webp",
-        section: "event-details",
-      },
-      {
-        name: "공연 정보",
-        asset: "/assets/info/info4.webp",
-        section: "event-details",
-      },
-      {
-        name: "공연 정보",
-        asset: "/assets/info/info5.webp",
-        section: "event-details",
-      },
-      {
-        name: "공연 정보",
-        asset: "/assets/info/info6.webp",
-        section: "event-details",
-      },
-
-      {
-        name: "굿즈",
-        asset: "/assets/info/goods1.webp",
-        section: "goods",
-      },
-      {
-        name: "굿즈",
-        asset: "/assets/info/goods2.webp",
-        section: "goods",
-      },
-      {
-        name: "굿즈",
-        asset: "/assets/info/goods3.webp",
-        section: "goods",
-      },
-      {
-        name: "굿즈",
-        asset: "/assets/info/goods4.webp",
-        section: "goods",
-      },
-      {
-        name: "굿즈",
-        asset: "/assets/info/goods5.webp",
-        section: "goods",
-      },
-      { name: "fnb", asset: "/assets/info/fnb0.webp", section: "fnb" },
-      { name: "fnb", asset: "/assets/info/fnb1.webp", section: "fnb" },
-      { name: "fnb", asset: "/assets/info/fnb2.webp", section: "fnb" },
-      { name: "fnb", asset: "/assets/info/fnb3.webp", section: "fnb" },
     ],
   },
 };

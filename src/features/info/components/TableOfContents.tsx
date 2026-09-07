@@ -1,6 +1,6 @@
-import { INFO_SECTIONS } from "@/features/info/info";
+import type { SectionDef } from "@/features/info/lib/types";
 
-export function TableOfContents() {
+export function TableOfContents({ sections }: { sections: SectionDef[] }) {
   return (
     <nav
       aria-label="목차"
@@ -10,7 +10,7 @@ export function TableOfContents() {
         바로가기
       </span>
       <div className="flex flex-wrap justify-center gap-2">
-        {INFO_SECTIONS.map(({ id, label }) => (
+        {sections.map(({ id, label }) => (
           <a
             key={id}
             href={`#${id}`}
