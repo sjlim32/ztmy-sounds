@@ -22,62 +22,77 @@ export function Footer() {
   return (
     <footer
       className={cn(
-        "flex flex-col items-center gap-2 border-t border-white/10 px-3 py-2 text-center text-[10px] text-white/50",
-        "tablet:items-end tablet:border-t-0 tablet:text-end tablet:text-white/40 tablet:text-xs",
+        "flex flex-col items-center border-t border-white/10 py-1 text-center text-[11px] text-white/50",
+        "tablet:gap-1 tablet:items-end tablet:border-t-0 tablet:text-end tablet:px-3 tablet:text-white/40 tablet:text-xs",
       )}
     >
-      <p className="tablet:border-b tablet:border-gray-500 tablet:pb-1 tablet:tracking-[0.4rem] tablet:max-w-100 w-full tracking-widest">
+      <p className="tablet:tracking-[0.4rem] tracking-widest">
         ©{ARTIST.name.jp}
         <span className="tablet:hidden"> Fan Page · </span>
         <span>2026</span>
       </p>
 
-      <div className="tablet:gap-4 flex flex-nowrap items-center justify-center gap-3">
-        <a
-          href={`https://tally.so/r/${TALLY_FORM_ID}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:border-ztmy-magenta/60 tablet:hidden rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
-        >
-          건의
-        </a>
-        <button
-          type="button"
-          data-tally-open={TALLY_FORM_ID}
-          data-tally-emoji-text="👋"
-          data-tally-emoji-animation="wave"
-          className="hover:border-ztmy-magenta/60 tablet:inline-block hidden rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
-        >
-          건의
-        </button>
+      <div className="flex flex-nowrap items-center justify-center gap-3">
+        <div className="flex gap-2">
+          <a
+            href={`https://tally.so/r/${TALLY_FORM_ID}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              "rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm",
+              "tablet:hidden",
+              "hover:border-ztmy-magenta/60 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+            )}
+          >
+            건의
+          </a>
+          <button
+            type="button"
+            data-tally-open={TALLY_FORM_ID}
+            data-tally-emoji-text="👋"
+            data-tally-emoji-animation="wave"
+            className={cn(
+              "hidden rounded-full border border-white/15 bg-black/40 px-3 py-0.5 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm",
+              "tablet:inline-block",
+              "hover:border-ztmy-magenta/60 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+            )}
+          >
+            건의
+          </button>
 
-        <Link
-          href="/credits"
-          className="hover:border-ztmy-magenta/60 rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
-        >
-          출처
-        </Link>
+          <Link
+            href="/credits"
+            className={cn(
+              "rounded-full border border-white/15 bg-black/40 px-3 py-0.5 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm",
+              "hover:border-ztmy-magenta/60 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+            )}
+          >
+            출처
+          </Link>
+        </div>
 
-        <span className="tablet:inline-block hidden font-mono text-[10px] font-medium tracking-[0.3em] text-white/40 uppercase">
-          Official Link
-        </span>
-        <nav className="tablet:gap-6 flex items-center gap-4">
-          {SOCIAL_LINKS.map(({ name, url, platform }) => {
-            const Icon = SOCIAL_PLATFORM_ICON[platform];
-            return (
-              <a
-                key={url}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={name}
-                className="hover:text-ztmy-purple transition-colors"
-              >
-                <Icon className={cn("h-4 w-4", "tablet:h-6 tablet:w-6")} />
-              </a>
-            );
-          })}
-        </nav>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="tablet:inline-block hidden font-mono text-[10px] font-medium tracking-[0.3em] text-white/40 uppercase">
+            Official Link
+          </span>
+          <nav className="flex items-center gap-3">
+            {SOCIAL_LINKS.map(({ name, url, platform }) => {
+              const Icon = SOCIAL_PLATFORM_ICON[platform];
+              return (
+                <a
+                  key={url}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={name}
+                  className="hover:text-ztmy-purple transition-colors"
+                >
+                  <Icon className={cn("h-3 w-3", "tablet:h-4 tablet:w-4")} />
+                </a>
+              );
+            })}
+          </nav>
+        </div>
       </div>
 
       <Script
