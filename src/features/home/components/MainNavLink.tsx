@@ -29,7 +29,7 @@ const badgeStyles = cva(
 );
 
 const labelStyles = cva(
-  "tablet:text-2xl text-lg leading-tight font-bold tracking-tight text-white transition-colors duration-300",
+  "tablet:text-2xl text-sm leading-tight font-bold tracking-tight text-white transition-colors duration-300",
   {
     variants: {
       accent: {
@@ -85,7 +85,12 @@ export function MainNavLink({
       </span>
 
       <span className="flex flex-col drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
-        <span className="font-mono text-[10px] font-medium tracking-[0.3em] text-white/50 uppercase">
+        <span
+          className={cn(
+            "font-mono text-[9px] font-medium tracking-[0.3em] text-white/50 uppercase",
+            "tablet:text-xs",
+          )}
+        >
           {eyebrow}
         </span>
         <span className={labelStyles({ accent })}>{label}</span>

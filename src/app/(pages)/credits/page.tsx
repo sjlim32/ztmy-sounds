@@ -40,9 +40,9 @@ export default function CreditsPage() {
         ← 홈으로
       </Link>
 
-      <h1 className="mt-6 text-2xl font-bold text-white">도움주신 분들</h1>
+      <h1 className="mt-6 text-2xl font-bold text-white">출처</h1>
       <p className="mt-2 text-sm text-white/60">
-        사이트를 만드는 데 도움을 주신 분들입니다.
+        사이트에 사용된 리소스 저작자분들입니다.
       </p>
 
       <ul className="mt-8 space-y-3">
