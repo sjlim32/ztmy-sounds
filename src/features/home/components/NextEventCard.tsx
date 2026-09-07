@@ -195,14 +195,14 @@ export function NextEventCard({
                     href={event.tourUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative mt-4 block overflow-hidden rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
+                    className="relative mt-4 flex w-fit overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={event.tourImg}
                       alt={event.tourName}
                       loading="lazy"
-                      className="w-full object-cover transition-opacity hover:opacity-80"
+                      className="w-[15dvw] rounded-lg object-cover transition-opacity hover:opacity-80"
                     />
                     {/* 이미지 하단이 아래 텍스트 영역으로 자연스럽게 이어지도록 스크림 처리 */}
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/60 to-transparent" />
