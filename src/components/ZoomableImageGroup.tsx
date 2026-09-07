@@ -46,6 +46,12 @@ export function ZoomableImageGroup({
   const dialogRef = useRef<HTMLDivElement>(null);
   // 모달을 연 썸네일 버튼 — 닫을 때 포커스를 여기로 되돌립니다.
   const triggerRef = useRef<HTMLElement | null>(null);
+  // 이미지를 드래그(모바일 스와이프 포함)해서 이전/다음으로 넘기기 위한 상태.
+  // dragStartX는 포인터가 눌린 x좌표, didDragRef는 임계값을 넘는 드래그가
+  // 실제로 있었는지 — 있었다면 pointerup 뒤에 이어지는 click(확대/축소
+  // 토글)을 막아야 스와이프가 실수로 확대를 트리거하지 않습니다.
+  const dragStartXRef = useRef<number | null>(null);
+  const didDragRef = useRef(false);
 
   const closeModal = () => {
     setOpenIndex(null);
@@ -62,6 +68,24 @@ export function ZoomableImageGroup({
     setOpenIndex((index) =>
       index === null ? null : (index + 1) % images.length,
     );
+  };
+
+  // 이미지를 좌/우로 드래그(모바일 스와이프 포함)하면 이전/다음으로 넘깁니다.
+  // 확대(isZoomedIn)된 상태에서는 드래그를 확대 이동(pan)으로 오해할 수
+  // 있어 스와이프 넘기기를 비활성화합니다.
+  const SWIPE_THRESHOLD_PX = 50;
+  const handleImagePointerDown = (event: React.PointerEvent) => {
+    if (isZoomedIn || !hasMultiple) return;
+    dragStartXRef.current = event.clientX;
+  };
+  const handleImagePointerUp = (event: React.PointerEvent) => {
+    if (dragStartXRef.current === null) return;
+    const deltaX = event.clientX - dragStartXRef.current;
+    dragStartXRef.current = null;
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD_PX) return;
+    didDragRef.current = true;
+    if (deltaX > 0) goPrev();
+    else goNext();
   };
 
   // 둘 다 지정 → 그 크기로 크롭. 하나만 지정 → 나머지는 auto로 비율
@@ -195,6 +219,7 @@ export function ZoomableImageGroup({
 
             {hasMultiple && (
               <>
+                {/* 태블릿 이상: 화면 좌우 모서리에 고정. */}
                 <button
                   type="button"
                   onClick={(event) => {
@@ -202,7 +227,7 @@ export function ZoomableImageGroup({
                     goPrev();
                   }}
                   aria-label="이전 이미지"
-                  className="fixed top-1/2 left-2 -translate-y-1/2 p-2 text-white/60 hover:text-white tablet:left-4"
+                  className="tablet:flex fixed top-1/2 left-4 hidden -translate-y-1/2 p-2 text-white/60 hover:text-white"
                 >
                   <ChevronLeftIcon className="h-8 w-8" />
                 </button>
@@ -213,14 +238,40 @@ export function ZoomableImageGroup({
                     goNext();
                   }}
                   aria-label="다음 이미지"
-                  className="fixed top-1/2 right-2 -translate-y-1/2 p-2 text-white/60 hover:text-white tablet:right-4"
+                  className="tablet:flex fixed top-1/2 right-4 hidden -translate-y-1/2 p-2 text-white/60 hover:text-white"
                 >
                   <ChevronLeftIcon className="h-8 w-8 rotate-180" />
                 </button>
-
-                <span className="fixed bottom-4 left-1/2 -translate-x-1/2 font-mono text-xs text-white/50">
+                <span className="tablet:block fixed bottom-4 left-1/2 hidden -translate-x-1/2 font-mono text-xs text-white/50">
                   {openIndex! + 1} / {images.length}
                 </span>
+
+                {/* 모바일: 화면 좌우는 스와이프로 대체하고, 버튼은 이미지 아래
+                    한 줄(이전 · 카운터 · 다음)로 모아 엄지로 누르기 쉽게. */}
+                <div
+                  onClick={(event) => event.stopPropagation()}
+                  className="tablet:hidden fixed bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-4"
+                >
+                  <button
+                    type="button"
+                    onClick={goPrev}
+                    aria-label="이전 이미지"
+                    className="p-2 text-white/60 hover:text-white"
+                  >
+                    <ChevronLeftIcon className="h-6 w-6" />
+                  </button>
+                  <span className="font-mono text-xs text-white/50">
+                    {openIndex! + 1} / {images.length}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    aria-label="다음 이미지"
+                    className="p-2 text-white/60 hover:text-white"
+                  >
+                    <ChevronLeftIcon className="h-6 w-6 rotate-180" />
+                  </button>
+                </div>
               </>
             )}
 
@@ -236,11 +287,20 @@ export function ZoomableImageGroup({
                   "확대/축소" 동작과 사진 설명을 함께 담습니다. */}
               <button
                 type="button"
+                onPointerDown={handleImagePointerDown}
+                onPointerUp={handleImagePointerUp}
                 onClick={(event) => {
                   event.stopPropagation();
+                  if (didDragRef.current) {
+                    // 드래그(스와이프)로 이미 넘겼으면, 뒤이어 발생하는
+                    // click까지 확대/축소로 처리하지 않도록 한 번 건너뜁니다.
+                    didDragRef.current = false;
+                    return;
+                  }
                   setZoomedIn((prev) => !prev);
                 }}
                 aria-label={`${current.alt} — ${isZoomedIn ? "축소" : "확대"}`}
+                style={{ touchAction: "pan-y" }}
                 className="block rounded-lg border-0 bg-transparent p-0"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- width/height가 없으면 이미지 자체의 크기를 그대로 써야 해서 next/image의 필수 width/height 제약을 피함 (어차피 output:export라 next/image 최적화는 꺼져있음) */}
