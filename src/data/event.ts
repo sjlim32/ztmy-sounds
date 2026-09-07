@@ -21,7 +21,7 @@ export const visitEvent: Event = {
   label: "NEXT VISIT",
   accent: "home",
   tourName: "사운드 플래닛 페스티널 2026",
-  tourImg: "/assets/next-visit/sound-planet-3.webp",
+  tourImg: "/assets/zutopia/sound-planet-2026/sound-planet-3.webp",
   tourUrl: "https://soundplanetfestival.co.kr/",
   place: "PARADISE CITY",
   placeUrl: "https://maps.app.goo.gl/TXhUQEc1cXpRPY1b8",

@@ -1,0 +1,183 @@
+import Link from "next/link";
+import { ZoomableImage } from "@/components/ZoomableImage";
+import {
+  EventDetails,
+  ImageLabel,
+} from "@/features/info/components/EventDetails";
+import { TableOfContents } from "@/features/info/components/TableOfContents";
+import { groupImagesBySection } from "@/features/info/lib/group-images";
+import { SOUNDPLANET_2026 } from "@/features/zutopia/archive/sound-planet-2026/data";
+import { SongLink } from "@/features/zutopia/archive/sound-planet-2026/SongLink";
+
+export const sections = groupImagesBySection(
+  SOUNDPLANET_2026.img.sub,
+  SOUNDPLANET_2026.sections,
+);
+
+<div className="mb-1 flex w-full justify-center">
+  <ZoomableImage
+    src={SOUNDPLANET_2026.img.main}
+    alt={SOUNDPLANET_2026.name}
+    thumbnailWidth={300}
+    thumbnailCrop="top"
+  />
+</div>
+
+<div className="tablet:mb-6 mb-3 text-center text-sm font-semibold text-white/60">
+  {"모든 이미지들은 클릭 시 확대됩니다."}
+</div>
+
+<TableOfContents sections={SOUNDPLANET_2026.sections} />
+
+<EventDetails event={SOUNDPLANET_2026} />
+
+<section className="flex flex-col items-center justify-center">
+  <ImageLabel id="set-list" label="세트리스트 (15 Songs)" />
+  <ul className="max-w-full overflow-x-auto">
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/l1wiiEQdBx4?si=FMZvNrFNphr7IcJK">
+        不死身の訓練 (불사신의 훈련)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/IeyCdm9WwXM?si=nYj6unvDorEpWrnb">
+        TAIDADA
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/GAB26GgJ8V8?si=hL8KYvQ-qSH0bZWn">
+        ヒューマノイド (Humanoid)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/Atvsg_zogxo?si=S2aeqXzEb0zk7TOQ">
+        お勉強しといてよ (공부해둬)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/PLG2Uexyi9s?si=sEFqhAfltHOUG0YJ">
+        海馬成長痛 (해마성장통)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/BVvvUGP0MFw?si=vzALdy2XBxeGSoq8">
+        ミラーチューン (Mirror Tune)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/4LDQXYTfWjA?si=v-JMJDD6GQ3GgIQA">
+        イチジク煙 (무화과 연기)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/arkEQD4vsIk?si=a0CcXB7YvP2SU6P4">
+        アンチモン (antimony)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/_JdiIp92rYk?si=RVig-nw1gACgnc3-">
+        機械油 (기계유)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/258qUAI7rck?si=KMk9MEKaXKl5Qymd">
+        正しくなれない (올바르게 될 수 없어)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/GJI4Gv7NbmE?si=krddDkTqnH9ySCZm">
+        秒針を噛む (초침을 깨물다)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/4QePrv24TBU?si=af10VMWHqRIQ8IhD">
+        勘冴えて悔しいわ (감이 좋아서 분해)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/sBpITQ7oXxM?si=6fAoktGoU1t6trDz">
+        メディアノーチェ (Medianoche)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/ZUwaudw8ht0?si=3wvb1ThfWCi3y8MQ">
+        あいつら全員同窓会 (저 녀석들 전원 동창회)
+      </SongLink>
+    </li>
+    <li className="whitespace-nowrap">
+      <SongLink href="https://youtu.be/Al_9DytnKnY?si=0woGMoIIXENuhNoS">
+        暗く黒く（強） (어둡게 검게(강))
+      </SongLink>
+    </li>
+  </ul>
+</section>
+
+<section className="flex flex-col gap-3">
+  <ImageLabel id="event-photos" label="공연 정보" />
+
+<div className="tablet:flex-row flex flex-col items-center gap-3">
+  {sections["event-photos"].map((img) => (
+    <ZoomableImage
+      key={img.asset}
+      src={img.asset}
+      alt={img.name}
+      thumbnailWidth={150}
+      thumbnailCrop="top"
+    />
+  ))}
+</div>
+
+<div className="tablet:grid tablet:grid-cols-6 flex flex-col items-center gap-3">
+  {sections["event-details"].map((img) => (
+    <ZoomableImage
+      key={img.asset}
+      src={img.asset}
+      alt={img.name}
+      thumbnailWidth={300}
+      thumbnailCrop="top"
+    />
+  ))}
+</div>
+
+<ImageLabel id="notice" label="유의 사항" />
+
+<div className="tablet:flex tablet:flex-row flex-col items-center gap-3">
+  {sections["notice"].map((img) => (
+    <ZoomableImage
+      key={img.asset}
+      src={img.asset}
+      alt={img.name}
+      thumbnailWidth={150}
+      thumbnailCrop="top"
+    />
+  ))}
+</div>
+
+<ImageLabel id="goods" label="굿즈" />
+
+<div className="tablet:grid tablet:grid-cols-5 flex flex-col items-center gap-3">
+  {sections["goods"].map((img) => (
+    <ZoomableImage
+      key={img.asset}
+      src={img.asset}
+      alt={img.name}
+      thumbnailWidth={500}
+      thumbnailCrop="top"
+    />
+  ))}
+</div>
+
+<ImageLabel id="fnb" label="F & B" />
+
+  <div className="tablet:grid tablet:grid-cols-4 flex flex-col items-center gap-3">
+    {sections["fnb"].map((img) => (
+      <ZoomableImage
+        key={img.asset}
+        src={img.asset}
+        alt={img.name}
+        thumbnailWidth={500}
+        thumbnailCrop="top"
+      />
+    ))}
+  </div>
+</section>
