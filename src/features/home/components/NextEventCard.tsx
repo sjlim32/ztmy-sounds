@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { formatEventDate, accentBorder, type Event } from "@/data/event";
@@ -63,6 +64,8 @@ export function NextEventCard({
   isOpen,
   onToggle,
 }: NextEventCardProps) {
+  const contentId = useId();
+
   return (
     <div data-role="next-event-card" className={cn("w-full", "tablet:w-96")}>
       <div className={cn("flex flex-col gap-2", !isOpen && "gap-0")}>
@@ -70,6 +73,7 @@ export function NextEventCard({
           type="button"
           onClick={onToggle}
           aria-expanded={isOpen}
+          aria-controls={contentId}
           className={cn(
             "group cursor-pointer",
             isDone ? "tablet:flex hidden" : "flex",
@@ -94,6 +98,7 @@ export function NextEventCard({
         토글 버튼 자체는 PC에서 계속 보여서 그 Countdown을 여닫을 수 있습니다. */}
         {!isDone && (
           <div
+            id={contentId}
             inert={!isOpen}
             className={cn(
               "grid rounded-b-md bg-black/40 transition-[grid-template-rows] duration-300 ease-out",
