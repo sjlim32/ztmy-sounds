@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import Script from "next/script";
 import { ARTIST } from "@/data/artist";
 import { SOCIAL_LINKS } from "@/data/social-links";
@@ -21,8 +22,8 @@ export function Footer() {
   return (
     <footer
       className={cn(
-        "flex flex-col items-center gap-2 border-t border-white/10 px-3 py-2 text-center text-xs text-white/50",
-        "tablet:items-end tablet:border-t-0 tablet:text-end tablet:text-gray-300 tablet:text-base",
+        "flex flex-col items-center gap-2 border-t border-white/10 px-3 py-2 text-center text-[10px] text-white/50",
+        "tablet:items-end tablet:border-t-0 tablet:text-end tablet:text-white/40 tablet:text-xs",
       )}
     >
       <p className="tablet:border-b tablet:border-gray-500 tablet:pb-1 tablet:tracking-[0.4rem] tablet:max-w-100 w-full tracking-widest">
@@ -38,22 +39,29 @@ export function Footer() {
           rel="noopener noreferrer"
           className="hover:border-ztmy-magenta/60 tablet:hidden rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
         >
-          사이트 건의
+          건의
         </a>
         <button
           type="button"
           data-tally-open={TALLY_FORM_ID}
           data-tally-emoji-text="👋"
           data-tally-emoji-animation="wave"
-          className="hover:border-ztmy-magenta/60 hidden rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none tablet:inline-block"
+          className="hover:border-ztmy-magenta/60 tablet:inline-block hidden rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
         >
-          사이트 건의
+          건의
         </button>
+
+        <Link
+          href="/credits"
+          className="hover:border-ztmy-magenta/60 rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
+        >
+          출처
+        </Link>
 
         <span className="tablet:inline-block hidden font-mono text-[10px] font-medium tracking-[0.3em] text-white/40 uppercase">
           Official Link
         </span>
-        <nav className="flex items-center gap-4 tablet:gap-6">
+        <nav className="tablet:gap-6 flex items-center gap-4">
           {SOCIAL_LINKS.map(({ name, url, platform }) => {
             const Icon = SOCIAL_PLATFORM_ICON[platform];
             return (
