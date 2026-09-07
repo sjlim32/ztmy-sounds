@@ -15,6 +15,10 @@ export const sections = groupImagesBySection(
 export const toGroupImages = (imgs) =>
   imgs.map((img) => ({ src: img.asset, alt: img.name }));
 
+<h1 className="tablet:mb-6 tablet:text-3xl mb-3 text-center text-lg font-bold">
+  {INFORMATION.name}
+</h1>
+
 <div className="mb-1 flex w-full justify-center">
   <ZoomableImage
     src={INFORMATION.img.main}

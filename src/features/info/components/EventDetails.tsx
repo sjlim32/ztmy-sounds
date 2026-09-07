@@ -60,7 +60,7 @@ function Field({
   return (
     <li className="flex gap-2 before:text-white/30 before:content-['-']">
       <div className="tablet:flex-row tablet:items-baseline tablet:gap-2 flex flex-col gap-1">
-        <span className="tablet:w-20 shrink-0">{label}:</span>
+        <span className="tablet:w-24 shrink-0">{label}:</span>
         {children}
       </div>
     </li>
