@@ -84,11 +84,17 @@ export function ZoomableImageGroup({
     cropThumbnail = true;
   }
 
+  const isOpen = openIndex !== null;
+
   useEffect(() => {
-    if (openIndex === null) return;
+    if (!isOpen) return;
 
     // 모달이 열리는 순간의 포커스를 기억해뒀다가, 닫히면(effect cleanup)
-    // 원래 있던 곳(연 썸네일 버튼)으로 되돌립니다.
+    // 원래 있던 곳(연 썸네일 버튼)으로 되돌립니다. openIndex가 아니라 isOpen
+    // (열림/닫힘 여부)에만 의존해야 합니다 — openIndex에 의존하면 모달을 연
+    // 채로 이전/다음 이미지만 넘겨도 매번 effect가 재실행되어, 방금 누른
+    // "다음 이미지" 버튼에서 포커스가 순간적으로 트리거 썸네일로 빠졌다가
+    // 다이얼로그로 돌아오는 불필요한 포커스 이동이 매 탐색마다 발생합니다.
     const previouslyFocused = triggerRef.current;
     dialogRef.current?.focus();
 
@@ -127,8 +133,8 @@ export function ZoomableImageGroup({
       document.body.style.overflow = "";
       previouslyFocused?.focus();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- goPrev/goNext는 매 렌더 재생성되지만 images.length에만 의존해 openIndex 변경 시 재등록이면 충분
-  }, [openIndex]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- goPrev/goNext/closeModal은 매 렌더 재생성되지만 images.length에만 의존해 isOpen 변경 시에만 재등록하면 충분
+  }, [isOpen]);
 
   const current = openIndex !== null ? images[openIndex] : null;
   const hasMultiple = images.length > 1;
@@ -223,32 +229,34 @@ export function ZoomableImageGroup({
                 스크롤해도 안 보이게 되는데, my-auto는 그 경우 0으로 줄어들어
                 위에서부터 자연스럽게 스크롤됩니다. */}
             <div className="my-auto flex flex-col items-center gap-3">
-              {/* eslint-disable-next-line @next/next/no-img-element -- width/height가 없으면 이미지 자체의 크기를 그대로 써야 해서 next/image의 필수 width/height 제약을 피함 (어차피 output:export라 next/image 최적화는 꺼져있음) */}
-              <img
-                src={current.src}
-                alt={current.alt}
-                width={current.width}
-                height={current.height}
-                role="button"
-                tabIndex={0}
-                aria-label={isZoomedIn ? "이미지 축소" : "이미지 확대"}
+              {/* aria-label을 img가 아니라 button에 둡니다 — img에 직접
+                  aria-label을 주면 접근성 이름 계산에서 alt(사진 설명)를
+                  완전히 덮어써버려, 정작 스크린리더가 사진 내용을 못 읽게
+                  됩니다. alt는 그대로 사진 설명으로 남기고, 버튼 라벨에
+                  "확대/축소" 동작과 사진 설명을 함께 담습니다. */}
+              <button
+                type="button"
                 onClick={(event) => {
                   event.stopPropagation();
                   setZoomedIn((prev) => !prev);
                 }}
-                onKeyDown={(event) => {
-                  if (event.key !== "Enter" && event.key !== " ") return;
-                  event.preventDefault();
-                  event.stopPropagation();
-                  setZoomedIn((prev) => !prev);
-                }}
-                className={cn(
-                  "rounded-lg object-contain",
-                  isZoomedIn
-                    ? "w-auto max-w-none cursor-zoom-out"
-                    : "max-h-[75vh] w-auto max-w-[90vw] cursor-zoom-in",
-                )}
-              />
+                aria-label={`${current.alt} — ${isZoomedIn ? "축소" : "확대"}`}
+                className="block rounded-lg border-0 bg-transparent p-0"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element -- width/height가 없으면 이미지 자체의 크기를 그대로 써야 해서 next/image의 필수 width/height 제약을 피함 (어차피 output:export라 next/image 최적화는 꺼져있음) */}
+                <img
+                  src={current.src}
+                  alt={current.alt}
+                  width={current.width}
+                  height={current.height}
+                  className={cn(
+                    "rounded-lg object-contain",
+                    isZoomedIn
+                      ? "w-auto max-w-none cursor-zoom-out"
+                      : "max-h-[75vh] w-auto max-w-[90vw] cursor-zoom-in",
+                  )}
+                />
+              </button>
 
               {(current.caption || current.sourceHref) && (
                 <div
