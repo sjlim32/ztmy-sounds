@@ -67,7 +67,9 @@ export function Countdown({
           ) : (
             <>
               <p className="tablet:text-sm text-xs font-medium text-white">
-                다음 내한을 기다려주세요 !
+                {accent === "home"
+                  ? "다음 내한을 기다려주세요 !"
+                  : "다음 원정을 기다려주세요 !"}
               </p>
               <p
                 className={cn(
