@@ -34,18 +34,12 @@ export default function Home() {
   // 펼쳐져 있어야 해서 "몇 번째가 열려 있는지"만 값으로 갖습니다(null 없음).
   // 이미 열려 있는 쪽을 다시 클릭하면 같은 값으로 다시 set되어 사실상
   // no-op이 되고, 닫혀 있던 쪽을 클릭하면 그쪽으로 전환됩니다.
+  // isDone이어도(날짜가 지나도) NextEventCard가 내용을 계속 렌더링하므로,
+  // 열려 있던 쪽이 종료돼도 펼침 콘텐츠가 사라지지 않습니다 — 다른 쪽으로
+  // 강제 전환할 필요 없이 tabletOpenAccent를 그대로 씁니다.
   const [tabletOpenAccent, setTabletOpenAccent] = useState<Event["accent"]>(
     mobileEvent.accent,
   );
-  // 열려 있던 쪽이 종료(isDone)되면 펼침 콘텐츠 자체가 사라져서 "항상 하나는
-  // 펼쳐짐" 보장이 깨지므로, 렌더링 중에 나머지 한쪽으로 대체해서 씁니다.
-  // (state를 직접 고치는 대신 파생시켜서, effect 안에서 setState하는 걸 피합니다.)
-  const effectiveTabletOpenAccent =
-    tabletOpenAccent === visitEvent.accent && visit.isDone
-      ? originEvent.accent
-      : tabletOpenAccent === originEvent.accent && origin.isDone
-        ? visitEvent.accent
-        : tabletOpenAccent;
 
   return (
     <>
@@ -111,7 +105,7 @@ export default function Home() {
           id="main-left"
           data-role="visit-info"
           className={cn(
-            "fixed top-1/2 left-10 hidden -translate-y-1/2 flex-col gap-6",
+            "fixed top-1/2 left-10 hidden -translate-y-1/2 flex-col gap-3",
             "tablet:flex",
           )}
         >
@@ -121,20 +115,18 @@ export default function Home() {
             isEventDay={visit.isEventDay}
             daysUntilEvent={visit.daysUntilEvent}
             isDone={visit.isDone}
-            isOpen={effectiveTabletOpenAccent === visitEvent.accent}
+            isOpen={tabletOpenAccent === visitEvent.accent}
             onToggle={() => setTabletOpenAccent(visitEvent.accent)}
           />
 
-          {/* 태블릿 이상에서는 내한/원정 둘 다 각자의 타이머와 함께 노출.
-          effectiveTabletOpenAccent가 null을 허용하지 않는 값이라 둘 중
-          하나는 항상 펼쳐져 있습니다. */}
+          {/* 태블릿 이상에서는 내한/원정 둘 다 각자의 타이머와 함께 노출. */}
           <NextEventCard
             event={originEvent}
             remaining={origin.remaining}
             isEventDay={origin.isEventDay}
             daysUntilEvent={origin.daysUntilEvent}
             isDone={origin.isDone}
-            isOpen={effectiveTabletOpenAccent === originEvent.accent}
+            isOpen={tabletOpenAccent === originEvent.accent}
             onToggle={() => setTabletOpenAccent(originEvent.accent)}
           />
         </section>

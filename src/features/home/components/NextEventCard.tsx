@@ -65,7 +65,7 @@ export function NextEventCard({
 }: NextEventCardProps) {
   return (
     <div data-role="next-event-card" className={cn("w-full", "tablet:w-96")}>
-      <div className={cn("space-y-0", "tablet:space-y-4")}>
+      <div className={cn("flex flex-col gap-2", !isOpen && "gap-0")}>
         <button
           type="button"
           onClick={onToggle}
@@ -86,7 +86,11 @@ export function NextEventCard({
           />
         </button>
 
-        {/* 배경(뱃지)이 확장되면서 열리는 느낌을 grid-template-rows 0fr→1fr 트랜지션으로 구현. 모바일/태블릿 이상 공통으로 접고 펼 수 있습니다. */}
+        {/* 배경(뱃지)이 확장되면서 열리는 느낌을 grid-template-rows 0fr→1fr 트랜지션으로 구현. 모바일/태블릿 이상 공통으로 접고 펼 수 있습니다.
+        투어 이미지/날짜/장소는 isDone이면(날짜가 지나면) 아예 렌더링하지
+        않습니다 — 지난 공연의 예매/오시는 길 정보는 더 이상 의미가 없어서.
+        대신 아래 Countdown이 "다음 내한을 기다려주세요" 종료 상태를 보여주고,
+        토글 버튼 자체는 PC에서 계속 보여서 그 Countdown을 여닫을 수 있습니다. */}
         {!isDone && (
           <div
             className={cn(
@@ -119,7 +123,7 @@ export function NextEventCard({
                       src={event.tourImg}
                       alt={event.tourName}
                       loading="lazy"
-                      className="h-full w-[30dvw] object-cover transition-opacity hover:opacity-80"
+                      className="h-full w-[24dvw] object-cover transition-opacity hover:opacity-80"
                     />
                     {/* 이미지 하단이 카드 배경으로 자연스럽게 이어지도록 스크림 처리 */}
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-t from-black/70 to-transparent" />
@@ -267,7 +271,6 @@ export function NextEventCard({
             </div>
           </div>
         )}
-
         {/* Countdown(물풍선/달)은 접힘 애니메이션 박스 밖에서 단순 표시/숨김으로
         렌더링합니다. 위 overflow-hidden 안에 있으면 grid-rows 트랜지션 때문에
         MoonPhase의 밤안개(overflow-visible로 살짝 벗어나는 장식)가 잘리고,
@@ -275,18 +278,18 @@ export function NextEventCard({
         정면으로 부딪혀서(둘 다 만족 불가) 아예 분리했습니다.
         모바일에서는 카드 펼침 여부와 관계없이 항상 보여주고(가장 눈에 띄는
         요소라 접힌 상태에도 노출), 태블릿 이상에서는 기존처럼 열린 카드에서만
-        보여줍니다. */}
-        {!isDone && (
-          <div className={cn("tablet:mt-0 mt-1.5", !isOpen && "tablet:hidden")}>
-            <Countdown
-              remaining={remaining}
-              isEventDay={isEventDay}
-              daysUntilEvent={daysUntilEvent}
-              isDone={isDone}
-              accent={event.accent}
-            />
-          </div>
-        )}
+        보여줍니다. isDone이어도 렌더링합니다 — Countdown이 내부적으로
+        "다음 내한을 기다려주세요" + 빈 풍선/달 같은 종료 상태를 직접
+        그려주므로, 여기서 숨기면 그 표시가 아예 안 나옵니다. */}
+        <div className={cn("tablet:mt-0 mt-1.5", !isOpen && "tablet:hidden")}>
+          <Countdown
+            remaining={remaining}
+            isEventDay={isEventDay}
+            daysUntilEvent={daysUntilEvent}
+            isDone={isDone}
+            accent={event.accent}
+          />
+        </div>
       </div>
     </div>
   );
