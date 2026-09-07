@@ -10,6 +10,7 @@ import { MainNavLink } from "@/features/home/components/MainNavLink";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
 import { FlagIcon } from "@/components/icons/FlagIcon";
+import { CalendarIcon } from "@/components/icons/CalendarIcon";
 import { useEventCountdown } from "@/features/home/lib/event-countdown";
 
 export default function Home() {
@@ -81,6 +82,13 @@ export default function Home() {
                 label="공연 정보"
                 icon={InfoIcon}
                 accent="pink"
+              />
+              <MainNavLink
+                href="/zutopia"
+                eyebrow="Zutopia"
+                label="즛토피아"
+                icon={CalendarIcon}
+                accent="sun"
               />
             </div>
           </div>
@@ -159,6 +167,13 @@ export default function Home() {
             label="공연 정보"
             icon={InfoIcon}
             accent="pink"
+          />
+          <MainNavLink
+            href="/zutopia"
+            eyebrow="Zutopia"
+            label="즛토피아"
+            icon={CalendarIcon}
+            accent="sun"
           />
         </nav>
       </main>
