@@ -11,7 +11,29 @@ import { MicIcon } from "@/components/icons/MicIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
 import { FlagIcon } from "@/components/icons/FlagIcon";
 import { CalendarIcon } from "@/components/icons/CalendarIcon";
-import { useEventCountdown } from "@/features/home/lib/event-countdown";
+import {
+  useEventCountdown,
+  getEventTargetMs,
+  DONE_AFTER_HOURS,
+} from "@/features/home/lib/event-countdown";
+
+// 태블릿 이상에서 처음 진입했을 때 내한/원정 중 어느 쪽을 펼쳐둘지 고르는
+// 기준 — 남은 시간이 더 짧은(더 임박한) 쪽. 이미 종료(isDone)된 쪽은 아무리
+// remaining이 작아도 후보에서 제외해 Infinity 취급합니다(둘 다 종료라면
+// 그때만 내한을 기본값으로). useEventCountdown의 remaining은 첫 tick이
+// 돌기 전(마운트 직후)엔 아직 null이라 이 판단에 쓸 수 없어서, 같은 공식을
+// getEventTargetMs로 동기 계산합니다.
+function getInitialTabletOpenAccent(): Event["accent"] {
+  const now = Date.now();
+  const urgency = (event: Event) => {
+    const diffMs = getEventTargetMs(event) - now;
+    const isDone = -diffMs / 3_600_000 >= DONE_AFTER_HOURS;
+    return isDone ? Infinity : diffMs;
+  };
+  return urgency(visitEvent) <= urgency(originEvent)
+    ? visitEvent.accent
+    : originEvent.accent;
+}
 
 export default function Home() {
   // 모바일/데스크톱용으로 NextEventCard가 아래에서 여러 번 렌더링되는데(같은
@@ -32,13 +54,15 @@ export default function Home() {
 
   // 태블릿 이상은 내한/원정 카드가 동시에 보이는데, 이 중 하나는 항상
   // 펼쳐져 있어야 해서 "몇 번째가 열려 있는지"만 값으로 갖습니다(null 없음).
-  // 이미 열려 있는 쪽을 다시 클릭하면 같은 값으로 다시 set되어 사실상
-  // no-op이 되고, 닫혀 있던 쪽을 클릭하면 그쪽으로 전환됩니다.
-  // isDone이어도(날짜가 지나도) NextEventCard가 내용을 계속 렌더링하므로,
-  // 열려 있던 쪽이 종료돼도 펼침 콘텐츠가 사라지지 않습니다 — 다른 쪽으로
-  // 강제 전환할 필요 없이 tabletOpenAccent를 그대로 씁니다.
+  // 처음 펼쳐지는 쪽은 남은 시간이 더 짧은(더 임박한) 이벤트(위
+  // getInitialTabletOpenAccent 참고). 이미 열려 있는 쪽을 다시 클릭하면
+  // 같은 값으로 다시 set되어 사실상 no-op이 되고, 닫혀 있던 쪽을 클릭하면
+  // 그쪽으로 전환됩니다. isDone이어도(날짜가 지나도) NextEventCard가 내용을
+  // 계속 렌더링하므로, 열려 있던 쪽이 종료돼도 펼침 콘텐츠가 사라지지
+  // 않습니다 — 다른 쪽으로 강제 전환할 필요 없이 tabletOpenAccent를 그대로
+  // 씁니다.
   const [tabletOpenAccent, setTabletOpenAccent] = useState<Event["accent"]>(
-    mobileEvent.accent,
+    getInitialTabletOpenAccent,
   );
 
   return (

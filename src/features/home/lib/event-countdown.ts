@@ -15,6 +15,15 @@ export const DONE_AFTER_HOURS = 2;
 // WaterBalloon과 MoonPhase가 같은 기준으로 "얼마나 찼는지"를 계산하도록 공유합니다.
 export const EMPTY_AT_DAYS = 90;
 
+// event.date("YYYY.MM.DD", 다일차 공연이면 배열의 첫째 날) + event.time("HH:mm")을
+// 조합해 목표 시각(ms)을 계산합니다. useEventCountdown 내부와, 마운트 시점에
+// 아직 훅의 상태(remaining/isDone)가 없어도 동기적으로 목표 시각이 필요한
+// 곳(예: page.tsx의 초기 펼침 상태 계산)에서 함께 씁니다.
+export function getEventTargetMs(event: Event): number {
+  const targetIso = `${getEventStartDate(event).replace(/\./g, "-")}T${event.time}:00+09:00`;
+  return new Date(targetIso).getTime();
+}
+
 /**
  * event.date("YYYY.MM.DD", 다일차 공연이면 배열의 첫째 날) + event.time("HH:mm")을
  * 조합해 목표 시각을 계산하고, 매초 남은/지난 시간을 갱신합니다. Countdown/
@@ -40,13 +49,12 @@ export function useEventCountdown(event: Event): {
   // 공연 시작 2시간 후까지는 "당일" 취급, 그 이후엔 "종료". Countdown/NextEventCard가
   // 매번 같은 공식을 반복 계산하지 않도록 여기서 한 번만 판단해 내려줍니다.
   const [isDone, setIsDone] = useState(false);
-  const targetIso = `${getEventStartDate(event).replace(/\./g, "-")}T${event.time}:00+09:00`;
+  const targetMs = getEventTargetMs(event);
 
   useEffect(() => {
-    const targetMs = new Date(targetIso).getTime();
     const tick = () => {
       const now = Date.now();
-      const r = getRemaining(targetIso, now);
+      const r = getRemaining(targetMs, now);
       const hsp = (now - targetMs) / 3_600_000;
       setRemaining(r);
       setHoursSincePast(hsp);
@@ -58,7 +66,7 @@ export function useEventCountdown(event: Event): {
     tick();
     const intervalId = setInterval(tick, 1000);
     return () => clearInterval(intervalId);
-  }, [targetIso]);
+  }, [targetMs]);
 
   return { remaining, hoursSincePast, isEventDay, daysUntilEvent, isDone };
 }
