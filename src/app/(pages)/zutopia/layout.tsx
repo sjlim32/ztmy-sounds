@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ZutopiaScrollArea } from "@/features/zutopia/components/ZutopiaScrollArea";
 import { ZutopiaTopNav } from "@/features/zutopia/components/ZutopiaTopNav";
-import { ARTIST } from "@/data/artist";
+import { ZutopiaHeader } from "@/features/zutopia/components/ZutopiaHeader";
 
 export const metadata: Metadata = {
   title: "즛토피아",
@@ -27,11 +27,7 @@ export default function ZutopiaLayout({
   return (
     <ZutopiaScrollArea>
       <ZutopiaTopNav />
-
-      <h1 className="mt-6 text-2xl font-bold tracking-[0.3em] uppercase">
-        ZUTOPIA
-      </h1>
-      <p className="mt-2 text-sm text-white/60">{ARTIST.name.jp} 기록 저장소</p>
+      <ZutopiaHeader />
 
       <div className="mt-8">{children}</div>
     </ZutopiaScrollArea>
