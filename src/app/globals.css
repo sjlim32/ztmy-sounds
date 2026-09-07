@@ -97,3 +97,122 @@ body {
     filter: drop-shadow(0 0 5px #fde047) drop-shadow(0 0 10px #f97316);
   }
 }
+
+/* ZUTOMAYO 픽셀 커서 (제작: 乱涂乱画ben — https://x.com/ben404yg, 무료 사용
+   가능/이름 바꿔 재배포·판매만 금지). 원본은 32x256 8프레임 스프라이트시트라
+   정적 적용을 위해 첫 프레임(32x32)만 잘라 public/cursors에 저장해뒀습니다.
+   이 사이트에서 실제로 발생하는 상태(기본/링크·버튼/텍스트 입력/비활성/
+   드래그)는 전역으로 바로 적용하고, 나머지 상태도 필요할 때 클래스만 붙이면
+   되도록 유틸리티로 준비해둡니다. cursor-zoom-in/out(ZoomableImage)은 대응되는
+   이미지가 없어 브라우저 기본 커서를 그대로 씁니다. */
+html {
+  cursor: url("/cursors/normal.png") 0 0, auto;
+}
+
+a,
+button,
+[role="button"],
+select,
+summary,
+label[for],
+input[type="submit"],
+input[type="button"],
+.cursor-pointer {
+  cursor: url("/cursors/link.png") 0 0, pointer;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="search"],
+input[type="password"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+textarea,
+[contenteditable="true"] {
+  cursor: url("/cursors/text.png") 0 0, text;
+}
+
+[disabled],
+[aria-disabled="true"],
+.cursor-not-allowed {
+  cursor: url("/cursors/unavailable.png") 0 0, not-allowed;
+}
+
+[draggable="true"],
+.cursor-move {
+  cursor: url("/cursors/move.png") 0 0, move;
+}
+
+/* 지금은 이 사이트에서 실제로 발생하지 않는 상태들 — 필요해지면 클래스만
+   붙이면 바로 커스텀 커서가 적용됩니다. */
+.cursor-help {
+  cursor: url("/cursors/help.png") 0 0, help;
+}
+.cursor-wait {
+  cursor: url("/cursors/busy.png") 0 0, wait;
+}
+.cursor-progress {
+  cursor: url("/cursors/working.png") 0 0, progress;
+}
+.cursor-crosshair {
+  cursor: url("/cursors/precision.png") 0 0, crosshair;
+}
+.cursor-context-menu {
+  cursor: url("/cursors/alternate.png") 0 0, context-menu;
+}
+.cursor-vertical-text {
+  cursor: url("/cursors/handwriting.png") 0 0, vertical-text;
+}
+.cursor-ns-resize,
+.cursor-row-resize {
+  cursor: url("/cursors/vertical.png") 0 0, ns-resize;
+}
+.cursor-ew-resize,
+.cursor-col-resize {
+  cursor: url("/cursors/horizontal.png") 0 0, ew-resize;
+}
+.cursor-nesw-resize {
+  cursor: url("/cursors/diagonal1.png") 0 0, nesw-resize;
+}
+.cursor-nwse-resize {
+  cursor: url("/cursors/diagonal2.png") 0 0, nwse-resize;
+}
+
+/* 실제로 움직이는 커서(CustomCursor.tsx). CSS cursor는 애니메이션을 지원하지
+   않아서, 마우스를 추종하는 div 위에 8프레임 스프라이트를 steps()로 순환시켜
+   흉내냅니다. 활성화되면(pointer: fine 기기) 위의 정적 커서 규칙은 전부 꺼서
+   이 div만 보이게 합니다. */
+html.custom-cursor-active,
+html.custom-cursor-active * {
+  cursor: none !important;
+}
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  animation: cursor-sprite 0.8s steps(8) infinite;
+}
+
+html.custom-cursor-active .custom-cursor {
+  opacity: 1;
+}
+
+@keyframes cursor-sprite {
+  from {
+    background-position-y: 0;
+  }
+  to {
+    background-position-y: -256px;
+  }
+}
