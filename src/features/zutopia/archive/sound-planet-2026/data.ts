@@ -1,6 +1,7 @@
 import type { InfoEvent } from "@/features/info/lib/types";
 
 export const SF_SECTIONS = [
+  { id: "set-list", label: "세트리스트" },
   { id: "event-photos", label: "공연 정보" },
   { id: "event-details", label: "공연 공지" },
   { id: "notice", label: "유의사항" },

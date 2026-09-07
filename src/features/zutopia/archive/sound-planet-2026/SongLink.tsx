@@ -1,29 +1,34 @@
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import { SiteLink } from "@/components/SiteLink";
-import { ExternalLinkIcon } from "@/components/icons/ExternalLinkIcon";
 
-const songLinkClass =
-  "text-indigo-100 mt-0 no-underline transition-colors hover:text-white";
+const songLinkClass = cn(
+  "group flex w-full items-center gap-3 px-4 py-2.5 no-underline transition-colors",
+  "text-sm text-white/80 hover:bg-white/5 hover:text-white",
+  "tablet:text-base",
+);
 
 /**
- * SiteLink는 외부 링크 아이콘을 텍스트 뒤 inline 요소로 붙이는데, 세트리스트
- * 처럼 좁은 폭에 여러 줄이 촘촘히 나열되는 곳에서는 이 아이콘이 텍스트와
- * 떨어져 다음 줄로 밀려납니다. inline-flex로 텍스트와 아이콘을 하나의 행으로
- * 직접 묶어서 항상 같은 줄에 붙어있도록 합니다.
+ * 세트리스트 트랙 한 줄 — 번호 + 제목 + (SiteLink가 자동으로 붙이는) 외부
+ * 링크 아이콘을 하나의 행으로 배치합니다. 제목 span에만 flex-1을 줘서 번호는
+ * 고정폭으로 왼쪽에, 아이콘은 SiteLink가 붙이는 순서 그대로 맨 오른쪽에
+ * 자연스럽게 밀려납니다.
  */
 export function SongLink({
   href,
+  index,
   children,
 }: {
   href: string;
+  index: number;
   children: ReactNode;
 }) {
   return (
-    <span className="tablet:p-0.5 flex items-center justify-center gap-1">
-      <SiteLink href={href} noIcon className={songLinkClass}>
-        {children}
-      </SiteLink>
-      <ExternalLinkIcon className="h-3 w-3 shrink-0" />
-    </span>
+    <SiteLink href={href} className={songLinkClass}>
+      <span className="w-6 shrink-0 font-mono text-xs text-white/30 tabular-nums group-hover:text-white/50">
+        {String(index).padStart(2, "0")}
+      </span>
+      <span className="flex-1">{children}</span>
+    </SiteLink>
   );
 }
