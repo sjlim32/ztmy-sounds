@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ComponentType } from "react";
 import { cva } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 
 type Accent = "purple" | "pink" | "magenta" | "sky" | "sun";
 
@@ -13,7 +14,7 @@ interface MainNavLinkProps {
 }
 
 const badgeStyles = cva(
-  "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)] transition-transform duration-300 group-hover:scale-110",
+  "flex h-6 w-6 tablet:h-9 tablet:w-9 shrink-0 items-center justify-center rounded-full text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)] transition-transform duration-300 group-hover:scale-110",
   {
     variants: {
       accent: {
@@ -28,7 +29,7 @@ const badgeStyles = cva(
 );
 
 const labelStyles = cva(
-  "tablet:text-2xl text-xl leading-tight font-bold tracking-tight text-white transition-colors duration-300",
+  "tablet:text-2xl text-lg leading-tight font-bold tracking-tight text-white transition-colors duration-300",
   {
     variants: {
       accent: {
@@ -74,10 +75,13 @@ export function MainNavLink({
   return (
     <Link
       href={href}
-      className="group tablet:min-w-48 tablet:bg-transparent flex items-center gap-3 rounded-lg bg-black/40 px-4 py-2 focus-visible:outline-none"
+      className={cn(
+        "group flex items-center gap-3 rounded-lg bg-black/40 px-4 py-1 focus-visible:outline-none",
+        "tablet:px-4 tablet:py-2 tablet:min-w-48 tablet:bg-transparent",
+      )}
     >
       <span className={badgeStyles({ accent })}>
-        <Icon className="h-4 w-4" />
+        <Icon className={cn("h-3 w-3", "tablet:h-4 w-4")} />
       </span>
 
       <span className="flex flex-col drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
