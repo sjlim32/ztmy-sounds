@@ -1,4 +1,5 @@
 import { ZoomableImage } from "@/components/ZoomableImage";
+import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import {
   EventDetails,
   ImageLabel,
@@ -12,6 +13,8 @@ export const sections = groupImagesBySection(
   SOUNDPLANET_2026.img.sub,
   SOUNDPLANET_2026.sections,
 );
+export const toGroupImages = (imgs) =>
+  imgs.map((img) => ({ src: img.asset, alt: img.name }));
 
 <div className="mb-1 flex w-full justify-center">
   <ZoomableImage
@@ -115,68 +118,48 @@ export const sections = groupImagesBySection(
   <ImageLabel id="event-photos" label="공연 정보" />
 
 <div className="tablet:flex-row flex flex-col items-center gap-3">
-  {sections["event-photos"].map((img) => (
-    <ZoomableImage
-      key={img.asset}
-      src={img.asset}
-      alt={img.name}
-      thumbnailWidth={150}
-      thumbnailCrop="top"
-    />
-  ))}
+  <ZoomableImageGroup
+    images={toGroupImages(sections["event-photos"])}
+    thumbnailWidth={150}
+    thumbnailCrop="top"
+  />
 </div>
 
 <div className="tablet:grid tablet:grid-cols-6 flex flex-col items-center gap-3">
-  {sections["event-details"].map((img) => (
-    <ZoomableImage
-      key={img.asset}
-      src={img.asset}
-      alt={img.name}
-      thumbnailWidth={300}
-      thumbnailCrop="top"
-    />
-  ))}
+  <ZoomableImageGroup
+    images={toGroupImages(sections["event-details"])}
+    thumbnailWidth={300}
+    thumbnailCrop="top"
+  />
 </div>
 
 <ImageLabel id="notice" label="유의 사항" />
 
 <div className="tablet:flex tablet:flex-row flex-col items-center gap-3">
-  {sections["notice"].map((img) => (
-    <ZoomableImage
-      key={img.asset}
-      src={img.asset}
-      alt={img.name}
-      thumbnailWidth={150}
-      thumbnailCrop="top"
-    />
-  ))}
+  <ZoomableImageGroup
+    images={toGroupImages(sections["notice"])}
+    thumbnailWidth={150}
+    thumbnailCrop="top"
+  />
 </div>
 
 <ImageLabel id="goods" label="굿즈" />
 
 <div className="tablet:grid tablet:grid-cols-5 flex flex-col items-center gap-3">
-  {sections["goods"].map((img) => (
-    <ZoomableImage
-      key={img.asset}
-      src={img.asset}
-      alt={img.name}
-      thumbnailWidth={500}
-      thumbnailCrop="top"
-    />
-  ))}
+  <ZoomableImageGroup
+    images={toGroupImages(sections["goods"])}
+    thumbnailWidth={500}
+    thumbnailCrop="top"
+  />
 </div>
 
 <ImageLabel id="fnb" label="F & B" />
 
   <div className="tablet:grid tablet:grid-cols-4 flex flex-col items-center gap-3">
-    {sections["fnb"].map((img) => (
-      <ZoomableImage
-        key={img.asset}
-        src={img.asset}
-        alt={img.name}
-        thumbnailWidth={500}
-        thumbnailCrop="top"
-      />
-    ))}
+    <ZoomableImageGroup
+      images={toGroupImages(sections["fnb"])}
+      thumbnailWidth={500}
+      thumbnailCrop="top"
+    />
   </div>
 </section>
