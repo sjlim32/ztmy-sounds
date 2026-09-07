@@ -30,7 +30,7 @@ export function EventDetails({ event }: EventDetailsProps) {
       )}
 
       <Field label="공식 사이트">
-        <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <span className="tablet:self-center flex flex-wrap items-center gap-x-4 gap-y-1">
           {event.url.official.map((official) => {
             const Icon = SOCIAL_PLATFORM_ICON[official.platform];
             return (
