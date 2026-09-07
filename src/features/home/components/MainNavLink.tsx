@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ComponentType } from "react";
+import { memo, type ComponentType } from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
@@ -61,8 +61,12 @@ const lineStyles = cva(
  * 큰 라벨, 호버 시 왼쪽에서 오른쪽으로 확장되는 스캔라인 밑줄이 시그니처.
  * 버튼마다 고유 accent 색으로 정체성을 구분합니다. 모바일 전체폭 스택/
  * 데스크톱 우측 고정 nav 두 곳에서 공용으로 씁니다.
+ *
+ * props가 전부 정적(고정 문자열/아이콘 컴포넌트 참조)이라 memo로 감쌉니다 —
+ * 홈 화면(page.tsx)이 카운트다운 때문에 초당 여러 번 리렌더되는데, 이 버튼
+ * 8개(모바일 4 + 데스크톱 4)는 그때마다 다시 그릴 이유가 없습니다.
  */
-export function MainNavLink({
+function MainNavLinkComponent({
   href,
   eyebrow,
   label,
@@ -98,3 +102,5 @@ export function MainNavLink({
     </Link>
   );
 }
+
+export const MainNavLink = memo(MainNavLinkComponent);

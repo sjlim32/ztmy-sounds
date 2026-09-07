@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { visitEvent, originEvent, type Event } from "@/data/event";
 import { ARTIST } from "@/data/artist";
@@ -23,6 +23,13 @@ import {
 // 그때만 내한을 기본값으로). useEventCountdown의 remaining은 첫 tick이
 // 돌기 전(마운트 직후)엔 아직 null이라 이 판단에 쓸 수 없어서, 같은 공식을
 // getEventTargetMs로 동기 계산합니다.
+//
+// Date.now()에 의존하는 값이라 useState의 초기값으로 직접 쓰지 않습니다 —
+// 이 사이트는 output:export라 HTML이 빌드 시점에 고정되는데, 빌드 이후
+// 시간이 지나 isDone 여부가 뒤바뀐 채로 클라이언트가 하이드레이션하면
+// 서버(빌드 시점) 렌더와 클라이언트 렌더가 달라져 hydration mismatch가
+// 납니다. 그래서 초기값은 시간과 무관한 고정값(visitEvent)으로 두고,
+// mount 이후 effect에서만 이 함수로 보정합니다.
 function getInitialTabletOpenAccent(): Event["accent"] {
   const now = Date.now();
   const urgency = (event: Event) => {
@@ -62,7 +69,30 @@ export default function Home() {
   // 않습니다 — 다른 쪽으로 강제 전환할 필요 없이 tabletOpenAccent를 그대로
   // 씁니다.
   const [tabletOpenAccent, setTabletOpenAccent] = useState<Event["accent"]>(
-    getInitialTabletOpenAccent,
+    visitEvent.accent,
+  );
+  // 마운트 이후(클라이언트 전용)에만 실제 시각 기준으로 보정 — 위 hydration
+  // mismatch 설명 참고. Date.now()는 렌더 중에 읽으면(즉 여기서 값을 그대로
+  // derive하면) 그 값 자체가 서버/클라이언트 사이에 달라질 수 있어서
+  // set-state-in-effect 규칙이 권장하는 "렌더 중 계산"으로는 애초에 풀 수
+  // 없는 경우입니다 — 마운트 후 클라이언트에서만 한 번 보정하는 게 의도된
+  // 동작입니다.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Date.now() 기반이라 렌더 중 계산이 불가능(위 주석 참고)
+    setTabletOpenAccent(getInitialTabletOpenAccent());
+  }, []);
+
+  // NextEventCard가 memo로 감싸여 있어서, onToggle을 인라인 화살표 함수로
+  // 내려주면 매 렌더마다 참조가 바뀌어 memo가 무력화됩니다 — useCallback으로
+  // 참조를 고정.
+  const toggleMobile = useCallback(() => setIsMobileOpen((open) => !open), []);
+  const openVisit = useCallback(
+    () => setTabletOpenAccent(visitEvent.accent),
+    [],
+  );
+  const openOrigin = useCallback(
+    () => setTabletOpenAccent(originEvent.accent),
+    [],
   );
 
   return (
@@ -119,7 +149,7 @@ export default function Home() {
               daysUntilEvent={mobile.daysUntilEvent}
               isDone={mobile.isDone}
               isOpen={isMobileOpen}
-              onToggle={() => setIsMobileOpen((open) => !open)}
+              onToggle={toggleMobile}
             />
           </div>
         </div>
@@ -140,7 +170,7 @@ export default function Home() {
             daysUntilEvent={visit.daysUntilEvent}
             isDone={visit.isDone}
             isOpen={tabletOpenAccent === visitEvent.accent}
-            onToggle={() => setTabletOpenAccent(visitEvent.accent)}
+            onToggle={openVisit}
           />
 
           {/* 태블릿 이상에서는 내한/원정 둘 다 각자의 타이머와 함께 노출. */}
@@ -151,7 +181,7 @@ export default function Home() {
             daysUntilEvent={origin.daysUntilEvent}
             isDone={origin.isDone}
             isOpen={tabletOpenAccent === originEvent.accent}
-            onToggle={() => setTabletOpenAccent(originEvent.accent)}
+            onToggle={openOrigin}
           />
         </section>
 

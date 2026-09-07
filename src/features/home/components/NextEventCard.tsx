@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { memo, useId } from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { formatEventDate, accentBorder, type Event } from "@/data/event";
@@ -54,8 +54,14 @@ interface NextEventCardProps {
  * isOpen/onToggle도 내부 state가 아니라 부모에게서 받습니다 — 태블릿 이상에서
  * 내한/원정 카드가 동시에 보일 때 한쪽을 열면 다른 쪽이 닫히도록(상호 배타)
  * 부모가 "어느 accent가 열려 있는지" 하나만 기억해야 하기 때문입니다.
+ *
+ * memo로 감쌉니다 — 내한/원정 두 이벤트가 각자 독립된 1초 타이머를 돌리는데,
+ * 한쪽 타이머가 틱해서 page.tsx가 리렌더돼도 다른 쪽 이벤트의 remaining은
+ * (그 틱에서 안 바뀌었으니) 참조가 그대로라 얕은 비교로 걸러집니다 — 안
+ * 그러면 매초 두 카드가 다 다시 그려짐. onToggle은 반드시 page.tsx에서
+ * useCallback으로 참조를 고정해서 내려줘야 이 memo가 실제로 효과가 있습니다.
  */
-export function NextEventCard({
+function NextEventCardComponent({
   event,
   remaining,
   isEventDay,
@@ -301,3 +307,5 @@ export function NextEventCard({
     </div>
   );
 }
+
+export const NextEventCard = memo(NextEventCardComponent);
