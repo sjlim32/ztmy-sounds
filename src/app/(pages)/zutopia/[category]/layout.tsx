@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getZutopiaCategory } from "@/features/zutopia/registry";
+import { ZutopiaCategoryTabs } from "@/features/zutopia/components/ZutopiaCategoryTabs";
 
 export async function generateMetadata(
   props: LayoutProps<"/zutopia/[category]">,
@@ -36,26 +36,7 @@ export default async function ZutopiaCategoryLayout(
         {category.label}
       </p>
 
-      <nav
-        aria-label={category.label}
-        className="mt-3 flex flex-wrap gap-2 border-b border-white/10 pb-4"
-      >
-        <Link
-          href={`/zutopia/${category.slug}`}
-          className="hover:border-ztmy-magenta/60 rounded-full border border-white/15 bg-black/40 px-4 py-1.5 text-sm font-medium text-white/80 backdrop-blur-sm transition-colors hover:text-white"
-        >
-          전체
-        </Link>
-        {category.entries.map((entry) => (
-          <Link
-            key={entry.slug}
-            href={`/zutopia/${category.slug}/${entry.slug}`}
-            className="hover:border-ztmy-magenta/60 rounded-full border border-white/15 bg-black/40 px-4 py-1.5 text-sm font-medium text-white/80 backdrop-blur-sm transition-colors hover:text-white"
-          >
-            {entry.label}
-          </Link>
-        ))}
-      </nav>
+      <ZutopiaCategoryTabs category={category} />
 
       <div className="mt-8">{props.children}</div>
     </div>

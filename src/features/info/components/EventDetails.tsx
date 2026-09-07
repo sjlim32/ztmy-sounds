@@ -34,7 +34,12 @@ export function EventDetails({ event }: EventDetailsProps) {
           {event.url.official.map((official) => {
             const Icon = SOCIAL_PLATFORM_ICON[official.platform];
             return (
-              <SiteLink key={official.href} href={official.href} noIcon>
+              <SiteLink
+                key={official.href}
+                href={official.href}
+                noIcon
+                aria-label={official.name}
+              >
                 <Icon className="h-4 w-4" />
               </SiteLink>
             );

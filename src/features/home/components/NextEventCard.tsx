@@ -69,6 +69,7 @@ export function NextEventCard({
         <button
           type="button"
           onClick={onToggle}
+          aria-expanded={isOpen}
           className={cn(
             "group cursor-pointer",
             isDone ? "tablet:flex hidden" : "flex",
@@ -89,10 +90,11 @@ export function NextEventCard({
         {/* 배경(뱃지)이 확장되면서 열리는 느낌을 grid-template-rows 0fr→1fr 트랜지션으로 구현. 모바일/태블릿 이상 공통으로 접고 펼 수 있습니다.
         투어 이미지/날짜/장소는 isDone이면(날짜가 지나면) 아예 렌더링하지
         않습니다 — 지난 공연의 예매/오시는 길 정보는 더 이상 의미가 없어서.
-        대신 아래 Countdown이 "다음 내한을 기다려주세요" 종료 상태를 보여주고,
+        대신 아래 Countdown이 "다음 내한/원정을 기다려주세요" 종료 상태를 보여주고,
         토글 버튼 자체는 PC에서 계속 보여서 그 Countdown을 여닫을 수 있습니다. */}
         {!isDone && (
           <div
+            inert={!isOpen}
             className={cn(
               "grid rounded-b-md bg-black/40 transition-[grid-template-rows] duration-300 ease-out",
               isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
@@ -279,7 +281,7 @@ export function NextEventCard({
         모바일에서는 카드 펼침 여부와 관계없이 항상 보여주고(가장 눈에 띄는
         요소라 접힌 상태에도 노출), 태블릿 이상에서는 기존처럼 열린 카드에서만
         보여줍니다. isDone이어도 렌더링합니다 — Countdown이 내부적으로
-        "다음 내한을 기다려주세요" + 빈 풍선/달 같은 종료 상태를 직접
+        "다음 내한/원정을 기다려주세요" + 빈 풍선/달 같은 종료 상태를 직접
         그려주므로, 여기서 숨기면 그 표시가 아예 안 나옵니다. */}
         <div className={cn("tablet:mt-0 mt-1.5", !isOpen && "tablet:hidden")}>
           <Countdown

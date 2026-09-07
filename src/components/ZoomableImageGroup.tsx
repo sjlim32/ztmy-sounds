@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { CloseIcon } from "@/components/icons/CloseIcon";
@@ -43,6 +43,9 @@ export function ZoomableImageGroup({
 }: ZoomableImageGroupProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [isZoomedIn, setZoomedIn] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // 모달을 연 썸네일 버튼 — 닫을 때 포커스를 여기로 되돌립니다.
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   const closeModal = () => {
     setOpenIndex(null);
@@ -84,10 +87,37 @@ export function ZoomableImageGroup({
   useEffect(() => {
     if (openIndex === null) return;
 
+    // 모달이 열리는 순간의 포커스를 기억해뒀다가, 닫히면(effect cleanup)
+    // 원래 있던 곳(연 썸네일 버튼)으로 되돌립니다.
+    const previouslyFocused = triggerRef.current;
+    dialogRef.current?.focus();
+
+    const getFocusable = () =>
+      Array.from(
+        dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button, a[href], [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      );
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") closeModal();
       if (event.key === "ArrowLeft") goPrev();
       if (event.key === "ArrowRight") goNext();
+      if (event.key === "Tab") {
+        // 포커스 트랩 — Tab이 모달 밖(뒤에 있는 페이지)으로 빠져나가지 않도록
+        // 마지막/처음 요소에서 반대편으로 되돌립니다.
+        const focusable = getFocusable();
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
     };
     document.addEventListener("keydown", onKeyDown);
     document.body.style.overflow = "hidden";
@@ -95,6 +125,7 @@ export function ZoomableImageGroup({
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "";
+      previouslyFocused?.focus();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- goPrev/goNext는 매 렌더 재생성되지만 images.length에만 의존해 openIndex 변경 시 재등록이면 충분
   }, [openIndex]);
@@ -108,7 +139,10 @@ export function ZoomableImageGroup({
         <button
           key={image.src}
           type="button"
-          onClick={() => setOpenIndex(index)}
+          onClick={(event) => {
+            triggerRef.current = event.currentTarget;
+            setOpenIndex(index);
+          }}
           className="inline-block cursor-zoom-in rounded-lg"
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- width/height 중 하나만 있을 때도 자연스러운 비율로 보여야 해서 next/image의 필수 width/height 제약을 피함 */}
@@ -134,10 +168,13 @@ export function ZoomableImageGroup({
       {current &&
         createPortal(
           <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
+            aria-label={current.alt || "이미지 확대 보기"}
+            tabIndex={-1}
             onClick={closeModal}
-            className="fixed inset-0 z-50 flex flex-col items-center overflow-auto bg-black/80 p-6"
+            className="fixed inset-0 z-50 flex flex-col items-center overflow-auto bg-black/80 p-6 focus:outline-none"
           >
             {/* absolute가 아니라 fixed — 안내문이 길어 아래 콘텐츠가 스크롤될
                 때도 닫기/이전/다음 버튼이 뷰포트 모서리에 계속 붙어있도록. */}
@@ -192,7 +229,16 @@ export function ZoomableImageGroup({
                 alt={current.alt}
                 width={current.width}
                 height={current.height}
+                role="button"
+                tabIndex={0}
+                aria-label={isZoomedIn ? "이미지 축소" : "이미지 확대"}
                 onClick={(event) => {
+                  event.stopPropagation();
+                  setZoomedIn((prev) => !prev);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key !== "Enter" && event.key !== " ") return;
+                  event.preventDefault();
                   event.stopPropagation();
                   setZoomedIn((prev) => !prev);
                 }}
