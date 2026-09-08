@@ -88,41 +88,76 @@ Supabase로 관리(관리자 페이지/Table Editor로 입력 → 웹훅으로 �
 곡 하나가 여러 앨범에 중복 수록될 수 있어 `songs`-`albums`는 다대다로 둔다.
 
 ```sql
+create extension if not exists pgcrypto;  -- gen_random_uuid() 사용을 위해 필요
+
 create table albums (
-  id uuid primary key default gen_random_uuid(),
-  title text not null,
-  release_date date not null,
-  cover_image_url text  -- R2 링크
+  id               uuid primary key default gen_random_uuid(),
+  title            text not null,
+  title_ko         text,
+  album_type       text check (album_type in ('full', 'mini', 'ep')),
+  album_number     int,
+  release_date     date not null,
+  cover_image_url  text,             -- R2 링크
+  book_image_urls  text[],           -- 부클릿 등 여러 장 이미지, R2 링크 배열
+  created_at       timestamptz not null default now()
 );
 
 create table songs (
-  id uuid primary key default gen_random_uuid(),
-  title text not null
+  id               uuid primary key default gen_random_uuid(),
+  title            text not null,
+  title_ko         text,
+  cover_image_url  text,             -- R2 링크
+  created_at       timestamptz not null default now()
 );
 
 create table song_albums (          -- songs ↔ albums 다대다 연결 테이블
-  song_id  uuid not null references songs(id),
-  album_id uuid not null references albums(id),
+  song_id  uuid not null references songs(id) on delete cascade,
+  album_id uuid not null references albums(id) on delete cascade,
   primary key (song_id, album_id)
 );
 
 create table concerts (
-  id uuid primary key default gen_random_uuid(),
-  title text not null,
-  concert_date date not null,
-  poster_image_url text
+  id                uuid primary key default gen_random_uuid(),
+  title             text not null,
+  title_ko          text,
+  type              text check (type in ('festival', 'concert')),
+  concert_date      date not null,
+  poster_image_url  text,
+  created_at        timestamptz not null default now()
 );
 
 create table setlists (
-  concert_id   uuid not null references concerts(id),
-  song_id      uuid not null references songs(id),
+  concert_id   uuid not null references concerts(id) on delete cascade,
+  song_id      uuid not null references songs(id) on delete cascade,
   track_number int not null,
   primary key (concert_id, song_id)
 );
 ```
 
+모든 테이블에 RLS를 켜고 `anon`에게 `SELECT`만 허용하는 공개 읽기 정책을 건다 (쓰기는
+Admin 프로젝트가 서비스 롤 키로 수행하므로 별도 정책 불필요).
+
+```sql
+alter table albums enable row level security;
+alter table songs enable row level security;
+alter table song_albums enable row level security;
+alter table concerts enable row level security;
+alter table setlists enable row level security;
+
+create policy "public read" on albums for select using (true);
+create policy "public read" on songs for select using (true);
+create policy "public read" on song_albums for select using (true);
+create policy "public read" on concerts for select using (true);
+create policy "public read" on setlists for select using (true);
+
+grant select on albums, songs, song_albums, concerts, setlists to anon;
+```
+
 **미확정:** `setlists`의 PK를 `(concert_id, song_id)`로 뒀는데, 이는 "한 공연에서 같은 곡이
 두 번(예: 앙코르 반복) 불릴 수 없다"는 전제다. 가능하다면 별도 `id` PK로 바꿔야 한다.
+
+**미확정:** `song_albums`엔 앨범 내 트랙 순서 컬럼이 없다. 지금은 곡 제목순 등으로 대체
+표시하며, 실제 트랙 순서가 필요해지면 `track_number` 컬럼 추가를 검토한다.
 
 ### 6.3 집계 뷰 (fan-out 버그 주의)
 
@@ -135,6 +170,8 @@ create view song_statistics as
 select
   s.id as song_id,
   s.title as song_title,
+  s.title_ko as song_title_ko,
+  s.cover_image_url as song_cover_image_url,
   coalesce(stats.play_count, 0) as play_count,
   coalesce(stats.played_concerts, '[]'::json) as played_concerts,
   coalesce(albums.album_list, '[]'::json) as albums
@@ -142,22 +179,45 @@ from songs s
 left join (
   select sl.song_id,
          count(*) as play_count,
-         json_agg(c.title order by c.concert_date) as played_concerts
+         json_agg(
+           jsonb_build_object(
+             'title', c.title,
+             'title_ko', c.title_ko,
+             'concert_date', c.concert_date,
+             'poster_image_url', c.poster_image_url
+           ) order by c.concert_date
+         ) as played_concerts
   from setlists sl
   join concerts c on c.id = sl.concert_id
   group by sl.song_id
 ) stats on stats.song_id = s.id
 left join (
   select sa.song_id,
-         json_agg(jsonb_build_object('title', a.title, 'release_date', a.release_date)) as album_list
+         json_agg(
+           jsonb_build_object(
+             'title', a.title,
+             'title_ko', a.title_ko,
+             'album_type', a.album_type,
+             'album_number', a.album_number,
+             'release_date', a.release_date,
+             'cover_image_url', a.cover_image_url,
+             'book_image_urls', a.book_image_urls
+           )
+         ) as album_list
   from song_albums sa
   join albums a on a.id = sa.album_id
   group by sa.song_id
 ) albums on albums.song_id = s.id;
+
+grant select on song_statistics to anon;
 ```
 
 `play_count`는 `COUNT(*)`라 한 공연에서 같은 곡이 두 번 불렸다면 그것도 2회로 센다 —
 "몇 번 불렸는지"의 정의를 그렇게 잡는다는 전제이며, 6.2절의 PK 미확정 사항과 연결된다.
+
+이 뷰는 콘서트 통계 페이지(6.6절) 전용이다 — 노래 DB 페이지(6.5절)는 `play_count`/
+`played_concerts`가 필요 없어서 이 뷰를 쓰지 않고 `songs`/`albums`/`song_albums`를
+직접 조회한다.
 
 ### 6.4 데이터 입력 방식
 
@@ -166,3 +226,51 @@ left join (
 다만 Supabase Table Editor는 FK 컬럼에 대해 관련 행을 검색해서 고르는 드롭다운을 지원하므로
 생각보다 덜 고통스럽다. **당분간 Table Editor로 시작**하고, 입력 빈도/고통이 실제로 느껴지면
 그때 퀴즈용 관리자 페이지(5.1절)에 콘서트/세트리스트 CRUD 섹션을 추가하는 식으로 확장한다.
+스키마 변경도 마이그레이션 파일(`supabase/migrations/`) 없이 Table/SQL Editor에서 직접
+실행하고, 이 문서를 최신 스키마의 기준(source of truth)으로 유지한다.
+
+### 6.5 노래 DB 페이지 (곡/앨범 목록)
+
+즛토피아 허브 페이지(`/zutopia`)의 "역대 공연" 카드 위에 "노래 DB" 카드/버튼을 추가하고,
+`/zutopia/songs`에서 곡 목록과 앨범 목록을 탭으로 전환해 보여준다. 6.6절의 통계 페이지와
+달리 `play_count`/`played_concerts`가 필요 없으므로 `song_statistics` 뷰 대신
+`songs`/`albums`/`song_albums`를 직접 조회한다.
+
+**데이터 페칭:** `output: "export"`라 런타임 API 라우트가 없다 — "API"는 빌드 타임에 한 번
+실행되는 함수를 의미한다(5.2절과 동일 패턴). `@supabase/supabase-js`를 빌드 타임 전용으로
+호출하는 클라이언트(`src/lib/supabase/build-time-client.ts`)를 두고, 서버 컴포넌트
+(`page.tsx`)에서 빌드 시 딱 한 번 호출해 정적 HTML로 굽는다. 브라우저로는 이 코드가
+전달되지 않는다.
+
+**쿼리:** PostgREST 임베딩으로 다대다 관계를 한 번에 가져온다.
+
+- 곡 목록: `songs` 조회 + `song_albums(albums(*))` 임베딩
+- 앨범 목록: `albums` 조회 + `song_albums(songs(*))` 임베딩
+
+앨범 안 트랙 순서는 `song_albums`에 순서 컬럼이 없어(6.2절 미확정 사항) 곡 제목순으로
+정렬한다. `book_image_urls`는 이번 페이지에선 쓰지 않는다(부클릿 뷰어는 별도 기능).
+
+**파일 구조:**
+
+```text
+src/lib/supabase/build-time-client.ts       # 빌드타임 전용 supabase-js 클라이언트
+src/features/zutopia/song-db/
+  types.ts          # Song, Album, SongWithAlbums, AlbumWithSongs
+  data.ts           # getSongsWithAlbums(), getAlbumsWithSongs()
+  SongDbTabs.tsx     # "곡" / "앨범" 탭 전환 (client component, 데이터는 props로만 받음)
+  SongListView.tsx   # 곡 카드 그리드
+  AlbumListView.tsx  # 앨범 카드 그리드 (펼치면 수록곡)
+src/app/(pages)/zutopia/songs/page.tsx      # 신규 라우트, 서버 컴포넌트
+```
+
+`src/app/(pages)/zutopia/page.tsx`의 `ZUTOPIA_CATEGORIES.map(...)` 위에 "노래 DB" 링크
+카드를 하나 추가한다. 기존 카테고리 배열(MDX 아카이브 전용 구조)엔 넣지 않고 별도 링크로
+둔다 — 데이터 성격이 다르고, 나중에 추가될 통계 카드도 같은 방식으로 이어붙인다.
+
+**배포 시 주의:** Cloudflare Pages 빌드 환경에도 `NEXT_PUBLIC_SUPABASE_URL` /
+`NEXT_PUBLIC_SUPABASE_PUB_KEY`가 설정돼 있어야 빌드 타임 페칭이 동작한다.
+
+### 6.6 콘서트 통계 페이지 (예정)
+
+"역대 공연" 카드 아래에 추가할 예정인 통계 페이지. `song_statistics` 뷰를 사용해 곡별
+플레이 횟수·공연 목록을 보여준다는 것 외엔 아직 설계 전이다 — 별도로 다시 브레인스토밍한다.
