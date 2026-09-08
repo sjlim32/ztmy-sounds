@@ -1,3 +1,4 @@
+import "server-only";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
 
@@ -6,7 +7,13 @@ import type { Database } from "./database.types";
  * output: "export"라 런타임 서버가 없으므로, 이 함수는 서버 컴포넌트의
  * 최상위(page.tsx)에서만 호출해야 하며 클라이언트 컴포넌트로 전달하면 안 된다.
  */
+let cachedClient: ReturnType<typeof createClient<Database>> | undefined;
+
 export function createBuildTimeSupabaseClient() {
+  if (cachedClient) {
+    return cachedClient;
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUB_KEY;
 
@@ -16,5 +23,6 @@ export function createBuildTimeSupabaseClient() {
     );
   }
 
-  return createClient<Database>(url, key);
+  cachedClient = createClient<Database>(url, key);
+  return cachedClient;
 }

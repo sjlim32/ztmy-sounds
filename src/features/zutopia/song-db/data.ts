@@ -35,6 +35,6 @@ export async function getAlbumsWithSongs(): Promise<AlbumWithSongs[]> {
     ...album,
     songs: song_albums
       .map((row) => row.songs)
-      .sort((a, b) => a.title.localeCompare(b.title)),
+      .sort((a, b) => a.title.localeCompare(b.title, "ja")),
   }));
 }
