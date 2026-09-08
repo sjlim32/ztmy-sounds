@@ -1,11 +1,6 @@
 import { cn } from "@/lib/utils";
+import { ALBUM_TYPE_SHORT_LABEL } from "./labels";
 import type { SongWithAlbums } from "./types";
-
-const ALBUM_TYPE_LABEL: Record<string, string> = {
-  full: "정규",
-  mini: "미니",
-  ep: "EP",
-};
 
 export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
   if (songs.length === 0) {
@@ -47,7 +42,7 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                     className="rounded-full bg-white/10 px-2 py-0.5 font-mono text-xs text-white/60"
                   >
                     {album.album_type
-                      ? `${ALBUM_TYPE_LABEL[album.album_type]} · `
+                      ? `${ALBUM_TYPE_SHORT_LABEL[album.album_type]} · `
                       : ""}
                     {album.title}
                   </li>

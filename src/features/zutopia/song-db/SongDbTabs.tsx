@@ -2,15 +2,12 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { ACTIVE_TAB_CLASS, TAB_CLASS } from "../components/tab-styles";
 import { AlbumListView } from "./AlbumListView";
 import { SongListView } from "./SongListView";
 import type { AlbumWithSongs, SongWithAlbums } from "./types";
 
 type Tab = "songs" | "albums";
-
-const tabClass =
-  "hover:border-ztmy-magenta/60 rounded-full border border-white/15 bg-black/40 px-4 py-1.5 text-sm font-medium text-white/80 backdrop-blur-sm transition-colors hover:text-white";
-const activeTabClass = "border-ztmy-magenta/60 text-white";
 
 export function SongDbTabs({
   songs,
@@ -19,7 +16,9 @@ export function SongDbTabs({
   songs: SongWithAlbums[];
   albums: AlbumWithSongs[];
 }) {
-  const [tab, setTab] = useState<Tab>("songs");
+  const [tab, setTab] = useState<Tab>(
+    songs.length === 0 && albums.length > 0 ? "albums" : "songs",
+  );
 
   return (
     <div>
@@ -29,20 +28,24 @@ export function SongDbTabs({
         className="flex flex-wrap gap-2 border-b border-white/10 pb-4"
       >
         <button
+          id="song-db-tab-songs"
           type="button"
           role="tab"
           aria-selected={tab === "songs"}
+          aria-controls="song-db-panel-songs"
           onClick={() => setTab("songs")}
-          className={cn(tabClass, tab === "songs" && activeTabClass)}
+          className={cn(TAB_CLASS, tab === "songs" && ACTIVE_TAB_CLASS)}
         >
           곡 ({songs.length})
         </button>
         <button
+          id="song-db-tab-albums"
           type="button"
           role="tab"
           aria-selected={tab === "albums"}
+          aria-controls="song-db-panel-albums"
           onClick={() => setTab("albums")}
-          className={cn(tabClass, tab === "albums" && activeTabClass)}
+          className={cn(TAB_CLASS, tab === "albums" && ACTIVE_TAB_CLASS)}
         >
           앨범 ({albums.length})
         </button>
@@ -50,9 +53,21 @@ export function SongDbTabs({
 
       <div className="mt-8">
         {tab === "songs" ? (
-          <SongListView songs={songs} />
+          <div
+            id="song-db-panel-songs"
+            role="tabpanel"
+            aria-labelledby="song-db-tab-songs"
+          >
+            <SongListView songs={songs} />
+          </div>
         ) : (
-          <AlbumListView albums={albums} />
+          <div
+            id="song-db-panel-albums"
+            role="tabpanel"
+            aria-labelledby="song-db-tab-albums"
+          >
+            <AlbumListView albums={albums} />
+          </div>
         )}
       </div>
     </div>

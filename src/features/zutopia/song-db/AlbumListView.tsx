@@ -2,21 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import {
+  ALBUM_TYPE_ORDER,
+  ALBUM_TYPE_SECTION_LABEL,
+  ALBUM_TYPE_SHORT_LABEL,
+} from "./labels";
 import type { AlbumWithSongs } from "./types";
-
-const ALBUM_TYPE_ORDER = ["full", "mini", "ep"] as const;
-
-const ALBUM_TYPE_SECTION_LABEL: Record<string, string> = {
-  full: "정규 앨범",
-  mini: "미니 앨범",
-  ep: "EP",
-};
-
-const ALBUM_TYPE_SHORT_LABEL: Record<string, string> = {
-  full: "정규",
-  mini: "미니",
-  ep: "EP",
-};
 
 function groupAlbumsByType(albums: AlbumWithSongs[]) {
   const groups = new Map<string, AlbumWithSongs[]>();
@@ -30,6 +21,12 @@ function groupAlbumsByType(albums: AlbumWithSongs[]) {
     }
   }
   return groups;
+}
+
+function isAlbumTypeKey(
+  type: string,
+): type is (typeof ALBUM_TYPE_ORDER)[number] {
+  return (ALBUM_TYPE_ORDER as readonly string[]).includes(type);
 }
 
 export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
@@ -54,9 +51,7 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
   const groups = groupAlbumsByType(albums);
   const orderedTypes = [
     ...ALBUM_TYPE_ORDER.filter((type) => groups.has(type)),
-    ...[...groups.keys()].filter(
-      (type) => !(ALBUM_TYPE_ORDER as readonly string[]).includes(type),
-    ),
+    ...[...groups.keys()].filter((type) => !isAlbumTypeKey(type)),
   ];
 
   return (
@@ -64,7 +59,7 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
       {orderedTypes.map((type) => (
         <section key={type}>
           <p className="font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
-            {ALBUM_TYPE_SECTION_LABEL[type] ?? type}
+            {isAlbumTypeKey(type) ? ALBUM_TYPE_SECTION_LABEL[type] : type}
           </p>
 
           <div className="mt-3 flex overflow-x-auto pt-2 pb-4">
