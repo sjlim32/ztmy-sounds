@@ -5,7 +5,9 @@ export async function getSongsWithAlbums(): Promise<SongWithAlbums[]> {
   const supabase = createBuildTimeSupabaseClient();
   const { data, error } = await supabase
     .from("songs")
-    .select("id, title, title_ko, cover_image_url, created_at, song_albums(albums(*))")
+    .select(
+      "id, title, title_ko, cover_image_url, created_at, song_albums(albums(*))",
+    )
     .order("title");
 
   if (error) {

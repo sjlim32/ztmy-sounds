@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import { getAlbumsWithSongs, getSongsWithAlbums } from "@/features/zutopia/song-db/data";
+import {
+  getAlbumsWithSongs,
+  getSongsWithAlbums,
+} from "@/features/zutopia/song-db/data";
 import { SongDbTabs } from "@/features/zutopia/song-db/SongDbTabs";
 
 export const metadata: Metadata = {

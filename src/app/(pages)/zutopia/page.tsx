@@ -26,9 +26,7 @@ export default function ZutopiaHubPage() {
             <p className="hover:text-ztmy-pink text-lg font-semibold text-white transition-colors">
               {category.label}
             </p>
-            <p className="mt-1 text-sm text-white/50">
-              {category.description}
-            </p>
+            <p className="mt-1 text-sm text-white/50">{category.description}</p>
             <p className="mt-2 font-mono text-xs text-white/40">
               {category.entries.length}개 항목
             </p>

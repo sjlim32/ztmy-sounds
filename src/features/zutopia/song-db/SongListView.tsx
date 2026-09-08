@@ -13,13 +13,7 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
   }
 
   return (
-    <ul
-      className={cn(
-        "grid gap-4",
-        "tablet:grid-cols-2",
-        "wide:grid-cols-3",
-      )}
-    >
+    <ul className={cn("grid gap-4", "tablet:grid-cols-2", "wide:grid-cols-3")}>
       {songs.map((song) => (
         <li
           key={song.id}
@@ -38,7 +32,9 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
           )}
 
           <div className="min-w-0">
-            <p className="truncate text-base font-semibold text-white">{song.title}</p>
+            <p className="truncate text-base font-semibold text-white">
+              {song.title}
+            </p>
             {song.title_ko && (
               <p className="truncate text-sm text-white/50">{song.title_ko}</p>
             )}
@@ -50,7 +46,9 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                     key={album.id}
                     className="rounded-full bg-white/10 px-2 py-0.5 font-mono text-xs text-white/60"
                   >
-                    {album.album_type ? `${ALBUM_TYPE_LABEL[album.album_type]} · ` : ""}
+                    {album.album_type
+                      ? `${ALBUM_TYPE_LABEL[album.album_type]} · `
+                      : ""}
                     {album.title}
                   </li>
                 ))}

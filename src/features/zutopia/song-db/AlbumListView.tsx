@@ -14,16 +14,13 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
   const [openId, setOpenId] = useState<string | null>(null);
 
   if (albums.length === 0) {
-    return <p className="text-sm text-white/50">아직 등록된 앨범이 없습니다.</p>;
+    return (
+      <p className="text-sm text-white/50">아직 등록된 앨범이 없습니다.</p>
+    );
   }
 
   return (
-    <ul
-      className={cn(
-        "grid gap-4",
-        "tablet:grid-cols-2",
-      )}
-    >
+    <ul className={cn("grid gap-4", "tablet:grid-cols-2")}>
       {albums.map((album) => {
         const isOpen = openId === album.id;
         return (
@@ -46,31 +43,44 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                   className="size-16 shrink-0 rounded object-cover"
                 />
               ) : (
-                <div className="size-16 shrink-0 rounded bg-white/5" aria-hidden />
+                <div
+                  className="size-16 shrink-0 rounded bg-white/5"
+                  aria-hidden
+                />
               )}
 
               <div className="min-w-0 flex-1">
                 <p className="truncate text-base font-semibold text-white">
-                  {album.album_type ? `[${ALBUM_TYPE_LABEL[album.album_type]}] ` : ""}
+                  {album.album_type
+                    ? `[${ALBUM_TYPE_LABEL[album.album_type]}] `
+                    : ""}
                   {album.title}
                 </p>
                 {album.title_ko && (
-                  <p className="truncate text-sm text-white/50">{album.title_ko}</p>
+                  <p className="truncate text-sm text-white/50">
+                    {album.title_ko}
+                  </p>
                 )}
-                <p className="mt-1 font-mono text-xs text-white/40">{album.release_date}</p>
+                <p className="mt-1 font-mono text-xs text-white/40">
+                  {album.release_date}
+                </p>
               </div>
             </button>
 
             {isOpen && (
               <ul className="border-t border-white/10 px-4 py-3">
                 {album.songs.length === 0 ? (
-                  <li className="text-sm text-white/40">수록곡 정보가 없습니다.</li>
+                  <li className="text-sm text-white/40">
+                    수록곡 정보가 없습니다.
+                  </li>
                 ) : (
                   album.songs.map((song) => (
                     <li key={song.id} className="py-1 text-sm text-white/70">
                       {song.title}
                       {song.title_ko && (
-                        <span className="ml-2 text-white/40">{song.title_ko}</span>
+                        <span className="ml-2 text-white/40">
+                          {song.title_ko}
+                        </span>
                       )}
                     </li>
                   ))
