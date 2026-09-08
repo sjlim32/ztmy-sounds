@@ -7,8 +7,8 @@ const notice: Notice = {
   title: "사운드 플래닛 관련 안내사항",
   version: 1,
   content: festivalContent,
-  visible: true,
-  isAlwaysOpen: true,
+  visible: false,
+  isAlwaysOpen: false,
   isSlamVisible: false,
 };
 

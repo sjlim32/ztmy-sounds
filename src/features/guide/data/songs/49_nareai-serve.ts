@@ -71,7 +71,7 @@ const song: Song = {
     {
       time: "0:38.2",
       original: "荒めのギターで 掻き消したいや",
-      pronunciation: "아라메노 기타ー데 카키케시타이야",
+      pronunciation: "아라메노 기타-데 카키케시타이야",
       translation: "조잡한 기타로 흔적도 없이 사라져버리고 싶어",
     },
     {
@@ -85,7 +85,7 @@ const song: Song = {
     {
       time: "0:52.7",
       original: "適当ラリー やりとりが",
-      pronunciation: "^테키토오 라리ー 야리토리가^",
+      pronunciation: "^테키토오 라리- 야리토리가^",
       translation: "적당한 랠리- 주고받기가",
       slam: "핏 벌리기",
     },
@@ -104,7 +104,7 @@ const song: Song = {
     {
       time: "1:01.1",
       original: "馴れ合いサーブでしょ",
-      pronunciation: "나레아이 사ー브데쇼",
+      pronunciation: "나레아이 사-브데쇼",
       translation: "짜고 치는 서브잖아",
     },
     {
@@ -121,7 +121,7 @@ const song: Song = {
     {
       time: "1:04.5",
       original: "適当ラリーが 気が短いやつと",
-      pronunciation: "^테키토오 라리ー^ 키가 미지카이 야츠토",
+      pronunciation: "^테키토오 라리-^ 키가 미지카이 야츠토",
       translation: "적당한 랠리- 성미가 급한 녀석과",
       slam: "슬램 !",
     },
@@ -222,7 +222,7 @@ const song: Song = {
     {
       time: "2:42",
       original: "適当ラリー やりとりが",
-      pronunciation: "^테키토오 라리ー^ 야리토리가",
+      pronunciation: "^테키토오 라리-^ 야리토리가",
       translation: "적당한 랠리- 주고받기가",
       slam: "슬램 !",
     },
@@ -241,7 +241,7 @@ const song: Song = {
     {
       time: "2:50.8",
       original: "馴れ合いサーブでしょ",
-      pronunciation: "나레아이 사ー브데쇼",
+      pronunciation: "나레아이 사-브데쇼",
       translation: "짜고 치는 서브잖아",
     },
     {
@@ -258,7 +258,7 @@ const song: Song = {
     {
       time: "2:53.7",
       original: "適当ラリーが 気が短いやつと",
-      pronunciation: "테키토오 라리ー 키가 미지카이 야츠토",
+      pronunciation: "테키토오 라리- 키가 미지카이 야츠토",
       translation: "적당한 랠리- 성미가 급한 녀석과",
     },
     {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, RocknRoll_One } from "next/font/google";
 import localFont from "next/font/local";
 import { SerwistProvider } from "@serwist/turbopack/react";
+import { CustomCursor } from "@/components/CustomCursor";
 import { GuideDimOverlay } from "@/components/GuideDimOverlay";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
 import { Footer } from "@/components/Footer";
@@ -96,6 +97,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             __html: JSON.stringify(buildSiteJsonLdGraph()),
           }}
         />
+        <CustomCursor />
         <GuideDimOverlay />
         <SerwistProvider swUrl="/serwist/sw.js">
           <div className="relative z-10 flex min-h-0 flex-1 flex-col">

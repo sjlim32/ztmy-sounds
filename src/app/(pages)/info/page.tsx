@@ -1,27 +1,32 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import InfoContent from "@/features/info/info.mdx";
-import { visitEvent } from "@/data/event";
+import { originEvent } from "@/data/event";
 import { cn } from "@/lib/utils";
 import { buildMusicEventJsonLd } from "@/lib/structured-data";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 
-const description = `${visitEvent.tourName} 공연 일정과 장소, 유의사항 안내.`;
+// /info는 현재 안내 중인 공연(INFORMATION, info.tsx)의 상세 정보를 보여주는
+// 페이지라, 메타데이터도 그 공연과 같은 이벤트를 가리켜야 합니다. INFORMATION은
+// originEvent(NEXT STAGE)와 같은 공연을 다루므로 originEvent를 씁니다 — 이
+// 페이지가 안내하는 공연이 바뀌면 event.ts에서 어느 이벤트가 "현재"인지도
+// 함께 바뀌니 여기도 맞춰 갱신해야 합니다.
+const description = `${originEvent.tourName} 공연 일정과 장소, 유의사항 안내.`;
 const SCROLL_CONTAINER_ID = "info-scroll-container";
 
 export const metadata: Metadata = {
   title: "공연 정보",
   description,
   openGraph: {
-    title: visitEvent.tourName,
+    title: originEvent.tourName,
     description,
-    images: [{ url: visitEvent.tourImg }],
+    images: [{ url: originEvent.tourImg }],
   },
   twitter: {
     card: "summary_large_image",
-    title: visitEvent.tourName,
+    title: originEvent.tourName,
     description,
-    images: [visitEvent.tourImg],
+    images: [originEvent.tourImg],
   },
 };
 
@@ -40,7 +45,7 @@ export default function InfoPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(buildMusicEventJsonLd(visitEvent)),
+          __html: JSON.stringify(buildMusicEventJsonLd(originEvent)),
         }}
       />
 

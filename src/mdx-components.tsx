@@ -36,7 +36,7 @@ const components: MDXComponents = {
     </li>
   ),
   p: ({ className, children, ...props }) => (
-    <p className={cn("mt-3 text-white", className)} {...props}>
+    <p className={cn("text-white", className)} {...props}>
       {children}
     </p>
   ),

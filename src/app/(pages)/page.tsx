@@ -1,21 +1,99 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { visitEvent } from "@/data/event";
+import { visitEvent, originEvent, type Event } from "@/data/event";
 import { ARTIST } from "@/data/artist";
 import { Header } from "@/features/home/components/Header";
-import { NextVisit } from "@/features/home/components/NextVisit";
-import { Countdown } from "@/features/home/components/Countdown";
+import { NextEventCard } from "@/features/home/components/NextEventCard";
 import { MainNavLink } from "@/features/home/components/MainNavLink";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
 import { FlagIcon } from "@/components/icons/FlagIcon";
-import { useEventCountdown } from "@/features/home/lib/event-countdown";
+import { CalendarIcon } from "@/components/icons/CalendarIcon";
+import {
+  useEventCountdown,
+  getEventTargetMs,
+  DONE_AFTER_HOURS,
+} from "@/features/home/lib/event-countdown";
+
+// 태블릿 이상에서 처음 진입했을 때 내한/원정 중 어느 쪽을 펼쳐둘지 고르는
+// 기준 — 남은 시간이 더 짧은(더 임박한) 쪽. 이미 종료(isDone)된 쪽은 아무리
+// remaining이 작아도 후보에서 제외해 Infinity 취급합니다(둘 다 종료라면
+// 그때만 내한을 기본값으로). useEventCountdown의 remaining은 첫 tick이
+// 돌기 전(마운트 직후)엔 아직 null이라 이 판단에 쓸 수 없어서, 같은 공식을
+// getEventTargetMs로 동기 계산합니다.
+//
+// Date.now()에 의존하는 값이라 useState의 초기값으로 직접 쓰지 않습니다 —
+// 이 사이트는 output:export라 HTML이 빌드 시점에 고정되는데, 빌드 이후
+// 시간이 지나 isDone 여부가 뒤바뀐 채로 클라이언트가 하이드레이션하면
+// 서버(빌드 시점) 렌더와 클라이언트 렌더가 달라져 hydration mismatch가
+// 납니다. 그래서 초기값은 시간과 무관한 고정값(visitEvent)으로 두고,
+// mount 이후 effect에서만 이 함수로 보정합니다.
+function getInitialTabletOpenAccent(): Event["accent"] {
+  const now = Date.now();
+  const urgency = (event: Event) => {
+    const diffMs = getEventTargetMs(event) - now;
+    const isDone = -diffMs / 3_600_000 >= DONE_AFTER_HOURS;
+    return isDone ? Infinity : diffMs;
+  };
+  return urgency(visitEvent) <= urgency(originEvent)
+    ? visitEvent.accent
+    : originEvent.accent;
+}
 
 export default function Home() {
-  // 모바일/데스크톱용으로 Countdown이 아래에서 두 번 렌더링되는데, 타이머가
-  // 두 개 따로 돌지 않도록 여기서 한 번만 계산해서 내려줍니다.
-  const { remaining, hoursSincePast } = useEventCountdown(visitEvent);
+  // 모바일/데스크톱용으로 NextEventCard가 아래에서 여러 번 렌더링되는데(같은
+  // 이벤트가 모바일 영역과 태블릿 이상 영역에 동시에 마운트될 수 있음), 타이머가
+  // 이벤트마다 여러 개 따로 돌지 않도록 이벤트당 한 번만 계산해서 내려줍니다.
+  // NextEventCard가 각자 자기 이벤트의 Countdown도 안에서 함께 렌더링합니다.
+  const visit = useEventCountdown(visitEvent);
+  const origin = useEventCountdown(originEvent);
+
+  // 모바일은 카드 1개만 보여줄 수 있어서, 내한을 항상 우선 노출하고 내한이
+  // 종료된 뒤에만 원정을 기본으로 보여줍니다. 태블릿 이상은 둘 다 노출합니다.
+  const isVisitAvailable = !visit.isDone;
+  const mobileEvent = isVisitAvailable ? visitEvent : originEvent;
+  const mobile = isVisitAvailable ? visit : origin;
+
+  // 모바일은 카드가 1개뿐이라 독립적으로 접고 펼 수 있습니다(기본은 접힘).
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // 태블릿 이상은 내한/원정 카드가 동시에 보이는데, 이 중 하나는 항상
+  // 펼쳐져 있어야 해서 "몇 번째가 열려 있는지"만 값으로 갖습니다(null 없음).
+  // 처음 펼쳐지는 쪽은 남은 시간이 더 짧은(더 임박한) 이벤트(위
+  // getInitialTabletOpenAccent 참고). 이미 열려 있는 쪽을 다시 클릭하면
+  // 같은 값으로 다시 set되어 사실상 no-op이 되고, 닫혀 있던 쪽을 클릭하면
+  // 그쪽으로 전환됩니다. isDone이어도(날짜가 지나도) NextEventCard가 내용을
+  // 계속 렌더링하므로, 열려 있던 쪽이 종료돼도 펼침 콘텐츠가 사라지지
+  // 않습니다 — 다른 쪽으로 강제 전환할 필요 없이 tabletOpenAccent를 그대로
+  // 씁니다.
+  const [tabletOpenAccent, setTabletOpenAccent] = useState<Event["accent"]>(
+    visitEvent.accent,
+  );
+  // 마운트 이후(클라이언트 전용)에만 실제 시각 기준으로 보정 — 위 hydration
+  // mismatch 설명 참고. Date.now()는 렌더 중에 읽으면(즉 여기서 값을 그대로
+  // derive하면) 그 값 자체가 서버/클라이언트 사이에 달라질 수 있어서
+  // set-state-in-effect 규칙이 권장하는 "렌더 중 계산"으로는 애초에 풀 수
+  // 없는 경우입니다 — 마운트 후 클라이언트에서만 한 번 보정하는 게 의도된
+  // 동작입니다.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Date.now() 기반이라 렌더 중 계산이 불가능(위 주석 참고)
+    setTabletOpenAccent(getInitialTabletOpenAccent());
+  }, []);
+
+  // NextEventCard가 memo로 감싸여 있어서, onToggle을 인라인 화살표 함수로
+  // 내려주면 매 렌더마다 참조가 바뀌어 memo가 무력화됩니다 — useCallback으로
+  // 참조를 고정.
+  const toggleMobile = useCallback(() => setIsMobileOpen((open) => !open), []);
+  const openVisit = useCallback(
+    () => setTabletOpenAccent(visitEvent.accent),
+    [],
+  );
+  const openOrigin = useCallback(
+    () => setTabletOpenAccent(originEvent.accent),
+    [],
+  );
 
   return (
     <>
@@ -53,13 +131,26 @@ export default function Home() {
                 icon={InfoIcon}
                 accent="pink"
               />
+              <MainNavLink
+                href="/zutopia"
+                eyebrow="Zutopia"
+                label="즛토피아"
+                icon={CalendarIcon}
+                accent="sun"
+              />
             </div>
           </div>
 
           <div className="mt-auto flex flex-col items-center gap-2.5 px-4 py-3">
-            <NextVisit event={visitEvent} />
-
-            <Countdown remaining={remaining} hoursSincePast={hoursSincePast} />
+            <NextEventCard
+              event={mobileEvent}
+              remaining={mobile.remaining}
+              isEventDay={mobile.isEventDay}
+              daysUntilEvent={mobile.daysUntilEvent}
+              isDone={mobile.isDone}
+              isOpen={isMobileOpen}
+              onToggle={toggleMobile}
+            />
           </div>
         </div>
         {/* MOBILE END */}
@@ -68,13 +159,30 @@ export default function Home() {
           id="main-left"
           data-role="visit-info"
           className={cn(
-            "fixed top-1/2 left-10 hidden -translate-y-1/2 flex-col gap-6",
+            "fixed top-1/2 left-10 hidden -translate-y-1/2 flex-col gap-3",
             "tablet:flex",
           )}
         >
-          <NextVisit event={visitEvent} />
+          <NextEventCard
+            event={visitEvent}
+            remaining={visit.remaining}
+            isEventDay={visit.isEventDay}
+            daysUntilEvent={visit.daysUntilEvent}
+            isDone={visit.isDone}
+            isOpen={tabletOpenAccent === visitEvent.accent}
+            onToggle={openVisit}
+          />
 
-          <Countdown remaining={remaining} hoursSincePast={hoursSincePast} />
+          {/* 태블릿 이상에서는 내한/원정 둘 다 각자의 타이머와 함께 노출. */}
+          <NextEventCard
+            event={originEvent}
+            remaining={origin.remaining}
+            isEventDay={origin.isEventDay}
+            daysUntilEvent={origin.daysUntilEvent}
+            isDone={origin.isDone}
+            isOpen={tabletOpenAccent === originEvent.accent}
+            onToggle={openOrigin}
+          />
         </section>
 
         <nav
@@ -105,6 +213,13 @@ export default function Home() {
             label="공연 정보"
             icon={InfoIcon}
             accent="pink"
+          />
+          <MainNavLink
+            href="/zutopia"
+            eyebrow="Zutopia"
+            label="즛토피아"
+            icon={CalendarIcon}
+            accent="sun"
           />
         </nav>
       </main>

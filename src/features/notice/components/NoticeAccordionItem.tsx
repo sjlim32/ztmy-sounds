@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { cn } from "@/lib/utils";
 import type { Notice } from "@/features/notice/lib/types";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
@@ -22,6 +23,7 @@ export function NoticeAccordionItem({
   onDismissChange,
 }: NoticeAccordionItemProps) {
   const Content = notice.content;
+  const contentId = useId();
 
   return (
     <div
@@ -37,6 +39,8 @@ export function NoticeAccordionItem({
       <button
         type="button"
         onClick={onToggle}
+        aria-expanded={isOpen}
+        aria-controls={contentId}
         className={cn(
           "group relative flex w-full flex-col gap-1.5 text-left focus-visible:outline-none",
           "tablet:px-4 tablet:py-3",
@@ -85,6 +89,8 @@ export function NoticeAccordionItem({
       </button>
 
       <div
+        id={contentId}
+        inert={!isOpen}
         className={cn(
           "grid transition-[grid-template-rows] duration-300 ease-out",
           isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",

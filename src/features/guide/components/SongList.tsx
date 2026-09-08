@@ -7,10 +7,8 @@ import { HomeIcon } from "@/components/icons/HomeIcon";
 import { CallIcon } from "@/features/guide/components/CallIcon";
 import { getCachedSongCallTags } from "@/features/guide/lib/song-call-tags";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
-import {
-  accentBarStyles,
-  useScrollFadeMask,
-} from "@/features/guide/components/list-entrance";
+import { accentBarStyles } from "@/features/guide/components/list-entrance";
+import { useScrollFadeMask } from "@/lib/use-scroll-fade-mask";
 
 interface SongListProps {
   selectedSongId: string | null;

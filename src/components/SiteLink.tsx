@@ -3,8 +3,9 @@ import { cn } from "@/lib/utils";
 import { ExternalLinkIcon } from "@/components/icons/ExternalLinkIcon";
 
 interface SiteLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-  noIcon?: boolean;
   children: ReactNode;
+  noIcon?: boolean;
+  disabled?: boolean;
 }
 
 /**
@@ -14,22 +15,25 @@ interface SiteLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
  */
 export function SiteLink({
   href,
-  noIcon = false,
   className,
   children,
+  noIcon = false,
+  disabled = false,
   ...props
 }: SiteLinkProps) {
   const isExternal = href?.startsWith("http");
 
   return (
     <a
-      href={href}
+      href={disabled ? undefined : href}
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
       className={cn(
         "text-indigo-100 underline underline-offset-2 transition-colors hover:text-white",
+        disabled ? "cursor-not-allowed" : "cursor-pointer",
         className,
       )}
+      aria-disabled={disabled}
       {...props}
     >
       {children}

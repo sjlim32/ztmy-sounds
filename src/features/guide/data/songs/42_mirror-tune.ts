@@ -123,7 +123,7 @@ const song: Song = {
       translation: "좀 더 알려줘",
     },
     {
-      time: "0:40",
+      time: "0:39.8",
       original: "有耶無耶な未知数",
       pronunciation: "우야무야나 미치스우",
       translation: "있는 듯 없는 듯한 미지수",
@@ -141,31 +141,31 @@ const song: Song = {
       translation: "언제부터일까 홀로 무대에",
     },
     {
-      time: "0:47",
+      time: "0:46.9",
       original: "思いやりよりずる賢さなんて",
       pronunciation: "오모이야리요리 즈루가시코사 난테",
       translation: "배려보다 교활함이라니",
     },
     {
-      time: "0:49.8",
+      time: "0:49.6",
       original: "品がないし",
       pronunciation: "힌가 나이시",
       translation: "품위 없고",
     },
     {
-      time: "0:52.5",
+      time: "0:52.4",
       original: "うんと やり切れない場面で",
       pronunciation: "즛토 야리키레나이 바멘데",
       translation: "잘 해낼 수 없는 상황에서",
     },
     {
-      time: "0:56",
+      time: "0:56.1",
       original: "僕が 信じていたいもの",
       pronunciation: "보쿠가 신지테 이타이 모노",
       translation: "내가 믿고 싶은 것은",
     },
     {
-      time: "1:00",
+      time: "0:59.9",
       original: "もちろん問題は山積みですが yey",
       pronunciation: "모치롱 몬다이와 야마즈미 데스가 **yey**",
       translation: "당연히 문제는 산더미지만요 yey",
@@ -193,7 +193,7 @@ const song: Song = {
       translation: "깊은밤에도 계속 빛나고있어",
     },
     {
-      time: "1:14",
+      time: "1:14.1",
       original: "神秘的なミラーチューン yey",
       pronunciation: "심피테키나 미라츈 **yey**",
       translation: "신비한 미러튠 yey",
@@ -203,7 +203,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:18",
+      time: "1:18.1",
       original: "君がいなきゃ始まんない",
       pronunciation: "키미가 이나캬 하지만나이",
       translation: "네가 없으면 시작하지 않아",
@@ -213,7 +213,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:20",
+      time: "1:20.2",
       original: "繋ぐぜ笑っとく",
       pronunciation: "츠나구제 와랏토쿠",
       translation: "이어갈게 웃어 줘",
@@ -223,7 +223,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:22",
+      time: "1:22.2",
       original: "どんな逆境だって 煮詰まった",
       pronunciation: "돈나 걋쿄오닷테 니츠맛타",
       translation: "어떤 역경이라도 견뎌낸",
@@ -233,7 +233,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:25",
+      time: "1:25.1",
       original: "頑固な僕だって",
       pronunciation: "간코나 보쿠닷테",
       translation: "완고한 나조차도",
@@ -243,7 +243,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:27",
+      time: "1:27.1",
       original: "めんどくさい☆諦め悪いみたい",
       pronunciation: "멘도쿠사이☆ 아키라메 와루이미타이",
       translation: "귀찮아☆라며 포기하지 못하는 것 같아",
@@ -253,7 +253,7 @@ const song: Song = {
       },
     },
     {
-      time: "1:30",
+      time: "1:29.7",
       original: "まだ重々謙遜したい yey",
       pronunciation: "마다 쥬우쥬우 켄손시타이 yey",
       translation: "아직 계속 겸손하고 싶어 yey",
@@ -299,13 +299,13 @@ const song: Song = {
       translation: "더 나은 관계 선택하기 위해",
     },
     {
-      time: "2:05",
+      time: "2:05.3",
       original: "通やしてたいもの",
       pronunciation: "츠이야 시테타이 모노",
       translation: "끝까지 써버리고 싶은 것",
     },
     {
-      time: "2:08",
+      time: "2:07.4",
       original: "変身モード全開でクリアな情景",
       pronunciation: "헨신모-도 젠카이데 쿠리아나 죠오케이",
       translation: "변신 모드 전개로 깔끔한 광경",
@@ -317,25 +317,25 @@ const song: Song = {
       translation: "몇 번이나 들은 디스켓",
     },
     {
-      time: "2:13",
+      time: "2:12.8",
       original: "憧れはきっと超えてくもの ﾓｯﾄ",
       pronunciation: "아코가레와 킷토 코에테쿠모노 못토",
       translation: "동경은 분명 뛰어넘는 것 좀 더",
     },
     {
-      time: "2:16",
+      time: "2:15.9",
       original: "ドキドキするほう優先しようよ",
       pronunciation: "도키도키스루 호오 유우센시요우요",
       translation: "두근두근거리는 걸 우선시하자",
     },
     {
-      time: "2:20",
+      time: "2:20.2",
       original: "かぎりがあるもの",
       pronunciation: "카기리가 아루 모노",
       translation: "한계가 있는 것",
     },
     {
-      time: "2:23",
+      time: "2:22.3",
       original: "もちろん引き下がりはしないですが yey",
       pronunciation: "모치롱 히키사가리와 시나이데스가 **yey**",
       translation: "물론 물러서지는 않겠지만 yey",
@@ -345,13 +345,13 @@ const song: Song = {
       },
     },
     {
-      time: "2:26",
+      time: "2:25.9",
       original: "好きになってはもらいたいし",
       pronunciation: "스키니 낫테와 모라이타이시",
       translation: "좋아해줬으면 하고",
     },
     {
-      time: "2:30",
+      time: "2:29.8",
       original: "心意気やんちゃで危なっかしいけど yey",
       pronunciation: "코코로이키 얀챠데 아부낫카시이케도 **yey**",
       translation: "마음만 넘쳐서 위태롭지만서도 yey",
@@ -361,7 +361,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:34",
+      time: "2:33.4",
       original: "確信に疑えてる",
       pronunciation: "카쿠신니 우타가에테루",
       translation: "확신하며 의심하고 있어",
@@ -373,7 +373,7 @@ const song: Song = {
       translation: "그건 꿈의 space tune ~",
     },
     {
-      time: "2:41",
+      time: "2:40.9",
       original: "君がいなきゃ始まんない",
       pronunciation: "키미가 이나캬 하지만나이",
       translation: "네가 없으면 시작되지 않아",
@@ -383,7 +383,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:43",
+      time: "2:42.85",
       original: "繋ぐぜ笑っとく",
       pronunciation: "츠나구제 와랏토쿠",
       translation: "손 잡자 웃어 줘",
@@ -393,7 +393,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:45",
+      time: "2:44.8",
       original: "どんな逆境だって 煮詰まった",
       pronunciation: "돈나 걋쿄오닷테 니츠맛타",
       translation: "어떤 역경이라도 견뎌낸",
@@ -403,7 +403,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:48",
+      time: "2:47.7",
       original: "頑固な僕だって",
       pronunciation: "간코나 보쿠닷테",
       translation: "완고한 나조차도",
@@ -413,7 +413,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:50",
+      time: "2:49.7",
       original: "めんどくさい☆諦め悪いみたい",
       pronunciation: "멘도쿠사이☆ 아키라메 와루이미타이",
       translation: "귀찮아☆라며 포기하지 못하는 것 같아",
@@ -433,7 +433,7 @@ const song: Song = {
       },
     },
     {
-      time: "2:56",
+      time: "2:55.8",
       original: "止まらないよ心臓 揺るがないんだ",
       pronunciation: "토마라나이요 신조 유루가나인다",
       translation: "멈추지 않아 심장이 동요하지 않아",
@@ -458,28 +458,28 @@ const song: Song = {
       interlude: true,
     },
     {
-      time: "4:04",
+      time: "4:03.8",
       original: "とろけそうな月の狭間 毒だ",
       pronunciation: "토로케소오나 츠키노 하자마 도쿠다",
       translation: "녹을 것 같은 달 사이 독이야",
     },
     {
-      time: "4:08",
+      time: "4:07.9",
       original: "甘酸っぱい絆を恐れてしまうような",
       pronunciation: "아마즛파이 키즈나오 오소레테 시마우요우나",
       translation: "새콤달콤한 인연을 깨뜨려버리는",
     },
     {
-      time: "4:11",
+      time: "4:11.3",
       original: "未開拓な世界は 矛盾で不安定で",
       pronunciation: "미가이타쿠나 세카이와 무쥰데 후안테이데",
       translation: "개척되지 않은 세상은 모순으로 불안정해서",
     },
     {
-      time: "4:16",
+      time: "4:15.8",
       original: "カラ元気だよ。。。",
-      pronunciation: "카라 겡키다요. . . .",
-      translation: "허세란 말야. . . .",
+      pronunciation: "카라 겡키다요。。。",
+      translation: "허세란 말야. . . ",
     },
     {
       time: "4:19",
@@ -492,7 +492,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:24.5",
+      time: "4:24.4",
       original: "ye ye ye yey",
       pronunciation: "**ye ye ye yey**",
       translation: "ye ye ye yey",
@@ -502,7 +502,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:26",
+      time: "4:25.9",
       original: "君がいなきゃ始まんない",
       pronunciation: "키미가 이나캬 하지만나이",
       translation: "네가 없으면 시작되지 않아",
@@ -512,7 +512,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:28",
+      time: "4:27.9",
       original: "歌うぜ GACHIフォーㆍユー",
       pronunciation: "우타우제 GACHI 포- 유-",
       translation: "노래할게 GACHI for you",
@@ -522,7 +522,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:30",
+      time: "4:29.8",
       original: "どんな逆境だってあっちゅう間だ",
       pronunciation: "돈나 걋쿄오닷테 앗츄우맛다",
       translation: "어떤 역경도 순식간에 지나가",
@@ -532,7 +532,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:33",
+      time: "4:32.7",
       original: "頑固な僕だって",
       pronunciation: "간코나 보쿠닷테",
       translation: "완고한 나조차도",
@@ -542,7 +542,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:34.5",
+      time: "4:34.3",
       original: "めんどくさい☆諦め悪いみたい",
       pronunciation: "멘도쿠사이☆ 아키라메 와루이미타이",
       translation: "귀찮아☆라며 포기하지 못하는 것 같아",
@@ -552,7 +552,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:37.3",
+      time: "4:37.2",
       original: "まだ準々決勝したい yey",
       pronunciation: "마다 쥰쥰켓쇼오 시타이 yey",
       translation: "아직 준준결승전을 하고 싶어 yey",
@@ -562,9 +562,9 @@ const song: Song = {
       },
     },
     {
-      time: "4:40.7",
+      time: "4:40.6",
       original: "染まらないよ心臓 揺るがないんだ",
-      pronunciation: "소마라나이요 신조 유루가나인다",
+      pronunciation: "소마라나이요 신조 유루가나인다", // TODO : 토마라나이요 인가?
       translation: "물들지 않아 심장은 흔들리지 않아",
       cheer: {
         text: "",
@@ -572,7 +572,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:53.8",
+      time: "4:53.75",
       original: "mirror tune ~",
       pronunciation: "미라 츈 ~",
       translation: "",
@@ -582,7 +582,7 @@ const song: Song = {
       },
     },
     {
-      time: "4:54.5",
+      time: "4:54.65",
       original: "♫",
       pronunciation: "",
       translation: "",

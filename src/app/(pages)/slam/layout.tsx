@@ -2,6 +2,7 @@ import { PlayerProvider } from "@/features/guide/player-context";
 import { GuideModeProvider } from "@/features/guide/guide-mode-context";
 import { GuidePlayerArea } from "@/features/guide/components/GuidePlayerArea";
 import { GuideListScroll } from "@/features/guide/components/GuideListScroll";
+import { GuideMainScrollArea } from "@/features/guide/components/GuideMainScrollArea";
 import { SongPanel } from "@/features/guide/components/SongPanel";
 import { NoticePanel } from "@/features/notice/components/NoticePanel";
 import { cn } from "@/lib/utils";
@@ -23,15 +24,10 @@ export default function SlamLayout({ children }: LayoutProps<"/slam">) {
               "wide:pr-16",
             )}
           >
-            <div
-              className={cn(
-                "contents",
-                "tablet:flex tablet:min-h-0 tablet:min-w-0 tablet:flex-1 tablet:flex-col tablet:items-center tablet:justify-center tablet:self-stretch tablet:overflow-y-auto",
-              )}
-            >
+            <GuideMainScrollArea>
               <GuidePlayerArea />
               <NoticePanel />
-            </div>
+            </GuideMainScrollArea>
             <SongPanel />
           </div>
         </GuideListScroll>

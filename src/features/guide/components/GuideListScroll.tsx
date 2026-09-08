@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { useSelectedLayoutSegment } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useScrollFadeMask } from "@/features/guide/components/list-entrance";
+import { useScrollFadeMask } from "@/lib/use-scroll-fade-mask";
 
 /**
  * 모바일 전용 리스트 화면(/guide) 스크롤 컨테이너. NoticePanel과

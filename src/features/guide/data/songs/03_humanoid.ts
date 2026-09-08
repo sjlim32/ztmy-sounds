@@ -107,8 +107,8 @@ const song: Song = {
     {
       time: "1:01.3",
       original: "きっと水でさえ この熱でさえ",
-      pronunciation: "킷토 미즈데사에 코노 네츠데사에",
-      translation: "^분명^ 물조차도 이 열기조차도",
+      pronunciation: "^킷토^ 미즈데사에 코노 네츠데사에",
+      translation: "분명 물조차도 이 열기조차도",
       slam: "슬램 !",
     },
     {
@@ -205,8 +205,8 @@ const song: Song = {
     {
       time: "2:01.7",
       original: "桃味の 炭酸水に2人潜り込んで",
-      pronunciation: "모모아지노 탄산스이니 후타리 모구리콘데",
-      translation: "^복숭아맛^ 탄산수에 둘이서 뛰어들어서",
+      pronunciation: "^모모아지노^ 탄산스이니 후타리 모구리콘데",
+      translation: "복숭아맛 탄산수에 둘이서 뛰어들어서",
       slam: "핏 벌리기",
     },
     {
@@ -218,8 +218,8 @@ const song: Song = {
     {
       time: "2:15.5",
       original: "きっと震えさえ この重ささえ",
-      pronunciation: "킷토 후루에사에 코노 오모사사에",
-      translation: "^분명^ 이 떨림도 이 무게마저",
+      pronunciation: "^킷토^ 후루에사에 코노 오모사사에",
+      translation: "분명 이 떨림도 이 무게마저",
       slam: "슬램 !",
     },
     {
@@ -329,8 +329,8 @@ const song: Song = {
     {
       time: "3:15.2",
       original: "今日を終わらせるために",
-      pronunciation: "쿄-오 오와라세루타메니",
-      translation: "오늘을 끝내기 ^위해서^",
+      pronunciation: "쿄-오 오와라세루^타메니^",
+      translation: "오늘을 끝내기 위해서",
       slam: "핏 벌리기",
     },
     {
@@ -342,7 +342,7 @@ const song: Song = {
     {
       time: "3:26.5",
       original: "感じていないのなら",
-      pronunciation: "^칸지^테이나이노나라",
+      pronunciation: "^칸지테이나이^노나라",
       translation: "아무것도 느끼지 못한다면",
       slam: "슬램 !",
     },

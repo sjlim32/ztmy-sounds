@@ -30,11 +30,16 @@ export function EventDetails({ event }: EventDetailsProps) {
       )}
 
       <Field label="공식 사이트">
-        <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <span className="tablet:self-center flex flex-wrap items-center gap-x-4 gap-y-1">
           {event.url.official.map((official) => {
             const Icon = SOCIAL_PLATFORM_ICON[official.platform];
             return (
-              <SiteLink key={official.href} href={official.href} noIcon>
+              <SiteLink
+                key={official.href}
+                href={official.href}
+                noIcon
+                aria-label={official.name}
+              >
                 <Icon className="h-4 w-4" />
               </SiteLink>
             );
@@ -55,7 +60,7 @@ function Field({
   return (
     <li className="flex gap-2 before:text-white/30 before:content-['-']">
       <div className="tablet:flex-row tablet:items-baseline tablet:gap-2 flex flex-col gap-1">
-        <span className="tablet:w-20 shrink-0">{label}:</span>
+        <span className="tablet:w-24 shrink-0">{label}:</span>
         {children}
       </div>
     </li>
@@ -66,10 +71,23 @@ function LinkList({ items }: { items: Url[] }) {
   return (
     <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
       {items.map((item) => (
-        <SiteLink key={item.href} href={item.href} className="font-semibold">
+        <SiteLink
+          key={item.href}
+          href={item.href}
+          className="font-semibold"
+          disabled={item.disabled}
+        >
           {item.name}
         </SiteLink>
       ))}
     </span>
+  );
+}
+
+export function ImageLabel({ id, label }: { id: string; label: string }) {
+  return (
+    <h2 id={id} className="mt-6 mb-3 text-xl font-bold">
+      {label}
+    </h2>
   );
 }

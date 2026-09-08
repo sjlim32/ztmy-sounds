@@ -6,15 +6,17 @@ import { cn } from "@/lib/utils";
 import { CloseIcon } from "@/components/icons/CloseIcon";
 import { SiteLink } from "@/components/SiteLink";
 
-type ThumbnailCrop = "center" | "top" | "bottom";
+export type ThumbnailCrop = "center" | "top" | "bottom";
 
-const THUMBNAIL_CROP_CLASS: Record<ThumbnailCrop, string> = {
+// ZoomableImageGroup(같은 섹션 안 이미지를 좌/우로 넘겨보는 갤러리 버전)도
+// 같은 썸네일 규칙을 씁니다.
+export const THUMBNAIL_CROP_CLASS: Record<ThumbnailCrop, string> = {
   center: "object-center",
   top: "object-top",
   bottom: "object-bottom",
 };
 
-const DEFAULT_THUMBNAIL_SIZE = 160;
+export const DEFAULT_THUMBNAIL_SIZE = 160;
 
 interface ZoomableImageProps {
   src: string;
