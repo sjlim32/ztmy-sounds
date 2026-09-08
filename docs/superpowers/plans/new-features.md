@@ -65,3 +65,104 @@
 3. **자동 재빌드:** 신호를 받은 메인 프로젝트(Cloudflare)가 백그라운드에서 즉시 새 빌드를 시작합니다.
 4. **정적 생성:** 빌드 과정에서 Next.js 서버 컴포넌트가 Supabase의 최신 데이터를 한 번 긁어와(Fetch) 모든 페이지를 정적 HTML로 구워냅니다 (Bake).
 5. **라이브 반영:** 빌드 완료(1~2분 소요) 후 유저들은 추가적인 DB 조회 지연 없이 초고속으로 갱신된 콘텐츠를 소비합니다. 검색엔진 봇(SEO) 역시 완성된 HTML을 완벽하게 수집합니다.
+
+---
+
+## 6. 즛토피아 콘서트 아카이브 설계
+
+`main`에 이미 있는 즛토피아 아카이브 페이지에 "역대 공연" 섹션을 추가한다. 세트리스트 곡을
+수록 앨범/발매일로 필터링하고, 곡별로 몇 번 불렸는지·어떤 공연에서 불렸는지 보여준다.
+
+### 6.1 계산 위치: "백엔드 vs 프론트"가 아니라 "원본 데이터가 코드냐 DB냐"
+
+이 사이트는 `output: "export"` 완전 정적이라, 집계/필터링을 어디서 하든 최종적으로는
+**빌드 타임에 한 번 계산되어 정적으로 구워진다** — 런타임 서버가 없어서 "백엔드가 매 요청마다
+계산"하는 경로 자체가 없다. 그래서 실제 결정 포인트는 계산 위치가 아니라 **원본 데이터를
+코드(git)로 관리하느냐, Supabase로 관리하느냐**다. 공연은 앞으로도 계속 열리는 이벤트라
+Supabase로 관리(관리자 페이지/Table Editor로 입력 → 웹훅으로 재빌드, 5.2절과 동일 패턴)하는
+쪽을 택했다. 집계·조인은 빌드 타임에 끝내고, 브라우저는 이미 계산된 배열을 `.filter()`로
+걸러 보여주기만 한다.
+
+### 6.2 데이터 모델
+
+곡 하나가 여러 앨범에 중복 수록될 수 있어 `songs`-`albums`는 다대다로 둔다.
+
+```sql
+create table albums (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  release_date date not null,
+  cover_image_url text  -- R2 링크
+);
+
+create table songs (
+  id uuid primary key default gen_random_uuid(),
+  title text not null
+);
+
+create table song_albums (          -- songs ↔ albums 다대다 연결 테이블
+  song_id  uuid not null references songs(id),
+  album_id uuid not null references albums(id),
+  primary key (song_id, album_id)
+);
+
+create table concerts (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  concert_date date not null,
+  poster_image_url text
+);
+
+create table setlists (
+  concert_id   uuid not null references concerts(id),
+  song_id      uuid not null references songs(id),
+  track_number int not null,
+  primary key (concert_id, song_id)
+);
+```
+
+**미확정:** `setlists`의 PK를 `(concert_id, song_id)`로 뒀는데, 이는 "한 공연에서 같은 곡이
+두 번(예: 앙코르 반복) 불릴 수 없다"는 전제다. 가능하다면 별도 `id` PK로 바꿔야 한다.
+
+### 6.3 집계 뷰 (fan-out 버그 주의)
+
+`song_albums`와 `setlists`를 한 쿼리에서 동시에 JOIN하면 카티전 곱이 생겨 `COUNT`가
+부풀어 오른다 (곡이 앨범 2개 + 공연 3번이면 조인 결과가 6행이 되어버림). 두 집계를
+서브쿼리로 분리해서 조인 전에 각각 끝내야 한다.
+
+```sql
+create view song_statistics as
+select
+  s.id as song_id,
+  s.title as song_title,
+  coalesce(stats.play_count, 0) as play_count,
+  coalesce(stats.played_concerts, '[]'::json) as played_concerts,
+  coalesce(albums.album_list, '[]'::json) as albums
+from songs s
+left join (
+  select sl.song_id,
+         count(*) as play_count,
+         json_agg(c.title order by c.concert_date) as played_concerts
+  from setlists sl
+  join concerts c on c.id = sl.concert_id
+  group by sl.song_id
+) stats on stats.song_id = s.id
+left join (
+  select sa.song_id,
+         json_agg(jsonb_build_object('title', a.title, 'release_date', a.release_date)) as album_list
+  from song_albums sa
+  join albums a on a.id = sa.album_id
+  group by sa.song_id
+) albums on albums.song_id = s.id;
+```
+
+`play_count`는 `COUNT(*)`라 한 공연에서 같은 곡이 두 번 불렸다면 그것도 2회로 센다 —
+"몇 번 불렸는지"의 정의를 그렇게 잡는다는 전제이며, 6.2절의 PK 미확정 사항과 연결된다.
+
+### 6.4 데이터 입력 방식
+
+퀴즈(`quiz_questions` 단일 테이블)와 달리 이건 공연 하나 추가할 때마다 `setlists`에
+10~20행씩, 각 행마다 `song_id`를 정확히 골라 넣어야 해서 반복 작업량과 실수 가능성이 크다.
+다만 Supabase Table Editor는 FK 컬럼에 대해 관련 행을 검색해서 고르는 드롭다운을 지원하므로
+생각보다 덜 고통스럽다. **당분간 Table Editor로 시작**하고, 입력 빈도/고통이 실제로 느껴지면
+그때 퀴즈용 관리자 페이지(5.1절)에 콘서트/세트리스트 CRUD 섹션을 추가하는 식으로 확장한다.
