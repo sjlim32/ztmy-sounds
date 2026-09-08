@@ -12,6 +12,7 @@ const PRIORITY: Record<string, number> = {
   "/guide": 0.8,
   "/slam": 0.6,
   "/zutopia": 0.5,
+  "/zutopia/songs": 0.4,
   "/credits": 0.3,
 };
 
@@ -19,14 +20,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
   const slamSongList = getSongsWithTag("slam", songList);
 
-  const staticRoutes = ["/", "/guide", "/info", "/slam", "/zutopia", "/credits"].map(
-    (path) => ({
-      url: `${SITE_URL}${path}`,
-      lastModified,
-      changeFrequency: "weekly" as const,
-      priority: PRIORITY[path],
-    }),
-  );
+  const staticRoutes = [
+    "/",
+    "/guide",
+    "/info",
+    "/slam",
+    "/zutopia",
+    "/zutopia/songs",
+    "/credits",
+  ].map((path) => ({
+    url: `${SITE_URL}${path}`,
+    lastModified,
+    changeFrequency: "weekly" as const,
+    priority: PRIORITY[path],
+  }));
 
   const songRoutes = songList.map((song) => ({
     url: `${SITE_URL}/guide/${song.id}`,
