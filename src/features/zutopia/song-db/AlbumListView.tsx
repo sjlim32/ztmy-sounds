@@ -91,12 +91,11 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                     aria-expanded={isSelected}
                     aria-label={formatAlbumHoverLabel(album)}
                     style={{
-                      zIndex: isSelected ? 60 : index,
                       marginLeft: index === 0 ? 0 : "-2.5rem",
                     }}
                     className={cn(
                       "group relative shrink-0",
-                      "transition-[transform,filter] duration-300 ease-out",
+                      "transition-[transform,filter] duration-500 ease-in-out",
                       SHELF_TILT[index % SHELF_TILT.length],
                       SHELF_LEAN[index % SHELF_LEAN.length],
                       "tablet:hover:z-50 tablet:hover:rotate-0 tablet:hover:-translate-y-6 tablet:hover:scale-110 tablet:hover:brightness-110",
@@ -111,6 +110,7 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                         loading="lazy"
                         className={cn(
                           "h-36 w-36 rounded object-cover shadow-lg ring-1 ring-white/10",
+                          "transition-shadow duration-500 ease-in-out",
                           "tablet:h-44 tablet:w-44",
                           "tablet:group-hover:shadow-2xl",
                           isSelected &&
@@ -128,10 +128,10 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
 
                     <span
                       className={cn(
-                        "pointer-events-none absolute top-full left-1/2 mt-2 -translate-x-1/2 opacity-0",
+                        "pointer-events-none absolute top-full left-1/2 mt-1 -translate-x-1/2 translate-y-1 opacity-0",
                         "rounded-full bg-black/85 px-3 py-1 text-xs whitespace-nowrap text-white",
-                        "transition-opacity duration-200",
-                        "tablet:group-hover:opacity-100",
+                        "transition-[opacity,transform] duration-300 ease-out",
+                        "tablet:group-hover:translate-y-0 tablet:group-hover:opacity-100",
                       )}
                     >
                       {formatAlbumHoverLabel(album)}
