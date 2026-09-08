@@ -248,7 +248,8 @@ grant select on song_statistics to anon;
 - 앨범 목록: `albums` 조회 + `song_albums(songs(*))` 임베딩
 
 앨범 안 트랙 순서는 `song_albums`에 순서 컬럼이 없어(6.2절 미확정 사항) 곡 제목순으로
-정렬한다. `book_image_urls`는 이번 페이지에선 쓰지 않는다(부클릿 뷰어는 별도 기능).
+정렬한다. `book_image_urls`는 앨범 클릭 시 펼쳐지는 상세 패널에서 `ZoomableImageGroup`
+(기존 즛토피아 아카이브에서 쓰던 좌우 탐색 갤러리 컴포넌트)으로 보여준다.
 
 **파일 구조:**
 

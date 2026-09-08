@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
+import {
+  ZoomableImageGroup,
+  type ZoomableImageGroupItem,
+} from "@/components/ZoomableImageGroup";
 import {
   ALBUM_TYPE_ORDER,
   ALBUM_TYPE_SECTION_LABEL,
@@ -79,23 +84,71 @@ function groupAlbums(
 const SHELF_TILT = ["-rotate-2", "rotate-1", "-rotate-1"];
 const SHELF_LEAN = ["translate-y-0", "-translate-y-1.5", "translate-y-1"];
 
-function formatAlbumHoverLabel(album: AlbumWithSongs): string {
+function getAlbumHoverParts(album: AlbumWithSongs): {
+  prefix: string | null;
+  title: string;
+} {
   const typeLabel = album.album_type
     ? ALBUM_TYPE_SHORT_LABEL[album.album_type]
     : null;
   const numberLabel = album.album_number ? `${album.album_number}집` : null;
-  const prefix = [typeLabel, numberLabel].filter(Boolean).join(" ");
-  return prefix ? `${prefix} - ${album.title}` : album.title;
+  const prefix = [typeLabel, numberLabel].filter(Boolean).join(" ") || null;
+  return { prefix, title: album.title };
+}
+
+function getAlbumCoverSrc(
+  album: AlbumWithSongs,
+  showBookCover: boolean,
+): string | null {
+  if (showBookCover) {
+    return album.book_image_urls?.[0] ?? album.cover_image_url;
+  }
+  return album.cover_image_url;
+}
+
+/**
+ * 상세 패널 캐러셀에 들어갈 전체 이미지 목록 — cover_image_url + 부클릿
+ * (book_image_urls) 전부, 항상 둘 다 포함한다. "마도서 버전 보기"가 켜져
+ * 있으면 book_image_urls[0]이 먼저 보이도록 cover_image_url을 맨 뒤로
+ * 옮긴다(순서만 바뀔 뿐 빠지지는 않음) — 꺼져 있으면 cover_image_url이
+ * 그대로 맨 앞이다. 캐러셀은 항상 0번부터 시작하면 되므로 별도의 "시작
+ * 인덱스" 계산이 필요 없다.
+ */
+function getAlbumGalleryImages(
+  album: AlbumWithSongs,
+  showBookCover: boolean,
+): ZoomableImageGroupItem[] {
+  const coverImage: ZoomableImageGroupItem | null = album.cover_image_url
+    ? { src: album.cover_image_url, alt: album.title }
+    : null;
+  const bookImages = (album.book_image_urls ?? [])
+    .filter((url) => url !== album.cover_image_url)
+    .map((url, i) => ({
+      src: url,
+      alt: `${album.title} 북클릿 ${i + 1}`,
+    }));
+
+  if (!coverImage) return bookImages;
+  return showBookCover
+    ? [...bookImages, coverImage]
+    : [coverImage, ...bookImages];
 }
 
 export function AlbumListView({
   albums,
   groupBy,
+  showBookCover,
 }: {
   albums: AlbumWithSongs[];
   groupBy: AlbumGroupBy;
+  showBookCover: boolean;
 }) {
   const [selected, setSelected] = useState<AlbumWithSongs | null>(null);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const dragStartXRef = useRef<number | null>(null);
+  // pointerup에서 드래그(스와이프)가 임계값을 넘었으면 true — 뒤이어 발생하는
+  // click까지 "확대 보기 모달 열기"로 처리하지 않도록 한 번 건너뛴다.
+  const didDragRef = useRef(false);
 
   useEffect(() => {
     if (!selected) return;
@@ -106,6 +159,24 @@ export function AlbumListView({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selected]);
+
+  // cover_image_url + book_image_urls를 항상 통째로 넣는다. showBookCover가
+  // 켜져 있으면 이 함수가 이미 cover_image_url을 맨 뒤로 옮겨두므로, 캐러셀은
+  // 그냥 0번부터 시작하면 book_image_urls[0]이 자동으로 먼저 보인다.
+  const galleryImages = selected
+    ? getAlbumGalleryImages(selected, showBookCover)
+    : [];
+
+  // 앨범을 바꾸거나 마도서 버전 토글을 바꾸면 이미지 순서가 통째로 달라지므로,
+  // 미니 캐러셀은 항상 0번부터 다시 시작한다. useEffect가 아니라 렌더 중
+  // 비교(React가 권장하는 "prop 변화에 맞춰 state 조정" 패턴)로 처리해서
+  // 불필요한 추가 렌더 한 번을 건너뛴다.
+  const selectionKey = selected ? `${selected.id}:${showBookCover}` : null;
+  const prevSelectionKeyRef = useRef(selectionKey);
+  if (prevSelectionKeyRef.current !== selectionKey) {
+    prevSelectionKeyRef.current = selectionKey;
+    if (galleryIndex !== 0) setGalleryIndex(0);
+  }
 
   if (albums.length === 0) {
     return (
@@ -119,6 +190,31 @@ export function AlbumListView({
       ? albumYear(selected)
       : (selected.album_type ?? "기타")
     : null;
+  const hasGalleryMultiple = galleryImages.length > 1;
+
+  const goPrevImage = () => {
+    setGalleryIndex(
+      (index) => (index - 1 + galleryImages.length) % galleryImages.length,
+    );
+  };
+  const goNextImage = () => {
+    setGalleryIndex((index) => (index + 1) % galleryImages.length);
+  };
+
+  const GALLERY_SWIPE_THRESHOLD_PX = 40;
+  const handleGalleryPointerDown = (event: React.PointerEvent) => {
+    if (!hasGalleryMultiple) return;
+    dragStartXRef.current = event.clientX;
+  };
+  const handleGalleryPointerUp = (event: React.PointerEvent) => {
+    if (dragStartXRef.current === null) return;
+    const deltaX = event.clientX - dragStartXRef.current;
+    dragStartXRef.current = null;
+    if (Math.abs(deltaX) < GALLERY_SWIPE_THRESHOLD_PX) return;
+    didDragRef.current = true;
+    if (deltaX > 0) goPrevImage();
+    else goNextImage();
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -127,25 +223,32 @@ export function AlbumListView({
 
         return (
           <section key={group.key}>
-            <p className="font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
+            <p className="font-mono text-base font-semibold tracking-[0.2em] text-white/70 uppercase">
               {group.label}
             </p>
 
-            <div className="mt-3 flex overflow-x-auto pt-12 pr-4 pb-14">
+            <div
+              className={cn(
+                "grid gap-y-4 py-3 pr-8 pl-6",
+                "grid-cols-[repeat(auto-fill,4.5rem)]",
+                "tablet:overflow-visible overflow-x-clip",
+                "tablet:mt-3 tablet:grid-cols-[repeat(auto-fill,9.75rem)] tablet:pt-6 tablet:pr-6 tablet:pl-0 tablet:gap-y-10",
+              )}
+            >
               {group.albums.map((album, index) => {
                 const isSelected = selected?.id === album.id;
+                const { prefix, title } = getAlbumHoverParts(album);
+                const coverSrc = getAlbumCoverSrc(album, showBookCover);
                 return (
                   <button
                     key={album.id}
                     type="button"
                     onClick={() => setSelected(isSelected ? null : album)}
                     aria-expanded={isSelected}
-                    aria-label={formatAlbumHoverLabel(album)}
-                    style={{
-                      marginLeft: index === 0 ? 0 : "-2.5rem",
-                    }}
+                    aria-label={prefix ? `${prefix} ${title}` : title}
                     className={cn(
-                      "group relative shrink-0",
+                      "group relative h-28 w-28 cursor-help",
+                      "tablet:h-44 tablet:w-44",
                       "transition-[transform,filter] duration-500 ease-in-out",
                       SHELF_TILT[index % SHELF_TILT.length],
                       SHELF_LEAN[index % SHELF_LEAN.length],
@@ -153,14 +256,14 @@ export function AlbumListView({
                       isSelected && "z-60 rotate-0",
                     )}
                   >
-                    {album.cover_image_url ? (
+                    {coverSrc ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={album.cover_image_url}
+                        src={coverSrc}
                         alt={album.title}
                         loading="lazy"
                         className={cn(
-                          "h-36 w-36 rounded object-cover shadow-lg ring-1 ring-white/10",
+                          "h-28 w-28 rounded object-cover shadow-lg ring-1 ring-white/10",
                           "transition-shadow duration-500 ease-in-out",
                           "tablet:h-44 tablet:w-44",
                           "tablet:group-hover:shadow-2xl",
@@ -171,7 +274,7 @@ export function AlbumListView({
                     ) : (
                       <div
                         className={cn(
-                          "h-36 w-36 rounded bg-white/5 ring-1 ring-white/10",
+                          "h-28 w-28 rounded bg-white/5 ring-1 ring-white/10",
                           "tablet:h-44 tablet:w-44",
                         )}
                       />
@@ -179,13 +282,16 @@ export function AlbumListView({
 
                     <span
                       className={cn(
-                        "pointer-events-none absolute top-full left-1/2 mt-1 -translate-x-1/2 translate-y-1 opacity-0",
-                        "rounded-full bg-black/85 px-3 py-1 text-xs whitespace-nowrap text-white",
+                        "pointer-events-none absolute top-full left-1/2 mt-1 flex w-max max-w-40 -translate-x-1/2 translate-y-1 flex-col items-center opacity-0",
+                        "rounded-lg bg-black/85 px-3 py-1.5 text-xs text-white",
                         "transition-[opacity,transform] duration-300 ease-out",
                         "tablet:group-hover:translate-y-0 tablet:group-hover:opacity-100",
                       )}
                     >
-                      {formatAlbumHoverLabel(album)}
+                      {prefix && (
+                        <span className="text-white/60">{prefix}</span>
+                      )}
+                      <span>{title}</span>
                     </span>
                   </button>
                 );
@@ -206,26 +312,100 @@ export function AlbumListView({
                       "tablet:flex-row",
                     )}
                   >
-                    {selected.cover_image_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={selected.cover_image_url}
-                        alt={selected.title}
-                        className={cn(
-                          "h-56 w-full shrink-0 object-cover",
-                          "tablet:h-auto tablet:w-64",
-                        )}
-                      />
-                    ) : (
-                      <div
-                        className={cn(
-                          "h-56 w-full shrink-0 bg-white/5",
-                          "tablet:h-auto tablet:w-64",
-                        )}
-                      />
-                    )}
+                    <div
+                      className={cn(
+                        "relative h-56 w-full shrink-0 p-3",
+                        "tablet:h-120 tablet:w-fit tablet:p-12",
+                      )}
+                    >
+                      {galleryImages.length === 0 ? (
+                        <div className="h-full w-full bg-white/5" />
+                      ) : (
+                        <>
+                          <ZoomableImageGroup
+                            images={galleryImages}
+                            hideThumbnails
+                            renderTrigger={(open) => (
+                              <button
+                                type="button"
+                                onPointerDown={handleGalleryPointerDown}
+                                onPointerUp={handleGalleryPointerUp}
+                                onClick={() => {
+                                  if (didDragRef.current) {
+                                    didDragRef.current = false;
+                                    return;
+                                  }
+                                  open(galleryIndex);
+                                }}
+                                aria-label={`${galleryImages[galleryIndex].alt} — 크게 보기`}
+                                className="tablet:items-center tablet:justify-center flex h-full w-full cursor-zoom-in"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={galleryImages[galleryIndex].src}
+                                  alt={galleryImages[galleryIndex].alt}
+                                  className="tablet:h-3/4 aspect-square h-2/3 w-full object-contain"
+                                />
+                              </button>
+                            )}
+                          />
 
-                    <div className="min-w-0 flex-1 p-6">
+                          {hasGalleryMultiple && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={goPrevImage}
+                                aria-label="이전 이미지"
+                                className="absolute top-1/2 left-1 -translate-y-1/2 rounded-full bg-black/50 p-1 text-white/80 hover:text-white"
+                              >
+                                <ChevronLeftIcon className="h-5 w-5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={goNextImage}
+                                aria-label="다음 이미지"
+                                className="absolute top-1/2 right-1 -translate-y-1/2 rounded-full bg-black/50 p-1 text-white/80 hover:text-white"
+                              >
+                                <ChevronLeftIcon className="h-5 w-5 rotate-180" />
+                              </button>
+
+                              <div className="absolute bottom-1.5 left-1/2 flex -translate-x-1/2 gap-1.5">
+                                {[1, 2].map((offset) => {
+                                  const previewIndex =
+                                    (galleryIndex + offset) %
+                                    galleryImages.length;
+                                  const previewImage =
+                                    galleryImages[previewIndex];
+                                  return (
+                                    <button
+                                      key={`${previewImage.src}-${offset}`}
+                                      type="button"
+                                      onClick={() =>
+                                        setGalleryIndex(previewIndex)
+                                      }
+                                      aria-label={`다음 이미지로 이동: ${previewImage.alt}`}
+                                      className={cn(
+                                        "h-8 w-8 overflow-hidden rounded opacity-80 ring-1 ring-white/50 transition-opacity hover:opacity-100",
+                                        "tablet:h-12 tablet:w-12",
+                                      )}
+                                    >
+                                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                                      <img
+                                        src={previewImage.src}
+                                        alt={previewImage.alt}
+                                        className="h-full w-full object-cover"
+                                      />
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </>
+                          )}
+                        </>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1 p-3">
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0">
                           <p className="text-lg font-semibold text-white">

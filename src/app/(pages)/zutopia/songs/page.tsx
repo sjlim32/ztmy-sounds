@@ -18,9 +18,9 @@ export default async function ZutopiaSongDbPage() {
 
   return (
     <div>
-      <p className="font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
+      <h1 className="text-2xl font-bold tracking-widest text-white uppercase">
         노래 DB
-      </p>
+      </h1>
 
       <div className="mt-3">
         <SongDbTabs songs={songs} albums={albums} />

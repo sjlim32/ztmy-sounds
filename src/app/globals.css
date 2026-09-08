@@ -106,7 +106,9 @@ body {
    되도록 유틸리티로 준비해둡니다. cursor-zoom-in/out(ZoomableImage)은 대응되는
    이미지가 없어 브라우저 기본 커서를 그대로 씁니다. */
 html {
-  cursor: url("/cursors/normal.png") 0 0, auto;
+  cursor:
+    url("/cursors/normal.png") 0 0,
+    auto;
 }
 
 a,
@@ -118,7 +120,9 @@ label[for],
 input[type="submit"],
 input[type="button"],
 .cursor-pointer {
-  cursor: url("/cursors/link.png") 0 0, pointer;
+  cursor:
+    url("/cursors/link.png") 0 0,
+    pointer;
 }
 
 input[type="text"],
@@ -130,53 +134,79 @@ input[type="tel"],
 input[type="number"],
 textarea,
 [contenteditable="true"] {
-  cursor: url("/cursors/text.png") 0 0, text;
+  cursor:
+    url("/cursors/text.png") 0 0,
+    text;
 }
 
 [disabled],
 [aria-disabled="true"],
 .cursor-not-allowed {
-  cursor: url("/cursors/unavailable.png") 0 0, not-allowed;
+  cursor:
+    url("/cursors/unavailable.png") 0 0,
+    not-allowed;
 }
 
 [draggable="true"],
 .cursor-move {
-  cursor: url("/cursors/move.png") 0 0, move;
+  cursor:
+    url("/cursors/move.png") 0 0,
+    move;
 }
 
 /* 지금은 이 사이트에서 실제로 발생하지 않는 상태들 — 필요해지면 클래스만
    붙이면 바로 커스텀 커서가 적용됩니다. */
 .cursor-help {
-  cursor: url("/cursors/help.png") 0 0, help;
+  cursor:
+    url("/cursors/help.png") 0 0,
+    help;
 }
 .cursor-wait {
-  cursor: url("/cursors/busy.png") 0 0, wait;
+  cursor:
+    url("/cursors/busy.png") 0 0,
+    wait;
 }
 .cursor-progress {
-  cursor: url("/cursors/working.png") 0 0, progress;
+  cursor:
+    url("/cursors/working.png") 0 0,
+    progress;
 }
 .cursor-crosshair {
-  cursor: url("/cursors/precision.png") 0 0, crosshair;
+  cursor:
+    url("/cursors/precision.png") 0 0,
+    crosshair;
 }
 .cursor-context-menu {
-  cursor: url("/cursors/alternate.png") 0 0, context-menu;
+  cursor:
+    url("/cursors/alternate.png") 0 0,
+    context-menu;
 }
 .cursor-vertical-text {
-  cursor: url("/cursors/handwriting.png") 0 0, vertical-text;
+  cursor:
+    url("/cursors/handwriting.png") 0 0,
+    vertical-text;
 }
 .cursor-ns-resize,
 .cursor-row-resize {
-  cursor: url("/cursors/vertical.png") 0 0, ns-resize;
+  cursor:
+    url("/cursors/vertical.png") 0 0,
+    ns-resize;
 }
 .cursor-ew-resize,
 .cursor-col-resize {
-  cursor: url("/cursors/horizontal.png") 0 0, ew-resize;
+  cursor:
+    url("/cursors/horizontal.png") 0 0,
+    ew-resize;
 }
 .cursor-nesw-resize {
-  cursor: url("/cursors/diagonal1.png") 0 0, nesw-resize;
+  cursor:
+    url("/cursors/diagonal1.png") 0 0,
+    nesw-resize;
 }
 .cursor-nwse-resize {
-  cursor: url("/cursors/diagonal2.png") 0 0, nwse-resize;
+  cursor:
+    url("/cursors/diagonal2.png") 0 0,
+    nwse-resize;
 }
 
 /* 실제로 움직이는 커서(CustomCursor.tsx). CSS cursor는 애니메이션을 지원하지
@@ -206,6 +236,13 @@ html.custom-cursor-active * {
 
 html.custom-cursor-active .custom-cursor {
   opacity: 1;
+}
+
+/* help는 8프레임 시트가 없고 정적 프레임(help.png)만 있어서, steps(8)
+   애니메이션을 그대로 두면 빈 프레임 구간이 섞여 깜빡입니다. */
+.custom-cursor[data-state="help"] {
+  animation: none;
+  background-position-y: 0;
 }
 
 @keyframes cursor-sprite {
