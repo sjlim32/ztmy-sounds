@@ -10,3 +10,5 @@ export interface SongWithAlbums extends Song {
 export interface AlbumWithSongs extends Album {
   songs: Song[];
 }
+
+export type AlbumGroupBy = "type" | "year";

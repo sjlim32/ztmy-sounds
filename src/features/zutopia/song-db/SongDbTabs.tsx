@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { ACTIVE_TAB_CLASS, TAB_CLASS } from "../components/tab-styles";
 import { AlbumListView } from "./AlbumListView";
 import { SongListView } from "./SongListView";
-import type { AlbumWithSongs, SongWithAlbums } from "./types";
+import type { AlbumGroupBy, AlbumWithSongs, SongWithAlbums } from "./types";
 
 type Tab = "songs" | "albums";
 
@@ -19,9 +19,36 @@ export function SongDbTabs({
   const [tab, setTab] = useState<Tab>(
     songs.length === 0 && albums.length > 0 ? "albums" : "songs",
   );
+  const [groupBy, setGroupBy] = useState<AlbumGroupBy>("type");
 
   return (
     <div>
+      <div
+        role="group"
+        aria-label="정렬 필터"
+        className="flex flex-wrap items-center gap-2 pb-3"
+      >
+        <span className="font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
+          정렬
+        </span>
+        <button
+          type="button"
+          aria-pressed={groupBy === "type"}
+          onClick={() => setGroupBy("type")}
+          className={cn(TAB_CLASS, groupBy === "type" && ACTIVE_TAB_CLASS)}
+        >
+          타입별로 보기
+        </button>
+        <button
+          type="button"
+          aria-pressed={groupBy === "year"}
+          onClick={() => setGroupBy("year")}
+          className={cn(TAB_CLASS, groupBy === "year" && ACTIVE_TAB_CLASS)}
+        >
+          출시일순 보기
+        </button>
+      </div>
+
       <div
         role="tablist"
         aria-label="노래 DB"
@@ -66,7 +93,7 @@ export function SongDbTabs({
             role="tabpanel"
             aria-labelledby="song-db-tab-albums"
           >
-            <AlbumListView albums={albums} />
+            <AlbumListView albums={albums} groupBy={groupBy} />
           </div>
         )}
       </div>

@@ -7,26 +7,71 @@ import {
   ALBUM_TYPE_SECTION_LABEL,
   ALBUM_TYPE_SHORT_LABEL,
 } from "./labels";
-import type { AlbumWithSongs } from "./types";
+import type { AlbumGroupBy, AlbumWithSongs } from "./types";
 
-function groupAlbumsByType(albums: AlbumWithSongs[]) {
-  const groups = new Map<string, AlbumWithSongs[]>();
-  for (const album of albums) {
-    const key = album.album_type ?? "기타";
-    const bucket = groups.get(key);
-    if (bucket) {
-      bucket.push(album);
-    } else {
-      groups.set(key, [album]);
-    }
-  }
-  return groups;
+interface AlbumGroup {
+  key: string;
+  label: string;
+  albums: AlbumWithSongs[];
 }
 
 function isAlbumTypeKey(
   type: string,
 ): type is (typeof ALBUM_TYPE_ORDER)[number] {
   return (ALBUM_TYPE_ORDER as readonly string[]).includes(type);
+}
+
+function albumYear(album: AlbumWithSongs): string {
+  return album.release_date.slice(0, 4);
+}
+
+/**
+ * groupBy에 따라 정렬 기준이 통째로 바뀐다 — "type"은 정규→미니→EP 고정
+ * 순서, "year"는 데뷔년도가 위로 오도록 오름차순이다. albums는 이미
+ * data.ts에서 release_date 오름차순으로 오므로, year 그룹은 Map에 먼저
+ * 등장하는 순서(=오래된 연도부터)를 그대로 쓰면 된다.
+ */
+function groupAlbums(
+  albums: AlbumWithSongs[],
+  groupBy: AlbumGroupBy,
+): AlbumGroup[] {
+  if (groupBy === "year") {
+    const byYear = new Map<string, AlbumWithSongs[]>();
+    for (const album of albums) {
+      const year = albumYear(album);
+      const bucket = byYear.get(year);
+      if (bucket) {
+        bucket.push(album);
+      } else {
+        byYear.set(year, [album]);
+      }
+    }
+    return [...byYear.entries()].map(([year, list]) => ({
+      key: year,
+      label: `${year}년`,
+      albums: list,
+    }));
+  }
+
+  const byType = new Map<string, AlbumWithSongs[]>();
+  for (const album of albums) {
+    const key = album.album_type ?? "기타";
+    const bucket = byType.get(key);
+    if (bucket) {
+      bucket.push(album);
+    } else {
+      byType.set(key, [album]);
+    }
+  }
+  const orderedKeys = [
+    ...ALBUM_TYPE_ORDER.filter((type) => byType.has(type)),
+    ...[...byType.keys()].filter((key) => !isAlbumTypeKey(key)),
+  ];
+  return orderedKeys.map((key) => ({
+    key,
+    label: isAlbumTypeKey(key) ? ALBUM_TYPE_SECTION_LABEL[key] : key,
+    albums: byType.get(key) ?? [],
+  }));
 }
 
 // 카드마다 살짝 다른 기울기/높이를 줘서 "서랍장에 나란히 꽂힌" 느낌을 낸다 —
@@ -43,7 +88,13 @@ function formatAlbumHoverLabel(album: AlbumWithSongs): string {
   return prefix ? `${prefix} - ${album.title}` : album.title;
 }
 
-export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
+export function AlbumListView({
+  albums,
+  groupBy,
+}: {
+  albums: AlbumWithSongs[];
+  groupBy: AlbumGroupBy;
+}) {
   const [selected, setSelected] = useState<AlbumWithSongs | null>(null);
 
   useEffect(() => {
@@ -62,26 +113,26 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
     );
   }
 
-  const groups = groupAlbumsByType(albums);
-  const orderedTypes = [
-    ...ALBUM_TYPE_ORDER.filter((type) => groups.has(type)),
-    ...[...groups.keys()].filter((type) => !isAlbumTypeKey(type)),
-  ];
-  const selectedType = selected ? (selected.album_type ?? "기타") : null;
+  const groups = groupAlbums(albums, groupBy);
+  const selectedGroupKey = selected
+    ? groupBy === "year"
+      ? albumYear(selected)
+      : (selected.album_type ?? "기타")
+    : null;
 
   return (
     <div className="flex flex-col gap-8">
-      {orderedTypes.map((type) => {
-        const isSectionOpen = selectedType === type;
+      {groups.map((group) => {
+        const isSectionOpen = selectedGroupKey === group.key;
 
         return (
-          <section key={type}>
+          <section key={group.key}>
             <p className="font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
-              {isAlbumTypeKey(type) ? ALBUM_TYPE_SECTION_LABEL[type] : type}
+              {group.label}
             </p>
 
             <div className="mt-3 flex overflow-x-auto pt-12 pr-4 pb-14">
-              {(groups.get(type) ?? []).map((album, index) => {
+              {group.albums.map((album, index) => {
                 const isSelected = selected?.id === album.id;
                 return (
                   <button
