@@ -15,7 +15,8 @@ export function ZutopiaHeader() {
 
   return (
     <>
-      <h1 className="mt-6 text-2xl font-bold tracking-[0.3em] uppercase">
+      <div className="from-ztmy-magenta to-ztmy-purple mt-6 h-1 w-10 rounded-full bg-linear-to-r shadow-[0_0_10px_rgba(225,71,191,0.6)]" />
+      <h1 className="mt-3 text-3xl font-bold tracking-[0.3em] text-white uppercase">
         ZUTOPIA
       </h1>
       <p className="mt-2 text-sm text-white/60">{ARTIST.name.jp} 기록 저장소</p>

@@ -5,9 +5,7 @@ export async function getSongsWithAlbums(): Promise<SongWithAlbums[]> {
   const supabase = createBuildTimeSupabaseClient();
   const { data, error } = await supabase
     .from("songs")
-    .select(
-      "id, title, title_ko, cover_image_url, created_at, song_albums(albums(*))",
-    )
+    .select("*, song_albums(track_number, disc_number, albums(*))")
     .order("title");
 
   if (error) {
@@ -16,7 +14,11 @@ export async function getSongsWithAlbums(): Promise<SongWithAlbums[]> {
 
   return data.map(({ song_albums, ...song }) => ({
     ...song,
-    albums: song_albums.map((row) => row.albums),
+    albums: song_albums.map((row) => ({
+      ...row.albums,
+      track_number: row.track_number,
+      disc_number: row.disc_number,
+    })),
   }));
 }
 
@@ -24,7 +26,7 @@ export async function getAlbumsWithSongs(): Promise<AlbumWithSongs[]> {
   const supabase = createBuildTimeSupabaseClient();
   const { data, error } = await supabase
     .from("albums")
-    .select("*, song_albums(songs(*))")
+    .select("*, song_albums(track_number, disc_number, songs(*))")
     .order("release_date");
 
   if (error) {
@@ -33,8 +35,13 @@ export async function getAlbumsWithSongs(): Promise<AlbumWithSongs[]> {
 
   return data.map(({ song_albums, ...album }) => ({
     ...album,
-    songs: song_albums
-      .map((row) => row.songs)
-      .sort((a, b) => a.title.localeCompare(b.title, "ja")),
+    // 이제 song_albums에 실제 트랙 순서(disc_number, track_number)가 있으므로
+    // 곡 제목 알파벳순 대신 그 순서를 그대로 따른다.
+    songs: [...song_albums]
+      .sort(
+        (a, b) =>
+          a.disc_number - b.disc_number || a.track_number - b.track_number,
+      )
+      .map((row) => row.songs),
   }));
 }

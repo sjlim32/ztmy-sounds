@@ -185,7 +185,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                           >
                             {item.title.jp}
                           </span>
-                          <span className="text-xs leading-tight text-gray-400 transition-colors group-hover:text-white md:text-sm">
+                          <span className="tablet:text-sm text-xs leading-tight text-gray-400 transition-colors group-hover:text-white">
                             {item.title.kr}
                           </span>
                         </div>

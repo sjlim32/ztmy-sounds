@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
+import { HomeIcon } from "@/components/icons/HomeIcon";
 
 /**
  * tablet 이상 전용 상단 내비게이션(뒤로가기 + 홈으로). 모바일은 전역
@@ -22,20 +24,19 @@ export function ZutopiaTopNav() {
   segments.pop();
   const parentHref = segments.length ? `/${segments.join("/")}` : "/";
 
+  const navLinkClass =
+    "group inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-sm text-white/70 backdrop-blur-sm transition-colors hover:border-ztmy-magenta/60 hover:text-white";
+
   return (
     <div className="tablet:flex hidden items-center justify-between">
-      <Link
-        href={parentHref}
-        className="text-sm text-white/60 transition-colors hover:text-white"
-      >
-        ← 뒤로가기
+      <Link href={parentHref} className={navLinkClass}>
+        <ChevronLeftIcon className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+        뒤로가기
       </Link>
 
-      <Link
-        href="/"
-        className="text-sm text-white/60 transition-colors hover:text-white"
-      >
-        홈으로 →
+      <Link href="/" className={navLinkClass}>
+        <HomeIcon className="h-4 w-4" />
+        홈으로
       </Link>
     </div>
   );

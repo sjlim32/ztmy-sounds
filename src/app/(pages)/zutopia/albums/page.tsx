@@ -5,14 +5,14 @@ import {
   getSongsWithAlbums,
 } from "@/features/zutopia/song-db/data";
 import { SongDbNav } from "@/features/zutopia/song-db/SongDbNav";
-import { SongListView } from "@/features/zutopia/song-db/SongListView";
+import { AlbumListView } from "@/features/zutopia/song-db/AlbumListView";
 
 export const metadata: Metadata = {
-  title: "노래 DB · 곡",
-  description: "즛토마요 전체 곡 목록입니다.",
+  title: "노래 DB · 앨범",
+  description: "즛토마요 전체 앨범 목록입니다.",
 };
 
-export default async function ZutopiaSongsPage() {
+export default async function ZutopiaAlbumsPage() {
   const [songs, albums] = await Promise.all([
     getSongsWithAlbums(),
     getAlbumsWithSongs(),
@@ -33,7 +33,7 @@ export default async function ZutopiaSongsPage() {
         <SongDbNav songCount={songs.length} albumCount={albums.length} />
 
         <div className="mt-8">
-          <SongListView songs={songs} />
+          <AlbumListView albums={albums} />
         </div>
       </div>
     </div>

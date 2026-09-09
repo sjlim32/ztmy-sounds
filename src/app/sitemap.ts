@@ -13,6 +13,7 @@ const PRIORITY: Record<string, number> = {
   "/slam": 0.6,
   "/zutopia": 0.5,
   "/zutopia/songs": 0.4,
+  "/zutopia/albums": 0.4,
   "/credits": 0.3,
 };
 
@@ -27,6 +28,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/slam",
     "/zutopia",
     "/zutopia/songs",
+    "/zutopia/albums",
     "/credits",
   ].map((path) => ({
     url: `${SITE_URL}${path}`,
