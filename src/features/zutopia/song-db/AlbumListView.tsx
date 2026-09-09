@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
+import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
 import {
   ZoomableImageGroup,
   type ZoomableImageGroupItem,
@@ -14,16 +15,12 @@ import {
 } from "./labels";
 import { SongDbDrawer } from "./SongDbDrawer";
 import { SortFilterBar } from "./SortFilterBar";
+import { applySortDirection, DIRECTION_OPTIONS } from "./sort";
 import type { AlbumGroupBy, AlbumWithSongs, SortDirection } from "./types";
 
 const SORT_OPTIONS: { value: AlbumGroupBy; label: string }[] = [
   { value: "type", label: "타입" },
   { value: "year", label: "발매일" },
-];
-
-const DIRECTION_OPTIONS: { value: SortDirection; label: string }[] = [
-  { value: "desc", label: "내림차순" },
-  { value: "asc", label: "오름차순" },
 ];
 
 type AlbumCoverVersion = "regular" | "first-press";
@@ -51,12 +48,13 @@ function albumYear(album: AlbumWithSongs): string {
 
 /**
  * groupBy에 따라 정렬 기준이 통째로 바뀐다 — "type"은 정규→미니→EP 고정
- * 순서, "year"는 데뷔년도가 위로 오도록 오름차순이다. albums는 이미
- * data.ts에서 release_date 오름차순으로 오므로, year 그룹은 Map에 먼저
- * 등장하는 순서(=오래된 연도부터)를 그대로 쓰면 된다. 여기까지는 항상
- * 오름차순 기준으로 만들고, direction이 "desc"면 마지막에 그룹 순서와 각
- * 그룹 내부 앨범 순서를 통째로 뒤집는다 — groupBy가 뭐든 동일하게 적용되는
- * 공용 옵션이라 그룹핑 로직 자체에 분기를 늘리지 않고 후처리로 뺐다.
+ * 순서, "year"는 데뷔년도가 위로 오도록 오름차순이다. year 키는 Map
+ * 등장 순서가 아니라 명시적으로 정렬한다 — albums가 이미 release_date
+ * 오름차순으로 온다는(현재는 data.ts의 .order() 덕분에 참인) 가정에
+ * 기대면, 그 쿼리의 정렬이 나중에 바뀌었을 때 이 함수가 조용히 연도
+ * 순서를 깨뜨릴 수 있다(SongListView의 groupSongs도 동일하게 명시적으로
+ * 정렬한다). 여기까지는 항상 오름차순 기준으로 만들고, direction이
+ * "desc"면 마지막에 그룹 순서와 각 그룹 내부 앨범 순서를 통째로 뒤집는다.
  */
 function groupAlbums(
   albums: AlbumWithSongs[],
@@ -76,11 +74,13 @@ function groupAlbums(
         byYear.set(year, [album]);
       }
     }
-    groups = [...byYear.entries()].map(([year, list]) => ({
-      key: year,
-      label: `${year}년`,
-      albums: list,
-    }));
+    groups = [...byYear.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([year, list]) => ({
+        key: year,
+        label: `${year}년`,
+        albums: list,
+      }));
   } else {
     const byType = new Map<string, AlbumWithSongs[]>();
     for (const album of albums) {
@@ -103,13 +103,12 @@ function groupAlbums(
     }));
   }
 
-  if (direction === "desc") {
-    return groups
-      .slice()
-      .reverse()
-      .map((group) => ({ ...group, albums: [...group.albums].reverse() }));
-  }
-  return groups;
+  return applySortDirection(
+    groups,
+    direction,
+    (group) => group.albums,
+    (group, albums) => ({ ...group, albums }),
+  );
 }
 
 // 카드마다 살짝 다른 기울기/높이를 줘서 "서랍장에 나란히 꽂힌" 느낌을 낸다 —
@@ -118,14 +117,10 @@ const SHELF_TILT = ["-rotate-2", "rotate-1", "-rotate-1"];
 const SHELF_LEAN = ["translate-y-0", "-translate-y-1.5", "translate-y-1"];
 
 function getAlbumHoverParts(album: AlbumWithSongs): {
-  prefix: string | null;
+  prefix: string;
   title: string;
 } {
-  const typeLabel = album.album_type
-    ? ALBUM_TYPE_SHORT_LABEL[album.album_type]
-    : null;
-  const numberLabel = album.album_number ? `${album.album_number}집` : null;
-  const prefix = [typeLabel, numberLabel].filter(Boolean).join(" ") || null;
+  const prefix = `${ALBUM_TYPE_SHORT_LABEL[album.album_type]} ${album.album_number}집`;
   return { prefix, title: album.title };
 }
 
@@ -174,6 +169,11 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
     useState<AlbumCoverVersion>("regular");
   const showBookCover = coverVersion === "first-press";
   const [selected, setSelected] = useState<AlbumWithSongs | null>(null);
+  // 드로어에 매번 새 화살표 함수를 넘기면 SongDbDrawer의 포커스 관리
+  // effect가 참조 동일성 때문에 열려 있는 동안에도 매 렌더마다 다시
+  // 실행돼(포커스가 튀는 등) 불필요하게 흔들린다 — setSelected는 useState가
+  // 보장하는 안정적인 참조라 이 콜백도 항상 같은 참조를 유지한다.
+  const closeDrawer = useCallback(() => setSelected(null), []);
   const [galleryIndex, setGalleryIndex] = useState(0);
   const dragStartXRef = useRef<number | null>(null);
   // pointerup에서 드래그(스와이프)가 임계값을 넘었으면 true — 뒤이어 발생하는
@@ -183,11 +183,18 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
   // 앨범을 바꾸거나 마도서 버전 토글을 바꾸면 이미지 순서가 통째로 달라지므로,
   // 미니 캐러셀은 항상 0번부터 다시 시작한다. useEffect가 아니라 렌더 중
   // 비교(React가 권장하는 "prop 변화에 맞춰 state 조정" 패턴)로 처리해서
-  // 불필요한 추가 렌더 한 번을 건너뛴다.
+  // 불필요한 추가 렌더 한 번을 건너뛴다 — 이 패턴은 React 문서가 useRef가
+  // 아니라 useState로 이전 값을 추적하도록 명시한다(useRef를 렌더 중에 쓰면
+  // Strict Mode의 이중 렌더 호출에서 두 번째 호출이 첫 번째가 이미 반영한
+  // ref 값을 보고 조건을 건너뛰어버려 비멱등적이다). selected가 null이 되는
+  // (드로어가 닫히는) 순간은 비교 대상에서 제외한다 — 포함시키면 드로어가
+  // 닫히는 300ms 슬라이드 아웃 애니메이션이 재생되는 동안 갤러리 인덱스가
+  // 즉시 0으로 튀어, 마지막으로 보고 있던 이미지가 아니라 엉뚱한 이미지가
+  // 사라지는 것처럼 보인다.
   const selectionKey = selected ? `${selected.id}:${showBookCover}` : null;
-  const prevSelectionKeyRef = useRef(selectionKey);
-  if (prevSelectionKeyRef.current !== selectionKey) {
-    prevSelectionKeyRef.current = selectionKey;
+  const [prevSelectionKey, setPrevSelectionKey] = useState(selectionKey);
+  if (selected !== null && selectionKey !== prevSelectionKey) {
+    setPrevSelectionKey(selectionKey);
     if (galleryIndex !== 0) setGalleryIndex(0);
   }
 
@@ -253,8 +260,9 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                       type="button"
                       data-song-db-item
                       onClick={() => setSelected(isSelected ? null : album)}
-                      aria-expanded={isSelected}
-                      aria-label={prefix ? `${prefix} ${title}` : title}
+                      aria-haspopup="dialog"
+                      aria-pressed={isSelected}
+                      aria-label={`${prefix} ${title}`}
                       className={cn(
                         "group relative h-28 w-28 cursor-help",
                         "tablet:h-44 tablet:w-44",
@@ -291,16 +299,20 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
 
                       <span
                         className={cn(
-                          "pointer-events-none absolute top-full left-1/2 mt-1 flex w-max max-w-40 -translate-x-1/2 translate-y-1 flex-col items-center opacity-0",
+                          "pointer-events-none absolute top-full left-1/2 z-10 mt-1 flex w-max max-w-40 -translate-x-1/2 translate-y-1 flex-col items-center opacity-0",
                           "rounded-lg bg-black/85 px-3 py-1.5 text-sm text-white",
                           "tablet:text-base",
                           "transition-[opacity,transform] duration-300 ease-out",
+                          // 모바일엔 hover가 없어서 기본으로는 이 라벨을 볼 방법이
+                          // 없다 — 터치가 눌려있는 동안(group-active)만이라도
+                          // 잠깐 보여줘서, 커버를 눌러보면 그게 뭔지 미리 알 수
+                          // 있게 한다(그리드 레이아웃 자체를 건드리지 않는
+                          // position:absolute라 다른 카드와 안 겹친다).
+                          "group-active:translate-y-0 group-active:opacity-100",
                           "tablet:group-hover:translate-y-0 tablet:group-hover:opacity-100",
                         )}
                       >
-                        {prefix && (
-                          <span className="text-white/60">{prefix}</span>
-                        )}
+                        <span className="text-white/60">{prefix}</span>
                         <span>{title}</span>
                       </span>
                     </button>
@@ -314,7 +326,8 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
 
       <SongDbDrawer
         selected={selected}
-        onClose={() => setSelected(null)}
+        onClose={closeDrawer}
+        ariaLabel={selected ? `${selected.title} 상세 정보` : undefined}
         renderContent={(album) => {
           const galleryImages = getAlbumGalleryImages(album, showBookCover);
           const hasGalleryMultiple = galleryImages.length > 1;
@@ -333,6 +346,7 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
           const handleGalleryPointerDown = (event: React.PointerEvent) => {
             if (!hasGalleryMultiple) return;
             dragStartXRef.current = event.clientX;
+            event.currentTarget.setPointerCapture(event.pointerId);
           };
           const handleGalleryPointerUp = (event: React.PointerEvent) => {
             if (dragStartXRef.current === null) return;
@@ -373,6 +387,7 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                           <img
                             src={galleryImages[galleryIndex].src}
                             alt={galleryImages[galleryIndex].alt}
+                            draggable={false}
                             className="aspect-square h-4/5 max-h-full w-auto object-contain"
                           />
                         </button>
@@ -399,7 +414,13 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                         </button>
 
                         <div className="absolute bottom-1.5 left-1/2 flex -translate-x-1/2 gap-1.5">
-                          {[1, 2].map((offset) => {
+                          {/* 이미지가 정확히 2장이면 offset 1, 2가 같은(현재)
+                          이미지를 가리켜 미리보기가 중복된다 — 남은 이미지
+                          수만큼만 슬롯을 만든다. */}
+                          {Array.from(
+                            { length: Math.min(2, galleryImages.length - 1) },
+                            (_, i) => i + 1,
+                          ).map((offset) => {
                             const previewIndex =
                               (galleryIndex + offset) % galleryImages.length;
                             const previewImage = galleryImages[previewIndex];
@@ -431,12 +452,10 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <p
-                      className={cn("text-xs text-white/40", "tablet:text-sm")}
+                      className={cn("text-xs text-white/60", "tablet:text-sm")}
                     >
                       {ALBUM_TYPE_SHORT_LABEL[album.album_type]}
-                      {album.album_number
-                        ? `${album.album_number}집`
-                        : ""} · {album.title_ko}
+                      {album.album_number}집 · {album.title_ko}
                     </p>
                     <p
                       className={cn(
@@ -447,13 +466,13 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                       {album.title}
                     </p>
                     <p
-                      className={cn("text-xs text-white/40", "tablet:text-sm")}
+                      className={cn("text-xs text-white/60", "tablet:text-sm")}
                     >
                       {album.title_en}
                     </p>
                     <p
                       className={cn(
-                        "mt-1 font-mono text-sm text-white/40",
+                        "mt-1 font-mono text-sm text-white/60",
                         "tablet:text-base",
                       )}
                     >
@@ -463,9 +482,9 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
 
                   <button
                     type="button"
-                    onClick={() => setSelected(null)}
+                    onClick={closeDrawer}
                     aria-label="닫기"
-                    className="shrink-0 text-white/60 transition-colors hover:text-white"
+                    className="-m-2 shrink-0 p-2 text-white/60 transition-colors hover:text-white"
                   >
                     ✕
                   </button>
@@ -475,7 +494,7 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                   {album.songs.length === 0 ? (
                     <li
                       className={cn(
-                        "text-base text-white/40",
+                        "text-base text-white/60",
                         "tablet:text-lg",
                       )}
                     >
@@ -486,15 +505,26 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                       <li
                         key={song.id}
                         className={cn(
-                          "text-base text-white/70",
+                          "flex items-center gap-2 text-base text-white/70",
                           "tablet:text-lg",
                         )}
                       >
-                        {song.title}
-                        {song.title_ko && (
-                          <span className="ml-2 text-white/40">
+                        <span>
+                          {song.title}
+                          <span className="ml-2 text-white/60">
                             {song.title_ko}
                           </span>
+                        </span>
+                        {song.music_video_url && (
+                          <a
+                            href={song.music_video_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`${song.title} 뮤직비디오`}
+                            className="shrink-0 text-white/50 transition-colors hover:text-white"
+                          >
+                            <YouTubeIcon className="h-4 w-4" />
+                          </a>
                         )}
                       </li>
                     ))

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
 import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
 import { ALBUM_TYPE_SHORT_LABEL } from "./labels";
 import { SongDbDrawer } from "./SongDbDrawer";
 import { SortFilterBar } from "./SortFilterBar";
+import { applySortDirection, DIRECTION_OPTIONS } from "./sort";
 import type {
   Album,
   SongAlbumRef,
@@ -37,24 +38,12 @@ interface SelectedSong {
 
 const OTHERS_KEY = "기타";
 
-/**
- * 곡 자신의 release_date를 우선 쓰고(디지털 싱글 등 앨범 없이 발매될 수
- * 있음), 없으면 소속 앨범 중 가장 이른 발매일로 대체한다. 둘 다 없으면
- * null(발매일 미상 — "기타" 그룹으로 빠진다).
- */
-function songReleaseDate(song: SongWithAlbums): string | null {
-  if (song.release_date) return song.release_date;
-  if (song.albums.length === 0) return null;
-  const earliest = song.albums.reduce((min, album) =>
-    album.release_date < min.release_date ? album : min,
-  );
-  return earliest.release_date;
+function songYear(song: SongWithAlbums): string {
+  return song.release_date.slice(0, 4);
 }
 
-function songYear(song: SongWithAlbums): string | null {
-  return songReleaseDate(song)?.slice(0, 4) ?? null;
-}
-
+// songs/albums.release_date 모두 DB 제약상 date 타입 NOT NULL이라 항상
+// "YYYY-MM-DD" 형식으로 온다.
 function formatDateShort(date: string): string {
   const [year, month, day] = date.split("-");
   return `${year.slice(2)}.${month}.${day}`;
@@ -87,24 +76,14 @@ function getYouTubeEmbedUrl(url: string): string | null {
   }
 }
 
-/**
- * 드로어의 "앨범 수록 정보" 한 줄 — "(미니 1집 - 正しい偽りからの起床 (올바른
- * 거짓으로부터의 기상, ...))" 형태. album_type은 NOT NULL이라 항상 있고,
- * album_number는 없을 수 있어 있을 때만 "n집"을 붙인다. kr/en 중 있는 것만
- * 쉼표로 이어붙이고, 둘 다 없으면 괄호 자체를 생략한다.
- */
+// 드로어의 "앨범 수록 정보" 한 줄 — "(미니 1집 · 正しい偽りからの起床)" 형태.
+// album_type/album_number/title_ko/title_en 모두 NOT NULL이라 항상 있다.
 function formatAlbumCredit(
   album: Album,
   trackNumber: SongAlbumRef["track_number"],
 ) {
-  const typeLabel = album.album_type
-    ? ALBUM_TYPE_SHORT_LABEL[album.album_type]
-    : "";
-  const numberLabel = album.album_number ? `${album.album_number}집` : "";
-  const albumInfo = [typeLabel, numberLabel].filter(Boolean).join(" ");
-  const localized = [album.title_ko, album.title_en]
-    .filter(Boolean)
-    .join(" · ");
+  const albumInfo = `${ALBUM_TYPE_SHORT_LABEL[album.album_type]} ${album.album_number}집`;
+  const localized = `${album.title_ko} · ${album.title_en}`;
   return (
     <div className="flex flex-col">
       <span className={cn("text-xs", "tablet:text-sm")}>{albumInfo}</span>
@@ -133,8 +112,9 @@ function formatAlbumCredit(
  * 하나도 없는 곡은 맨 뒤 "기타" 그룹으로.
  *
  * groupBy === "year": 위 songYear 기준 연도별로 묶고 오름차순(데뷔 연도가
- * 위) 정렬한다. 각 연도 그룹 내부는 실제 발매일(songReleaseDate) 오름차순
- * 으로 정렬한다. 마찬가지로 연도를 못 구하는 곡은 "기타"로.
+ * 위) 정렬한다. 각 연도 그룹 내부는 실제 발매일(release_date) 오름차순으로
+ * 정렬한다. release_date는 NOT NULL이라 모든 곡이 연도를 가진다 — "기타"
+ * 버킷은 필요 없다.
  *
  * 위 두 경우 모두 항상 오름차순 기준으로 만들고, direction이 "desc"면
  * 마지막에 그룹 순서와 각 그룹 내부 곡 순서를 통째로 뒤집는다 — groupBy가
@@ -146,17 +126,12 @@ function groupSongs(
   groupBy: SongGroupBy,
   direction: SortDirection,
 ): SongGroup[] {
-  const others: SongWithAlbums[] = [];
   let groups: SongGroup[];
 
   if (groupBy === "year") {
     const byYear = new Map<string, SongWithAlbums[]>();
     for (const song of songs) {
       const year = songYear(song);
-      if (!year) {
-        others.push(song);
-        continue;
-      }
       const bucket = byYear.get(year);
       if (bucket) bucket.push(song);
       else byYear.set(year, [song]);
@@ -168,18 +143,11 @@ function groupSongs(
         label: `${year}년`,
         album: null,
         songs: [...list].sort((a, b) =>
-          (songReleaseDate(a) ?? "").localeCompare(songReleaseDate(b) ?? ""),
+          a.release_date.localeCompare(b.release_date),
         ),
       }));
-    if (others.length > 0) {
-      groups.push({
-        key: OTHERS_KEY,
-        label: OTHERS_KEY,
-        album: null,
-        songs: others,
-      });
-    }
   } else {
+    const others: SongWithAlbums[] = [];
     const byAlbum = new Map<
       string,
       { album: Album; songs: SongWithAlbums[] }
@@ -220,13 +188,12 @@ function groupSongs(
     }
   }
 
-  if (direction === "desc") {
-    return groups
-      .slice()
-      .reverse()
-      .map((group) => ({ ...group, songs: [...group.songs].reverse() }));
-  }
-  return groups;
+  return applySortDirection(
+    groups,
+    direction,
+    (group) => group.songs,
+    (group, songs) => ({ ...group, songs }),
+  );
 }
 
 const SORT_OPTIONS: { value: SongGroupBy; label: string }[] = [
@@ -234,15 +201,15 @@ const SORT_OPTIONS: { value: SongGroupBy; label: string }[] = [
   { value: "year", label: "발매일" },
 ];
 
-const DIRECTION_OPTIONS: { value: SortDirection; label: string }[] = [
-  { value: "desc", label: "내림차순" },
-  { value: "asc", label: "오름차순" },
-];
-
 export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
   const [groupBy, setGroupBy] = useState<SongGroupBy>("album");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [selected, setSelected] = useState<SelectedSong | null>(null);
+  // 드로어에 매번 새 화살표 함수를 넘기면 SongDbDrawer의 포커스 관리
+  // effect가 참조 동일성 때문에 열려 있는 동안에도 매 렌더마다 다시
+  // 실행돼(포커스가 튀는 등) 불필요하게 흔들린다 — setSelected는 useState가
+  // 보장하는 안정적인 참조라 이 콜백도 항상 같은 참조를 유지한다.
+  const closeDrawer = useCallback(() => setSelected(null), []);
   const showDateColumn = groupBy === "year";
 
   return (
@@ -268,22 +235,8 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
       ) : (
         <div className="flex flex-col gap-8">
           {groupSongs(songs, groupBy, sortDirection).map((group) => {
-            const albumTypeLabel = group.album
-              ? [
-                  group.album.album_type
-                    ? ALBUM_TYPE_SHORT_LABEL[group.album.album_type]
-                    : "",
-                  group.album.album_number
-                    ? `${group.album.album_number}집`
-                    : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")
-              : "";
             const albumSubtitle = group.album
-              ? [albumTypeLabel, group.album.title_ko]
-                  .filter(Boolean)
-                  .join(" · ")
+              ? `${ALBUM_TYPE_SHORT_LABEL[group.album.album_type]} ${group.album.album_number}집 · ${group.album.title_ko}`
               : "";
 
             return (
@@ -309,33 +262,48 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                   )}
                 </div>
 
-                {(albumSubtitle || group.album?.title_en) && (
+                {group.album && (
                   <div className="flex items-baseline justify-between gap-3">
-                    {albumSubtitle && (
-                      <p
-                        className={cn(
-                          "min-w-0 truncate text-sm font-normal tracking-normal text-white/50 normal-case",
-                          "tablet:text-base",
-                        )}
-                      >
-                        {albumSubtitle}
-                      </p>
-                    )}
-                    {group.album?.title_en && (
-                      <span
-                        className={cn(
-                          "hidden shrink-0 text-sm text-white/50",
-                          "tablet:inline tablet:text-base",
-                        )}
-                      >
-                        {group.album.title_en}
-                      </span>
-                    )}
+                    <p
+                      className={cn(
+                        "min-w-0 truncate text-sm font-normal tracking-normal text-white/50 normal-case",
+                        "tablet:text-base",
+                      )}
+                    >
+                      {albumSubtitle}
+                    </p>
+                    <span
+                      className={cn(
+                        "hidden shrink-0 text-sm text-white/50",
+                        "tablet:inline tablet:text-base",
+                      )}
+                    >
+                      {group.album.title_en}
+                    </span>
                   </div>
                 )}
 
                 <div className="mt-3 overflow-x-auto">
                   <table className="w-full border-collapse">
+                    <caption className="sr-only">{group.label} 수록곡</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col" className="sr-only">
+                          커버
+                        </th>
+                        <th scope="col" className="sr-only">
+                          제목
+                        </th>
+                        <th scope="col" className="sr-only">
+                          뮤직비디오
+                        </th>
+                        {showDateColumn && (
+                          <th scope="col" className="sr-only">
+                            발매일
+                          </th>
+                        )}
+                      </tr>
+                    </thead>
                     <tbody>
                       {group.songs.map((song) => {
                         const coverSrc = getSongCoverSrc(song);
@@ -343,19 +311,27 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                         const isSelected =
                           selected?.song.id === song.id &&
                           selected?.contextAlbumId === contextAlbumId;
-                        const releaseDate = songReleaseDate(song);
+                        const openSong = () =>
+                          setSelected(
+                            isSelected ? null : { song, contextAlbumId },
+                          );
                         return (
                           <tr
                             key={song.id}
                             data-song-db-item
-                            onClick={() =>
-                              setSelected(
-                                isSelected ? null : { song, contextAlbumId },
-                              )
-                            }
+                            tabIndex={0}
+                            onClick={openSong}
+                            onKeyDown={(event) => {
+                              if (event.key !== "Enter" && event.key !== " ")
+                                return;
+                              event.preventDefault();
+                              openSong();
+                            }}
                             aria-selected={isSelected}
+                            aria-label={`${song.title} 상세 정보 보기`}
                             className={cn(
                               "cursor-help border-b border-white/10 transition-colors last:border-0 hover:bg-white/5",
+                              "focus-visible:outline-ztmy-magenta focus-visible:outline-2 focus-visible:-outline-offset-2",
                               isSelected && "bg-white/10",
                             )}
                           >
@@ -398,22 +374,18 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                                   </a>
                                 )}
                               </div>
-                              {song.title_ko && (
-                                <p
-                                  className={cn(
-                                    "text-sm text-white/70",
-                                    "tablet:text-base",
-                                  )}
-                                >
-                                  {song.title_ko}
-                                  {song.title_en && (
-                                    <span className="tablet:inline hidden">
-                                      {" "}
-                                      ({song.title_en})
-                                    </span>
-                                  )}
-                                </p>
-                              )}
+                              <p
+                                className={cn(
+                                  "text-sm text-white/70",
+                                  "tablet:text-base",
+                                )}
+                              >
+                                {song.title_ko}
+                                <span className="tablet:inline hidden">
+                                  {" "}
+                                  ({song.title_en})
+                                </span>
+                              </p>
                             </td>
                             <td className="tablet:table-cell hidden py-2 pl-3 align-middle">
                               {song.music_video_url && (
@@ -431,16 +403,14 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                             </td>
                             {showDateColumn && (
                               <td className="py-2 pl-3 text-right align-middle">
-                                {releaseDate && (
-                                  <span
-                                    className={cn(
-                                      "font-mono text-sm text-white/40",
-                                      "tablet:text-base",
-                                    )}
-                                  >
-                                    {formatDateShort(releaseDate)}
-                                  </span>
-                                )}
+                                <span
+                                  className={cn(
+                                    "font-mono text-sm text-white/60",
+                                    "tablet:text-base",
+                                  )}
+                                >
+                                  {formatDateShort(song.release_date)}
+                                </span>
                               </td>
                             )}
                           </tr>
@@ -457,10 +427,10 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
 
       <SongDbDrawer
         selected={selected}
-        onClose={() => setSelected(null)}
+        onClose={closeDrawer}
+        ariaLabel={selected ? `${selected.song.title} 상세 정보` : undefined}
         renderContent={({ song, contextAlbumId }) => {
           const coverSrc = getSongCoverSrc(song);
-          const releaseDate = songReleaseDate(song);
           const hasArranger = (song.arranger?.length ?? 0) > 0;
           const hasMovieDirector = (song.movie_director?.length ?? 0) > 0;
           // 어느 앨범 문맥에서 열렸는지(contextAlbumId) 알면 그 앨범 정보를
@@ -494,7 +464,7 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     {contextAlbum && (
-                      <div className="flex flex-row flex-wrap items-baseline gap-1 text-white/40">
+                      <div className="flex flex-row flex-wrap items-baseline gap-1 text-white/60">
                         <p className="tablet:text-sm text-xs">
                           {ALBUM_TYPE_SHORT_LABEL[contextAlbum.album_type]}
                           {contextAlbum.album_number}집 · {contextAlbum.title}
@@ -512,34 +482,30 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                     >
                       {song.title}
                     </p>
-                    {song.title_ko && (
-                      <div
-                        className={cn(
-                          "flex flex-col gap-0 text-sm text-white/70",
-                          "tablet:text-base",
-                        )}
-                      >
-                        <span className="-mt-0.5">{song.title_en}</span>
-                        <span className="-mt-1">{song.title_ko}</span>
-                      </div>
-                    )}
-                    {releaseDate && (
-                      <p
-                        className={cn(
-                          "mt-1 font-mono text-sm text-white/50",
-                          "tablet:text-base",
-                        )}
-                      >
-                        {releaseDate}
-                      </p>
-                    )}
+                    <div
+                      className={cn(
+                        "flex flex-col gap-0 text-sm text-white/70",
+                        "tablet:text-base",
+                      )}
+                    >
+                      <span className="-mt-0.5">{song.title_en}</span>
+                      <span className="-mt-1">{song.title_ko}</span>
+                    </div>
+                    <p
+                      className={cn(
+                        "mt-1 font-mono text-sm text-white/50",
+                        "tablet:text-base",
+                      )}
+                    >
+                      {song.release_date}
+                    </p>
                   </div>
 
                   <button
                     type="button"
-                    onClick={() => setSelected(null)}
+                    onClick={closeDrawer}
                     aria-label="닫기"
-                    className="shrink-0 text-white/60 transition-colors hover:text-white"
+                    className="-m-2 shrink-0 p-2 text-white/60 transition-colors hover:text-white"
                   >
                     ✕
                   </button>
@@ -562,7 +528,21 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                 {song.music_video_url &&
                   (() => {
                     const embedUrl = getYouTubeEmbedUrl(song.music_video_url);
-                    if (!embedUrl) return null;
+                    if (!embedUrl) {
+                      return (
+                        <a
+                          href={song.music_video_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={cn(
+                            "mt-3 inline-flex text-sm text-white/60 underline transition-colors hover:text-white",
+                            "tablet:text-base",
+                          )}
+                        >
+                          MV 링크로 보기 ↗
+                        </a>
+                      );
+                    }
                     return (
                       <div className="mt-3 aspect-video w-full overflow-hidden rounded-lg">
                         <iframe
@@ -588,7 +568,7 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                   {otherAlbums.length === 0 ? (
                     <p
                       className={cn(
-                        "mt-2 text-base text-white/40",
+                        "mt-2 text-base text-white/60",
                         "tablet:text-lg",
                       )}
                     >

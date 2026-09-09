@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cn } from "@/lib/utils";
 import {
-  getAlbumsWithSongs,
+  getAlbumsCount,
   getSongsWithAlbums,
 } from "@/features/zutopia/song-db/data";
 import { SongDbNav } from "@/features/zutopia/song-db/SongDbNav";
@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 };
 
 export default async function ZutopiaSongsPage() {
-  const [songs, albums] = await Promise.all([
+  const [songs, albumCount] = await Promise.all([
     getSongsWithAlbums(),
-    getAlbumsWithSongs(),
+    getAlbumsCount(),
   ]);
 
   return (
@@ -30,7 +30,7 @@ export default async function ZutopiaSongsPage() {
       </h1>
 
       <div className="mt-3">
-        <SongDbNav songCount={songs.length} albumCount={albums.length} />
+        <SongDbNav songCount={songs.length} albumCount={albumCount} />
 
         <div className="mt-8">
           <SongListView songs={songs} />

@@ -148,6 +148,14 @@ export function ZoomableImageGroup({
       );
 
     const onKeyDown = (event: KeyboardEvent) => {
+      // document 레벨 리스너라 window 레벨(예: SongDbDrawer)보다 먼저
+      // 버블링을 탄다 — 이 모달이 다른 모달(드로어) 안에 중첩되어 열려있을
+      // 때, stopPropagation 없이는 Escape 한 번에 이 확대 뷰만 닫히는 게
+      // 아니라 바깥 드로어까지 같이 닫혀버린다(이벤트가 그대로 window까지
+      // 전파되어 그쪽 Escape 핸들러도 반응하기 때문). 여기서 처리하는
+      // 키(Escape/화살표/Tab)는 전부 이 모달이 열려있는 동안 독점해야 하는
+      // 키이므로 항상 멈춘다.
+      event.stopPropagation();
       if (event.key === "Escape") closeModal();
       if (event.key === "ArrowLeft") goPrev();
       if (event.key === "ArrowRight") goNext();

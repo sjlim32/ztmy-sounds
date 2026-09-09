@@ -18,35 +18,28 @@ export function SongDbNav({
   albumCount: number;
 }) {
   const pathname = usePathname();
+  const isSongs = pathname === "/zutopia/songs";
+  const isAlbums = pathname === "/zutopia/albums";
 
   return (
-    <div
-      role="tablist"
+    <nav
       aria-label="노래 DB"
       className="flex flex-wrap gap-2 border-b border-white/10 pb-4"
     >
       <Link
         href="/zutopia/songs"
-        role="tab"
-        aria-selected={pathname === "/zutopia/songs"}
-        className={cn(
-          TAB_CLASS,
-          pathname === "/zutopia/songs" && ACTIVE_TAB_CLASS,
-        )}
+        aria-current={isSongs ? "page" : undefined}
+        className={cn(TAB_CLASS, isSongs && ACTIVE_TAB_CLASS)}
       >
         곡 ({songCount})
       </Link>
       <Link
         href="/zutopia/albums"
-        role="tab"
-        aria-selected={pathname === "/zutopia/albums"}
-        className={cn(
-          TAB_CLASS,
-          pathname === "/zutopia/albums" && ACTIVE_TAB_CLASS,
-        )}
+        aria-current={isAlbums ? "page" : undefined}
+        className={cn(TAB_CLASS, isAlbums && ACTIVE_TAB_CLASS)}
       >
         앨범 ({albumCount})
       </Link>
-    </div>
+    </nav>
   );
 }

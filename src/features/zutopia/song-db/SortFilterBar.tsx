@@ -7,6 +7,10 @@ interface SortFilterBarProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
   label?: string;
+  // 이 컴포넌트가 항상 "정렬/필터" 용도로 쓰이는 건 아니다(예: 앨범 커버
+  // 판본 선택은 필터가 아니라 표시 옵션) — 그런 경우 접근성 이름이 잘못
+  // "필터"로 읽히지 않도록 group의 aria-label을 통째로 덮어쓸 수 있게 한다.
+  groupLabel?: string;
 }
 
 /**

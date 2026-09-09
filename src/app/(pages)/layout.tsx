@@ -100,7 +100,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <CustomCursor />
         <GuideDimOverlay />
         <SerwistProvider swUrl="/serwist/sw.js">
-          <div className="relative z-10 flex min-h-0 flex-1 flex-col">
+          <div
+            id="app-root"
+            className="relative z-10 flex min-h-0 flex-1 flex-col"
+          >
             <MobileHeader />
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               {children}

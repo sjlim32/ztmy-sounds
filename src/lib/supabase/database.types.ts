@@ -15,11 +15,11 @@ export interface Database {
       songs: {
         Row: {
           id: string;
-          slug: string | null;
+          slug: string;
           title: string;
-          title_ko: string | null;
-          title_en: string | null;
-          release_date: string | null;
+          title_ko: string;
+          title_en: string;
+          release_date: string;
           cover_image_url: string | null;
           music_video_url: string | null;
           streaming_urls: Json | null;
@@ -32,11 +32,11 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          slug?: string | null;
+          slug: string;
           title: string;
-          title_ko?: string | null;
-          title_en?: string | null;
-          release_date?: string | null;
+          title_ko: string;
+          title_en: string;
+          release_date: string;
           cover_image_url?: string | null;
           music_video_url?: string | null;
           streaming_urls?: Json | null;
@@ -49,11 +49,11 @@ export interface Database {
         };
         Update: {
           id?: string;
-          slug?: string | null;
+          slug?: string;
           title?: string;
-          title_ko?: string | null;
-          title_en?: string | null;
-          release_date?: string | null;
+          title_ko?: string;
+          title_en?: string;
+          release_date?: string;
           cover_image_url?: string | null;
           music_video_url?: string | null;
           streaming_urls?: Json | null;
@@ -69,12 +69,12 @@ export interface Database {
       albums: {
         Row: {
           id: string;
-          slug: string | null;
+          slug: string;
           title: string;
-          title_ko: string | null;
-          title_en: string | null;
+          title_ko: string;
+          title_en: string;
           album_type: AlbumType;
-          album_number: number | null;
+          album_number: number;
           release_date: string;
           cover_image_url: string | null;
           book_image_urls: string[] | null;
@@ -85,12 +85,12 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          slug?: string | null;
+          slug: string;
           title: string;
-          title_ko?: string | null;
-          title_en?: string | null;
+          title_ko: string;
+          title_en: string;
           album_type: AlbumType;
-          album_number?: number | null;
+          album_number: number;
           release_date: string;
           cover_image_url?: string | null;
           book_image_urls?: string[] | null;
@@ -101,12 +101,12 @@ export interface Database {
         };
         Update: {
           id?: string;
-          slug?: string | null;
+          slug?: string;
           title?: string;
-          title_ko?: string | null;
-          title_en?: string | null;
+          title_ko?: string;
+          title_en?: string;
           album_type?: AlbumType;
-          album_number?: number | null;
+          album_number?: number;
           release_date?: string;
           cover_image_url?: string | null;
           book_image_urls?: string[] | null;
