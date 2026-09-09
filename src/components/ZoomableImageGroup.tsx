@@ -225,10 +225,17 @@ export function ZoomableImageGroup({
             aria-label={current.alt || "이미지 확대 보기"}
             tabIndex={-1}
             onClick={closeModal}
-            className="fixed inset-0 z-50 flex flex-col items-center overflow-auto bg-black/80 p-6 focus:outline-none"
+            className="fixed inset-0 z-50 flex flex-col items-center-safe overflow-auto bg-black/80 p-6 focus:outline-none"
           >
             {/* absolute가 아니라 fixed — 안내문이 길어 아래 콘텐츠가 스크롤될
                 때도 닫기/이전/다음 버튼이 뷰포트 모서리에 계속 붙어있도록. */}
+            {/* items-center(순수 center)면 확대된 이미지가 컨테이너보다 넓어질
+                때 좌우로 똑같이 넘치는데, overflow-auto는 스크롤 시작 위치(0)
+                기준 음수 방향(왼쪽) 오버플로우로는 스크롤이 닿지 않아 왼쪽
+                절반이 영영 안 보이게 됩니다(오른쪽은 스크롤 가능 영역에
+                포함돼 끝까지 갈 수 있는 것과 비대칭). safe center는 오버플로우가
+                생기면 자동으로 start 정렬로 물러나 전체가 스크롤로 닿게 해주고,
+                안 넘칠 땐 평소처럼 중앙 정렬을 유지합니다. */}
             <button
               type="button"
               onClick={closeModal}

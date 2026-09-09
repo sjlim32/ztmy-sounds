@@ -149,6 +149,8 @@ export function AlbumListView({
   // pointerup에서 드래그(스와이프)가 임계값을 넘었으면 true — 뒤이어 발생하는
   // click까지 "확대 보기 모달 열기"로 처리하지 않도록 한 번 건너뛴다.
   const didDragRef = useRef(false);
+  // 선택된 앨범의 썸네일 버튼 — 선택 시 그 위치로 스크롤하기 위해 잡아둔다.
+  const selectedButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (!selected) return;
@@ -158,6 +160,23 @@ export function AlbumListView({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selected]);
+
+  // block: "start"로 상세 패널이 아래에 펼쳐질 공간을 확보한다 — "nearest"를
+  // 쓰면 화면 아래쪽 앨범을 선택했을 때 버튼이 뷰포트 하단에 붙어버려 정작
+  // 방금 펼쳐진 패널은 더 안 보이게 된다.
+  // 상세 패널은 grid-template-rows로 0→1fr 펼쳐지는 애니메이션(아래
+  // duration-300과 동일한 시간)이 있어서, 그게 끝나기 전에 스크롤하면
+  // 아직 다 안 늘어난 스크롤 가능 영역 기준으로 목표 위치가 잘려버린다.
+  useEffect(() => {
+    if (!selected) return;
+    const timer = setTimeout(() => {
+      selectedButtonRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 300);
+    return () => clearTimeout(timer);
   }, [selected]);
 
   // cover_image_url + book_image_urls를 항상 통째로 넣는다. showBookCover가
@@ -242,6 +261,7 @@ export function AlbumListView({
                 return (
                   <button
                     key={album.id}
+                    ref={isSelected ? selectedButtonRef : undefined}
                     type="button"
                     onClick={() => setSelected(isSelected ? null : album)}
                     aria-expanded={isSelected}
@@ -252,7 +272,7 @@ export function AlbumListView({
                       "transition-[transform,filter] duration-500 ease-in-out",
                       SHELF_TILT[index % SHELF_TILT.length],
                       SHELF_LEAN[index % SHELF_LEAN.length],
-                      "tablet:hover:z-50 tablet:hover:rotate-0 tablet:hover:-translate-y-6 tablet:hover:scale-110 tablet:hover:brightness-110",
+                      "tablet:hover:z-70 tablet:hover:rotate-0 tablet:hover:-translate-y-6 tablet:hover:scale-110 tablet:hover:brightness-110",
                       isSelected && "z-60 rotate-0",
                     )}
                   >
