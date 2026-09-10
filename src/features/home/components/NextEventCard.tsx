@@ -1,6 +1,7 @@
 "use client";
 
-import { memo, useId } from "react";
+import { memo, useId, type ReactNode } from "react";
+import Link from "next/link";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { formatEventDate, accentBorder, type Event } from "@/data/event";
@@ -29,6 +30,41 @@ const ticketAccentGradient = {
   home: "from-ztmy-magenta to-ztmy-pink",
   away: "from-ztmy-sky to-ztmy-sun",
 } satisfies Record<Event["accent"], string>;
+
+/**
+ * 포스터 클릭 시 이동 위치 — 내한(home)은 사이트 자체 공연 정보 페이지
+ * (/info)로, 원정(away)은 여전히 외부 투어 링크(티켓 사이트 등)로 보낸다.
+ * /info가 지금 어느 공연을 다루는지는 event.ts/info.tsx 쪽에서 관리하는
+ * 별도 설정이라, 나중에 "현재 공연"이 바뀌면 그쪽과 맞춰 갱신해야 한다.
+ */
+function PosterLink({
+  event,
+  className,
+  children,
+}: {
+  event: Event;
+  className?: string;
+  children: ReactNode;
+}) {
+  if (event.accent === "home") {
+    return (
+      <Link href="/info" className={className}>
+        {children}
+      </Link>
+    );
+  }
+
+  return (
+    <a
+      href={event.tourUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={className}
+    >
+      {children}
+    </a>
+  );
+}
 
 interface NextEventCardProps {
   event: Event;
@@ -125,10 +161,8 @@ function NextEventCardComponent({
               >
                 {/* 모바일 - 가로 레이아웃 */}
                 <div className={cn("flex gap-3 px-2 pb-1", "tablet:hidden")}>
-                  <a
-                    href={event.tourUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <PosterLink
+                    event={event}
                     className="relative block shrink-0 overflow-hidden rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -140,7 +174,7 @@ function NextEventCardComponent({
                     />
                     {/* 이미지 하단이 카드 배경으로 자연스럽게 이어지도록 스크림 처리 */}
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-t from-black/70 to-transparent" />
-                  </a>
+                  </PosterLink>
 
                   <div className="flex min-w-0 flex-col justify-center gap-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
                     <a
@@ -208,10 +242,8 @@ function NextEventCardComponent({
                     </p>
                   </a>
 
-                  <a
-                    href={event.tourUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <PosterLink
+                    event={event}
                     className="relative mt-4 flex w-fit overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -223,7 +255,7 @@ function NextEventCardComponent({
                     />
                     {/* 이미지 하단이 아래 텍스트 영역으로 자연스럽게 이어지도록 스크림 처리 */}
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/60 to-transparent" />
-                  </a>
+                  </PosterLink>
 
                   {/* 콘서트 티켓 스텁을 참고한 레이아웃 — DATE/VENUE 두 반쪽을
                   점선 절취선으로 나누고, 절취선과 상단 띠 둘 다 accent 색을
