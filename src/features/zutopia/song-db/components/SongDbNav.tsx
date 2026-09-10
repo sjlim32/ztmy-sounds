@@ -23,7 +23,7 @@ export function SongDbNav({
 
   return (
     <nav
-      aria-label="노래 DB"
+      aria-label="디스코그래피"
       className="flex flex-wrap gap-2 border-b border-white/10 pb-4"
     >
       <Link

@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
+import { MicIcon } from "@/components/icons/MicIcon";
 import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
 import {
   ZoomableImageGroup,
@@ -13,6 +14,7 @@ import {
   ALBUM_TYPE_SECTION_LABEL,
   ALBUM_TYPE_SHORT_LABEL,
 } from "../labels";
+import { IconLinkButton } from "./IconLinkButton";
 import { SongDbDrawer } from "./SongDbDrawer";
 import { SortFilterBar } from "./SortFilterBar";
 import { applySortDirection, DIRECTION_OPTIONS } from "../sort";
@@ -244,8 +246,8 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
             <section key={group.key}>
               <p
                 className={cn(
-                  "font-mono text-lg font-semibold tracking-[0.2em] text-white/70 uppercase",
-                  "tablet:text-xl",
+                  "tracking-[0.2em bg-ztmy-purple/15 p-1 font-mono text-lg font-semibold text-white/70 uppercase",
+                  "tablet:text-xl tablet:p-2",
                 )}
               >
                 {group.label}
@@ -308,9 +310,9 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
 
                       <span
                         className={cn(
-                          "pointer-events-none absolute top-full left-1/2 z-10 mt-1 flex w-max max-w-40 -translate-x-1/2 translate-y-1 flex-col items-center opacity-0",
-                          "rounded-lg bg-black/85 px-3 py-1.5 text-sm text-white",
-                          "tablet:text-base",
+                          "pointer-events-none absolute top-full left-1/2 z-10 mt-1 flex w-max max-w-60 -translate-x-1/2 translate-y-1 flex-col items-center opacity-0",
+                          "rounded-lg bg-black/85 px-3 py-1.5 text-xs text-white",
+                          "tablet:text-sm",
                           "transition-[opacity,transform] duration-300 ease-out",
                           // 모바일엔 hover가 없어서 기본으로는 이 라벨을 볼 방법이
                           // 없다 — 터치가 눌려있는 동안(group-active)만이라도
@@ -469,7 +471,7 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                     </p>
                     <p
                       className={cn(
-                        "text-xl font-semibold text-white",
+                        "mt-2 text-xl font-semibold text-white",
                         "tablet:text-2xl",
                       )}
                     >
@@ -514,36 +516,42 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                     album.songs.map((song) => (
                       <li
                         key={song.id}
-                        className={cn(
-                          "flex items-center gap-2 text-base text-white/70",
-                          "tablet:text-lg",
-                        )}
+                        className="flex flex-col items-baseline"
                       >
-                        <span>
-                          {song.title}
-                          <span className="ml-2 text-white/60">
-                            {song.title_ko}
+                        <div className="flex items-center gap-2 text-white">
+                          <span className="w-5 shrink-0 font-mono text-xs text-white/40 tabular-nums">
+                            {String(song.track_number).padStart(2, "0")}
                           </span>
+                          <span>{song.title}</span>
+                          {song.music_video_url && (
+                            <IconLinkButton
+                              href={song.music_video_url}
+                              icon={YouTubeIcon}
+                              label="뮤직비디오 보기"
+                              tone="youtube"
+                            />
+                          )}
+                          {song.guideHref && (
+                            <IconLinkButton
+                              href={song.guideHref}
+                              icon={MicIcon}
+                              label="샤모지 호응 가이드 이동"
+                              tone="guide"
+                            />
+                          )}
+                        </div>
+
+                        <span className="tablet:text-sm -mt-0.5 pl-7 text-xs text-white/60">
+                          {song.title_ko}
                         </span>
-                        {song.music_video_url && (
-                          <a
-                            href={song.music_video_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label={`${song.title} 뮤직비디오`}
-                            className="shrink-0 text-white/50 transition-colors hover:text-white"
-                          >
-                            <YouTubeIcon className="h-4 w-4" />
-                          </a>
-                        )}
                       </li>
                     ))
                   )}
                 </ul>
 
                 {imageSource && (
-                  <p className="mt-4 truncate text-[11px] text-white/40">
-                    이미지 출처:{" "}
+                  <p className="tablet:text-xs mt-4 flex gap-1 truncate text-[10px] text-white/40">
+                    <span>이미지 출처 :</span>
                     <a
                       href={imageSource}
                       target="_blank"

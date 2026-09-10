@@ -2,8 +2,10 @@
 
 import { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
+import { MicIcon } from "@/components/icons/MicIcon";
 import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
 import { ALBUM_TYPE_SHORT_LABEL } from "../labels";
+import { IconLinkButton } from "./IconLinkButton";
 import { SongDbDrawer } from "./SongDbDrawer";
 import { SortFilterBar } from "./SortFilterBar";
 import { applySortDirection, DIRECTION_OPTIONS } from "../sort";
@@ -241,7 +243,7 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
 
             return (
               <section key={group.key}>
-                <div className="flex items-baseline justify-between gap-3">
+                <div className="bg-ztmy-dark/60 flex items-baseline justify-between gap-3 px-2 pt-1">
                   <p
                     className={cn(
                       "min-w-0 truncate font-mono text-lg font-semibold tracking-[0.2em] uppercase",
@@ -263,7 +265,7 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                 </div>
 
                 {group.album && (
-                  <div className="flex items-baseline justify-between gap-3">
+                  <div className="bg-ztmy-dark/60 flex items-baseline justify-between gap-3 px-2 pb-1">
                     <p
                       className={cn(
                         "min-w-0 truncate text-sm font-normal tracking-normal text-white/50 normal-case",
@@ -283,8 +285,8 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                   </div>
                 )}
 
-                <div className="mt-3 overflow-x-auto">
-                  <table className="w-full border-collapse">
+                <div>
+                  <table className="w-full">
                     <caption className="sr-only">{group.label} 수록곡</caption>
                     <thead>
                       <tr>
@@ -293,9 +295,6 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                         </th>
                         <th scope="col" className="sr-only">
                           제목
-                        </th>
-                        <th scope="col" className="sr-only">
-                          뮤직비디오
                         </th>
                         {showDateColumn && (
                           <th scope="col" className="sr-only">
@@ -330,12 +329,13 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                             aria-selected={isSelected}
                             aria-label={`${song.title} 상세 정보 보기`}
                             className={cn(
-                              "cursor-help border-b border-white/10 transition-colors last:border-0 hover:bg-white/5",
+                              "flex cursor-help items-center gap-1 border-b border-white/10 px-2 transition-colors last:border-0 hover:bg-white/5",
+                              "tablet:gap-3",
                               "focus-visible:outline-ztmy-magenta focus-visible:outline-2 focus-visible:-outline-offset-2",
                               isSelected && "bg-white/10",
                             )}
                           >
-                            <td className="w-14 py-2 pr-3 align-middle">
+                            <td>
                               {coverSrc ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
@@ -351,28 +351,42 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                                 />
                               )}
                             </td>
-                            <td className="py-2 pr-3 align-middle">
-                              <div className="flex items-center gap-2">
+                            <td className="flex-1 py-2 align-middle">
+                              <div className="flex items-center justify-between gap-2">
                                 <p
                                   className={cn(
-                                    "text-base font-medium text-white",
+                                    "min-w-0 text-base font-medium text-white",
                                     "tablet:text-lg",
                                   )}
                                 >
                                   {song.title}
                                 </p>
-                                {song.music_video_url && (
-                                  <a
-                                    href={song.music_video_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={(event) => event.stopPropagation()}
-                                    aria-label={`${song.title} 뮤직비디오`}
-                                    className="tablet:hidden inline-flex shrink-0 text-white/50 transition-colors hover:text-white"
-                                  >
-                                    <YouTubeIcon className="h-5 w-5" />
-                                  </a>
-                                )}
+                                <div className="ml-auto flex shrink-0 items-center gap-2">
+                                  {song.music_video_url && (
+                                    <IconLinkButton
+                                      href={song.music_video_url}
+                                      icon={YouTubeIcon}
+                                      label="뮤직비디오 보기"
+                                      tone="youtube"
+                                      size="md"
+                                      onClick={(event) =>
+                                        event.stopPropagation()
+                                      }
+                                    />
+                                  )}
+                                  {song.guideHref && (
+                                    <IconLinkButton
+                                      href={song.guideHref}
+                                      icon={MicIcon}
+                                      label="샤모지 호응 가이드 이동"
+                                      tone="guide"
+                                      size="md"
+                                      onClick={(event) =>
+                                        event.stopPropagation()
+                                      }
+                                    />
+                                  )}
+                                </div>
                               </div>
                               <p
                                 className={cn(
@@ -386,20 +400,6 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                                   ({song.title_en})
                                 </span>
                               </p>
-                            </td>
-                            <td className="tablet:table-cell hidden py-2 pl-3 align-middle">
-                              {song.music_video_url && (
-                                <a
-                                  href={song.music_video_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={(event) => event.stopPropagation()}
-                                  aria-label={`${song.title} 뮤직비디오`}
-                                  className="inline-flex text-white/50 transition-colors hover:text-white"
-                                >
-                                  <YouTubeIcon className="h-5 w-5" />
-                                </a>
-                              )}
                             </td>
                             {showDateColumn && (
                               <td className="py-2 pl-3 text-right align-middle">
@@ -476,7 +476,7 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                     )}
                     <p
                       className={cn(
-                        "text-xl font-semibold text-white",
+                        "mt-2 text-xl font-semibold text-white",
                         "tablet:text-2xl",
                       )}
                     >
@@ -484,12 +484,12 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                     </p>
                     <div
                       className={cn(
-                        "flex flex-col gap-0 text-sm text-white/70",
+                        "flex flex-col text-sm leading-tight text-white/70",
                         "tablet:text-base",
                       )}
                     >
-                      <span className="-mt-0.5">{song.title_en}</span>
-                      <span className="-mt-1">{song.title_ko}</span>
+                      <span>{song.title_en}</span>
+                      <span>{song.title_ko}</span>
                     </div>
                     <p
                       className={cn(
@@ -514,7 +514,7 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                 {(hasArranger || hasMovieDirector) && (
                   <div
                     className={cn(
-                      "bg-ztmy-purple/15 -mx-2 mt-3 flex flex-col px-2 py-1 text-sm text-white/80",
+                      "-mx-2 mt-3 flex flex-col bg-white/8 px-2 py-1 text-sm text-white/80",
                       "tablet:text-base",
                     )}
                   >
@@ -523,6 +523,21 @@ export function SongListView({ songs }: { songs: SongWithAlbums[] }) {
                       <p>M/V - {song.movie_director!.join(", ")}</p>
                     )}
                   </div>
+                )}
+
+                {song.guideHref && (
+                  <a
+                    href={song.guideHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "border-ztmy-purple/40 bg-ztmy-purple/15 hover:bg-ztmy-purple/25 mt-3 flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold text-white transition-colors",
+                      "tablet:text-base",
+                    )}
+                  >
+                    <MicIcon className="h-4 w-4" />
+                    샤모지 호응 가이드 이동
+                  </a>
                 )}
 
                 {song.music_video_url &&
