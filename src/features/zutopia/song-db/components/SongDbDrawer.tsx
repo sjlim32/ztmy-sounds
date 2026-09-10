@@ -207,8 +207,8 @@ export function SongDbDrawer<T>({
         aria-label={ariaLabel}
         tabIndex={-1}
         className={cn(
-          "pointer-events-auto absolute top-0 right-0 flex h-full w-full flex-col overflow-y-auto bg-black/50",
-          "tablet:max-w-md",
+          "pointer-events-auto absolute top-0 right-0 flex h-full w-full flex-col overflow-y-auto bg-black/50 backdrop-blur-md",
+          "tablet:max-w-md pc:max-w-xl",
           "shadow-[-8px_0_32px_rgba(0,0,0,0.6)] transition-transform duration-300 ease-out",
           "focus:outline-none",
           isOpen ? "translate-x-0" : "translate-x-full",
