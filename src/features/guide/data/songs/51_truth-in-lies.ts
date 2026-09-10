@@ -7,7 +7,7 @@ const uso: SongTitle = {
 };
 
 const song: Song = {
-  id: "uso-ja-nai",
+  id: "truth-in-lies",
   title: uso,
   youtubeId: "GfDXqY-V0EY",
   lyrics: [

@@ -1,4 +1,5 @@
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
+import { getGuideHref } from "./guide-link";
 import type { AlbumWithSongs, SongWithAlbums } from "./types";
 
 // 곡 페이지는 앨범 개수를, 앨범 페이지는 곡 개수를 SongDbNav 배지에 표시하기
@@ -66,7 +67,7 @@ export async function getSongsWithAlbums(): Promise<SongWithAlbums[]> {
       }))
       .sort((a, b) => a.release_date.localeCompare(b.release_date));
 
-    return { ...song, albums };
+    return { ...song, albums, guideHref: getGuideHref(song.slug) };
   });
 }
 
@@ -100,7 +101,12 @@ export async function getAlbumsWithSongs(): Promise<AlbumWithSongs[]> {
         (a, b) =>
           a.disc_number - b.disc_number || a.track_number - b.track_number,
       )
-      .map((row) => row.songs);
+      .map((row) => ({
+        ...row.songs,
+        track_number: row.track_number,
+        disc_number: row.disc_number,
+        guideHref: getGuideHref(row.songs.slug),
+      }));
 
     return { ...album, songs };
   });

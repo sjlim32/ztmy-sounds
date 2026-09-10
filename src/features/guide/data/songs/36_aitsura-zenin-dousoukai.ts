@@ -7,7 +7,7 @@ const dousoukai: SongTitle = {
 };
 
 const song: Song = {
-  id: "aitsura-zenin-dousoukai",
+  id: "inside-joke",
   title: dousoukai,
   youtubeId: "o2tonXY8lCY",
   lyrics: [
