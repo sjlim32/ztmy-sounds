@@ -32,37 +32,20 @@ const ticketAccentGradient = {
 } satisfies Record<Event["accent"], string>;
 
 /**
- * 포스터 클릭 시 이동 위치 — 내한(home)은 사이트 자체 공연 정보 페이지
- * (/info)로, 원정(away)은 여전히 외부 투어 링크(티켓 사이트 등)로 보낸다.
- * /info가 지금 어느 공연을 다루는지는 event.ts/info.tsx 쪽에서 관리하는
- * 별도 설정이라, 나중에 "현재 공연"이 바뀌면 그쪽과 맞춰 갱신해야 한다.
+ * 포스터 클릭 시 이동 위치 — 내한/원정 둘 다 외부 투어 링크 대신 사이트
+ * 자체 공연 정보 페이지(/info)로 보낸다.
  */
 function PosterLink({
-  event,
   className,
   children,
 }: {
-  event: Event;
   className?: string;
   children: ReactNode;
 }) {
-  if (event.accent === "home") {
-    return (
-      <Link href="/info" className={className}>
-        {children}
-      </Link>
-    );
-  }
-
   return (
-    <a
-      href={event.tourUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={className}
-    >
+    <Link href="/info" className={className}>
       {children}
-    </a>
+    </Link>
   );
 }
 
@@ -161,10 +144,7 @@ function NextEventCardComponent({
               >
                 {/* 모바일 - 가로 레이아웃 */}
                 <div className={cn("flex gap-3 px-2 pb-1", "tablet:hidden")}>
-                  <PosterLink
-                    event={event}
-                    className="relative block shrink-0 overflow-hidden rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
-                  >
+                  <PosterLink className="relative block shrink-0 overflow-hidden rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.6)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={event.tourImg}
@@ -242,10 +222,7 @@ function NextEventCardComponent({
                     </p>
                   </a>
 
-                  <PosterLink
-                    event={event}
-                    className="relative mt-4 flex w-fit overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
-                  >
+                  <PosterLink className="relative mt-4 flex w-fit overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.6)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={event.tourImg}
