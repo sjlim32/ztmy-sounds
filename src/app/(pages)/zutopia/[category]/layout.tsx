@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getZutopiaCategory } from "@/features/zutopia/registry";
 import { ZutopiaCategoryTabs } from "@/features/zutopia/components/ZutopiaCategoryTabs";
+import { ZutopiaSectionHeader } from "@/features/zutopia/components/ZutopiaSectionHeader";
 
 export async function generateMetadata(
   props: LayoutProps<"/zutopia/[category]">,
@@ -32,9 +33,10 @@ export default async function ZutopiaCategoryLayout(
 
   return (
     <div>
-      <p className="font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
-        {category.label}
-      </p>
+      <ZutopiaSectionHeader
+        title={category.label}
+        description={category.description}
+      />
 
       <ZutopiaCategoryTabs category={category} />
 

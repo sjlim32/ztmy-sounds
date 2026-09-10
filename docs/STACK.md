@@ -11,5 +11,5 @@
 | PWA           | `@serwist/turbopack` (오프라인 캐싱)                                                       |
 | 영상 재생     | YouTube IFrame API                                                                         |
 | 아이콘        | 커스텀 SVG 컴포넌트 (`src/components/icons/`) — 외부 아이콘 라이브러리 미사용              |
-| 폰트          | Geist Sans/Mono, RocknRoll One (Google Fonts) — 851MkPOP (로컬 폰트)                       |
+| 폰트          | IBM Plex Sans KR/JP/Mono, RocknRoll One (Google Fonts) — 851MkPOP (로컬 폰트)              |
 | 배포          | Cloudflare Pages (`wrangler.jsonc`, `pnpm pages:deploy`)                                   |

@@ -7,7 +7,7 @@ const medi: SongTitle = {
 };
 
 const song: Song = {
-  id: "medi",
+  id: "medianoche",
   title: medi,
   youtubeId: "sBpITQ7oXxM",
   lyrics: [

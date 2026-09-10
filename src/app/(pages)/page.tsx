@@ -106,7 +106,7 @@ export default function Home() {
           <div
             className={cn(
               "absolute inset-0 flex flex-col items-center justify-center px-4",
-              "short:static short:flex-1 short:justify-end short:pb-6",
+              "short:static short:flex-1 short:justify-end short:pb-3",
             )}
           >
             <div className="flex w-full flex-col gap-2">

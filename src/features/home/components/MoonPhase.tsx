@@ -125,17 +125,17 @@ export function MoonPhase({
       {/* 달 내부 글자는 흰색 채우기 + ztmy-dark 테두리(-webkit-text-stroke)로
       이중 대비를 만듭니다. 달이 덜 찼을 땐 배경(어두운 페이지)에 흰 글자가,
       다 찼을 땐 노란 달빛 위에 짙은 보라 테두리가 각각 대비를 담당합니다. */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center [-webkit-text-stroke:0.5px_var(--ztmy-dark)]">
+      <div className="absolute inset-0 flex flex-col items-center justify-center [-webkit-text-stroke:0.1px_var(--ztmy-dark)]">
         {isDone ? (
-          <span className="tablet:text-2xl font-mono text-base font-bold text-white/60 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="tablet:text-3xl font-mono text-lg font-extrabold text-white/60 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             -
           </span>
         ) : isToday ? (
-          <span className="tablet:text-xl font-mono text-xs font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="tablet:text-2xl font-mono text-sm font-extrabold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             D-DAY
           </span>
         ) : (
-          <span className="tablet:text-xl font-mono text-xs font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="tablet:text-2xl font-mono text-sm font-extrabold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             D-{daysUntilEvent}
           </span>
         )}

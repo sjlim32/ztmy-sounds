@@ -7,7 +7,7 @@ const kan_saete_kuyashiiwa: SongTitle = {
 };
 
 const song: Song = {
-  id: "kan_saete_kuyashiiwa",
+  id: "kan-saete-kuyashiiwa",
   title: kan_saete_kuyashiiwa,
   youtubeId: "4QePrv24TBU",
   lyrics: [

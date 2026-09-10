@@ -7,7 +7,7 @@ const obenkyou: SongTitle = {
 };
 
 const song: Song = {
-  id: "obenkyou-shitoiteyo",
+  id: "study-me",
   title: obenkyou,
   youtubeId: "_WQNWVZqw4Q",
   lyrics: [

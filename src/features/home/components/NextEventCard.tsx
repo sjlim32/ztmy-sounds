@@ -1,6 +1,7 @@
 "use client";
 
-import { memo, useId } from "react";
+import { memo, useId, type ReactNode } from "react";
+import Link from "next/link";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { formatEventDate, accentBorder, type Event } from "@/data/event";
@@ -29,6 +30,24 @@ const ticketAccentGradient = {
   home: "from-ztmy-magenta to-ztmy-pink",
   away: "from-ztmy-sky to-ztmy-sun",
 } satisfies Record<Event["accent"], string>;
+
+/**
+ * 포스터 클릭 시 이동 위치 — 내한/원정 둘 다 외부 투어 링크 대신 사이트
+ * 자체 공연 정보 페이지(/info)로 보낸다.
+ */
+function PosterLink({
+  className,
+  children,
+}: {
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <Link href="/info" className={className}>
+      {children}
+    </Link>
+  );
+}
 
 interface NextEventCardProps {
   event: Event;
@@ -73,7 +92,10 @@ function NextEventCardComponent({
   const contentId = useId();
 
   return (
-    <div data-role="next-event-card" className={cn("w-full", "tablet:w-96")}>
+    <div
+      data-role="next-event-card"
+      className="tablet:max-w-72 pc:max-w-80 wide:max-w-96"
+    >
       <div className={cn("flex flex-col gap-2", !isOpen && "gap-0")}>
         <button
           type="button"
@@ -125,12 +147,7 @@ function NextEventCardComponent({
               >
                 {/* 모바일 - 가로 레이아웃 */}
                 <div className={cn("flex gap-3 px-2 pb-1", "tablet:hidden")}>
-                  <a
-                    href={event.tourUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="relative block shrink-0 overflow-hidden rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
-                  >
+                  <PosterLink className="relative block shrink-0 overflow-hidden rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.6)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={event.tourImg}
@@ -140,7 +157,7 @@ function NextEventCardComponent({
                     />
                     {/* 이미지 하단이 카드 배경으로 자연스럽게 이어지도록 스크림 처리 */}
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-t from-black/70 to-transparent" />
-                  </a>
+                  </PosterLink>
 
                   <div className="flex min-w-0 flex-col justify-center gap-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
                     <a
@@ -151,7 +168,7 @@ function NextEventCardComponent({
                     >
                       <p
                         data-role="title"
-                        className="hover:text-ztmy-pink truncate text-xs font-semibold text-white transition-colors"
+                        className="hover:text-ztmy-pink text-xs font-semibold break-keep text-white transition-colors"
                       >
                         {event.tourName}
                         <ExternalLinkIcon className="ml-1 inline h-2.5 w-2.5 opacity-70" />
@@ -164,7 +181,7 @@ function NextEventCardComponent({
                       </p>
                       <p
                         data-role="date"
-                        className="font-mono text-sm font-bold text-white"
+                        className="font-mono text-xs font-bold text-white"
                       >
                         {formatEventDate(event)}
                         <span className="ml-1.5 text-xs font-normal text-white/70">
@@ -183,7 +200,7 @@ function NextEventCardComponent({
                       <p className="font-mono text-[8px] tracking-[0.2em] text-white/40 uppercase">
                         Venue
                       </p>
-                      <span className="group-hover:text-ztmy-pink inline-flex items-center gap-1 text-sm text-white transition-colors group-hover:underline">
+                      <span className="group-hover:text-ztmy-pink inline-flex items-center gap-1 text-xs text-white transition-colors group-hover:underline">
                         {event.place}
                         <ExternalLinkIcon className="h-2.5 w-2.5" />
                       </span>
@@ -192,7 +209,9 @@ function NextEventCardComponent({
                 </div>
 
                 {/* 태블릿 이상 - 세로 레이아웃 */}
-                <div className={cn("hidden", "tablet:block")}>
+                <div
+                  className={cn("hidden", "tablet:flex flex-col items-center")}
+                >
                   <a
                     href={event.tourUrl}
                     target="_blank"
@@ -201,34 +220,38 @@ function NextEventCardComponent({
                   >
                     <p
                       data-role="title"
-                      className="hover:text-ztmy-pink text-xl font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] transition-colors"
+                      className={cn(
+                        "hover:text-ztmy-pink font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] transition-colors",
+                        "tablet:text-base pc:text-lg wide:text-xl",
+                      )}
                     >
                       {event.tourName}
-                      <ExternalLinkIcon className="ml-1 inline h-3.5 w-3.5 opacity-70" />
+                      <ExternalLinkIcon
+                        className={cn(
+                          "inline h-3.5 w-3.5 opacity-70",
+                          "pc:h-4 pc:w-4",
+                          "wide:h-5 wide:w-5",
+                        )}
+                      />
                     </p>
                   </a>
 
-                  <a
-                    href={event.tourUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="relative mt-4 flex w-fit overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
-                  >
+                  <PosterLink className="relative mt-4 flex w-full overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.6)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={event.tourImg}
                       alt={event.tourName}
                       loading="lazy"
-                      className="w-[15dvw] rounded-lg object-cover transition-opacity hover:opacity-80"
+                      className="rounded-lg object-cover transition-opacity hover:opacity-80"
                     />
                     {/* 이미지 하단이 아래 텍스트 영역으로 자연스럽게 이어지도록 스크림 처리 */}
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/60 to-transparent" />
-                  </a>
+                  </PosterLink>
 
                   {/* 콘서트 티켓 스텁을 참고한 레이아웃 — DATE/VENUE 두 반쪽을
                   점선 절취선으로 나누고, 절취선과 상단 띠 둘 다 accent 색을
                   씁니다. */}
-                  <div className="relative mt-3 flex overflow-hidden bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]">
+                  <div className="relative mt-3 flex w-full overflow-hidden bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]">
                     <div
                       className={cn(
                         "absolute inset-x-0 top-0 h-0.5 bg-linear-to-r",
@@ -236,17 +259,20 @@ function NextEventCardComponent({
                       )}
                     />
 
-                    <div className="flex-1 px-4 py-3">
+                    <div className="flex-1 p-3">
                       <p className="font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase">
                         Date
                       </p>
                       <p
                         data-role="date"
-                        className="mt-1 font-mono text-lg font-bold text-white"
+                        className={cn(
+                          "mt-1 font-mono text-lg text-white",
+                          "wide:text-lg pc:text-base tablet:text-sm",
+                        )}
                       >
                         {formatEventDate(event)}
                       </p>
-                      <p className="font-mono text-xs text-white/50">
+                      <p className="font-mono text-xs font-bold text-white/50">
                         {event.time}
                       </p>
                     </div>
@@ -263,17 +289,28 @@ function NextEventCardComponent({
                       target="_blank"
                       rel="noopener noreferrer"
                       data-role="venue"
-                      className="group flex-1 px-4 py-3 transition-colors hover:bg-white/5"
+                      className="group flex-1 p-3 transition-colors hover:bg-white/5"
                     >
                       <p className="font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase">
                         Venue
                       </p>
-                      <p className="group-hover:text-ztmy-pink mt-1 inline-flex items-center gap-1 text-lg font-bold text-white transition-colors">
+                      <p
+                        className={cn(
+                          "group-hover:text-ztmy-pink mt-1 inline-flex items-center gap-1 text-lg break-keep text-white transition-colors",
+                          "wide:text-lg pc:text-base tablet:text-sm",
+                        )}
+                      >
                         {event.place}
-                        <ExternalLinkIcon className="h-3 w-3 opacity-70" />
+                        <ExternalLinkIcon
+                          className={cn(
+                            "h-3 w-3 opacity-70",
+                            "pc:h-3.5 pc:w-3.5",
+                            "wide:h-4 wide:w-4",
+                          )}
+                        />
                       </p>
                       {event.placeDesc && (
-                        <p className="text-xs text-white/50">
+                        <p className="text-xs font-bold text-white/50">
                           {event.placeDesc}
                         </p>
                       )}

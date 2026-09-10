@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import InfoContent from "@/features/info/info.mdx";
 import { originEvent } from "@/data/event";
 import { cn } from "@/lib/utils";
 import { buildMusicEventJsonLd } from "@/lib/structured-data";
+import { HomeLink } from "@/components/HomeLink";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 
 // /info는 현재 안내 중인 공연(INFORMATION, info.tsx)의 상세 정보를 보여주는
@@ -55,12 +55,7 @@ export default function InfoPage() {
           "tablet:max-w-4xl tablet:px-6 tablet:py-16",
         )}
       >
-        <Link
-          href="/"
-          className="tablet:block hidden text-sm text-white/60 hover:text-white"
-        >
-          ← 홈으로
-        </Link>
+        <HomeLink label="홈으로" className="tablet:inline-flex hidden" />
 
         <div className="mt-6">
           <InfoContent />

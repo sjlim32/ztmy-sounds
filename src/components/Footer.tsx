@@ -22,8 +22,8 @@ export function Footer() {
   return (
     <footer
       className={cn(
-        "flex flex-col items-center border-t border-white/10 py-1 text-center text-[11px] text-white/50",
-        "tablet:gap-1 tablet:items-end tablet:border-t-0 tablet:text-end tablet:px-3 tablet:text-white/40 tablet:text-xs",
+        "flex flex-col items-center gap-1 border-t border-white/10 py-1 text-center text-[10px] font-medium text-white/50",
+        "tablet:items-end tablet:border-t-0 tablet:text-end tablet:px-3 tablet:text-white/40 tablet:text-xs",
       )}
     >
       <p className="tablet:tracking-[0.4rem] tracking-widest">
@@ -39,7 +39,7 @@ export function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-              "rounded-full border border-white/15 bg-black/40 px-4 py-1 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm",
+              "rounded-full border border-white/15 bg-black/40 px-3 py-0.5 text-[10px] font-medium tracking-wide text-white/80 backdrop-blur-sm",
               "tablet:hidden",
               "hover:border-ztmy-magenta/60 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
             )}
@@ -63,8 +63,8 @@ export function Footer() {
           <Link
             href="/credits"
             className={cn(
-              "rounded-full border border-white/15 bg-black/40 px-3 py-0.5 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm",
-              "hover:border-ztmy-magenta/60 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+              "rounded-full border border-white/15 bg-black/40 px-3 py-0.5 text-[10px] font-medium tracking-wide text-white/80 backdrop-blur-sm",
+              "hover:border-ztmy-magenta/60 tablet:text-xs transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
             )}
           >
             출처
@@ -87,7 +87,9 @@ export function Footer() {
                   aria-label={name}
                   className="hover:text-ztmy-purple transition-colors"
                 >
-                  <Icon className={cn("h-3 w-3", "tablet:h-4 tablet:w-4")} />
+                  <Icon
+                    className={cn("h-3.5 w-3.5", "tablet:h-4 tablet:w-4")}
+                  />
                 </a>
               );
             })}

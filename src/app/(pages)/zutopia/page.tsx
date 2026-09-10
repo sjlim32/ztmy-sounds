@@ -1,28 +1,49 @@
-import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { ZUTOPIA_CATEGORIES } from "@/features/zutopia/registry";
+import { ARTIST } from "@/data/artist";
+import {
+  ZUTOPIA_CATEGORIES,
+  summarizeEntryTypes,
+} from "@/features/zutopia/registry";
+import { ZutopiaHubCard } from "@/features/zutopia/components/ZutopiaHubCard";
+import { ZutopiaSectionHeader } from "@/features/zutopia/components/ZutopiaSectionHeader";
+import { getSongsCount, getAlbumsCount } from "@/features/zutopia/song-db/data";
 
-export default function ZutopiaHubPage() {
+export default async function ZutopiaHubPage() {
+  const [songCount, albumCount] = await Promise.all([
+    getSongsCount(),
+    getAlbumsCount(),
+  ]);
+
   return (
-    <ul className={cn("grid gap-4", "tablet:grid-cols-2")}>
-      {ZUTOPIA_CATEGORIES.map((category) => (
-        <li key={category.slug}>
-          <Link
-            href={`/zutopia/${category.slug}`}
-            className="hover:border-ztmy-magenta/60 group block rounded-lg border border-white/10 bg-black/30 p-4 shadow-[0_4px_16px_rgba(0,0,0,0.4)] transition-colors hover:bg-black/40"
-          >
-            <p className="hover:text-ztmy-pink text-lg font-semibold text-white transition-colors">
-              {category.label}
-            </p>
-            <p className="mt-1 text-sm text-white/50">
-              {category.description}
-            </p>
-            <p className="mt-2 font-mono text-xs text-white/40">
-              {category.entries.length}개 항목
-            </p>
-          </Link>
+    <div className="flex flex-col gap-8">
+      <ZutopiaSectionHeader
+        title="ZUTOPIA"
+        description={`${ARTIST.name.jp} 기록 저장소`}
+      />
+
+      <ul className={cn("grid gap-4", "tablet:grid-cols-2")}>
+        <li>
+          <ZutopiaHubCard
+            href="/zutopia/songs"
+            title="디스코그래피"
+            description="전체 곡과 앨범 목록"
+            meta={`${songCount}곡 · ${albumCount}개 앨범`}
+            imageUrl="/assets/zutopia/components/song_db.webp"
+          />
         </li>
-      ))}
-    </ul>
+
+        {ZUTOPIA_CATEGORIES.map((category) => (
+          <li key={category.slug}>
+            <ZutopiaHubCard
+              href={`/zutopia/${category.slug}`}
+              title={category.label}
+              description={category.description}
+              meta={summarizeEntryTypes(category.entries)}
+              imageUrl={category.image}
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

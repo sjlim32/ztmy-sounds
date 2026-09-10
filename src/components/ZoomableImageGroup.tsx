@@ -27,6 +27,19 @@ interface ZoomableImageGroupProps {
   thumbnailWidth?: number;
   thumbnailHeight?: number;
   thumbnailCrop?: ThumbnailCrop;
+  /**
+   * 기본 썸네일 줄(전체 이미지를 한 줄로 나열)을 안 그린다 — renderTrigger로
+   * 완전히 다른 모양의 진입점을 두고 싶을 때 쓴다.
+   */
+  hideThumbnails?: boolean;
+  /**
+   * hideThumbnails와 함께 써서 커스텀 진입점을 그린다. 넘겨주는 open(index)을
+   * 트리거의 onClick에서 호출하면 그 인덱스부터 모달이 열리고, 그 안에서는
+   * images 전체를 그대로 순환한다. 내부 썸네일 버튼과 달리 닫을 때 포커스를
+   * 트리거로 자동 복귀시키지는 않는다(트리거가 임의의 커스텀 엘리먼트라 어떤
+   * 걸 ref로 잡아야 할지 렌더 시점엔 알 수 없음).
+   */
+  renderTrigger?: (open: (index: number) => void) => React.ReactNode;
 }
 
 /**
@@ -40,12 +53,17 @@ export function ZoomableImageGroup({
   thumbnailWidth,
   thumbnailHeight,
   thumbnailCrop = "center",
+  hideThumbnails = false,
+  renderTrigger,
 }: ZoomableImageGroupProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [isZoomedIn, setZoomedIn] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   // 모달을 연 썸네일 버튼 — 닫을 때 포커스를 여기로 되돌립니다.
   const triggerRef = useRef<HTMLElement | null>(null);
+  const openAt = (index: number) => {
+    setOpenIndex(index);
+  };
   // 이미지를 드래그(모바일 스와이프 포함)해서 이전/다음으로 넘기기 위한 상태.
   // dragStartX는 포인터가 눌린 x좌표, didDragRef는 임계값을 넘는 드래그가
   // 실제로 있었는지 — 있었다면 pointerup 뒤에 이어지는 click(확대/축소
@@ -130,6 +148,14 @@ export function ZoomableImageGroup({
       );
 
     const onKeyDown = (event: KeyboardEvent) => {
+      // document 레벨 리스너라 window 레벨(예: SongDbDrawer)보다 먼저
+      // 버블링을 탄다 — 이 모달이 다른 모달(드로어) 안에 중첩되어 열려있을
+      // 때, stopPropagation 없이는 Escape 한 번에 이 확대 뷰만 닫히는 게
+      // 아니라 바깥 드로어까지 같이 닫혀버린다(이벤트가 그대로 window까지
+      // 전파되어 그쪽 Escape 핸들러도 반응하기 때문). 여기서 처리하는
+      // 키(Escape/화살표/Tab)는 전부 이 모달이 열려있는 동안 독점해야 하는
+      // 키이므로 항상 멈춘다.
+      event.stopPropagation();
       if (event.key === "Escape") closeModal();
       if (event.key === "ArrowLeft") goPrev();
       if (event.key === "ArrowRight") goNext();
@@ -165,35 +191,38 @@ export function ZoomableImageGroup({
 
   return (
     <>
-      {images.map((image, index) => (
-        <button
-          key={image.src}
-          type="button"
-          onClick={(event) => {
-            triggerRef.current = event.currentTarget;
-            setOpenIndex(index);
-          }}
-          className="inline-block cursor-zoom-in rounded-lg"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- width/height 중 하나만 있을 때도 자연스러운 비율로 보여야 해서 next/image의 필수 width/height 제약을 피함 */}
-          <img
-            src={image.src}
-            alt={image.alt}
-            width={resolvedThumbnailWidth}
-            height={resolvedThumbnailHeight}
-            style={{
-              width: resolvedThumbnailWidth,
-              height: resolvedThumbnailHeight,
+      {renderTrigger?.(openAt)}
+
+      {!hideThumbnails &&
+        images.map((image, index) => (
+          <button
+            key={image.src}
+            type="button"
+            onClick={(event) => {
+              triggerRef.current = event.currentTarget;
+              setOpenIndex(index);
             }}
-            className={cn(
-              "max-tablet:h-auto! max-tablet:w-full! rounded-lg",
-              cropThumbnail
-                ? cn("object-cover", THUMBNAIL_CROP_CLASS[thumbnailCrop])
-                : "h-auto w-auto",
-            )}
-          />
-        </button>
-      ))}
+            className="inline-block cursor-zoom-in rounded-lg"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- width/height 중 하나만 있을 때도 자연스러운 비율로 보여야 해서 next/image의 필수 width/height 제약을 피함 */}
+            <img
+              src={image.src}
+              alt={image.alt}
+              width={resolvedThumbnailWidth}
+              height={resolvedThumbnailHeight}
+              style={{
+                width: resolvedThumbnailWidth,
+                height: resolvedThumbnailHeight,
+              }}
+              className={cn(
+                "max-tablet:h-auto! max-tablet:w-full! rounded-lg",
+                cropThumbnail
+                  ? cn("object-cover", THUMBNAIL_CROP_CLASS[thumbnailCrop])
+                  : "h-auto w-auto",
+              )}
+            />
+          </button>
+        ))}
 
       {current &&
         createPortal(
@@ -204,10 +233,17 @@ export function ZoomableImageGroup({
             aria-label={current.alt || "이미지 확대 보기"}
             tabIndex={-1}
             onClick={closeModal}
-            className="fixed inset-0 z-50 flex flex-col items-center overflow-auto bg-black/80 p-6 focus:outline-none"
+            className="fixed inset-0 z-50 flex flex-col items-center-safe overflow-auto bg-black/80 p-6 focus:outline-none"
           >
             {/* absolute가 아니라 fixed — 안내문이 길어 아래 콘텐츠가 스크롤될
                 때도 닫기/이전/다음 버튼이 뷰포트 모서리에 계속 붙어있도록. */}
+            {/* items-center(순수 center)면 확대된 이미지가 컨테이너보다 넓어질
+                때 좌우로 똑같이 넘치는데, overflow-auto는 스크롤 시작 위치(0)
+                기준 음수 방향(왼쪽) 오버플로우로는 스크롤이 닿지 않아 왼쪽
+                절반이 영영 안 보이게 됩니다(오른쪽은 스크롤 가능 영역에
+                포함돼 끝까지 갈 수 있는 것과 비대칭). safe center는 오버플로우가
+                생기면 자동으로 start 정렬로 물러나 전체가 스크롤로 닿게 해주고,
+                안 넘칠 땐 평소처럼 중앙 정렬을 유지합니다. */}
             <button
               type="button"
               onClick={closeModal}
@@ -279,7 +315,7 @@ export function ZoomableImageGroup({
                 뷰포트보다 커지면 justify-center는 위쪽이 화면 밖으로 밀려나
                 스크롤해도 안 보이게 되는데, my-auto는 그 경우 0으로 줄어들어
                 위에서부터 자연스럽게 스크롤됩니다. */}
-            <div className="my-auto flex flex-col items-center gap-3">
+            <div className="tablet:px-16 my-auto flex flex-col items-center gap-3 px-4 py-6">
               {/* aria-label을 img가 아니라 button에 둡니다 — img에 직접
                   aria-label을 주면 접근성 이름 계산에서 alt(사진 설명)를
                   완전히 덮어써버려, 정작 스크린리더가 사진 내용을 못 읽게
@@ -300,7 +336,13 @@ export function ZoomableImageGroup({
                   setZoomedIn((prev) => !prev);
                 }}
                 aria-label={`${current.alt} — ${isZoomedIn ? "축소" : "확대"}`}
-                style={{ touchAction: "pan-y" }}
+                // 평소엔 스와이프 넘기기(JS)가 제스처를 온전히 받아야 해서
+                // 브라우저 네이티브 처리를 끈다. 확대 중엔 반대로 — 넘기기
+                // 로직은 이미 꺼져 있고(handleImagePointerDown 참고), 오히려
+                // 뷰포트보다 커진 이미지를 좌우로 훑어볼 수 있어야 하므로
+                // 부모(다이얼로그)의 overflow-auto가 실제로 스크롤하도록
+                // 네이티브 터치/휠 처리를 그대로 둔다.
+                style={{ touchAction: isZoomedIn ? "auto" : "none" }}
                 className="block rounded-lg border-0 bg-transparent p-0"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- width/height가 없으면 이미지 자체의 크기를 그대로 써야 해서 next/image의 필수 width/height 제약을 피함 (어차피 output:export라 next/image 최적화는 꺼져있음) */}
@@ -313,7 +355,7 @@ export function ZoomableImageGroup({
                     "rounded-lg object-contain",
                     isZoomedIn
                       ? "w-auto max-w-none cursor-zoom-out"
-                      : "max-h-[75vh] w-auto max-w-[90vw] cursor-zoom-in",
+                      : "tablet:max-w-[90vw] max-h-[75vh] w-auto max-w-[50vw] cursor-zoom-in",
                   )}
                 />
               </button>
@@ -334,6 +376,37 @@ export function ZoomableImageGroup({
                       {current.sourceLabel ?? current.sourceHref}
                     </SiteLink>
                   )}
+                </div>
+              )}
+
+              {hasMultiple && (
+                <div
+                  onClick={(event) => event.stopPropagation()}
+                  className="mt-1 flex items-center gap-2"
+                >
+                  {[1, 2].map((offset) => {
+                    const previewIndex = (openIndex! + offset) % images.length;
+                    const previewImage = images[previewIndex];
+                    return (
+                      <button
+                        key={`${previewImage.src}-${offset}`}
+                        type="button"
+                        onClick={() => {
+                          setZoomedIn(false);
+                          setOpenIndex(previewIndex);
+                        }}
+                        aria-label={`다음 이미지로 이동: ${previewImage.alt}`}
+                        className="overflow-hidden rounded-md opacity-60 ring-1 ring-white/20 transition-opacity hover:opacity-100"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={previewImage.src}
+                          alt={previewImage.alt}
+                          className="h-14 w-14 object-cover"
+                        />
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>

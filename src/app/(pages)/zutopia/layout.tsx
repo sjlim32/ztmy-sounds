@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { ZutopiaScrollArea } from "@/features/zutopia/components/ZutopiaScrollArea";
 import { ZutopiaTopNav } from "@/features/zutopia/components/ZutopiaTopNav";
-import { ZutopiaHeader } from "@/features/zutopia/components/ZutopiaHeader";
 
 export const metadata: Metadata = {
   title: "즛토피아",
@@ -27,7 +26,6 @@ export default function ZutopiaLayout({
   return (
     <ZutopiaScrollArea>
       <ZutopiaTopNav />
-      <ZutopiaHeader />
 
       <div className="mt-8">{children}</div>
     </ZutopiaScrollArea>

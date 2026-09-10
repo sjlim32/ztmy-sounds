@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { HomeIcon } from "@/components/icons/HomeIcon";
+import { HomeLink } from "@/components/HomeLink";
 import { CallIcon } from "@/features/guide/components/CallIcon";
 import { getCachedSongCallTags } from "@/features/guide/lib/song-call-tags";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
@@ -185,7 +185,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                           >
                             {item.title.jp}
                           </span>
-                          <span className="text-xs leading-tight text-gray-400 transition-colors group-hover:text-white md:text-sm">
+                          <span className="tablet:text-sm text-xs leading-tight text-gray-400 transition-colors group-hover:text-white">
                             {item.title.kr}
                           </span>
                         </div>
@@ -207,16 +207,10 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
       </div>
 
       {!selectedSongId && (
-        <Link
-          href={"/"}
-          className={cn(
-            "group mx-auto my-2 hidden items-center gap-1.5 text-xs text-gray-400 transition-colors hover:font-semibold hover:text-white",
-            "tablet:flex",
-          )}
-        >
-          <HomeIcon className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5" />
-          메인으로
-        </Link>
+        <HomeLink
+          label="메인으로"
+          className={cn("mx-auto my-2 hidden", "tablet:inline-flex")}
+        />
       )}
     </>
   );
