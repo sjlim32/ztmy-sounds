@@ -92,7 +92,10 @@ function NextEventCardComponent({
   const contentId = useId();
 
   return (
-    <div data-role="next-event-card" className={cn("w-full", "tablet:w-96")}>
+    <div
+      data-role="next-event-card"
+      className={cn("w-full", "tablet:max-w-120 w-fit")}
+    >
       <div className={cn("flex flex-col gap-2", !isOpen && "gap-0")}>
         <button
           type="button"
@@ -245,17 +248,17 @@ function NextEventCardComponent({
                       )}
                     />
 
-                    <div className="flex-1 px-4 py-3">
+                    <div className="flex-1 p-3">
                       <p className="font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase">
                         Date
                       </p>
                       <p
                         data-role="date"
-                        className="mt-1 font-mono text-lg font-bold text-white"
+                        className="mt-1 font-mono text-lg text-white"
                       >
                         {formatEventDate(event)}
                       </p>
-                      <p className="font-mono text-xs text-white/50">
+                      <p className="font-mono text-xs font-bold text-white/50">
                         {event.time}
                       </p>
                     </div>
@@ -272,17 +275,17 @@ function NextEventCardComponent({
                       target="_blank"
                       rel="noopener noreferrer"
                       data-role="venue"
-                      className="group flex-1 px-4 py-3 transition-colors hover:bg-white/5"
+                      className="group flex-1 p-3 transition-colors hover:bg-white/5"
                     >
                       <p className="font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase">
                         Venue
                       </p>
-                      <p className="group-hover:text-ztmy-pink mt-1 inline-flex items-center gap-1 text-lg font-bold text-white transition-colors">
+                      <p className="group-hover:text-ztmy-pink mt-1 inline-flex items-center gap-1 text-lg break-keep text-white transition-colors">
                         {event.place}
                         <ExternalLinkIcon className="h-3 w-3 opacity-70" />
                       </p>
                       {event.placeDesc && (
-                        <p className="text-xs text-white/50">
+                        <p className="text-xs font-bold text-white/50">
                           {event.placeDesc}
                         </p>
                       )}
