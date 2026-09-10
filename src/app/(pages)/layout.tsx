@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, RocknRoll_One } from "next/font/google";
+import {
+  IBM_Plex_Sans_KR,
+  IBM_Plex_Sans_JP,
+  IBM_Plex_Mono,
+  RocknRoll_One,
+} from "next/font/google";
 import localFont from "next/font/local";
 import { SerwistProvider } from "@serwist/turbopack/react";
 import { CustomCursor } from "@/components/CustomCursor";
@@ -12,13 +17,21 @@ import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 import { buildSiteJsonLdGraph } from "@/lib/structured-data";
 import "../globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const plexSansKR = IBM_Plex_Sans_KR({
+  variable: "--font-plex-sans-kr",
+  weight: ["400", "500", "700"],
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const plexSansJP = IBM_Plex_Sans_JP({
+  variable: "--font-plex-sans-jp",
+  weight: ["400", "500", "700"],
+  subsets: ["latin"],
+});
+
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  weight: ["400", "500"],
   subsets: ["latin"],
 });
 
@@ -89,7 +102,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} ${rocknrollOne.variable} ${mkpop.variable} h-full antialiased`}
+      className={`${plexSansKR.variable} ${plexSansJP.variable} ${plexMono.variable} ${rocknrollOne.variable} ${mkpop.variable} h-full antialiased`}
     >
       <body className="flex h-dvh flex-col overflow-hidden">
         <script

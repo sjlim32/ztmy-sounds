@@ -20,8 +20,8 @@
   --color-ztmy-pink: var(--ztmy-pink);
   --color-ztmy-sky: var(--ztmy-sky);
   --color-ztmy-sun: var(--ztmy-sun);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-plex-sans-kr), var(--font-plex-sans-jp);
+  --font-mono: var(--font-plex-mono);
   --font-rocknroll: var(--font-rocknroll-one);
   --font-mkpop: var(--font-mkpop-101);
 }
@@ -59,10 +59,6 @@ body {
   background-repeat: no-repeat, no-repeat;
   background-attachment: fixed, fixed;
   color: var(--foreground);
-  /* create-next-app 기본값(Arial/Helvetica)이 그대로 남아있던 자리 — 이
-     시스템 폰트 스택이 OS마다 실제 글자 모양·크기를 다르게 그려서 윈도우와
-     맥에서 폰트가 달라 보이던 원인이었다. layout.tsx에서 이미 로드해둔
-     Geist(--font-sans)를 실제로 쓰도록 교체. */
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
