@@ -59,7 +59,11 @@ body {
   background-repeat: no-repeat, no-repeat;
   background-attachment: fixed, fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* create-next-app 기본값(Arial/Helvetica)이 그대로 남아있던 자리 — 이
+     시스템 폰트 스택이 OS마다 실제 글자 모양·크기를 다르게 그려서 윈도우와
+     맥에서 폰트가 달라 보이던 원인이었다. layout.tsx에서 이미 로드해둔
+     Geist(--font-sans)를 실제로 쓰도록 교체. */
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* 모바일(tablet 브레이크포인트 미만)에서는 세로형 배경 이미지로 교체 */
