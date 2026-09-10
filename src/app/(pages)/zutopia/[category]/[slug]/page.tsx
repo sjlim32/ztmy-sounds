@@ -5,13 +5,13 @@ import {
   ZUTOPIA_CATEGORIES,
   getZutopiaCategory,
 } from "@/features/zutopia/registry";
-import SoundPlanet2026Content from "@/features/zutopia/archive/sound-planet-2026/content.mdx";
+import SoundPlanet2026Content from "@/features/zutopia/lives/sound-planet-2026/content.mdx";
 
 // 공연/항목마다 MDX 콘텐츠 구조(어떤 섹션이 있는지 등)가 다를 수 있어서, 억지로
 // 공통 템플릿화하지 않고 "카테고리/항목" 슬러그로 MDX 파일을 매핑합니다. 새
 // 항목을 추가할 땐 이 맵에 한 줄만 더하면 됩니다.
 const CONTENT_BY_KEY: Record<string, ComponentType> = {
-  "concerts/sound-planet-2026": SoundPlanet2026Content,
+  "lives/sound-planet-2026": SoundPlanet2026Content,
 };
 
 export function generateStaticParams() {

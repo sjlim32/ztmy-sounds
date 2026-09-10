@@ -22,7 +22,7 @@ export interface ZutopiaCategory {
 // [category]/[slug]/page.tsx의 CONTENT_BY_KEY에도 등록하면 됩니다.
 export const ZUTOPIA_CATEGORIES: ZutopiaCategory[] = [
   {
-    slug: "concerts",
+    slug: "lives",
     label: "공연",
     description: "역대 공연 및 세트리스트 정보",
     entries: [
