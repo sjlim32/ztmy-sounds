@@ -19,19 +19,19 @@ import "../globals.css";
 
 const plexSansKR = IBM_Plex_Sans_KR({
   variable: "--font-plex-sans-kr",
-  weight: ["400", "500", "700"],
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
 });
 
 const plexSansJP = IBM_Plex_Sans_JP({
   variable: "--font-plex-sans-jp",
-  weight: ["400", "500", "700"],
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
 });
 
 const plexMono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
-  weight: ["400", "500"],
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
 });
 
