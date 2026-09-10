@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { HomeLink } from "@/components/HomeLink";
+import { SiteLink } from "@/components/SiteLink";
 
 export const metadata: Metadata = {
   title: "출처",
@@ -29,37 +30,30 @@ export default function CreditsPage() {
         // 대비해 자기 <main>에서 직접 스크롤을 열어둡니다 (/info/page.tsx와
         // 동일한 패턴).
         "min-h-0 w-full flex-1 overflow-y-auto scroll-smooth",
-        "mx-auto px-3 pt-6 pb-10",
+        "mx-auto px-3",
         "tablet:max-w-2xl tablet:px-6 tablet:py-16",
       )}
     >
-      <Link
-        href="/"
-        className="text-sm text-white/60 transition-colors hover:text-white"
-      >
-        ← 홈으로
-      </Link>
+      <HomeLink label="홈으로" className="tablet:inline-flex hidden" />
 
-      <h1 className="mt-6 text-2xl font-bold text-white">출처</h1>
+      <h1 className="tablet:mt-6 mt-3 text-2xl font-bold text-white">출처</h1>
       <p className="mt-2 text-sm text-white/60">
         사이트에 사용된 리소스 저작자분들입니다.
       </p>
 
-      <ul className="mt-8 space-y-3">
+      <ul className="tablet:mt-8 mt-3 space-y-3">
         {CREDITS.map((credit) => (
           <li key={credit.name} className="rounded-lg bg-black/30 p-4">
             <p className="font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
               {credit.role}
             </p>
             {credit.url ? (
-              <a
+              <SiteLink
                 href={credit.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-ztmy-pink mt-1 inline-block text-lg font-semibold text-white transition-colors"
+                className="mt-1 inline-block text-lg font-semibold"
               >
                 {credit.name}
-              </a>
+              </SiteLink>
             ) : (
               <p className="mt-1 text-lg font-semibold text-white">
                 {credit.name}

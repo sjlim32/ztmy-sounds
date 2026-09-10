@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { ARTIST } from "@/data/artist";
-import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
-import { HomeIcon } from "@/components/icons/HomeIcon";
+import { BackLink } from "@/components/BackLink";
+import { HomeLink } from "@/components/HomeLink";
 import { MOBILE_HEADER_ROUTES } from "@/components/mobile/mobile-header.constants";
 
 /**
@@ -14,7 +13,6 @@ import { MOBILE_HEADER_ROUTES } from "@/components/mobile/mobile-header.constant
  */
 export function MobileHeader() {
   const pathname = usePathname();
-  const router = useRouter();
   const isHome = pathname === "/";
 
   const matchedRoute = MOBILE_HEADER_ROUTES.find((route) =>
@@ -35,26 +33,22 @@ export function MobileHeader() {
     // 아래 뒤로가기/홈 버튼의 absolute 기준점 역할을 위해 유지합니다.
     <header className="tablet:hidden relative z-30 flex h-12 items-center justify-center border-b border-white/10 bg-black/60 px-4 backdrop-blur-md">
       {!isHome && (
-        <button
-          type="button"
-          onClick={() => router.back()}
-          aria-label="뒤로가기"
-          className="absolute left-2 flex h-full w-10 items-center text-white/70"
-        >
-          <ChevronLeftIcon className="h-6 w-6" />
-        </button>
+        <BackLink
+          label="뒤로가기"
+          showLabel={false}
+          className="absolute top-1/2 left-2 -translate-y-1/2"
+          iconClassName="h-5 w-5"
+        />
       )}
 
       <div className="text-lg font-bold tracking-tight">{title}</div>
 
       {!isHome && (
-        <Link
-          href="/"
-          aria-label="메인으로"
-          className="absolute right-2 flex h-full w-10 items-center justify-end text-white/70"
-        >
-          <HomeIcon className="h-5 w-5" />
-        </Link>
+        <HomeLink
+          label="메인으로"
+          showLabel={false}
+          className="absolute top-1/2 right-2 -translate-y-1/2"
+        />
       )}
     </header>
   );
