@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ACTIVE_TAB_CLASS, TAB_CLASS } from "../components/tab-styles";
+import { ACTIVE_TAB_CLASS, TAB_CLASS } from "../../components/tab-styles";
 
 /**
  * 곡/앨범을 탭처럼 보이지만 실제로는 별도 라우트(/zutopia/songs,

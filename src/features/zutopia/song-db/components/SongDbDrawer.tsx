@@ -10,15 +10,6 @@ import {
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
-interface SongDbDrawerProps<T> {
-  selected: T | null;
-  onClose: () => void;
-  renderContent: (item: T) => React.ReactNode;
-  // 스크린 리더 다이얼로그 이름 — 곡/앨범 제목처럼 내용을 알 수 있는 값을
-  // 호출부에서 넘겨준다. 생략하면 일반 문구로 대체된다.
-  ariaLabel?: string;
-}
-
 const noopSubscribe = () => () => {};
 
 const FOCUSABLE_SELECTOR =
@@ -30,11 +21,8 @@ function getFocusableIn(container: HTMLElement | null): HTMLElement[] {
   ).filter((el) => !el.hasAttribute("data-focus-sentinel"));
 }
 
-// 정적 export라 서버 렌더 시점엔 document가 없다 — createPortal은 클라이언트
-// 하이드레이션이 끝난 뒤에만 호출해야 한다. useEffect+setState로 하면
-// react-hooks/set-state-in-effect 린트에 걸리는데, 이 패턴(서버/클라이언트
-// 스냅샷이 다름을 알리는 것) 자체가 useSyncExternalStore가 설계된 용도라
-// 그걸 그대로 쓴다 — 별도 state/effect 없이 "마운트됐는가"를 안전하게 얻는다.
+// 정적 export라 서버 렌더 시점엔 document가 없어 createPortal은 클라이언트 하이드레이션이 끝난 뒤에만 호출해야함
+// useSyncExternalStore로 서버/클라이언트 스냅샷이 다름을 알림 (마운트 됐는지 확인)
 function useMounted() {
   return useSyncExternalStore(
     noopSubscribe,
@@ -60,6 +48,16 @@ function useMounted() {
  * 따라 엉뚱한 곳에 그려질 수 있다 — Portal로 완전히 그 부모 체인을 벗어나야
  * position:fixed가 항상 실제 뷰포트 기준으로 동작함을 보장할 수 있다.
  */
+
+interface SongDbDrawerProps<T> {
+  selected: T | null;
+  onClose: () => void;
+  renderContent: (item: T) => React.ReactNode;
+  // 스크린 리더 다이얼로그 이름 — 곡/앨범 제목처럼 내용을 알 수 있는 값을
+  // 호출부에서 넘겨준다. 생략하면 일반 문구로 대체된다.
+  ariaLabel?: string;
+}
+
 export function SongDbDrawer<T>({
   selected,
   onClose,

@@ -3,17 +3,17 @@
 import { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
 import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
-import { ALBUM_TYPE_SHORT_LABEL } from "./labels";
+import { ALBUM_TYPE_SHORT_LABEL } from "../labels";
 import { SongDbDrawer } from "./SongDbDrawer";
 import { SortFilterBar } from "./SortFilterBar";
-import { applySortDirection, DIRECTION_OPTIONS } from "./sort";
+import { applySortDirection, DIRECTION_OPTIONS } from "../sort";
 import type {
   Album,
   SongAlbumRef,
   SongGroupBy,
   SongWithAlbums,
   SortDirection,
-} from "./types";
+} from "../types";
 
 interface SongGroup {
   key: string;

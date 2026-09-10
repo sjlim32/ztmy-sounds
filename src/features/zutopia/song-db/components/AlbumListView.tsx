@@ -12,11 +12,11 @@ import {
   ALBUM_TYPE_ORDER,
   ALBUM_TYPE_SECTION_LABEL,
   ALBUM_TYPE_SHORT_LABEL,
-} from "./labels";
+} from "../labels";
 import { SongDbDrawer } from "./SongDbDrawer";
 import { SortFilterBar } from "./SortFilterBar";
-import { applySortDirection, DIRECTION_OPTIONS } from "./sort";
-import type { AlbumGroupBy, AlbumWithSongs, SortDirection } from "./types";
+import { applySortDirection, DIRECTION_OPTIONS } from "../sort";
+import type { AlbumGroupBy, AlbumWithSongs, SortDirection } from "../types";
 
 const SORT_OPTIONS: { value: AlbumGroupBy; label: string }[] = [
   { value: "type", label: "타입" },

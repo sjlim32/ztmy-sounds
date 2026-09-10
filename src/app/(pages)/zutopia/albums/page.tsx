@@ -4,8 +4,8 @@ import {
   getAlbumsWithSongs,
   getSongsCount,
 } from "@/features/zutopia/song-db/data";
-import { SongDbNav } from "@/features/zutopia/song-db/SongDbNav";
-import { AlbumListView } from "@/features/zutopia/song-db/AlbumListView";
+import { SongDbNav } from "@/features/zutopia/song-db/components/SongDbNav";
+import { AlbumListView } from "@/features/zutopia/song-db/components/AlbumListView";
 
 export const metadata: Metadata = {
   title: "노래 DB · 앨범",
