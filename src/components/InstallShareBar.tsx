@@ -86,8 +86,6 @@ export function InstallShareBar() {
   };
 
   return (
-    // bottom-4가 아니라 bottom-16 — 그 자리는 Next.js 개발 서버가 켜주는
-    // devtools 배지(프로덕션엔 없음) 자리라 겹친다.
     <div className="pc:flex fixed bottom-4 left-4 z-20 hidden items-center gap-2">
       {installEvent && (
         <button type="button" onClick={handleInstall} className={PILL_CLASS}>
