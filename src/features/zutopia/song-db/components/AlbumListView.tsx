@@ -142,6 +142,15 @@ function getAlbumCoverSrc(
  * 그대로 맨 앞이다. 캐러셀은 항상 0번부터 시작하면 되므로 별도의 "시작
  * 인덱스" 계산이 필요 없다.
  */
+function getAlbumImageSource(album: AlbumWithSongs): string | null {
+  const metadata = album.metadata;
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return null;
+  }
+  const source = (metadata as { source?: unknown }).source;
+  return typeof source === "string" && source.length > 0 ? source : null;
+}
+
 function getAlbumGalleryImages(
   album: AlbumWithSongs,
   showBookCover: boolean,
@@ -331,6 +340,7 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
         renderContent={(album) => {
           const galleryImages = getAlbumGalleryImages(album, showBookCover);
           const hasGalleryMultiple = galleryImages.length > 1;
+          const imageSource = getAlbumImageSource(album);
 
           const goPrevImage = () => {
             setGalleryIndex(
@@ -530,6 +540,20 @@ export function AlbumListView({ albums }: { albums: AlbumWithSongs[] }) {
                     ))
                   )}
                 </ul>
+
+                {imageSource && (
+                  <p className="mt-4 truncate text-[11px] text-white/40">
+                    이미지 출처:{" "}
+                    <a
+                      href={imageSource}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-white/60"
+                    >
+                      {imageSource}
+                    </a>
+                  </p>
+                )}
               </div>
             </>
           );
