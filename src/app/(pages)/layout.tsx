@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     "샤모지",
     "아카네",
     "ACAね",
-    "ACA",
+    "즛토마요",
   ],
   openGraph: {
     title: SITE_NAME,

@@ -27,7 +27,7 @@ export default function ZutopiaLayout({
     <ZutopiaScrollArea>
       <ZutopiaTopNav />
 
-      <div className="mt-8">{children}</div>
+      <div className="tablet:mt-8">{children}</div>
     </ZutopiaScrollArea>
   );
 }

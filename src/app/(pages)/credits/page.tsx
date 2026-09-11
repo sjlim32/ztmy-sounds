@@ -16,6 +16,11 @@ interface Credit {
 
 const CREDITS: Credit[] = [
   {
+    name: "즛토마요 갤러리 - ♿ 내한 대비 샤모지 호응 가이드",
+    role: "콜가이드",
+    url: "https://gall.dcinside.com/mgallery/board/view/?id=zuttomayo&no=231225&page=1",
+  },
+  {
     name: "乱涂乱画ben",
     role: "마우스 커서 디자인",
     url: "https://x.com/ben404yg",
