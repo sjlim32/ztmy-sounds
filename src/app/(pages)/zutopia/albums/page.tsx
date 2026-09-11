@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import {
   getAlbumsWithSongs,
   getSongsCount,
@@ -29,7 +30,12 @@ export default async function ZutopiaAlbumsPage() {
         <SongDbNav songCount={songCount} albumCount={albums.length} />
 
         <div className="mt-8">
-          <AlbumListView albums={albums} />
+          {/* AlbumListView가 드로어 상태를 URL 쿼리스트링(useSearchParams)
+          으로 들고 있어서(AlbumListView 주석 참고), 정적 export 빌드
+          요구사항대로 Suspense로 감싸야 한다. */}
+          <Suspense fallback={null}>
+            <AlbumListView albums={albums} />
+          </Suspense>
         </div>
       </div>
     </div>
