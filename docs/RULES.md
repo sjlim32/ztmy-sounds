@@ -23,6 +23,17 @@
   필요하면 이미 떠 있는 서버(보통 `localhost:3000`)에 read-only로 접속해서 확인하세요.
 - `package.json`엔 있는데 "Cannot find module"로 에러나면 `pnpm install`부터 실행해
   보세요 — `node_modules`가 `pnpm-lock.yaml`과 어긋나 있을 수 있습니다.
+- 모바일 `body`는 `overflow: hidden`으로 절대 스크롤되면 안 되는데, WebKit은 visual
+  viewport가 layout viewport보다 작아지면 `overflow: hidden`을 의도적으로 무시하고
+  문서를 스크롤 가능하게 풀어줍니다 — 핀치 줌한 사용자가 화면 이동을 못 하게
+  갇히는 걸 막기 위한 설계입니다(WebKit bug 240860 코멘트 참고). 탭을 오래
+  비활성화했다가 돌아오면 브라우저 UI 상태가 바뀌며 같은 조건이 의도치 않게
+  발생해, 문서가 헤더 높이만큼 스크롤된 채 복귀합니다 — 화면상 헤더가 사라지고
+  레이아웃이 위로 붙어 보이는(새로고침하면 스크롤이 리셋되어 정상으로 돌아오는)
+  원인입니다. `src/components/BodyScrollGuard.tsx`가 이를 교정하는데, 줌 중인
+  사용자까지 원점으로 스냅시키면 접근성을 해치므로 `visualViewport.scale ≈ 1`일
+  때만(즉 줌 안 됐을 때만) 스크롤을 (0, 0)으로 되돌립니다. "안 쓰이는 것 같다"고
+  지우거나 무조건 리셋하게 단순화하지 마세요.
 - MDX(`*.mdx`) 최상단 코드 블록은 `import`/`export`만 허용되고 순수 `const` 선언은
   안 됩니다 — 본문 JSX에서 쓸 값은 `export const`로 선언하세요.
 - MDX에서 태그와 텍스트를 줄바꿈해서 쓰면 안쪽 텍스트가 별도 markdown 문단으로

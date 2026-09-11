@@ -7,6 +7,7 @@ import {
 } from "next/font/google";
 import localFont from "next/font/local";
 import { SerwistProvider } from "@serwist/turbopack/react";
+import { BodyScrollGuard } from "@/components/BodyScrollGuard";
 import { CustomCursor } from "@/components/CustomCursor";
 import { GuideDimOverlay } from "@/components/GuideDimOverlay";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
@@ -111,6 +112,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             __html: JSON.stringify(buildSiteJsonLdGraph()),
           }}
         />
+        <BodyScrollGuard />
         <CustomCursor />
         <GuideDimOverlay />
         <SerwistProvider swUrl="/serwist/sw.js">
