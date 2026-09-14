@@ -22,8 +22,8 @@ export function ZutopiaSectionHeader({
       <div className="from-ztmy-magenta to-ztmy-purple h-1 w-10 rounded-full bg-linear-to-r shadow-[0_0_10px_rgba(225,71,191,0.6)]" />
       <h1
         className={cn(
-          "mt-3 text-3xl font-bold tracking-[0.3em] text-white uppercase",
-          "tablet:text-4xl",
+          "mt-3 text-2xl font-bold tracking-[0.3em] text-white uppercase",
+          "tablet:text-3xl",
         )}
       >
         {title}

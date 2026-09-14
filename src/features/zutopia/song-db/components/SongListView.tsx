@@ -110,7 +110,7 @@ export function SongListView({ songs }: SongListViewProps) {
                   <div className="flex items-baseline justify-between gap-3">
                     <p
                       className={cn(
-                        "min-w-0 truncate font-mono text-base font-semibold tracking-[0.2em] uppercase",
+                        "min-w-0 truncate font-mono text-base leading-tight font-semibold tracking-[0.2em] uppercase",
                         "tablet:text-xl",
                       )}
                     >
