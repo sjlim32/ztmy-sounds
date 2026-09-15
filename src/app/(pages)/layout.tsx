@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import {
-  IBM_Plex_Sans_KR,
-  IBM_Plex_Sans_JP,
-  IBM_Plex_Mono,
-  RocknRoll_One,
-} from "next/font/google";
+import { IBM_Plex_Mono, RocknRoll_One } from "next/font/google";
 import localFont from "next/font/local";
+import "@fontsource/line-seed-jp/400.css";
+import "@fontsource/line-seed-jp/700.css";
+import "@fontsource/line-seed-jp/800.css";
 import { SerwistProvider } from "@serwist/turbopack/react";
 import { BodyScrollGuard } from "@/components/BodyScrollGuard";
 import { CustomCursor } from "@/components/CustomCursor";
@@ -18,16 +16,41 @@ import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 import { buildSiteJsonLdGraph } from "@/lib/structured-data";
 import "../globals.css";
 
-const plexSansKR = IBM_Plex_Sans_KR({
-  variable: "--font-plex-sans-kr",
-  weight: ["400", "500", "600", "700"],
-  subsets: ["latin"],
-});
-
-const plexSansJP = IBM_Plex_Sans_JP({
-  variable: "--font-plex-sans-jp",
-  weight: ["400", "500", "600", "700"],
-  subsets: ["latin"],
+const lineSeedKR = localFont({
+  src: [
+    {
+      path: "../../fonts/LINESeedKR-Th.woff2",
+      weight: "100",
+      style: "normal",
+    },
+    {
+      path: "../../fonts/LINESeedKR-Rg.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../fonts/LINESeedKR-Rg.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../fonts/LINESeedKR-Bd.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../fonts/LINESeedKR-Bd.woff2",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../../fonts/LINESeedKR-Bd.woff2",
+      weight: "800",
+      style: "normal",
+    },
+  ],
+  variable: "--font-line-seed-kr",
+  display: "swap",
 });
 
 const plexMono = IBM_Plex_Mono({
@@ -103,7 +126,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ko"
-      className={`${plexSansKR.variable} ${plexSansJP.variable} ${plexMono.variable} ${rocknrollOne.variable} ${mkpop.variable} h-full antialiased`}
+      className={`${lineSeedKR.variable} ${plexMono.variable} ${rocknrollOne.variable} ${mkpop.variable} h-full antialiased`}
     >
       <body className="flex h-dvh flex-col overflow-hidden">
         <script

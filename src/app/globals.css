@@ -20,7 +20,9 @@
   --color-ztmy-pink: var(--ztmy-pink);
   --color-ztmy-sky: var(--ztmy-sky);
   --color-ztmy-sun: var(--ztmy-sun);
-  --font-sans: var(--font-plex-sans-kr), var(--font-plex-sans-jp);
+  --font-sans:
+    var(--font-line-seed-kr), "LINE Seed JP", ui-sans-serif, system-ui,
+    sans-serif;
   --font-mono: var(--font-plex-mono);
   --font-rocknroll: var(--font-rocknroll-one);
   --font-mkpop: var(--font-mkpop-101);
