@@ -79,7 +79,12 @@ export function SongListView({ songs }: SongListViewProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+      <div
+        className={cn(
+          "flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 px-2 py-1",
+          "tablet:px-4 tablet:py-3",
+        )}
+      >
         <SortFilterBar
           options={SORT_OPTIONS}
           value={groupBy}
@@ -228,7 +233,7 @@ export function SongListView({ songs }: SongListViewProps) {
                           <span className="min-w-0 flex-1">
                             <span
                               className={cn(
-                                "block min-w-0 truncate text-base font-medium text-white",
+                                "block min-w-0 truncate text-base leading-tight font-medium text-white",
                                 "tablet:text-lg",
                               )}
                             >

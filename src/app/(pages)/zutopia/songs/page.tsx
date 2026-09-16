@@ -29,7 +29,7 @@ export default async function ZutopiaSongsPage() {
       <div className="mt-3">
         <SongDbNav songCount={songs.length} albumCount={albumCount} />
 
-        <div className="mt-8">
+        <div className="tablet:mt-8 mt-3">
           {/* SongListView가 드로어 상태를 URL 쿼리스트링(useSearchParams)
           으로 들고 있어서(SongListView 주석 참고), 정적 export 빌드
           요구사항대로 Suspense로 감싸야 한다. */}

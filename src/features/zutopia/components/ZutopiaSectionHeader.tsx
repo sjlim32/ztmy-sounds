@@ -29,7 +29,9 @@ export function ZutopiaSectionHeader({
         {title}
       </h1>
       {description && (
-        <p className="mt-2 text-sm text-white/60">{description}</p>
+        <p className="tablet:mt-2 mt-0.5 text-sm text-white/60">
+          {description}
+        </p>
       )}
     </div>
   );
