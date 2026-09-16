@@ -2,32 +2,48 @@
 
 ## 프로젝트 구조
 
+기능(feature) 단위로 나뉘어 있습니다 — 페이지·컴포넌트·데이터·도메인 로직을
+전부 `src/features/<기능>/` 아래에 모으고, `src/app/`은 라우팅(페이지 조립)만
+담당합니다. 여러 기능에서 공유하는 것만 `src/components/`, `src/lib/`에 둡니다.
+
 ```text
 src/
   app/
-    (pages)/             # 실제 페이지 라우트 그룹 (레이아웃에 헤더/푸터 포함)
-      guide/              # /guide, /guide/[songId]
-      info/               # /info
-    (pwa)/                # 서비스워커 전용 라우트 그룹 (레이아웃 없음)
-      serwist/            # 서비스워커를 서빙하는 라우트 핸들러
-      sw.ts               # 서비스워커 엔트리
-  components/
-    guide/
-      detail/             # 곡 상세(영상·컨트롤·가사) 컴포넌트
-      list/               # 곡 목록(SongList) 컴포넌트
-      SongPanel.tsx       # 목록/상세 토글 컨테이너
-    home/                 # 홈 화면 전용 컴포넌트 (Header, Footer, NextVisit 등)
-    mobile/               # 모바일 전용 전역 컴포넌트 (MobileHeader 등)
-    icons/                # 커스텀 SVG 아이콘 (외부 아이콘 라이브러리 미사용)
-  context/                # React Context (플레이어 상태 등)
-  data/
-    artist.ts             # 아티스트 정보
-    event.ts              # 공연 정보
-    songs/                 # 곡 하나 = 파일 하나, index.ts가 취합
-  lib/
-    guide/                 # 프레임워크 비의존 도메인 로직 (타입, 파서 등)
-    seo.ts                 # 사이트 전역 메타데이터 상수 (SITE_NAME 등)
-  content/                 # MDX 프로즈 콘텐츠
+    (pages)/               # 실제 페이지 라우트 그룹 (레이아웃에 헤더/푸터 포함)
+      guide/                # /guide, /guide/[songId]
+      slam/                 # /slam, /slam/[songId]
+      info/                 # /info
+      zutopia/              # /zutopia, /zutopia/[category], /zutopia/[category]/[slug],
+                             # /zutopia/albums, /zutopia/songs
+      credits/              # /credits
+    (pwa)/                  # 서비스워커 전용 라우트 그룹 (레이아웃 없음)
+      serwist/              # 서비스워커를 서빙하는 라우트 핸들러
+      sw.ts                 # 서비스워커 엔트리
+  features/                 # 기능 단위 모듈. 각 폴더는 보통 components/lib(/data) 구성
+    guide/                  # 곡 가이드(영상+가사+응원법). *-context.tsx로 플레이어/모드 상태 보유
+      data/
+        songs/              # 정식 공개곡 — 곡 하나당 파일 하나, index.ts가 취합
+        not-yet/            # 아직 가이드 미공개곡 데이터
+        origin/             # 원본(수정 전) 가사/정보 백업
+    home/                   # 홈 화면 (Header, Countdown, MoonPhase 등)
+    info/                   # /info 페이지 콘텐츠 (info.mdx + 렌더 컴포넌트)
+    notice/                 # 공지사항 (MDX 콘텐츠 + 데이터 + 노출/해제 로직)
+      content/              # 공지 MDX 프로즈
+    zutopia/                 # 즛토피아 허브: 카테고리→항목 2단 구조(registry.ts) +
+                             # 곡/앨범 DB(song-db/, Supabase 기반 — 아래 "곡 데이터" 참고)
+      lives/                # 카테고리별 콘텐츠 (예: lives/sound-planet-2026/content.mdx)
+      song-db/              # 곡/앨범 DB 조회·정렬·표시 로직 (Supabase 소스)
+  components/               # 여러 기능이 공유하는 전역 컴포넌트
+    mobile/                 # 모바일 전용 전역 컴포넌트
+    icons/                  # 커스텀 SVG 아이콘 (외부 아이콘 라이브러리 미사용)
+  data/                     # 사이트 전역 데이터 (특정 기능에 속하지 않음)
+    artist.ts               # 아티스트 정보
+    event.ts                # 공연 정보
+    social-links.ts         # 소셜 링크
+  lib/                      # 여러 기능이 공유하는 프레임워크 비의존 로직
+    supabase/                # Supabase 클라이언트 (빌드 타임 전용 — 아래 "곡 데이터" 참고)
+    seo.ts                   # 사이트 전역 메타데이터 상수 (SITE_NAME 등)
+  fonts/                    # 로컬 폰트 파일 (LINE Seed KR, 851MkPOP)
 ```
 
 ## Import
@@ -54,12 +70,31 @@ src/
 
 ## 곡 데이터
 
-- 곡 하나당 파일 하나 (`src/data/songs/<번호>_<song-id>.ts`), `Song` 객체를 default export.
-  파일명 앞의 두 자리 번호는 목록에 표시되는 순서(셋리스트 순서)를 나타내며, `Song.id`
-  값 자체에는 포함하지 않습니다 (예: 파일 `01_byoushin-wo-kamu.ts` → `id: "byoushin-wo-kamu"`).
-- `src/data/songs/index.ts`가 모든 곡을 모아 `songList` 배열과 `getSong(id)`를 제공.
-- 새 곡 추가 시: 다음 번호로 파일 하나 만들고 `index.ts`에 import + `songList` 배열
-  항목 추가.
+`guide` 기능(가이드 가사/응원법)과 `zutopia` 기능(곡/앨범 DB)은 서로 다른
+데이터 소스를 씁니다 — 섞어서 참조하지 마세요.
+
+### guide: 정적 파일 (가이드 콘텐츠)
+
+- 곡 하나당 파일 하나 (`src/features/guide/data/songs/<번호>_<song-id>.ts`),
+  `Song` 객체를 default export. 파일명 앞의 두 자리 번호는 목록에 표시되는
+  순서(셋리스트 순서)를 나타내며, `Song.id` 값 자체에는 포함하지 않습니다
+  (예: 파일 `01_byoushinwo-kamu.ts` → `id: "byoushinwo-kamu"`).
+- `src/features/guide/data/songs/index.ts`가 모든 곡을 모아 `songList` 배열과
+  `getSong(id)`를 제공.
+- 새 곡 추가 시: 다음 번호로 파일 하나 만들고 `index.ts`에 import + `songList`
+  배열 항목 추가.
+- `data/not-yet/`은 아직 가이드가 준비되지 않은 곡, `data/origin/`은 수정 전
+  원본 가사/정보 백업 — 둘 다 `songList`에는 포함되지 않습니다.
+
+### zutopia: Supabase DB (곡/앨범 데이터베이스)
+
+- `/zutopia/songs`, `/zutopia/albums`에서 보여주는 곡·앨범 목록은 정적 파일이
+  아니라 Supabase(`songs`/`albums` 테이블)에서 빌드 타임에 가져옵니다
+  (`src/features/zutopia/song-db/data.ts` → `createBuildTimeSupabaseClient()`).
+- 이 클라이언트는 서버 컴포넌트 최상위(`page.tsx`)에서만 호출해야 합니다 —
+  `output: "export"`(정적 export) 빌드라 런타임 서버가 없고, 클라이언트
+  컴포넌트로 전달할 수 없습니다. 자세한 제약은
+  `docs/RULES.md`의 관련 항목을 참고하세요.
 
 ## 가사 타이밍
 

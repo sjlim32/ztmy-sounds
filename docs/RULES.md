@@ -46,3 +46,9 @@
 - Tailwind Preflight가 `img { height: auto }`를 깔아둬서 `next/image`의 `height`
   prop을 덮어씁니다 — 크기 고정/크롭(`object-cover`)이 필요한 썸네일은 인라인
   `style={{ width, height }}`도 함께 지정하세요.
+- `createBuildTimeSupabaseClient()`(`src/lib/supabase/build-time-client.ts`)는
+  이름 그대로 빌드 타임 전용입니다. `next.config`가 `output: "export"`라 런타임
+  서버가 없으므로, 이 함수는 서버 컴포넌트 최상위(`page.tsx`)에서만 호출하고
+  클라이언트 컴포넌트로 전달하면 안 됩니다. `NEXT_PUBLIC_SUPABASE_URL` /
+  `NEXT_PUBLIC_SUPABASE_PUB_KEY` 환경변수(`.env.local`)가 없으면 빌드가
+  즉시 에러를 던집니다.
