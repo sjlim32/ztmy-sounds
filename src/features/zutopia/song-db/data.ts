@@ -1,5 +1,5 @@
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
-import { getGuideHref } from "./guide-link";
+import { getGuideHref } from "@/features/zutopia/guide-link";
 import type { Song } from "./types";
 import type { AlbumWithSongs, SongWithAlbums } from "./types";
 
