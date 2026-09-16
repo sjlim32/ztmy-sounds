@@ -1,10 +1,6 @@
 import { ARTIST } from "@/data/artist";
 import { SOCIAL_LINKS } from "@/data/social-links";
-import {
-  getEventStartDate,
-  getEventEndDate,
-  type Event,
-} from "@/data/event";
+import { getEventStartDate, getEventEndDate, type Event } from "@/data/event";
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 
 const OFFICIAL_URL = "https://zutomayo.net";
@@ -60,7 +56,8 @@ export function buildMusicEventJsonLd(event: Event) {
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     eventStatus: "https://schema.org/EventScheduled",
     url: event.tourUrl,
-    image: `${SITE_URL}${event.tourImg}`,
+    // tourImg가 없는 이벤트(예: 아직 포스터가 안 나온 다음 공연)도 있다.
+    ...(event.tourImg && { image: `${SITE_URL}${event.tourImg}` }),
     location: {
       "@type": "Place",
       name: event.place,

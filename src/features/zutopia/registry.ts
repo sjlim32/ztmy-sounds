@@ -42,16 +42,7 @@ export const ZUTOPIA_CATEGORIES: ZutopiaCategory[] = [
     label: "지난 공연",
     description: "공연 및 세트리스트 정보",
     image: "/assets/zutopia/components/lives.webp",
-    entries: [
-      {
-        slug: "sound-planet-2026",
-        label: "사운드 플래닛 2026",
-        name: "SOUND PLANET FESTIVAL 2026",
-        date: "2026년 9월 6일",
-        thumbnail: "/assets/zutopia/sound-planet-2026/sound-planet-3.webp",
-        type: "festival",
-      },
-    ],
+    entries: [],
   },
 ];
 

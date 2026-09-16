@@ -148,15 +148,21 @@ function NextEventCardComponent({
                 {/* 모바일 - 가로 레이아웃 */}
                 <div className={cn("flex gap-3 px-2 pb-1", "tablet:hidden")}>
                   <PosterLink className="relative block shrink-0 overflow-hidden rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.6)]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={event.tourImg}
-                      alt={event.tourName}
-                      loading="lazy"
-                      className="h-full w-[24dvw] object-cover transition-opacity hover:opacity-80"
-                    />
-                    {/* 이미지 하단이 카드 배경으로 자연스럽게 이어지도록 스크림 처리 */}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-t from-black/70 to-transparent" />
+                    {event.tourImg !== "" ? (
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={event.tourImg}
+                          alt={event.tourName}
+                          loading="lazy"
+                          className="h-full w-[24dvw] object-cover transition-opacity hover:opacity-80"
+                        />
+                        {/* 이미지 하단이 카드 배경으로 자연스럽게 이어지도록 스크림 처리 */}
+                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-t from-black/70 to-transparent" />
+                      </>
+                    ) : (
+                      <div className="h-full w-[24dvw] bg-white/5" />
+                    )}
                   </PosterLink>
 
                   <div className="flex min-w-0 flex-col justify-center gap-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
@@ -237,15 +243,21 @@ function NextEventCardComponent({
                   </a>
 
                   <PosterLink className="relative mt-4 flex w-full overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.6)]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={event.tourImg}
-                      alt={event.tourName}
-                      loading="lazy"
-                      className="rounded-lg object-cover transition-opacity hover:opacity-80"
-                    />
-                    {/* 이미지 하단이 아래 텍스트 영역으로 자연스럽게 이어지도록 스크림 처리 */}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/60 to-transparent" />
+                    {event.tourImg !== "" ? (
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={event.tourImg}
+                          alt={event.tourName}
+                          loading="lazy"
+                          className="rounded-lg object-cover transition-opacity hover:opacity-80"
+                        />
+                        {/* 이미지 하단이 아래 텍스트 영역으로 자연스럽게 이어지도록 스크림 처리 */}
+                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/60 to-transparent" />
+                      </>
+                    ) : (
+                      <div className="aspect-3/4 w-full rounded-lg bg-white/5" />
+                    )}
                   </PosterLink>
 
                   {/* 콘서트 티켓 스텁을 참고한 레이아웃 — DATE/VENUE 두 반쪽을

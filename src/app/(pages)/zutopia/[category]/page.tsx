@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ZUTOPIA_CATEGORIES, getZutopiaCategory } from "@/features/zutopia/registry";
+import {
+  ZUTOPIA_CATEGORIES,
+  getZutopiaCategory,
+} from "@/features/zutopia/registry";
 
 export function generateStaticParams() {
   return ZUTOPIA_CATEGORIES.map((category) => ({ category: category.slug }));
@@ -13,6 +16,14 @@ export default async function ZutopiaCategoryPage(
   const { category: slug } = await props.params;
   const category = getZutopiaCategory(slug);
   if (!category) notFound();
+
+  if (category.entries.length === 0) {
+    return (
+      <p className={cn("text-base text-white/50", "tablet:text-lg")}>
+        아직 등록된 항목이 없습니다.
+      </p>
+    );
+  }
 
   return (
     <ul className={cn("grid gap-4", "tablet:grid-cols-2")}>
