@@ -8,6 +8,7 @@ export type Json =
 
 type AlbumType = "FULL" | "MINI" | "EP";
 type RowStatus = "ACTIVE" | "PENDING" | "HIDDEN" | "DELETED";
+type LiveType = "FESTIVAL" | "CONCERT" | "EVENT";
 
 export interface Database {
   public: {
@@ -25,6 +26,8 @@ export interface Database {
           streaming_urls: Json | null;
           arranger: string[] | null;
           movie_director: string[] | null;
+          original_song_id: string | null;
+          version_name: string | null;
           metadata: Json | null;
           status: RowStatus;
           created_at: string;
@@ -42,6 +45,8 @@ export interface Database {
           streaming_urls?: Json | null;
           arranger?: string[] | null;
           movie_director?: string[] | null;
+          original_song_id?: string | null;
+          version_name?: string | null;
           metadata?: Json | null;
           status?: RowStatus;
           created_at?: string;
@@ -59,12 +64,22 @@ export interface Database {
           streaming_urls?: Json | null;
           arranger?: string[] | null;
           movie_director?: string[] | null;
+          original_song_id?: string | null;
+          version_name?: string | null;
           metadata?: Json | null;
           status?: RowStatus;
           created_at?: string;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "songs_original_song_id_fkey";
+            columns: ["original_song_id"];
+            isOneToOne: false;
+            referencedRelation: "songs";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       albums: {
         Row: {
@@ -155,6 +170,123 @@ export interface Database {
             columns: ["album_id"];
             isOneToOne: false;
             referencedRelation: "albums";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      lives: {
+        Row: {
+          id: string;
+          slug: string;
+          tour_id: string | null;
+          title: string;
+          title_ko: string;
+          title_en: string;
+          type: LiveType;
+          start_date: string;
+          end_date: string | null;
+          live_date: string;
+          country: string;
+          region: string;
+          live_venue: string;
+          venue_url: string | null;
+          poster_image_url: string | null;
+          icon_image_url: string | null;
+          additional_image_urls: string[] | null;
+          official_url: string | null;
+          metadata: Json | null;
+          status: RowStatus;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          slug: string;
+          tour_id?: string | null;
+          title: string;
+          title_ko: string;
+          title_en: string;
+          type: LiveType;
+          start_date: string;
+          end_date?: string | null;
+          live_date: string;
+          country: string;
+          region: string;
+          live_venue: string;
+          venue_url?: string | null;
+          poster_image_url?: string | null;
+          icon_image_url?: string | null;
+          additional_image_urls?: string[] | null;
+          official_url?: string | null;
+          metadata?: Json | null;
+          status?: RowStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          slug?: string;
+          tour_id?: string | null;
+          title?: string;
+          title_ko?: string;
+          title_en?: string;
+          type?: LiveType;
+          start_date?: string;
+          end_date?: string | null;
+          live_date?: string;
+          country?: string;
+          region?: string;
+          live_venue?: string;
+          venue_url?: string | null;
+          poster_image_url?: string | null;
+          icon_image_url?: string | null;
+          additional_image_urls?: string[] | null;
+          official_url?: string | null;
+          metadata?: Json | null;
+          status?: RowStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      setlists: {
+        Row: {
+          live_id: string;
+          song_id: string;
+          track_number: number;
+          is_encore: boolean;
+          note: Json | null;
+          updated_at: string;
+        };
+        Insert: {
+          live_id: string;
+          song_id: string;
+          track_number: number;
+          is_encore?: boolean;
+          note?: Json | null;
+          updated_at?: string;
+        };
+        Update: {
+          live_id?: string;
+          song_id?: string;
+          track_number?: number;
+          is_encore?: boolean;
+          note?: Json | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "setlists_live_id_fkey";
+            columns: ["live_id"];
+            isOneToOne: false;
+            referencedRelation: "lives";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "setlists_song_id_fkey";
+            columns: ["song_id"];
+            isOneToOne: false;
+            referencedRelation: "songs";
             referencedColumns: ["id"];
           },
         ];
