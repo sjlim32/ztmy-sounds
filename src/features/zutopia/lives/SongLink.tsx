@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { MicIcon } from "@/components/icons/MicIcon";
-import { IconLinkButton } from "@/features/zutopia/song-db/components/IconLinkButton";
+import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 
 const indexBadgeClass = cn(
   "w-6 shrink-0 font-mono text-xs tabular-nums",

@@ -1,13 +1,17 @@
 import type { ComponentType } from "react";
 import { cn } from "@/lib/utils";
 
-type Tone = "youtube" | "guide";
+type Tone = "youtube" | "guide" | "spotify" | "appleMusic";
 
 const TONE_STYLES: Record<Tone, string> = {
   youtube:
     "text-white/60 hover:bg-red-500/15 hover:text-red-400 focus-visible:bg-red-500/15 focus-visible:text-red-400",
   guide:
     "text-white/60 hover:bg-ztmy-purple/20 hover:text-ztmy-magenta focus-visible:bg-ztmy-purple/20 focus-visible:text-ztmy-magenta",
+  spotify:
+    "text-white/60 hover:bg-green-500/15 hover:text-green-400 focus-visible:bg-green-500/15 focus-visible:text-green-400",
+  appleMusic:
+    "text-white/60 hover:bg-pink-500/15 hover:text-pink-400 focus-visible:bg-pink-500/15 focus-visible:text-pink-400",
 };
 
 const SIZE_STYLES = {

@@ -10,7 +10,7 @@ import {
 } from "@/components/ZoomableImageGroup";
 import { ALBUM_TYPE_SHORT_LABEL } from "@/features/zutopia/song-db/labels";
 import { DrawerCloseButton } from "@/features/zutopia/song-db/components/DrawerCloseButton";
-import { IconLinkButton } from "@/features/zutopia/song-db/components/IconLinkButton";
+import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 import type { AlbumWithSongs } from "@/features/zutopia/song-db/types";
 
 /**

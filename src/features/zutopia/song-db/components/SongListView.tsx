@@ -11,7 +11,7 @@ import {
   groupSongs,
 } from "@/features/zutopia/song-db/song-album-grouping";
 import { DIRECTION_OPTIONS } from "@/features/zutopia/song-db/sort";
-import { IconLinkButton } from "@/features/zutopia/song-db/components/IconLinkButton";
+import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 import { SongDbDrawer } from "@/features/zutopia/song-db/components/SongDbDrawer";
 import { SongDetailPanel } from "@/features/zutopia/song-db/components/SongDetailPanel";
 import { SortFilterBar } from "@/features/zutopia/song-db/components/SortFilterBar";
