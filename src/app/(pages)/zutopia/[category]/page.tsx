@@ -35,13 +35,17 @@ export default async function ZutopiaCategoryPage(
             href={`/zutopia/${category.slug}/${entry.slug}`}
             className="group block overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)] transition-colors hover:bg-black/40"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={entry.thumbnail}
-              alt={entry.name}
-              loading="lazy"
-              className="aspect-video w-full object-cover transition-opacity group-hover:opacity-80"
-            />
+            {entry.thumbnail ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={entry.thumbnail}
+                alt={entry.name}
+                loading="lazy"
+                className="aspect-video w-full object-cover transition-opacity group-hover:opacity-80"
+              />
+            ) : (
+              <div className="aspect-video w-full bg-white/5" />
+            )}
             <div className="p-4">
               <p className="hover:text-ztmy-pink text-lg font-semibold text-white transition-colors">
                 {entry.label}

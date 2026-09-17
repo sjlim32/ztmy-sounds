@@ -30,8 +30,15 @@ src/
     notice/                 # 공지사항 (MDX 콘텐츠 + 데이터 + 노출/해제 로직)
       content/              # 공지 MDX 프로즈
     zutopia/                 # 즛토피아 허브: 카테고리→항목 2단 구조(registry.ts) +
-                             # 곡/앨범 DB(song-db/, Supabase 기반 — 아래 "곡 데이터" 참고)
-      lives/                # 카테고리별 콘텐츠 (예: lives/sound-planet-2026/content.mdx)
+                             # 곡/앨범 DB(song-db/) + 지난 공연 DB(lives/) — 전부
+                             # Supabase 기반(아래 "곡 데이터" 참고)
+      guide-link.ts          # 응원 가이드(/guide/[songId]) 존재 여부 조회 —
+                             # song-db와 lives가 공유
+      lives/                # 지난 공연 데이터(data.ts, Supabase 기반) + 공용
+                             # 컴포넌트(SongLink.tsx, DefaultLiveContent.tsx).
+                             # 공연별 수동 콘텐츠가 필요하면 lives/<슬러그>/
+                             # content.mdx를 만들어 [slug]/page.tsx의
+                             # CONTENT_BY_KEY에 등록한다(선택 사항).
       song-db/              # 곡/앨범 DB 조회·정렬·표시 로직 (Supabase 소스)
   components/               # 여러 기능이 공유하는 전역 컴포넌트
     mobile/                 # 모바일 전용 전역 컴포넌트
@@ -86,11 +93,12 @@ src/
 - `data/not-yet/`은 아직 가이드가 준비되지 않은 곡, `data/origin/`은 수정 전
   원본 가사/정보 백업 — 둘 다 `songList`에는 포함되지 않습니다.
 
-### zutopia: Supabase DB (곡/앨범 데이터베이스)
+### zutopia: Supabase DB (곡/앨범/공연 데이터베이스)
 
-- `/zutopia/songs`, `/zutopia/albums`에서 보여주는 곡·앨범 목록은 정적 파일이
-  아니라 Supabase(`songs`/`albums` 테이블)에서 빌드 타임에 가져옵니다
-  (`src/features/zutopia/song-db/data.ts` → `createBuildTimeSupabaseClient()`).
+- `/zutopia/songs`, `/zutopia/albums`에서 보여주는 곡·앨범 목록과 `/zutopia/lives`의
+  지난 공연·세트리스트 목록은 정적 파일이 아니라 Supabase(`songs`/`albums`/
+  `lives`/`setlists` 테이블)에서 빌드 타임에 가져옵니다
+  (`song-db/data.ts`, `lives/data.ts` → `createBuildTimeSupabaseClient()`).
 - 이 클라이언트는 서버 컴포넌트 최상위(`page.tsx`)에서만 호출해야 합니다 —
   `output: "export"`(정적 export) 빌드라 런타임 서버가 없고, 클라이언트
   컴포넌트로 전달할 수 없습니다. 자세한 제약은

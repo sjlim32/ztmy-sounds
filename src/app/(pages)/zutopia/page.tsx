@@ -1,9 +1,7 @@
 import { cn } from "@/lib/utils";
 import { ARTIST } from "@/data/artist";
-import {
-  ZUTOPIA_CATEGORIES,
-  summarizeEntryTypes,
-} from "@/features/zutopia/registry";
+import { ZUTOPIA_CATEGORIES } from "@/features/zutopia/registry";
+import { summarizeEntryTypes } from "@/features/zutopia/types";
 import { ZutopiaHubCard } from "@/features/zutopia/components/ZutopiaHubCard";
 import { ZutopiaSectionHeader } from "@/features/zutopia/components/ZutopiaSectionHeader";
 import { getSongsCount, getAlbumsCount } from "@/features/zutopia/song-db/data";

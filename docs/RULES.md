@@ -52,3 +52,7 @@
   클라이언트 컴포넌트로 전달하면 안 됩니다. `NEXT_PUBLIC_SUPABASE_URL` /
   `NEXT_PUBLIC_SUPABASE_PUB_KEY` 환경변수(`.env.local`)가 없으면 빌드가
   즉시 에러를 던집니다.
+- Supabase `lives.live_date`는 `timestamptz`라 `"2026-09-06T00:00:00+00:00"`처럼
+  전체 타임스탬프 문자열로 내려옵니다. 날짜 부분만 쓰려면(`lives/data.ts`의
+  `formatLiveDate`) `"T"` 앞부분만 잘라 파싱해야 합니다 — 그냥 `split("-")`하면
+  시간대 오프셋이 day 자리에 섞여 `NaN`이 됩니다(실제로 한 번 발생한 버그).

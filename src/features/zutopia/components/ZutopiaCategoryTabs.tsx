@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import type { ZutopiaEntry } from "@/features/zutopia/registry";
+import type { ZutopiaEntry } from "@/features/zutopia/types";
 import { ACTIVE_TAB_CLASS, TAB_CLASS } from "./tab-styles";
 
 /**
