@@ -83,15 +83,16 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
           {formatLiveDate(live.live_date)} · {live.live_venue}
         </p>
         {hasStreamingLinks && (
-          <div className="mt-2 flex items-center justify-center gap-2">
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
             {spotify && (
               <IconLinkButton
                 href={spotify}
                 icon={SpotifyIcon}
                 label="Spotify에서 세트리스트 듣기"
+                visibleLabel="Spotify"
                 tone="spotify"
                 variant="solid"
-                size="md"
+                size="lg"
               />
             )}
             {youtubeMusic && (
@@ -99,9 +100,10 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
                 href={youtubeMusic}
                 icon={YouTubeIcon}
                 label="YouTube Music에서 세트리스트 듣기"
+                visibleLabel="YouTube Music"
                 tone="youtube"
                 variant="solid"
-                size="md"
+                size="lg"
               />
             )}
             {appleMusic && (
@@ -109,9 +111,10 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
                 href={appleMusic}
                 icon={AppleMusicIcon}
                 label="Apple Music에서 세트리스트 듣기"
+                visibleLabel="Apple Music"
                 tone="appleMusic"
                 variant="solid"
-                size="md"
+                size="lg"
               />
             )}
           </div>

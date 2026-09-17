@@ -5,21 +5,21 @@ type Tone = "youtube" | "guide" | "spotify" | "appleMusic";
 type Variant = "pill" | "solid";
 
 // variant="pill": 배경 없이 있다가 호버/포커스에만 은은하게 색이 붙는
-// 기본형(유튜브 MV, 응원 가이드). guide는 다른 pill 톤과 달리 늘 옅은
-// 배경을 깔아 항상 눈에 띄게 한다 — 응원 가이드가 있다는 사실 자체를
-// 놓치기 쉬워서다.
+// 기본형(유튜브 MV). guide는 행 배경이 이미 어두워 은은한 색으로는 묻혀
+// 보이지 않아서, 다른 pill 톤과 달리 사이트 시그니처 그라데이션을 항상
+// 꽉 채운다(홈 화면 accent 바와 동일한 배색).
 const PILL_TONE_STYLES: Record<Tone, string> = {
   youtube:
     "text-white/60 hover:bg-red-500/15 hover:text-red-400 focus-visible:bg-red-500/15 focus-visible:text-red-400",
   guide:
-    "bg-ztmy-purple/15 text-ztmy-magenta hover:bg-ztmy-purple/25 focus-visible:bg-ztmy-purple/25",
+    "bg-linear-to-br from-ztmy-purple to-ztmy-magenta text-white shadow-sm hover:brightness-110 focus-visible:brightness-110",
   spotify:
     "text-white/60 hover:bg-green-500/15 hover:text-green-400 focus-visible:bg-green-500/15 focus-visible:text-green-400",
   appleMusic:
     "text-white/60 hover:bg-pink-500/15 hover:text-pink-400 focus-visible:bg-pink-500/15 focus-visible:text-pink-400",
 };
 
-// variant="solid": 각 음원 사이트 대표색을 항상 채운 사각 버튼(세트리스트
+// variant="solid": 각 음원 사이트 대표색을 항상 채운 버튼(세트리스트
 // 스트리밍 링크용) — pill보다 훨씬 눈에 띄어야 해서 별도 스타일셋을 둔다.
 const SOLID_TONE_STYLES: Partial<Record<Tone, string>> = {
   youtube: "bg-red-500 text-white hover:bg-red-400",
@@ -27,15 +27,35 @@ const SOLID_TONE_STYLES: Partial<Record<Tone, string>> = {
   appleMusic: "bg-pink-500 text-white hover:bg-pink-400",
 };
 
+// square: 아이콘만 있는 정사각형 버튼. pill: visibleLabel과 함께 쓰는,
+// 텍스트 폭만큼 늘어나는 알약 모양 버튼.
 const SIZE_STYLES = {
-  sm: { button: "h-6 w-6", icon: "h-4 w-4" },
-  md: { button: "h-7 w-7", icon: "h-5 w-5" },
-} satisfies Record<string, { button: string; icon: string }>;
+  sm: { square: "h-6 w-6", icon: "h-4 w-4", pill: "h-6 gap-1 px-2 text-xs" },
+  md: {
+    square: "h-7 w-7",
+    icon: "h-5 w-5",
+    pill: "h-7 gap-1.5 px-2.5 text-sm",
+  },
+  // md의 1.5배(세트리스트 스트리밍 버튼처럼 더 눈에 띄어야 할 때).
+  lg: {
+    square: "h-11 w-11",
+    icon: "h-7 w-7",
+    pill: "h-11 gap-2 px-3.5 text-base",
+  },
+} satisfies Record<string, { square: string; icon: string; pill: string }>;
 
 interface IconLinkButtonProps {
   href: string;
   icon: ComponentType<{ className?: string }>;
+  /** 접근성 레이블 + 툴팁 문구. */
   label: string;
+  /**
+   * 지정하면 아이콘 옆에 이 짧은 텍스트도 항상 보이는 "라벨 있는 버튼"으로
+   * 렌더링한다(세트리스트 스트리밍 버튼처럼 어떤 서비스인지 바로 알아야
+   * 할 때). 지정하지 않으면 기존처럼 아이콘만 있는 원/사각 버튼 + 호버
+   * 시에만 뜨는 툴팁으로 렌더링한다.
+   */
+  visibleLabel?: string;
   tone: Tone;
   variant?: Variant;
   size?: keyof typeof SIZE_STYLES;
@@ -58,6 +78,7 @@ export function IconLinkButton({
   href,
   icon: Icon,
   label,
+  visibleLabel,
   tone,
   variant = "pill",
   size = "sm",
@@ -65,6 +86,13 @@ export function IconLinkButton({
 }: IconLinkButtonProps) {
   const sizing = SIZE_STYLES[size];
   const isSolid = variant === "solid";
+  const hasVisibleLabel = Boolean(visibleLabel);
+  // visibleLabel이 있으면 항상 꽉 찬 색으로 강조한다 — 텍스트까지 붙는
+  // 버튼이 은은한 톤이면 어중간해 보인다.
+  const colorClass =
+    isSolid || hasVisibleLabel
+      ? cn("shadow-md", SOLID_TONE_STYLES[tone])
+      : cn("bg-white/5", PILL_TONE_STYLES[tone]);
 
   return (
     <span className={cn("group/tip relative inline-flex shrink-0", className)}>
@@ -74,33 +102,36 @@ export function IconLinkButton({
         rel="noopener noreferrer"
         aria-label={label}
         className={cn(
-          "inline-flex items-center justify-center transition-all duration-200",
-          "hover:scale-110 active:scale-95",
+          "inline-flex items-center justify-center font-semibold transition-all duration-200",
+          "hover:scale-105 active:scale-95",
           "focus-visible:outline-ztmy-magenta focus-visible:outline-2 focus-visible:outline-offset-2",
-          sizing.button,
-          isSolid
-            ? cn("rounded-md shadow-md", SOLID_TONE_STYLES[tone])
-            : cn("rounded-full bg-white/5", PILL_TONE_STYLES[tone]),
+          hasVisibleLabel
+            ? cn("rounded-md", sizing.pill)
+            : cn(isSolid ? "rounded-md" : "rounded-full", sizing.square),
+          colorClass,
         )}
       >
         <Icon className={sizing.icon} />
+        {visibleLabel && <span>{visibleLabel}</span>}
       </a>
 
-      <span
-        role="tooltip"
-        className={cn(
-          // 아이콘이 행 우측 끝에 있어 중앙 정렬(left-1/2)하면 뷰포트
-          // 밖으로 넘어가 잘린다 — 아이콘 오른쪽 끝(right-0)에 맞춰 왼쪽
-          // 으로만 펼친다.
-          "pointer-events-none absolute right-0 bottom-full z-50 mb-1.5 translate-y-1 rounded-md bg-black/90 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 shadow-lg",
-          "transition-[opacity,transform] duration-150",
-          "group-active/tip:translate-y-0 group-active/tip:opacity-100",
-          "group-focus-within/tip:translate-y-0 group-focus-within/tip:opacity-100",
-          "tablet:group-hover/tip:translate-y-0 tablet:group-hover/tip:opacity-100",
-        )}
-      >
-        {label}
-      </span>
+      {!hasVisibleLabel && (
+        <span
+          role="tooltip"
+          className={cn(
+            // 아이콘이 행 우측 끝에 있어 중앙 정렬(left-1/2)하면 뷰포트
+            // 밖으로 넘어가 잘린다 — 아이콘 오른쪽 끝(right-0)에 맞춰 왼쪽
+            // 으로만 펼친다.
+            "pointer-events-none absolute right-0 bottom-full z-50 mb-1.5 translate-y-1 rounded-md bg-black/90 px-2.5 py-1.5 text-sm whitespace-nowrap text-white opacity-0 shadow-lg",
+            "transition-[opacity,transform] duration-150",
+            "group-active/tip:translate-y-0 group-active/tip:opacity-100",
+            "group-focus-within/tip:translate-y-0 group-focus-within/tip:opacity-100",
+            "tablet:group-hover/tip:translate-y-0 tablet:group-hover/tip:opacity-100",
+          )}
+        >
+          {label}
+        </span>
+      )}
     </span>
   );
 }
