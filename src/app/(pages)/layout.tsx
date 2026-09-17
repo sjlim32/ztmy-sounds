@@ -7,6 +7,7 @@ import "@fontsource/line-seed-jp/800.css";
 import { SerwistProvider } from "@serwist/turbopack/react";
 import { BodyScrollGuard } from "@/components/BodyScrollGuard";
 import { CustomCursor } from "@/components/CustomCursor";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { GuideDimOverlay } from "@/components/GuideDimOverlay";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
 import { Footer } from "@/components/Footer";
@@ -135,6 +136,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             __html: JSON.stringify(buildSiteJsonLdGraph()),
           }}
         />
+        <GoogleAnalytics />
         <BodyScrollGuard />
         <CustomCursor />
         <GuideDimOverlay />
