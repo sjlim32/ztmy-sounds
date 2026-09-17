@@ -42,7 +42,7 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
     label: live.title_ko,
     name: live.title,
     date: formatLiveDate(live.live_date),
-    thumbnail: live.poster_image_url ?? live.icon_image_url ?? "",
+    thumbnail: live.icon_image_url ?? live.poster_image_url ?? "",
     type: LIVE_TYPE_TO_ENTRY_TYPE[live.type],
   }));
 }

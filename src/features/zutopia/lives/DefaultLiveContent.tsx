@@ -42,7 +42,7 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
             {live.setlist.map((entry, i) => (
               <li key={entry.songId}>
                 <SongLink href={entry.guideHref} index={i + 1}>
-                  {entry.titleKo} ({entry.title})
+                  {entry.title} ({entry.titleKo})
                 </SongLink>
               </li>
             ))}
