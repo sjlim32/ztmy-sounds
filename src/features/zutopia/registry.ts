@@ -1,11 +1,12 @@
-export type ZutopiaEntryType = "concert" | "festival";
+export type ZutopiaEntryType = "concert" | "festival" | "event";
 
 const ENTRY_TYPE_LABEL: Record<ZutopiaEntryType, string> = {
   concert: "콘서트",
   festival: "페스티벌",
+  event: "행사",
 };
-// summarizeEntryTypes가 항상 이 순서로(콘서트 → 페스티벌) 보여주기 위한 목록.
-const ENTRY_TYPE_ORDER: ZutopiaEntryType[] = ["concert", "festival"];
+// summarizeEntryTypes가 항상 이 순서로 보여주기 위한 목록.
+const ENTRY_TYPE_ORDER: ZutopiaEntryType[] = ["concert", "festival", "event"];
 
 export interface ZutopiaEntry {
   slug: string;
