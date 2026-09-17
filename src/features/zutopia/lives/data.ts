@@ -11,7 +11,7 @@ import type { LiveDetail } from "./types";
 
 /** "2026-09-06" -> "2026년 9월 6일" (기존 정적 데이터 표기와 동일한 형식). */
 function formatLiveDate(isoDate: string): string {
-  const [year, month, day] = isoDate.split("-");
+  const [year, month, day] = isoDate.split("T")[0].split("-");
   return `${year}년 ${Number(month)}월 ${Number(day)}일`;
 }
 
