@@ -16,6 +16,20 @@ export function formatLiveDate(isoDate: string): string {
   return `${year}년 ${Number(month)}월 ${Number(day)}일`;
 }
 
+/**
+ * 목록 카드는 공연(페스티벌) 전체 기간(start_date~end_date)을 보여준다 —
+ * live_date(줏토마요가 실제로 서는 날짜)는 상세 페이지 전용이다. 같은
+ * 날이거나 end_date가 없으면(단일 일자 공연) 범위 없이 하루만 보여준다.
+ */
+function formatLiveDateRange(
+  startDate: string,
+  endDate: string | null,
+): string {
+  const start = formatLiveDate(startDate);
+  if (!endDate || endDate === startDate) return start;
+  return `${start} ~ ${formatLiveDate(endDate)}`;
+}
+
 const LIVE_TYPE_TO_ENTRY_TYPE: Record<Live["type"], ZutopiaEntryType> = {
   FESTIVAL: "festival",
   CONCERT: "concert",
@@ -28,7 +42,7 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
   const { data, error } = await supabase
     .from("lives")
     .select(
-      "slug, title, title_ko, live_date, poster_image_url, icon_image_url, type",
+      "slug, title, title_ko, start_date, end_date, live_date, poster_image_url, icon_image_url, type",
     )
     .eq("status", "ACTIVE")
     .order("live_date", { ascending: false });
@@ -41,7 +55,7 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
     slug: live.slug,
     label: live.title_ko,
     name: live.title,
-    date: formatLiveDate(live.live_date),
+    date: formatLiveDateRange(live.start_date, live.end_date),
     thumbnail: live.icon_image_url ?? live.poster_image_url ?? "",
     type: LIVE_TYPE_TO_ENTRY_TYPE[live.type],
   }));

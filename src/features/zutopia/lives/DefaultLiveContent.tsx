@@ -90,6 +90,7 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
                 icon={SpotifyIcon}
                 label="Spotify에서 세트리스트 듣기"
                 tone="spotify"
+                variant="solid"
                 size="md"
               />
             )}
@@ -99,6 +100,7 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
                 icon={YouTubeIcon}
                 label="YouTube Music에서 세트리스트 듣기"
                 tone="youtube"
+                variant="solid"
                 size="md"
               />
             )}
@@ -108,6 +110,7 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
                 icon={AppleMusicIcon}
                 label="Apple Music에서 세트리스트 듣기"
                 tone="appleMusic"
+                variant="solid"
                 size="md"
               />
             )}

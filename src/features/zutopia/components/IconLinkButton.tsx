@@ -2,16 +2,29 @@ import type { ComponentType } from "react";
 import { cn } from "@/lib/utils";
 
 type Tone = "youtube" | "guide" | "spotify" | "appleMusic";
+type Variant = "pill" | "solid";
 
-const TONE_STYLES: Record<Tone, string> = {
+// variant="pill": 배경 없이 있다가 호버/포커스에만 은은하게 색이 붙는
+// 기본형(유튜브 MV, 응원 가이드). guide는 다른 pill 톤과 달리 늘 옅은
+// 배경을 깔아 항상 눈에 띄게 한다 — 응원 가이드가 있다는 사실 자체를
+// 놓치기 쉬워서다.
+const PILL_TONE_STYLES: Record<Tone, string> = {
   youtube:
     "text-white/60 hover:bg-red-500/15 hover:text-red-400 focus-visible:bg-red-500/15 focus-visible:text-red-400",
   guide:
-    "text-white/60 hover:bg-ztmy-purple/20 hover:text-ztmy-magenta focus-visible:bg-ztmy-purple/20 focus-visible:text-ztmy-magenta",
+    "bg-ztmy-purple/15 text-ztmy-magenta hover:bg-ztmy-purple/25 focus-visible:bg-ztmy-purple/25",
   spotify:
     "text-white/60 hover:bg-green-500/15 hover:text-green-400 focus-visible:bg-green-500/15 focus-visible:text-green-400",
   appleMusic:
     "text-white/60 hover:bg-pink-500/15 hover:text-pink-400 focus-visible:bg-pink-500/15 focus-visible:text-pink-400",
+};
+
+// variant="solid": 각 음원 사이트 대표색을 항상 채운 사각 버튼(세트리스트
+// 스트리밍 링크용) — pill보다 훨씬 눈에 띄어야 해서 별도 스타일셋을 둔다.
+const SOLID_TONE_STYLES: Partial<Record<Tone, string>> = {
+  youtube: "bg-red-500 text-white hover:bg-red-400",
+  spotify: "bg-green-500 text-white hover:bg-green-400",
+  appleMusic: "bg-pink-500 text-white hover:bg-pink-400",
 };
 
 const SIZE_STYLES = {
@@ -24,6 +37,7 @@ interface IconLinkButtonProps {
   icon: ComponentType<{ className?: string }>;
   label: string;
   tone: Tone;
+  variant?: Variant;
   size?: keyof typeof SIZE_STYLES;
   /**
    * 감싸는 span에 붙는 클래스 — 반응형 노출 제어용(예: 모바일 전용
@@ -33,8 +47,8 @@ interface IconLinkButtonProps {
 }
 
 /**
- * 곡 행에 붙는 외부 링크 아이콘(유튜브/응원 가이드) 공용 버튼.
- * 그냥 아이콘이 아니라 누를 수 있는 버튼임이 드러나도록 원형 배경 +
+ * 곡 행/공연 정보에 붙는 외부 링크 아이콘(유튜브/응원 가이드/음원 사이트)
+ * 공용 버튼. 그냥 아이콘이 아니라 누를 수 있는 버튼임이 드러나도록
  * 확대/색상 전환을 주고, 브라우저 기본 title 대신 커스텀 툴팁을 붙인다
  * (AlbumListView 커버 호버 라벨과 동일한 opacity/translate 트랜지션
  * 재사용). 터치(group-active) / 마우스(tablet:group-hover) /
@@ -45,10 +59,12 @@ export function IconLinkButton({
   icon: Icon,
   label,
   tone,
+  variant = "pill",
   size = "sm",
   className,
 }: IconLinkButtonProps) {
   const sizing = SIZE_STYLES[size];
+  const isSolid = variant === "solid";
 
   return (
     <span className={cn("group/tip relative inline-flex shrink-0", className)}>
@@ -58,11 +74,13 @@ export function IconLinkButton({
         rel="noopener noreferrer"
         aria-label={label}
         className={cn(
-          "inline-flex items-center justify-center rounded-full bg-white/5 transition-all duration-200",
+          "inline-flex items-center justify-center transition-all duration-200",
           "hover:scale-110 active:scale-95",
           "focus-visible:outline-ztmy-magenta focus-visible:outline-2 focus-visible:outline-offset-2",
           sizing.button,
-          TONE_STYLES[tone],
+          isSolid
+            ? cn("rounded-md shadow-md", SOLID_TONE_STYLES[tone])
+            : cn("rounded-full bg-white/5", PILL_TONE_STYLES[tone]),
         )}
       >
         <Icon className={sizing.icon} />
