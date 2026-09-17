@@ -215,7 +215,7 @@ export function ZoomableImageGroup({
                 height: resolvedThumbnailHeight,
               }}
               className={cn(
-                "max-tablet:h-auto! max-tablet:w-full! rounded-lg",
+                "rounded-lg",
                 cropThumbnail
                   ? cn("object-cover", THUMBNAIL_CROP_CLASS[thumbnailCrop])
                   : "h-auto w-auto",
