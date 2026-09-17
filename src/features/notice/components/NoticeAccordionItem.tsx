@@ -4,7 +4,6 @@ import { useId } from "react";
 import { cn } from "@/lib/utils";
 import type { Notice } from "@/features/notice/lib/types";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
-import { accentBarStyles } from "@/features/guide/components/list-entrance";
 
 interface NoticeAccordionItemProps {
   notice: Notice;
@@ -42,19 +41,19 @@ export function NoticeAccordionItem({
         aria-expanded={isOpen}
         aria-controls={contentId}
         className={cn(
-          "group relative flex w-full flex-col gap-1.5 text-left focus-visible:outline-none",
-          "tablet:px-4 tablet:py-3",
+          "group relative flex w-full flex-col gap-1 py-2 text-left focus-visible:outline-none",
+          "table:gap-2 tablet:py-4",
         )}
       >
         <span
-          className={cn(accentBarStyles({ selected: isOpen }), "tablet:hidden")}
-        />
-
-        <span className="flex items-center justify-between">
+          className={cn(
+            "flex items-center justify-between px-3",
+            "tablet:px-5",
+          )}
+        >
           <span
             className={cn(
-              "px-6 font-mono text-[10px] font-medium tracking-[0.3em] uppercase",
-              "tablet:px-0",
+              "font-mono text-[10px] font-medium tracking-[0.3em] uppercase",
               notice.isAlwaysOpen ? "text-ztmy-pink" : "text-white/40",
             )}
           >
@@ -70,15 +69,15 @@ export function NoticeAccordionItem({
 
         <span
           className={cn(
-            "transi px-6 text-base leading-tight font-bold tracking-tight",
-            "tablet:text-2xl tablet:px-0",
-            isOpen ? "text-white/60" : "text-white",
+            "px-3 text-base leading-tight tracking-tight transition",
+            "tablet:text-2xl tablet:px-5",
+            isOpen ? "font-semibold text-white" : "font-medium text-white/90",
           )}
         >
           {notice.title}
         </span>
 
-        <span className="relative block h-px w-full overflow-hidden bg-white/15">
+        <span className="relative my-1 block h-px w-full overflow-hidden bg-white/15">
           <span
             className={cn(
               "from-ztmy-pink to-ztmy-purple absolute inset-y-0 left-0 w-full origin-left scale-x-0 bg-linear-to-r transition-transform duration-500 ease-out",
@@ -99,8 +98,8 @@ export function NoticeAccordionItem({
         <div className="overflow-hidden">
           <div
             className={cn(
-              "space-y-3 border-b border-white/10 px-2 pb-4 text-sm leading-relaxed [&_strong]:text-white",
-              "tablet:px-4 tablet:text-lg tablet:border-b-0",
+              "space-y-2 border-b border-white/10 px-5 pb-5 text-sm leading-relaxed break-keep [&_strong]:text-white",
+              "tablet:text-lg tablet:border-b-0",
             )}
           >
             <Content />
