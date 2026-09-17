@@ -58,11 +58,11 @@ Expected: "OK: 남은 참조 없음" 출력, `tsc --noEmit` 에러 0건.
 
 - [ ] **Step 4: 커밋 (사용자 승인 후)**
 
-제안 메시지: `refactor: share guide-link between song-db and lives features`
+제안 메시지: `refactor: guide-link을 song-db와 lives가 공유하도록 이동`
 
 ```bash
 git add -A
-git commit -m "refactor: share guide-link between song-db and lives features"
+git commit -m "refactor: guide-link을 song-db와 lives가 공유하도록 이동"
 ```
 
 ---
@@ -108,11 +108,11 @@ Expected: 에러 0건.
 
 - [ ] **Step 3: 커밋 (사용자 승인 후)**
 
-제안 메시지: `feat: add lives feature types`
+제안 메시지: `feat: lives 기능 타입 추가`
 
 ```bash
 git add -A
-git commit -m "feat: add lives feature types"
+git commit -m "feat: lives 기능 타입 추가"
 ```
 
 ---
@@ -158,11 +158,11 @@ Expected: 에러 0건 (`entries`/`ZutopiaCategory` 구조는 아직 안 바꿨�
 
 - [ ] **Step 3: 커밋 (사용자 승인 후)**
 
-제안 메시지: `feat: add "event" as a zutopia entry type`
+제안 메시지: `feat: zutopia 항목 타입에 "event" 추가`
 
 ```bash
 git add -A
-git commit -m "feat: add \"event\" as a zutopia entry type"
+git commit -m "feat: zutopia 항목 타입에 \"event\" 추가"
 ```
 
 ---
@@ -320,11 +320,11 @@ Expected: 둘 다 `error: null`, `entries: []`, `bySlug: null` (테이블이 비
 
 - [ ] **Step 4: 커밋 (사용자 승인 후)**
 
-제안 메시지: `feat: add Supabase-backed lives data fetchers`
+제안 메시지: `feat: Supabase 기반 lives 데이터 조회 함수 추가`
 
 ```bash
 git add -A
-git commit -m "feat: add Supabase-backed lives data fetchers"
+git commit -m "feat: Supabase 기반 lives 데이터 조회 함수 추가"
 ```
 
 ---
@@ -760,11 +760,11 @@ pnpm exec prettier --write \
 
 - [ ] **Step 4: 커밋 (사용자 승인 후) — Task 5~8을 한 번에**
 
-제안 메시지: `refactor: make zutopia category entries load asynchronously`
+제안 메시지: `refactor: zutopia 카테고리 항목을 비동기로 불러오도록 변경`
 
 ```bash
 git add -A
-git commit -m "refactor: make zutopia category entries load asynchronously"
+git commit -m "refactor: zutopia 카테고리 항목을 비동기로 불러오도록 변경"
 ```
 
 ---
@@ -852,11 +852,11 @@ Expected: 에러 0건.
 
 - [ ] **Step 3: 커밋 (사용자 승인 후)**
 
-제안 메시지: `feat: add shared setlist row component for lives content`
+제안 메시지: `feat: lives 콘텐츠용 공유 세트리스트 행 컴포넌트 추가`
 
 ```bash
 git add -A
-git commit -m "feat: add shared setlist row component for lives content"
+git commit -m "feat: lives 콘텐츠용 공유 세트리스트 행 컴포넌트 추가"
 ```
 
 ---
@@ -964,11 +964,11 @@ Expected 두 가지 경우:
 
 - [ ] **Step 4: 커밋 (사용자 승인 후)**
 
-제안 메시지: `feat: recreate zutopia lives detail route backed by Supabase`
+제안 메시지: `feat: Supabase 기반 zutopia lives 상세 라우트 재생성`
 
 ```bash
 git add -A
-git commit -m "feat: recreate zutopia lives detail route backed by Supabase"
+git commit -m "feat: Supabase 기반 zutopia lives 상세 라우트 재생성"
 ```
 
 ---
