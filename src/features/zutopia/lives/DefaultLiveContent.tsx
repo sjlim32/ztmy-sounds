@@ -37,11 +37,30 @@ function parseLiveMetadata(metadata: Live["metadata"]): LiveStreamingLinks {
   };
 }
 
+// 공연 타입 배지 점 색 — 페스티벌/콘서트/행사를 한눈에 구분하는 용도라
+// 텍스트는 항상 흰색으로 고정하고(배경색 대비 걱정 없이) 점 색으로만
+// 구분한다.
+const LIVE_TYPE_LABEL: Record<Live["type"], string> = {
+  FESTIVAL: "페스티벌",
+  CONCERT: "콘서트",
+  EVENT: "행사",
+};
+const LIVE_TYPE_DOT: Record<Live["type"], string> = {
+  FESTIVAL: "bg-ztmy-pink",
+  CONCERT: "bg-ztmy-magenta",
+  EVENT: "bg-ztmy-sky",
+};
+
 /**
  * CONTENT_BY_KEY에 이 공연 전용 콘텐츠가 없을 때 쓰는 기본 상세 뷰 —
  * 티켓/사진 같은 수동 콘텐츠는 없지만 최소한 공연 정보와 세트리스트는
  * 보여준다. 나중에 이 공연의 content.mdx를 만들면 CONTENT_BY_KEY에
  * 등록해 이 기본 뷰를 덮어쓰면 된다.
+ *
+ * 레이아웃은 NextEventCard의 "콘서트 티켓 스텁" 모티프(점선 절취선으로
+ * 나뉜 DATE/VENUE, accent 그라데이션 띠)를 그대로 확장한다 — 이 사이트가
+ * 이미 갖고 있는 시각 언어라 새로 지어내지 않고 재사용한다. 스트리밍
+ * 링크는 티켓 아래쪽에 가로 절취선으로 나뉜 "LISTEN" 구간으로 붙인다.
  */
 export function DefaultLiveContent({ live }: { live: LiveDetail }) {
   const { variation, spotify, youtubeMusic, appleMusic } = parseLiveMetadata(
@@ -50,87 +69,133 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
   const hasStreamingLinks = spotify || youtubeMusic || appleMusic;
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      {live.poster_image_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={live.poster_image_url}
-          alt={live.title}
-          className="max-h-[60vh] w-auto rounded-lg object-contain"
-        />
-      ) : null}
+    <div className="mx-auto flex w-full max-w-md flex-col items-center gap-6">
+      {live.poster_image_url && (
+        <div className="relative w-full">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={live.poster_image_url}
+            alt={live.title}
+            className="max-h-[60vh] w-full rounded-lg object-contain"
+          />
+          <span
+            className={cn(
+              "absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1 backdrop-blur-sm",
+              "font-mono text-[10px] tracking-[0.2em] text-white uppercase",
+            )}
+          >
+            <span
+              className={cn(
+                "h-1.5 w-1.5 rounded-full",
+                LIVE_TYPE_DOT[live.type],
+              )}
+            />
+            {LIVE_TYPE_LABEL[live.type]}
+          </span>
+        </div>
+      )}
 
       {live.additional_image_urls && live.additional_image_urls.length > 0 && (
-        <div className="flex flex-wrap items-center justify-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           <ZoomableImageGroup
             images={live.additional_image_urls.map((url, i) => ({
               src: url,
               alt: `${live.title} 추가 이미지 ${i + 1}`,
             }))}
-            thumbnailWidth={200}
-            thumbnailCrop="top"
+            thumbnailWidth={96}
+            thumbnailHeight={96}
           />
         </div>
       )}
 
       <div className="text-center">
-        <h1 className="text-2xl font-semibold text-white">{live.title_ko}</h1>
-        <p className="mt-1 text-sm text-white/60">{live.title}</p>
-        {variation && (
-          <p className="mt-1 text-sm text-white/50 italic">{variation}</p>
-        )}
-        <p className="mt-2 text-sm text-white/70">
-          {formatLiveDate(live.live_date)} · {live.live_venue}
+        <h1 className="font-rocknroll text-3xl text-white">{live.title_ko}</h1>
+        <p className="mt-1 font-mono text-xs tracking-[0.15em] text-white/50 uppercase">
+          {live.title}
         </p>
-        {hasStreamingLinks && (
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-            {spotify && (
-              <IconLinkButton
-                href={spotify}
-                icon={SpotifyIcon}
-                label="Spotify에서 세트리스트 듣기"
-                visibleLabel="Spotify"
-                tone="spotify"
-                variant="solid"
-                size="lg"
-              />
-            )}
-            {youtubeMusic && (
-              <IconLinkButton
-                href={youtubeMusic}
-                icon={YouTubeIcon}
-                label="YouTube Music에서 세트리스트 듣기"
-                visibleLabel="YouTube Music"
-                tone="youtube"
-                variant="solid"
-                size="lg"
-              />
-            )}
-            {appleMusic && (
-              <IconLinkButton
-                href={appleMusic}
-                icon={AppleMusicIcon}
-                label="Apple Music에서 세트리스트 듣기"
-                visibleLabel="Apple Music"
-                tone="appleMusic"
-                variant="solid"
-                size="lg"
-              />
-            )}
+        {variation && <p className="mt-2 text-sm text-white/60">{variation}</p>}
+      </div>
+
+      {/* 티켓 스텁 — 상단 accent 띠, DATE/VENUE를 점선으로 나눈 본 티켓,
+      스트리밍 링크가 있으면 가로 절취선 아래 LISTEN 구간을 덧붙인다. */}
+      <div className="relative w-full overflow-hidden bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]">
+        <div className="from-ztmy-magenta to-ztmy-purple absolute inset-x-0 top-0 h-0.5 bg-linear-to-r" />
+
+        <div className="flex">
+          <div className="flex-1 p-4">
+            <p className="font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase">
+              Date
+            </p>
+            <p className="mt-1 font-mono text-base text-white">
+              {formatLiveDate(live.live_date)}
+            </p>
           </div>
+
+          <div className="border-ztmy-purple/40 w-0 border-l border-dashed" />
+
+          <div className="flex-1 p-4">
+            <p className="font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase">
+              Venue
+            </p>
+            <p className="mt-1 text-base break-keep text-white">
+              {live.live_venue}
+            </p>
+          </div>
+        </div>
+
+        {hasStreamingLinks && (
+          <>
+            <div className="border-ztmy-purple/40 border-t border-dashed" />
+            <div className="flex items-center justify-between gap-3 p-4">
+              <p className="font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase">
+                Listen
+              </p>
+              <div className="flex items-center gap-2">
+                {spotify && (
+                  <IconLinkButton
+                    href={spotify}
+                    icon={SpotifyIcon}
+                    label="Spotify에서 세트리스트 듣기"
+                    tone="spotify"
+                    variant="solid"
+                    size="md"
+                  />
+                )}
+                {youtubeMusic && (
+                  <IconLinkButton
+                    href={youtubeMusic}
+                    icon={YouTubeIcon}
+                    label="YouTube Music에서 세트리스트 듣기"
+                    tone="youtube"
+                    variant="solid"
+                    size="md"
+                  />
+                )}
+                {appleMusic && (
+                  <IconLinkButton
+                    href={appleMusic}
+                    icon={AppleMusicIcon}
+                    label="Apple Music에서 세트리스트 듣기"
+                    tone="appleMusic"
+                    variant="solid"
+                    size="md"
+                  />
+                )}
+              </div>
+            </div>
+          </>
         )}
       </div>
 
       {live.setlist.length > 0 && (
         <section className="w-full">
-          <h2 className="mb-2 text-center text-sm font-semibold tracking-wide text-white/70 uppercase">
-            세트리스트 ({live.setlist.length}곡)
-          </h2>
-          <ul
-            className={cn(
-              "mx-auto flex w-full max-w-md flex-col divide-y divide-white/5 overflow-hidden rounded-lg bg-black/20",
-            )}
-          >
+          <div className="flex items-baseline justify-between border-b border-white/10 pb-2">
+            <p className="text-base font-semibold text-white">세트리스트</p>
+            <p className="font-mono text-xs text-white/40">
+              {live.setlist.length} songs
+            </p>
+          </div>
+          <ul className="flex flex-col divide-y divide-white/5">
             {live.setlist.map((entry, i) => (
               <li key={entry.songId}>
                 <SongLink href={entry.guideHref} index={i + 1}>
