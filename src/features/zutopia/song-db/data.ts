@@ -54,29 +54,34 @@ async function fetchOriginalsById(
 /**
  * 어레인지 버전(original_song_id가 있는 곡)은 화면에 자기 자신의 정보가
  * 아니라 원곡 정보를 그대로 보여주고, title/title_ko에만 버전명을 붙여야
- * 한다 — 응원법 링크(slug 기준), 유튜브 영상, 스트리밍 링크, 편곡/영상
- * 크레딧, 커버까지 전부 원곡 기준이다. 컴포넌트마다 분기를 넣는 대신
- * 데이터를 내려주는 시점에 이 필드들 자체를 치환해서, 그대로 읽는 모든
- * 화면(목록/상세/앨범 트랙리스트)에 자동으로 반영되게 한다.
- * title_en에는 버전명을 붙이지 않는다. release_date/id/status 등 이
- * 릴리즈 자체에 대한 사실은 자기 자신 값을 유지한다.
+ * 한다 — 응원법 링크, 유튜브 영상, 스트리밍 링크, 편곡/영상 크레딧,
+ * 커버까지 전부 원곡 기준이다. 컴포넌트마다 분기를 넣는 대신 데이터를
+ * 내려주는 시점에 이 필드들 자체를 치환해서, 그대로 읽는 모든 화면(목록/
+ * 상세/앨범 트랙리스트)에 자동으로 반영되게 한다.
+ * title_en에는 버전명을 붙이지 않는다. release_date/id/slug/status 등 이
+ * 릴리즈 자체에 대한 사실은 자기 자신 값을 유지한다 — 특히 slug는 song-db
+ * 드로어가 URL(?song=<slug>)로 행을 구분하는 키라, 원곡 것으로 바꿔치기하면
+ * 원곡과 어레인지 버전이 같은 slug를 갖게 되어 조회가 모호해진다. 응원
+ * 가이드만 원곡 slug로 별도 조회한다.
  */
 function resolveDisplaySong<T extends Song>(
   song: T,
   originalsById: Map<string, OriginalSongRef>,
-): T {
+): T & { guideHref: string | null } {
   const original = song.original_song_id
     ? (originalsById.get(song.original_song_id) ?? null)
     : null;
-  if (!original) return song;
+  const guideHref = getGuideHref(original?.slug ?? song.slug);
+
+  if (!original) return { ...song, guideHref };
 
   const suffix = song.version_name ? ` (${song.version_name})` : "";
   return {
     ...song,
-    slug: original.slug,
     title: `${original.title}${suffix}`,
     title_ko: `${original.title_ko}${suffix}`,
     title_en: original.title_en,
+    guideHref,
   };
 }
 
@@ -148,7 +153,7 @@ export async function getSongsWithAlbums(): Promise<SongWithAlbums[]> {
       }))
       .sort((a, b) => a.release_date.localeCompare(b.release_date));
 
-    return { ...song, albums, guideHref: getGuideHref(song.slug) };
+    return { ...song, albums };
   });
 }
 
@@ -193,7 +198,6 @@ export async function getAlbumsWithSongs(): Promise<AlbumWithSongs[]> {
           ...song,
           track_number: row.track_number,
           disc_number: row.disc_number,
-          guideHref: getGuideHref(song.slug),
         };
       });
 

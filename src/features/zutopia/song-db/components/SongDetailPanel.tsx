@@ -15,15 +15,15 @@ import type {
  */
 export function SongDetailPanel({
   song,
-  contextAlbumId,
+  contextAlbumSlug,
   onClose,
 }: SongDetailPanelProps) {
   const coverSrc = getSongCoverSrc(song);
   const hasArranger = (song.arranger?.length ?? 0) > 0;
   const hasMovieDirector = (song.movie_director?.length ?? 0) > 0;
 
-  const contextAlbum = contextAlbumId
-    ? (song.albums.find((album) => album.id === contextAlbumId) ?? null)
+  const contextAlbum = contextAlbumSlug
+    ? (song.albums.find((album) => album.slug === contextAlbumSlug) ?? null)
     : null;
   const otherAlbums = contextAlbum
     ? song.albums.filter((album) => album.id !== contextAlbum.id)
@@ -181,7 +181,7 @@ export function SongDetailPanel({
 
 interface SongDetailPanelProps {
   song: SongWithAlbums;
-  contextAlbumId: string | null;
+  contextAlbumSlug: string | null;
   onClose: () => void;
 }
 

@@ -70,8 +70,9 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const selectedAlbumId = searchParams.get("album");
-  const selected = albums.find((album) => album.id === selectedAlbumId) ?? null;
+  const selectedAlbumSlug = searchParams.get("album");
+  const selected =
+    albums.find((album) => album.slug === selectedAlbumSlug) ?? null;
 
   /**
    * 매번 새 함수를 넘기면 SongDbDrawer 포커스 관리 effect가 참조 동일성
@@ -151,7 +152,7 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
                 )}
               >
                 {group.albums.map((album, index) => {
-                  const isSelected = selected?.id === album.id;
+                  const isSelected = selected?.slug === album.slug;
                   const { prefix, title } = getAlbumHoverParts(album);
                   const coverSrc = getAlbumCoverSrc(album, showBookCover);
                   return (
@@ -164,7 +165,7 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
                           router.back();
                           return;
                         }
-                        const url = `${pathname}?album=${album.id}`;
+                        const url = `${pathname}?album=${album.slug}`;
                         // 닫힌 상태에서 처음 열 때만 새 엔트리를 쌓는다.
                         // 이미 열린 채로 다른 앨범으로 바꿀 때는 같은
                         // 엔트리를 replace한다(SongListView 동일).

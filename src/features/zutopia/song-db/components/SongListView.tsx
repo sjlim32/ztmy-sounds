@@ -27,13 +27,13 @@ interface SongListViewProps {
 
 /**
  * 곡이 여러 앨범에 실릴 수 있어(다대다) "이 곡"만으론 드로어가 어느 앨범
- * 그룹에서 열렸는지 알 수 없다 — contextAlbumId로 클릭한 행의 앨범을
+ * 그룹에서 열렸는지 알 수 없다 — contextAlbumSlug로 클릭한 행의 앨범을
  * 같이 들고 다녀 드로어 상단 표시/"다른 앨범" 제외에 쓴다.
  * 연도별 보기처럼 특정 앨범이 없으면 null.
  */
 interface SelectedSong {
   song: SongWithAlbums;
-  contextAlbumId: string | null;
+  contextAlbumSlug: string | null;
 }
 
 /** release_date는 DB에서 NOT NULL "YYYY-MM-DD"로 온다. */
@@ -62,9 +62,9 @@ export function SongListView({ songs }: SongListViewProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const selectedSong = songs.find((s) => s.id === searchParams.get("song"));
+  const selectedSong = songs.find((s) => s.slug === searchParams.get("song"));
   const selected: SelectedSong | null = selectedSong
-    ? { song: selectedSong, contextAlbumId: searchParams.get("album") }
+    ? { song: selectedSong, contextAlbumSlug: searchParams.get("album") }
     : null;
 
   /**
@@ -169,18 +169,19 @@ export function SongListView({ songs }: SongListViewProps) {
                   따로 넣을 필요가 없다. */}
                   {group.songs.map((song) => {
                     const coverSrc = getSongCoverSrc(song);
-                    const contextAlbumId = group.album?.id ?? null;
+                    const contextAlbumSlug = group.album?.slug ?? null;
                     const isSelected =
-                      selected?.song.id === song.id &&
-                      selected?.contextAlbumId === contextAlbumId;
+                      selected?.song.slug === song.slug &&
+                      selected?.contextAlbumSlug === contextAlbumSlug;
                     const openSong = () => {
                       if (isSelected) {
                         router.back();
                         return;
                       }
                       const params = new URLSearchParams();
-                      params.set("song", song.id);
-                      if (contextAlbumId) params.set("album", contextAlbumId);
+                      params.set("song", song.slug);
+                      if (contextAlbumSlug)
+                        params.set("album", contextAlbumSlug);
                       const url = `${pathname}?${params.toString()}`;
                       // 닫힌 상태에서 처음 열 때만 push한다(뒤로가기 한
                       // 번에 닫힘). 이미 열린 채로 다른 곡으로 바꿀 때는
@@ -301,10 +302,10 @@ export function SongListView({ songs }: SongListViewProps) {
         selected={selected}
         onClose={closeDrawer}
         ariaLabel={selected ? `${selected.song.title} 상세 정보` : undefined}
-        renderContent={({ song, contextAlbumId }) => (
+        renderContent={({ song, contextAlbumSlug }) => (
           <SongDetailPanel
             song={song}
-            contextAlbumId={contextAlbumId}
+            contextAlbumSlug={contextAlbumSlug}
             onClose={closeDrawer}
           />
         )}
