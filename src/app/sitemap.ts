@@ -17,7 +17,7 @@ const PRIORITY: Record<string, number> = {
   "/credits": 0.3,
 };
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
   const slamSongList = getSongsWithTag("slam", songList);
 
@@ -58,14 +58,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.4,
   }));
 
-  const zutopiaEntryRoutes = ZUTOPIA_CATEGORIES.flatMap((category) =>
-    category.entries.map((entry) => ({
-      url: `${SITE_URL}/zutopia/${category.slug}/${entry.slug}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.4,
-    })),
-  );
+  const zutopiaEntryRoutes = (
+    await Promise.all(
+      ZUTOPIA_CATEGORIES.map(async (category) =>
+        (await category.getEntries()).map((entry) => ({
+          url: `${SITE_URL}/zutopia/${category.slug}/${entry.slug}`,
+          lastModified,
+          changeFrequency: "monthly" as const,
+          priority: 0.4,
+        })),
+      ),
+    )
+  ).flat();
 
   return [
     ...staticRoutes,

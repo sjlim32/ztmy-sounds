@@ -9,9 +9,15 @@ import { ZutopiaSectionHeader } from "@/features/zutopia/components/ZutopiaSecti
 import { getSongsCount, getAlbumsCount } from "@/features/zutopia/song-db/data";
 
 export default async function ZutopiaHubPage() {
-  const [songCount, albumCount] = await Promise.all([
+  const [songCount, albumCount, categoryCards] = await Promise.all([
     getSongsCount(),
     getAlbumsCount(),
+    Promise.all(
+      ZUTOPIA_CATEGORIES.map(async (category) => ({
+        category,
+        entries: await category.getEntries(),
+      })),
+    ),
   ]);
 
   return (
@@ -32,13 +38,13 @@ export default async function ZutopiaHubPage() {
           />
         </li>
 
-        {ZUTOPIA_CATEGORIES.map((category) => (
+        {categoryCards.map(({ category, entries }) => (
           <li key={category.slug}>
             <ZutopiaHubCard
               href={`/zutopia/${category.slug}`}
               title={category.label}
               description={category.description}
-              meta={summarizeEntryTypes(category.entries)}
+              meta={summarizeEntryTypes(entries)}
               imageUrl={category.image}
             />
           </li>

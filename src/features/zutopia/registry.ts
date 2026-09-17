@@ -1,3 +1,5 @@
+import { getLiveEntries } from "@/features/zutopia/lives/data";
+
 export type ZutopiaEntryType = "concert" | "festival" | "event";
 
 const ENTRY_TYPE_LABEL: Record<ZutopiaEntryType, string> = {
@@ -27,23 +29,27 @@ export interface ZutopiaCategory {
   // 항목이 바뀌거나 순서가 바뀔 때 카테고리 대표 이미지도 같이 흔들리므로,
   // 카테고리 자체의 고정 이미지를 따로 둔다.
   image?: string;
-  entries: ZutopiaEntry[];
+  // 카테고리 안의 항목 목록을 가져오는 함수. "lives"처럼 Supabase 등
+  // 외부 데이터 소스를 쓸 수 있어 비동기다.
+  getEntries: () => Promise<ZutopiaEntry[]>;
 }
 
 // 즛토피아는 "지난 공연" 말고도 나중에 다른 대분류(예: 굿즈, 디스코그래피 등)가
 // 늘어날 수 있어서, 카테고리 하나 아래에 항목들이 딸리는 2단 구조로 둡니다.
 // URL도 그대로 /zutopia/<카테고리 슬러그>/<항목 슬러그>가 됩니다.
 //
-// 새 카테고리를 추가할 땐 이 배열에 { slug, label, description, entries: [] }를
-// 하나 더하면 되고, 카테고리 안에 새 항목을 추가할 땐 해당 entries에 추가한 뒤
-// [category]/[slug]/page.tsx의 CONTENT_BY_KEY에도 등록하면 됩니다.
+// 새 카테고리를 추가할 땐 이 배열에 { slug, label, description, getEntries }를
+// 하나 더하면 됩니다. 카테고리 안에 새 항목을 추가할 땐(예: Supabase에 공연을
+// 추가) 목록/탭에는 바로 나타나지만, 사진/공지 등 수동 콘텐츠가 필요하면
+// [category]/[slug]/page.tsx의 CONTENT_BY_KEY에도 등록해야 상세 페이지가
+// 보입니다.
 export const ZUTOPIA_CATEGORIES: ZutopiaCategory[] = [
   {
     slug: "lives",
     label: "지난 공연",
     description: "공연 및 세트리스트 정보",
     image: "/assets/zutopia/components/lives.webp",
-    entries: [],
+    getEntries: getLiveEntries,
   },
 ];
 

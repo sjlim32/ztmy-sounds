@@ -31,6 +31,8 @@ export default async function ZutopiaCategoryLayout(
   const category = getZutopiaCategory(slug);
   if (!category) notFound();
 
+  const entries = await category.getEntries();
+
   return (
     <div>
       <ZutopiaSectionHeader
@@ -38,7 +40,11 @@ export default async function ZutopiaCategoryLayout(
         description={category.description}
       />
 
-      <ZutopiaCategoryTabs category={category} />
+      <ZutopiaCategoryTabs
+        categorySlug={category.slug}
+        categoryLabel={category.label}
+        entries={entries}
+      />
 
       <div className="mt-8">{props.children}</div>
     </div>
