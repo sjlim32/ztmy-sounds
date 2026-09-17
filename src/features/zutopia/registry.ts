@@ -13,8 +13,8 @@ import type { ZutopiaCategory } from "@/features/zutopia/types";
 export const ZUTOPIA_CATEGORIES: ZutopiaCategory[] = [
   {
     slug: "lives",
-    label: "지난 공연",
-    description: "공연 및 세트리스트 정보",
+    label: "공연",
+    description: "지난 공연 목록 및 세트리스트 정보",
     image: "/assets/zutopia/components/lives.webp",
     getEntries: getLiveEntries,
   },
