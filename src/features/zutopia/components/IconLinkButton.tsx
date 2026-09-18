@@ -4,13 +4,9 @@ import { cn } from "@/lib/utils";
 type Tone = "youtube" | "guide" | "spotify" | "appleMusic";
 type Variant = "pill" | "solid";
 
-// variant="pill": 배경 없이 있다가 호버/포커스에만 은은하게 색이 붙는
-// 기본형(유튜브 MV). guide는 행 배경이 이미 어두워 은은한 색으로는 묻혀
-// 보이지 않아서, 다른 pill 톤과 달리 사이트 시그니처 그라데이션을 항상
-// 꽉 채운다(홈 화면 accent 바와 동일한 배색).
 const PILL_TONE_STYLES: Record<Tone, string> = {
   youtube:
-    "text-white/60 hover:bg-red-500/15 hover:text-red-400 focus-visible:bg-red-500/15 focus-visible:text-red-400",
+    "bg-linear-to-br from-red-700 to-red-400 text-white shadow-sm hover:brightness-110 focus-visible:brightness-110",
   guide:
     "bg-linear-to-br from-ztmy-purple to-ztmy-magenta text-white shadow-sm hover:brightness-110 focus-visible:brightness-110",
   spotify:
@@ -28,10 +24,10 @@ const SOLID_TONE_STYLES: Partial<Record<Tone, string>> = {
 };
 
 const SIZE_STYLES = {
-  sm: { square: "h-6 w-6", icon: "h-4 w-4" },
-  md: { square: "h-7 w-7", icon: "h-5 w-5" },
+  sm: { square: "h-6 w-6", icon: "h-3 w-3" },
+  md: { square: "h-7 w-7", icon: "h-4 w-4" },
   // md의 1.5배(세트리스트 스트리밍 버튼처럼 더 눈에 띄어야 할 때).
-  lg: { square: "h-11 w-11", icon: "h-7 w-7" },
+  lg: { square: "h-11 w-11", icon: "h-6 w-6" },
 } satisfies Record<string, { square: string; icon: string }>;
 
 interface IconLinkButtonProps {
