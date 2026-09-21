@@ -20,9 +20,11 @@ export function EventDetails({ event }: EventDetailsProps) {
         </SiteLink>
       </DetailField>
 
-      <DetailField label="티켓">
-        <LinkList items={event.url.ticket} />
-      </DetailField>
+      {event.url.ticket && (
+        <DetailField label="티켓">
+          <LinkList items={event.url.ticket} />
+        </DetailField>
+      )}
 
       {event.url.sub && (
         <DetailField label="이동 방법">
@@ -30,23 +32,26 @@ export function EventDetails({ event }: EventDetailsProps) {
         </DetailField>
       )}
 
-      <DetailField label="공식 사이트">
-        <span className="tablet:self-center flex flex-wrap items-center gap-x-4 gap-y-1">
-          {event.url.official.map((official) => {
-            const Icon = SOCIAL_PLATFORM_ICON[official.platform];
-            return (
-              <SiteLink
-                key={official.href}
-                href={official.href}
-                noIcon
-                aria-label={official.name}
-              >
-                <Icon className="h-4 w-4" />
-              </SiteLink>
-            );
-          })}
-        </span>
-      </DetailField>
+      {event.url.official && (
+        <DetailField label="링크">
+          <span className="tablet:self-center flex flex-wrap items-center gap-x-4 gap-y-1">
+            {event.url.official.map((official) => {
+              const Icon = SOCIAL_PLATFORM_ICON[official.platform];
+              return (
+                <SiteLink
+                  key={official.href}
+                  href={official.href}
+                  noIcon
+                  aria-label={official.name}
+                  className="flex items-center gap-1"
+                >
+                  공식 홈페이지 <Icon className="h-4 w-4" />
+                </SiteLink>
+              );
+            })}
+          </span>
+        </DetailField>
+      )}
     </ul>
   );
 }

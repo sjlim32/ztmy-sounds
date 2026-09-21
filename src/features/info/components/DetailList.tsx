@@ -21,9 +21,9 @@ export function DetailList({
   children: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-2 rounded-lg bg-black/30 p-3">
+    <div className="tablet:p-3 flex flex-col gap-2 rounded-lg bg-black/30 px-2 py-1">
       {title && <h3 className={cn("font-bold", titleClassName)}>{title}</h3>}
-      <ul className="space-y-2.5 text-white">{children}</ul>
+      <ul className="tablet:space-y-1 space-y-0.5 text-white">{children}</ul>
       {note && <p className="text-sm text-white/60">{note}</p>}
     </div>
   );

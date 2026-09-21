@@ -16,8 +16,8 @@ export type InfoEvent = {
   url: {
     main: string;
     place: string;
-    ticket: Url[];
-    official: SocialUrl[];
+    ticket?: Url[];
+    official?: SocialUrl[];
     sub?: Url[];
   };
   img: {

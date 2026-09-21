@@ -41,14 +41,20 @@ export const toGroupImages = (imgs) =>
 
 <section className="mt-6 flex flex-col gap-3">
   <DetailList title="축제 Area 일정" note="입장 무료">
-    <DetailField label="입장">09:30</DetailField>
-    <DetailField label="시작">10:00</DetailField>
-    <DetailField label="종료">17:30</DetailField>
+    <DetailField label="입장" className="flex-row">  
+      09:30
+    </DetailField>
+    <DetailField label="시작" className="flex-row">
+      10:00
+    </DetailField>
+    <DetailField label="종료" className="flex-row">
+      17:30
+    </DetailField>
   </DetailList>
 
   <DetailList title="공연 일정" note="※ 우천 결행 ・ 황천 중지">
-    <DetailField label="개장">15:30</DetailField>
-    <DetailField label="개연">17:30</DetailField>
+    <DetailField label="개장" className="flex-row">15:30</DetailField>
+    <DetailField label="개연" className="flex-row">17:30</DetailField>
   </DetailList>
 </section>
 
@@ -77,22 +83,37 @@ export const toGroupImages = (imgs) =>
           </SiteLink>
         </DetailField>
         <DetailField label="공식 사이트">
-          <SiteLink href="https://zutomayo.net/bunka-denrai/">
-            {`링크`}
+        <div className="tablet:flex-col tablet:gap-0 flex flex-col gap-1">
+          <span>나라에서의 개최에 있어서, 평상시 역을 이용의 여러분에게도 공연을 알고 주셨으면 하고, 출점.</span>
+          <span>키오스크적인 꽤 작은 매점이므로, "ZUTOMAYO STAND"라고 명명했습니다,</span>
+          <span>소품 계를 중심으로 일부 상품만 판매합니다, 들러 주시는 것만으로 기쁩니다.</span>
+          <strong className="text-ztmy-pink">Premium 회원 한정, 9월 22일 18시에 사전 예약 진행 (LINE 계정 필요)</strong>
+        </div>
+        </DetailField>
+
+        <DetailField label="링크" >
+        <div className="flex-row flex gap-1">
+          <SiteLink href="https://zutomayo.net/mart_nara202610/">
+            {`공식 사이트`}
           </SiteLink>
+          <span> / </span>
+          <SiteLink href="https://www.0101.co.jp/405/info/index.html?contents_id=1212&from=01_pc_anime-contents_article1209">
+            {`사전 예약`}
+          </SiteLink>
+          </div>
         </DetailField>
       </DetailList>
 
       <div className="flex items-center justify-center">
-        <ZoomableImage
-          src={sections["popup"][0].asset}
-          thumbnailWidth={1000}
+        <ZoomableImageGroup
+          images={toGroupImages(sections["ztmy-mart"])}
+          thumbnailWidth={800}
           thumbnailCrop="top"
         />
       </div>
 
-      <DetailList title="ZUTOMAYO STAND 야마토 사이다이지 역점" note="※ 10/10(토)・11(일)은 10:00 ~ 17:30">
-        <DetailField label="날짜">10/3(토) - 10/11(일))</DetailField>
+      <DetailList title="ZUTOMAYO STAND 야마토 사이다이지 역점" note="※ 10/10(토)・11(일)은 10:00 ~ 17:30, 점포 한정 상품 없음">
+        <DetailField label="날짜">10/3(토) - 10/11(일)</DetailField>
         <DetailField label="시간">10:00～20:00</DetailField>
         <DetailField label="장소">
           <SiteLink href="https://maps.app.goo.gl/51zaNuYxbRgBoTrg9">
@@ -104,19 +125,19 @@ export const toGroupImages = (imgs) =>
           <span>나라에서의 개최에 있어서, 평상시 역을 이용의 여러분에게도 공연을 알고 주셨으면 하고, 출점.</span>
           <span>키오스크적인 꽤 작은 매점이므로, "ZUTOMAYO STAND"라고 명명했습니다,</span>
           <span>소품 계를 중심으로 일부 상품만 판매합니다, 들러 주시는 것만으로 기쁩니다.</span>
-          <span className="tablet:text-white/80 tablet:text-sm text-xs">※ 점포 한정으로 판매하는 상품등은 없습니다</span>
         </div>
         </DetailField>
-        <DetailField label="공식 사이트">
+
+        <DetailField label="링크">
           <SiteLink href="https://zutomayo.net/bunka-denrai/">
-            {`링크`}
+            {`공식 사이트`}
           </SiteLink>
         </DetailField>
       </DetailList>
 
       <div className="flex items-center justify-center">
         <ZoomableImage
-          src={sections["popup"][1].asset}
+          src={sections["ztmy-stand"][0].asset}
           thumbnailWidth={1000}
           thumbnailCrop="top"
         />

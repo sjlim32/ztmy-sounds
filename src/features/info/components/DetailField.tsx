@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
 /**
@@ -9,14 +10,21 @@ import type { ReactNode } from "react";
 export function DetailField({
   label,
   children,
+  className,
 }: {
   label: string;
   children: ReactNode;
+  className?: string;
 }) {
   return (
     <li className="flex gap-2 before:text-white/30 before:content-['-']">
-      <div className="tablet:flex-row tablet:items-baseline tablet:gap-2 flex flex-col gap-1">
-        <span className="tablet:w-24 shrink-0">{label}:</span>
+      <div
+        className={cn(
+          "tablet:flex-row tablet:items-baseline tablet:gap-2 flex flex-col gap-1",
+          className,
+        )}
+      >
+        <span className="tablet:w-24 shrink-0">{label} :</span>
         {children}
       </div>
     </li>

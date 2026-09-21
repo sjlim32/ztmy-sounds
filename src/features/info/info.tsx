@@ -30,7 +30,7 @@ export const INFO_TAB_SECTIONS: Record<InfoTabId, string[]> = {
     "matsuri-collabo",
   ],
   collabo: ["zutomarosh", "matsuri-collabo"],
-  popup: ["popup"],
+  popup: ["popup", "ztmy-mart", "ztmy-stand"],
 };
 
 // 여기서 다루는 공연이 바뀌면(다음 공연 안내로 교체), src/data/event.ts의
@@ -54,17 +54,12 @@ export const INFORMATION: InfoEvent = {
     { id: "matsuri-sidestage", label: "사이드 스테이지" },
     { id: "matsuri-collabo", label: "나라현 콜라보 상품" },
     { id: "zutomarosh", label: "즛토마로슈" },
-    { id: "popup", label: "팝업" },
+    { id: "ztmy-mart", label: "팝업" },
+    { id: "ztmy-stand", label: "팝업" },
   ],
   url: {
     main: "https://zutomayo.net/bunka-denrai/",
     place: "https://maps.app.goo.gl/A4VAKugihbhTjSg48",
-    ticket: [
-      {
-        name: "공식 홈페이지",
-        href: "https://zutomayo.net/bunka-denrai/",
-      },
-    ],
     official: [
       {
         name: "홈페이지",
@@ -159,12 +154,17 @@ export const INFORMATION: InfoEvent = {
       {
         name: "pop-up",
         asset: "/assets/info/popup_01.webp",
-        section: "popup",
+        section: "ztmy-mart",
+      },
+      {
+        name: "pop-up",
+        asset: "/assets/info/popup_03.webp",
+        section: "ztmy-mart",
       },
       {
         name: "pop-up",
         asset: "/assets/info/popup_02.webp",
-        section: "popup",
+        section: "ztmy-stand",
       },
     ],
   },
