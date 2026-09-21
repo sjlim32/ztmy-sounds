@@ -20,14 +20,16 @@ const TALLY_FORM_ID = "814rXx";
 const SELF_MANAGED_FOOTER_PREFIXES = ["/zutopia", "/info", "/credits"];
 
 /**
- * 전역 저작권 푸터. 고정/sticky가 아니라 각 페이지 콘텐츠 맨 아래에
- * 일반 흐름으로 붙습니다.
+ * 전역 저작권 푸터.
  * 노래 가사 페이지(/guide/[songId])는 화면을 전부 가사에 쓰므로 표시하지 않습니다.
  *
  * inline=true는 페이지가 자기 스크롤 컨테이너 안에서 직접 렌더링할 때 쓴다
  * (ZutopiaScrollArea, info/credits 페이지) — 그 경로 자신이 바로
  * SELF_MANAGED_FOOTER_PREFIXES가 가리키는 예외이므로, 그 숨김 규칙을
- * 적용하지 않는다.
+ * 적용하지 않는다. 이 모드는 호출부에서 콘텐츠 div와 함께
+ * `tablet:flex tablet:min-h-full tablet:flex-col` wrapper로 감싸져, 모바일은
+ * 콘텐츠 맨 아래에 일반 흐름으로 붙고 태블릿 이상은 콘텐츠가 짧으면 화면
+ * 하단에 고정되고 콘텐츠가 길어지면 그 뒤로 밀려난다.
  */
 export function Footer({ inline = false }: { inline?: boolean } = {}) {
   const pathname = usePathname();

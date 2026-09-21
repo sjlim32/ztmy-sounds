@@ -50,20 +50,23 @@ export default function InfoPage() {
         }}
       />
 
-      <div
-        className={cn(
-          "mx-auto w-full px-3 pt-6 pb-10",
-          "tablet:max-w-4xl tablet:px-6 tablet:py-16",
-        )}
-      >
-        <HomeLink label="홈으로" className="tablet:inline-flex hidden" />
+      <div className={cn("tablet:flex", "tablet:min-h-full tablet:flex-col")}>
+        <div
+          className={cn(
+            "mx-auto w-full px-3 pt-6 pb-10",
+            "tablet:max-w-4xl tablet:px-6 tablet:py-16",
+            "tablet:flex-1",
+          )}
+        >
+          <HomeLink label="홈으로" className="tablet:inline-flex hidden" />
 
-        <div className="mt-6">
-          <InfoContent />
+          <div className="mt-6">
+            <InfoContent />
+          </div>
         </div>
-      </div>
 
-      <Footer inline />
+        <Footer inline />
+      </div>
     </main>
   );
 }

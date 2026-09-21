@@ -27,15 +27,18 @@ export function ZutopiaScrollArea({ children }: { children: ReactNode }) {
         "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
       )}
     >
-      <div
-        className={cn(
-          "mx-auto px-3 pt-6 pb-10",
-          "tablet:max-w-4xl tablet:px-6 tablet:py-16",
-        )}
-      >
-        {children}
+      <div className={cn("tablet:flex", "tablet:min-h-full tablet:flex-col")}>
+        <div
+          className={cn(
+            "mx-auto w-full px-3 pt-6 pb-10",
+            "tablet:max-w-4xl tablet:px-6 tablet:py-16",
+            "tablet:flex-1",
+          )}
+        >
+          {children}
+        </div>
+        <Footer inline />
       </div>
-      <Footer inline />
     </main>
   );
 }
