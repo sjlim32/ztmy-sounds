@@ -1,10 +1,14 @@
 import { ZoomableImage } from "@/components/ZoomableImage";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
+import { DetailField } from "@/features/info/components/DetailField";
+import { DetailList } from "@/features/info/components/DetailList";
 import {
   EventDetails,
   ImageLabel,
 } from "@/features/info/components/EventDetails";
-import { TableOfContents } from "@/features/info/components/TableOfContents";
+import { InfoTabProvider } from "@/features/info/components/InfoTabContext";
+import { InfoTabs } from "@/features/info/components/InfoTabs";
+import { TabSection } from "@/features/info/components/TabSection";
 import { groupImagesBySection } from "@/features/info/lib/group-images";
 import { INFORMATION } from "@/features/info/info";
 import { SiteLink } from "@/components/SiteLink";
@@ -33,148 +37,201 @@ export const toGroupImages = (imgs) =>
   {"모든 이미지들은 클릭 시 확대됩니다."}
 </div>
 
-<TableOfContents sections={INFORMATION.sections} />
-
 <EventDetails event={INFORMATION} />
 
-<section className="flex flex-col gap-3">
-  <ImageLabel id="event-photos" label="일정" />
+<section className="mt-6 flex flex-col gap-3">
+  <DetailList title="축제 Area 일정" note="입장 무료">
+    <DetailField label="입장">09:30</DetailField>
+    <DetailField label="시작">10:00</DetailField>
+    <DetailField label="종료">17:30</DetailField>
+  </DetailList>
 
-  <div className="flex flex-col">
-    <h3 className="font-bold text-ztmy-magenta">[ZUTOMAYO PREMIUM] 최속 선행 [마감]</h3>
-    <span> 접수 : 6/17(수) 21:30 ~ 7/5(일) 23:59 </span>
-    <span> 발표 및 지불 : 7/8(수) 18:00 ~ 7/11(토) 23:59 </span>
-    <span> 금액 : 최소 ¥ 12,000 </span>
-    <span className="text-sm text-white/60"> 유의 사항 : 1인 4매, 동행자는 비회원도 가능 (1-2인: 회원 1명, 3-4인: 회원 2명 필요)</span>
-  </div>
-  
-  <div className="flex flex-col">
-    <h3 className="font-bold text-ztmy-magenta">[ZUTOMAYO PREMIUM] 한정 2차 선행 [마감]</h3>
-    <span> 접수 : 7/8(수) 18:00 ~ 7/12(일) 23:59 </span>
-    <span> 발표 및 지불 : 7/16(목) 18:00 ~ 7/19(일) 23:59 </span>
-    <span> 금액 : 최소 ¥ 12,000 </span>
-    <span className="text-sm text-white/60">유의 사항 : Premium Area 업그레이드 신청 불가</span>
-  </div>
-  
-  <div className="flex flex-col">
-    <h3 className="font-bold text-ztmy-magenta">[ZUTOMAYO PREMIUM] Premium Area Upgrade 신청 [마감]</h3>
-    <span> 접수 : 8/26(수) 18:00 ~ 8/30(일) 23:59</span>
-    <span> 발표 및 지불 : 9/5(토) 18:00 ~ 9/7(월) 23:59 </span>
-    <span> 금액 : 최소 ¥ 3,000 </span>
-    <span className="text-sm text-white/60"> 유의 사항 : 양일은 각 공연마다 신청 필요, 선행 당첨 매수와 업그레이드 신청 매수가 동일하지 않으면 즉시 낙선</span>
-  </div>
-  
-  <div className="flex flex-col">
-    <h3 className="font-bold text-ztmy-pink">일반 최속 선행 [마감]</h3>
-    <span> 접수 : 7/16(목) 18:00 ~ 7/26(일) 23:59 </span>
-    <span> 발표 및 지불 : 7/30(목) 18:00 ~ 8/2(일) 23:59 </span>
-    <span> 금액 : 최소 ¥ 12,000 </span>
-    <span className="text-sm text-white/60">유의 사항 : 1인 4매, Standard Area 한정</span>
-  </div>
-  
-  <div className="flex flex-col">
-    <h3 className="font-bold text-ztmy-pink">일반 판매 (일본 번호 필수)</h3>
-    <span> 판매일자 : 9/19(토)~ </span>
-    <span> 금액 : Standard Area 최소 ¥ 12,000 / 후방 Free Area 최소 ¥ 6,500 (나라현 주민 ¥ 5,500 )</span>
-    <span className="text-sm text-white/60"> 유의사항 : 선착순 판매, Standard Area 및 후방 Free Area 한정 </span>
-  </div>
+  <DetailList title="공연 일정" note="※ 우천 결행 ・ 황천 중지">
+    <DetailField label="개장">15:30</DetailField>
+    <DetailField label="개연">17:30</DetailField>
+  </DetailList>
 </section>
 
-<section className="flex flex-col gap-3">
-  <ImageLabel id="notice" label="공연" />
-  <div className="tablet:flex-row flex flex-col items-center justify-center gap-3">
-    <ZoomableImageGroup
-      images={toGroupImages(sections["notice"])}
-      thumbnailWidth={600}
-      thumbnailCrop="top"
-    />
+<InfoTabProvider defaultTab="concert">
+  <InfoTabs />
+
+  <div className="flex flex-col gap-3">
+    <TabSection id="notice">
+      <ImageLabel id="notice" label="공연" />
+      <div className="tablet:flex-row flex flex-col items-center justify-center gap-3">
+        <ZoomableImageGroup
+          images={toGroupImages(sections["notice"])}
+          thumbnailWidth={600}
+          thumbnailCrop="top"
+        />
+      </div>
+    </TabSection>
+
+    <TabSection id="popup">
+      <DetailList title="ZUTOMAYO MART 출장소" note="※ 10/10일(토)·11일(일)은 11:00 ~ 21:00 (최종 입장 20:30)">
+        <DetailField label="날짜">10/3(토) - 10/12(월)</DetailField>
+        <DetailField label="시간">11:00～19:00 (최종 입장 18:30)</DetailField>
+        <DetailField label="장소">
+          <SiteLink href="https://maps.app.goo.gl/p35sGj94Bcv2dDiP6">
+            나라현 컨벤션 센터 2F 텐헤이 갤러리 〒630-8013 나라현 나라시 산조 오지 1 쵸메 691-1
+          </SiteLink>
+        </DetailField>
+        <DetailField label="공식 사이트">
+          <SiteLink href="https://zutomayo.net/bunka-denrai/">
+            {`링크`}
+          </SiteLink>
+        </DetailField>
+      </DetailList>
+
+      <div className="flex items-center justify-center">
+        <ZoomableImage
+          src={sections["popup"][0].asset}
+          thumbnailWidth={1000}
+          thumbnailCrop="top"
+        />
+      </div>
+
+      <DetailList title="ZUTOMAYO STAND 야마토 사이다이지 역점" note="※ 10/10(토)・11(일)은 10:00 ~ 17:30">
+        <DetailField label="날짜">10/3(토) - 10/11(일))</DetailField>
+        <DetailField label="시간">10:00～20:00</DetailField>
+        <DetailField label="장소">
+          <SiteLink href="https://maps.app.goo.gl/51zaNuYxbRgBoTrg9">
+            긴테츠 야마토-사이다이지 역 Time's Place 니시 다이지 17번 부스
+          </SiteLink>
+        </DetailField>
+        <DetailField label="설명">
+        <div className="tablet:flex-col tablet:gap-0 flex flex-col gap-1">
+          <span>나라에서의 개최에 있어서, 평상시 역을 이용의 여러분에게도 공연을 알고 주셨으면 하고, 출점.</span>
+          <span>키오스크적인 꽤 작은 매점이므로, "ZUTOMAYO STAND"라고 명명했습니다,</span>
+          <span>소품 계를 중심으로 일부 상품만 판매합니다, 들러 주시는 것만으로 기쁩니다.</span>
+          <span className="tablet:text-white/80 tablet:text-sm text-xs">※ 점포 한정으로 판매하는 상품등은 없습니다</span>
+        </div>
+        </DetailField>
+        <DetailField label="공식 사이트">
+          <SiteLink href="https://zutomayo.net/bunka-denrai/">
+            {`링크`}
+          </SiteLink>
+        </DetailField>
+      </DetailList>
+
+      <div className="flex items-center justify-center">
+        <ZoomableImage
+          src={sections["popup"][1].asset}
+          thumbnailWidth={1000}
+          thumbnailCrop="top"
+        />
+      </div>
+    </TabSection>
+
+    <TabSection id="map">
+      <ImageLabel id="map" label="전체 지도" />
+      <div className="flex items-center justify-center">
+        <ZoomableImage
+          src={sections["map"][0].asset}
+          thumbnailWidth={1000}
+          thumbnailCrop="top"
+        />
+      </div>
+    </TabSection>
+
+    <TabSection id="matsuri-map">
+      <ImageLabel id="matsuri-map" label="축제 AREA 지도" />
+      <div className="flex items-center justify-center">
+        <ZoomableImage
+          src={sections["matsuri-map"][0].asset}
+          thumbnailWidth={1000}
+          thumbnailCrop="top"
+        />
+      </div>
+    </TabSection>
+
+    <TabSection id="matsuri-notice">
+      <ImageLabel id="matsuri-notice" label="축제 공지" />
+      <SiteLink href="https://zutomayo.net/special/bunka-denrai/matsuri-area/">
+        {`공식 사이트 이동`}
+      </SiteLink>
+
+      <div className="flex items-center justify-center">
+        <ZoomableImage
+          src={sections["matsuri-notice"][0].asset}
+          thumbnailWidth={1000}
+          thumbnailCrop="top"
+          sourceHref="https://zutomayo.net/special/bunka-denrai/matsuri-area/"
+          sourceLabel="축제 공지 페이지 이동"
+          captionTarget="_blank"
+        />
+      </div>
+    </TabSection>
+
+    <TabSection id="matsuri-workshop">
+      <ImageLabel id="matsuri-workshop" label="워크숍 & 미니 게임" />
+      <div className="tablet:flex-row flex flex-col items-center justify-center gap-3">
+        <ZoomableImageGroup
+          images={toGroupImages(sections["matsuri-workshop"])}
+          thumbnailWidth={500}
+          thumbnailCrop="top"
+        />
+      </div>
+    </TabSection>
+
+    <TabSection id="matsuri-food">
+      <ImageLabel id="matsuri-food" label="음식 코너" />
+      <div className="flex items-center justify-center">
+        <ZoomableImage
+          src={sections["matsuri-food"][0].asset}
+          thumbnailWidth={1000}
+          thumbnailCrop="top"
+        />
+      </div>
+    </TabSection>
+
+    <TabSection id="matsuri-sidestage">
+      <ImageLabel id="matsuri-sidestage" label="사이드 스테이지" />
+      <div className="flex items-center justify-center">
+        <ZoomableImage
+          src={sections["matsuri-sidestage"][0].asset}
+          thumbnailWidth={1000}
+          thumbnailCrop="top"
+        />
+      </div>
+    </TabSection>
+
+    <TabSection id="zutomarosh">
+      <ImageLabel id="zutomarosh" label="즛토마로슈" />
+
+      <DetailList note="*각 점포 20장 한정, 소진 시 종료">
+        <DetailField label="판매 개시">26년 9월 22일</DetailField>
+        <DetailField label="장소">일본 내 세븐일레븐</DetailField>
+        <DetailField label="특전">오리지널 스티커 1종 (총 5종)</DetailField>
+        <DetailField label="특전 수령 방법">
+          26년 9월 24일 10:00 이후, 대상의 구미・캔디를 한 번에 2개(조합
+          자유) 구입
+        </DetailField>
+      </DetailList>
+
+      <div className="tablet:grid-cols-3 tablet:grid flex flex-col items-center justify-center gap-3">
+        <ZoomableImageGroup
+          images={toGroupImages(sections["zutomarosh"])}
+          thumbnailWidth={500}
+          thumbnailCrop="top"
+        />
+      </div>
+    </TabSection>
+
+    <TabSection id="matsuri-collabo">
+      <ImageLabel id="matsuri-collabo" label="나라현 콜라보 상품" />
+      <SiteLink href="https://zutomayo.net/special/bunka-denrai/#collab">
+        {`공식 사이트 이동`}
+      </SiteLink>
+
+      <div className="tablet:grid-cols-2 tablet:grid flex flex-col items-center justify-center gap-3">
+        <ZoomableImageGroup
+          images={toGroupImages(sections["matsuri-collabo"])}
+          thumbnailWidth={800}
+          thumbnailCrop="top"
+        />
+      </div>
+    </TabSection>
+
   </div>
-
-<ImageLabel id="popup" label="팝업" />
-<SiteLink href="https://zutomayo.net/bunka-denrai/">
-  {`공식 사이트 이동`}
-</SiteLink>
-
-<div className="tablet:flex-row flex flex-col items-center justify-center gap-3">
-  <ZoomableImageGroup
-    images={toGroupImages(sections["popup"])}
-    thumbnailWidth={500}
-    thumbnailCrop="top"
-  />
-</div>
-
-<ImageLabel id="map" label="전체 지도" />
-<div className="flex items-center justify-center">
-  <ZoomableImage
-    src={sections["map"][0].asset}
-    thumbnailWidth={1000}
-    thumbnailCrop="top"
-  />
-</div>
-
-<ImageLabel id="matsuri-map" label="축제 AREA 지도" />
-<div className="flex items-center justify-center">
-  <ZoomableImage
-    src={sections["matsuri-map"][0].asset}
-    thumbnailWidth={1000}
-    thumbnailCrop="top"
-  />
-</div>
-
-<ImageLabel id="matsuri-notice" label="축제 공지" />
-<SiteLink href="https://zutomayo.net/special/bunka-denrai/matsuri-area/">
-  {`공식 사이트 이동`}
-</SiteLink>
-
-<div className="flex items-center justify-center">
-  <ZoomableImage
-    src={sections["matsuri-notice"][0].asset}
-    thumbnailWidth={1000}
-    thumbnailCrop="top"
-    sourceHref="https://zutomayo.net/special/bunka-denrai/matsuri-area/"
-    sourceLabel="축제 공지 페이지 이동"
-    captionTarget="_blank"
-  />
-</div>
-
-<ImageLabel id="matsuri-workshop" label="WORK SHOP & MINI GAME" />
-<div className="tablet:flex-row flex flex-col items-center justify-center gap-3">
-  <ZoomableImageGroup
-    images={toGroupImages(sections["matsuri-workshop"])}
-    thumbnailWidth={500}
-    thumbnailCrop="top"
-  />
-</div>
-
-<ImageLabel id="matsuri-food" label="Food" />
-<div className="flex items-center justify-center">
-  <ZoomableImage
-    src={sections["matsuri-food"][0].asset}
-    thumbnailWidth={1000}
-    thumbnailCrop="top"
-  />
-</div>
-
-<ImageLabel id="matsuri-sidestage" label="Side Stage" />
-<div className="flex items-center justify-center">
-  <ZoomableImage
-    src={sections["matsuri-sidestage"][0].asset}
-    thumbnailWidth={1000}
-    thumbnailCrop="top"
-  />
-</div>
-
-<ImageLabel id="matsuri-collabo" label="Collaboration" />
-<SiteLink href="https://zutomayo.net/special/bunka-denrai/#collab">
-  {`공식 사이트 이동`}
-</SiteLink>
-
-<div className="tablet:grid-cols-2 tablet:grid flex flex-col items-center justify-center gap-3">
-  <ZoomableImageGroup
-    images={toGroupImages(sections["matsuri-collabo"])}
-    thumbnailWidth={800}
-    thumbnailCrop="top"
-  />
-</div>
-
-</section>
+</InfoTabProvider>

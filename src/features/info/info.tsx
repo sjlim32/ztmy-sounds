@@ -1,5 +1,38 @@
 import { InfoEvent } from "@/features/info/lib/types";
 
+/** 정보 페이지 상단 탭 4종. */
+export type InfoTabId = "concert" | "matsuri" | "collabo" | "popup";
+
+export const INFO_TABS: { id: InfoTabId; label: string }[] = [
+  { id: "concert", label: "공연" },
+  { id: "matsuri", label: "축제" },
+  { id: "collabo", label: "콜라보" },
+  { id: "popup", label: "팝업" },
+];
+
+/**
+ * 탭 → 그 탭에 속한 sections id 목록. sections 쪽에 tabs를 매달지 않고
+ * 이렇게 별도로 관리하는 이유는, section 하나가 여러 탭에 동시에 속할 수
+ * 있어서(예: "map"은 공연·축제 둘 다, "matsuri-collabo"는 축제·콜라보 둘
+ * 다) 그 소속 관계 자체를 탭 기준으로 한눈에 보는 편이 sections 배열
+ * 안에 흩어놓는 것보다 파악하기 쉽기 때문이다.
+ */
+export const INFO_TAB_SECTIONS: Record<InfoTabId, string[]> = {
+  concert: ["notice", "map"],
+  matsuri: [
+    "map",
+    "matsuri-map",
+    "matsuri",
+    "matsuri-notice",
+    "matsuri-workshop",
+    "matsuri-food",
+    "matsuri-sidestage",
+    "matsuri-collabo",
+  ],
+  collabo: ["zutomarosh", "matsuri-collabo"],
+  popup: ["popup"],
+};
+
 // 여기서 다루는 공연이 바뀌면(다음 공연 안내로 교체), src/data/event.ts의
 // originEvent/visitEvent 중 "지금 이 공연"에 해당하는 쪽도 함께 갱신해야
 // 합니다 — src/app/(pages)/info/page.tsx의 메타데이터(OG·Twitter·JSON-LD)가
@@ -16,11 +49,12 @@ export const INFORMATION: InfoEvent = {
     { id: "matsuri-map", label: "축제 AREA 지도" },
     { id: "matsuri", label: "축제 AREA" },
     { id: "matsuri-notice", label: "축제 공지" },
-    { id: "matsuri-workshop", label: "WORK SHOP & MINI GAME" },
-    { id: "matsuri-food", label: "Food" },
-    { id: "matsuri-sidestage", label: "Side Stage" },
-    { id: "matsuri-collabo", label: "Collabo" },
-    { id: "popup", label: "Pop Up" },
+    { id: "matsuri-workshop", label: "워크숍 & 미니 게임" },
+    { id: "matsuri-food", label: "음식 코너" },
+    { id: "matsuri-sidestage", label: "사이드 스테이지" },
+    { id: "matsuri-collabo", label: "나라현 콜라보 상품" },
+    { id: "zutomarosh", label: "즛토마로슈" },
+    { id: "popup", label: "팝업" },
   ],
   url: {
     main: "https://zutomayo.net/bunka-denrai/",
@@ -106,6 +140,21 @@ export const INFORMATION: InfoEvent = {
         name: "Collabo",
         asset: "/assets/info/matsuri_09.webp",
         section: "matsuri-collabo",
+      },
+      {
+        name: "zutomarosh",
+        asset: "/assets/info/zutomarosh_01.webp",
+        section: "zutomarosh",
+      },
+      {
+        name: "zutomarosh",
+        asset: "/assets/info/zutomarosh_02.webp",
+        section: "zutomarosh",
+      },
+      {
+        name: "zutomarosh",
+        asset: "/assets/info/zutomarosh_03.webp",
+        section: "zutomarosh",
       },
       {
         name: "pop-up",
