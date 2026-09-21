@@ -10,14 +10,34 @@ import { cn } from "@/lib/utils";
 
 const TALLY_FORM_ID = "814rXx";
 
+// 자기 스크롤 영역 안에 Footer를 직접 넣는 페이지들 — 루트 레이아웃의 전역
+// 인스턴스(placement 기본값, inline=false)는 이 경로들에서 대신 자기 자신을
+// 숨긴다. 그렇지 않으면 앱 셸(overflow-hidden 고정 레이아웃, 자세한 배경은
+// ZutopiaScrollArea 주석 참고)의 children 래퍼 바로 뒤에 항상 렌더링되는
+// 루트 Footer가, 그 페이지의 실제 스크롤 콘텐츠와 무관하게 화면 하단에
+// 고정된 것처럼 보인다 — 콘텐츠가 짧아도 항상 뷰포트 맨 아래, 콘텐츠가
+// 길어도 스크롤과 상관없이 항상 뷰포트 맨 아래에 떠 있는 문제.
+const SELF_MANAGED_FOOTER_PREFIXES = ["/zutopia", "/info", "/credits"];
+
 /**
  * 전역 저작권 푸터. 고정/sticky가 아니라 각 페이지 콘텐츠 맨 아래에
  * 일반 흐름으로 붙습니다.
  * 노래 가사 페이지(/guide/[songId])는 화면을 전부 가사에 쓰므로 표시하지 않습니다.
+ *
+ * inline=true는 페이지가 자기 스크롤 컨테이너 안에서 직접 렌더링할 때 쓴다
+ * (ZutopiaScrollArea, info/credits 페이지) — 그 경로 자신이 바로
+ * SELF_MANAGED_FOOTER_PREFIXES가 가리키는 예외이므로, 그 숨김 규칙을
+ * 적용하지 않는다.
  */
-export function Footer() {
+export function Footer({ inline = false }: { inline?: boolean } = {}) {
   const pathname = usePathname();
   if (pathname.startsWith("/guide/")) return null;
+  if (
+    !inline &&
+    SELF_MANAGED_FOOTER_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  ) {
+    return null;
+  }
 
   return (
     <footer

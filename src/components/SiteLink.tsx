@@ -29,7 +29,7 @@ export function SiteLink({
       target={isExternal ? "_blank" : undefined}
       rel={isExternal ? "noopener noreferrer" : undefined}
       className={cn(
-        "text-indigo-100 underline underline-offset-2 transition-colors hover:text-white",
+        "flex flex-row items-center text-indigo-100 underline underline-offset-2 transition-colors hover:text-white",
         disabled ? "cursor-not-allowed" : "cursor-pointer",
         className,
       )}

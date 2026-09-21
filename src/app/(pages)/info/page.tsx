@@ -3,6 +3,7 @@ import InfoContent from "@/features/info/info.mdx";
 import { originEvent } from "@/data/event";
 import { cn } from "@/lib/utils";
 import { buildMusicEventJsonLd } from "@/lib/structured-data";
+import { Footer } from "@/components/Footer";
 import { HomeLink } from "@/components/HomeLink";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 
@@ -61,6 +62,8 @@ export default function InfoPage() {
           <InfoContent />
         </div>
       </div>
+
+      <Footer inline />
     </main>
   );
 }
