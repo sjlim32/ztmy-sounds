@@ -158,7 +158,10 @@ function CheerText({ text, tag }: { text?: string; tag?: CallTag }) {
   return (
     <p
       data-role="cheer"
-      className="tablet:text-sm text-xs font-bold"
+      className={cn(
+        "text-xs leading-loose font-bold",
+        "tablet:text-sm tablet:leading-relaxed",
+      )}
       style={tag ? { color: TAG_BORDER_COLOR[tag] } : { color: "silver" }}
     >
       {renderTextParts(text, "cheer")}

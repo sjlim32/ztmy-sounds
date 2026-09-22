@@ -10,21 +10,26 @@ export const metadata: Metadata = {
 };
 
 interface Credit {
-  name: string;
   role: string;
+  name: string;
+  nameUrl?: string;
+  description?: string;
   url?: string;
 }
 
 const CREDITS: Credit[] = [
   {
-    name: "즛토마요 갤러리 - ♿ 내한 대비 샤모지 호응 가이드",
     role: "콜가이드",
-    url: "https://gall.dcinside.com/mgallery/board/view/?id=zuttomayo&no=231225&page=1",
+    name: "즛토마요 갤러리 - ♿ 내한 대비 샤모지 호응 가이드",
+    nameUrl:
+      "https://gall.dcinside.com/mgallery/board/view/?id=zuttomayo&no=231225&page=1",
   },
   {
-    name: "乱涂乱画ben",
     role: "마우스 커서 디자인",
-    url: "https://x.com/ben404yg",
+    name: "乱涂乱画ben",
+    nameUrl: "https://x.com/ben404yg",
+    description: "커서 원본 링크",
+    url: "https://ko-fi.com/s/22841fd8b0",
   },
 ];
 
@@ -49,7 +54,7 @@ export default function CreditsPage() {
 
         <h1 className="tablet:mt-6 mt-3 text-2xl font-bold text-white">출처</h1>
         <p className="mt-2 text-sm text-white/60">
-          사이트에 사용된 리소스 저작자분들입니다.
+          모든 리소스는 저작자의 허락을 받고 사용되었으며, 깊은 감사를 표합니다.
         </p>
 
         <ul className="tablet:mt-8 mt-3 space-y-3">
@@ -58,18 +63,35 @@ export default function CreditsPage() {
               <p className="font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
                 {credit.role}
               </p>
-              {credit.url ? (
-                <SiteLink
-                  href={credit.url}
-                  className="mt-1 inline-block text-lg font-semibold"
-                >
-                  {credit.name}
-                </SiteLink>
-              ) : (
-                <p className="mt-1 text-lg font-semibold text-white">
-                  {credit.name}
-                </p>
-              )}
+              <div>
+                {credit.nameUrl ? (
+                  <SiteLink
+                    href={credit.nameUrl}
+                    className="mt-1 inline-block text-base font-semibold"
+                  >
+                    {credit.name}
+                  </SiteLink>
+                ) : (
+                  <p className="mt-1 text-base font-semibold text-white">
+                    {credit.name}
+                  </p>
+                )}
+              </div>
+              <div>
+                {credit.description &&
+                  (credit.url ? (
+                    <SiteLink
+                      href={credit.url}
+                      className="mt-1 inline-block text-base font-semibold"
+                    >
+                      {credit.description}
+                    </SiteLink>
+                  ) : (
+                    <p className="mt-1 text-base font-semibold text-white">
+                      {credit.description}
+                    </p>
+                  ))}
+              </div>
             </li>
           ))}
         </ul>
