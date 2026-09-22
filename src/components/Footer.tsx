@@ -17,19 +17,26 @@ const TALLY_FORM_ID = "814rXx";
 // 루트 Footer가, 그 페이지의 실제 스크롤 콘텐츠와 무관하게 화면 하단에
 // 고정된 것처럼 보인다 — 콘텐츠가 짧아도 항상 뷰포트 맨 아래, 콘텐츠가
 // 길어도 스크롤과 상관없이 항상 뷰포트 맨 아래에 떠 있는 문제.
+//
+// <Footer inline />의 유일한 호출부는 PageScrollBody.tsx다 — 이 배열은 그
+// PageScrollBody를 쓰는 페이지들의 경로 prefix와 수동으로 동기화해야 한다.
+// 새 페이지에서 PageScrollBody를 쓰기 시작하면 그 경로 prefix를 여기에도
+// 반드시 추가해야 하고(안 그러면 루트 Footer와 이중 렌더), 반대로 여기서
+// prefix를 지우면 그 페이지도 PageScrollBody 사용을 그만둬야 한다(안
+// 그러면 footer가 아예 안 뜸). 현재 PageScrollBody 사용처: ZutopiaScrollArea,
+// app/(pages)/info/page.tsx, app/(pages)/credits/page.tsx.
 const SELF_MANAGED_FOOTER_PREFIXES = ["/zutopia", "/info", "/credits"];
 
 /**
  * 전역 저작권 푸터.
  * 노래 가사 페이지(/guide/[songId])는 화면을 전부 가사에 쓰므로 표시하지 않습니다.
  *
- * inline=true는 페이지가 자기 스크롤 컨테이너 안에서 직접 렌더링할 때 쓴다
- * (ZutopiaScrollArea, info/credits 페이지) — 그 경로 자신이 바로
- * SELF_MANAGED_FOOTER_PREFIXES가 가리키는 예외이므로, 그 숨김 규칙을
- * 적용하지 않는다. 이 모드는 호출부에서 콘텐츠 div와 함께
- * `tablet:flex tablet:min-h-full tablet:flex-col` wrapper로 감싸져, 모바일은
- * 콘텐츠 맨 아래에 일반 흐름으로 붙고 태블릿 이상은 콘텐츠가 짧으면 화면
- * 하단에 고정되고 콘텐츠가 길어지면 그 뒤로 밀려난다.
+ * inline=true는 PageScrollBody.tsx가 자기 스크롤 컨테이너 안에서 직접
+ * 렌더링할 때 쓴다 — 그 경로 자신이 바로 SELF_MANAGED_FOOTER_PREFIXES가
+ * 가리키는 예외이므로, 그 숨김 규칙을 적용하지 않는다. PageScrollBody가
+ * 콘텐츠를 `tablet:flex tablet:min-h-full tablet:flex-col` wrapper로 감싸서,
+ * 모바일은 콘텐츠 맨 아래에 일반 흐름으로 붙고 태블릿 이상은 콘텐츠가
+ * 짧으면 화면 하단에 고정되고 콘텐츠가 길어지면 그 뒤로 밀려난다.
  */
 export function Footer({ inline = false }: { inline?: boolean } = {}) {
   const pathname = usePathname();

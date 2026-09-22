@@ -26,7 +26,14 @@ src/
         not-yet/            # 아직 가이드 미공개곡 데이터
         origin/             # 원본(수정 전) 가사/정보 백업
     home/                   # 홈 화면 (Header, Countdown, MoonPhase 등)
-    info/                   # /info 페이지 콘텐츠 (info.mdx + 렌더 컴포넌트)
+    info/                   # /info 페이지 콘텐츠 (info.mdx + 렌더 컴포넌트).
+                             # 탭(공연/축제/콜라보/팝업) 소속은 info.tsx의
+                             # INFO_TABS/INFO_TAB_SECTIONS 하나로만 관리하고
+                             # (섹션 쪽엔 안 붙임 — 섹션 하나가 여러 탭에
+                             # 동시에 속할 수 있어서), InfoTabs/TabSection/
+                             # InfoTabContext가 이를 읽어 렌더링한다.
+                             # DetailField/DetailList(라벨: 값 카드)는
+                             # 티켓/굿즈 안내처럼 반복되는 목록에 재사용한다.
     notice/                 # 공지사항 (MDX 콘텐츠 + 데이터 + 노출/해제 로직)
       content/              # 공지 MDX 프로즈
     zutopia/                 # 즛토피아 허브: 카테고리→항목 2단 구조(registry.ts) +
@@ -43,6 +50,10 @@ src/
   components/               # 여러 기능이 공유하는 전역 컴포넌트
     mobile/                 # 모바일 전용 전역 컴포넌트
     icons/                  # 커스텀 SVG 아이콘 (외부 아이콘 라이브러리 미사용)
+    PageScrollBody.tsx       # 스크롤 페이지(/info, /credits, /zutopia) 공용
+                             # 안쪽 레이아웃 — 콘텐츠 + <Footer inline />
+                             # 배치를 한 곳에서 관리 (아래 "페이지 스크롤 +
+                             # Footer" 참고)
   data/                     # 사이트 전역 데이터 (특정 기능에 속하지 않음)
     artist.ts               # 아티스트 정보
     event.ts                # 공연 정보
@@ -50,6 +61,8 @@ src/
   lib/                      # 여러 기능이 공유하는 프레임워크 비의존 로직
     supabase/                # Supabase 클라이언트 (빌드 타임 전용 — 아래 "곡 데이터" 참고)
     seo.ts                   # 사이트 전역 메타데이터 상수 (SITE_NAME 등)
+    use-install-prompt.ts    # PWA beforeinstallprompt/appinstalled 공용 훅
+                             # (아래 "PWA 설치 프롬프트" 참고)
   fonts/                    # 로컬 폰트 파일 (LINE Seed KR, 851MkPOP)
 ```
 
@@ -155,6 +168,48 @@ src/
   빠뜨리면 404가 납니다.
 - 배경 이미지는 `public/backgrounds/`, PWA/매니페스트 아이콘은 `public/icons/`,
   Open Graph 이미지는 `public/og/`, 폰트는 `public/fonts/`에 둡니다.
+
+## 페이지 스크롤 레이아웃 + Footer
+
+- 앱 셸(`body`)은 스크롤되지 않는 고정 레이아웃입니다(`docs/RULES.md` 참고).
+  자기 `<main>`에서 직접 스크롤을 여는 페이지(`/info`, `/credits`,
+  `/zutopia`)는 안쪽 레이아웃을 직접 짜지 말고 `src/components/PageScrollBody.tsx`를
+  씁니다 — 모바일은 콘텐츠 바로 다음에 Footer가 일반 흐름으로 붙고, 태블릿
+  이상은 콘텐츠가 짧으면 화면 하단에 고정되고 길어지면 밀려나는 동작을
+  한 곳에서 관리합니다.
+- `PageScrollBody`는 내부적으로 `<Footer inline />`을 렌더링합니다. 이 방식을
+  새로 쓰는 페이지를 추가하면 `src/components/Footer.tsx`의
+  `SELF_MANAGED_FOOTER_PREFIXES`에도 그 경로 prefix를 반드시 추가하세요 —
+  안 그러면 루트 레이아웃의 전역 Footer와 이중으로 렌더링됩니다.
+
+## PWA 설치 프롬프트
+
+- `beforeinstallprompt`/`appinstalled` 구독 로직은 `src/lib/use-install-prompt.ts`의
+  `useInstallPrompt()` 하나로 관리합니다. PC 코너 바(`InstallShareBar`)와
+  모바일 배너(`InstallPromptBanner`)는 UI만 다르고 이 배관은 공유합니다 —
+  새로 설치 유도 UI를 추가해도 이 이벤트 구독을 다시 만들지 말고 훅을
+  재사용하세요.
+- iOS Safari는 `beforeinstallprompt` 자체를 지원하지 않아 프로그래밍적으로
+  설치를 띄울 방법이 없습니다 — iOS에서는 "공유 버튼 → 홈 화면에 추가"
+  안내 텍스트로 대체해야 합니다(`isIos()` 판별 필요, iPadOS 13+는 데스크톱
+  Safari와 동일한 UA를 보내 `navigator.platform === "MacIntel" &&
+  navigator.maxTouchPoints > 1` 조합으로만 구분 가능 — `navigator.platform`이
+  타입 정의상 deprecated로 뜨지만 이 용도엔 대안이 없어 의도된 사용입니다).
+
+## 브라우저 API 기반 초기 상태
+
+- `Date.now()`, `navigator.*`, `localStorage` 등 클라이언트에서만 확정되는
+  값을 `useState`의 초기값으로 직접 계산하면 안 됩니다 — 이 사이트는
+  `output: "export"`라 HTML이 빌드 시점에 고정되는데, 빌드 이후 그 값이
+  달라진 채로 하이드레이션하면 서버(빌드 시점) 렌더와 클라이언트 렌더가
+  달라져 hydration mismatch가 납니다. 항상 시간/환경과 무관한 고정값으로
+  초기화하고, `useEffect` 안에서 한 번 보정하세요(예:
+  `page.tsx`의 `getInitialTabletOpenAccent`, `InstallPromptBanner`의
+  iOS/dismissed 판별).
+- 이 패턴은 `react-hooks/set-state-in-effect` 린트 규칙과 충돌합니다(effect
+  본문에서 직접 `setState`를 부르지 말라는 규칙) — 위 사유로 불가피한
+  경우, 이유를 적은 `// eslint-disable-next-line react-hooks/set-state-in-effect --
+  ...` 주석과 함께 예외 처리하세요.
 
 ## Git / 커밋
 

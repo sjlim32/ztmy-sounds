@@ -42,7 +42,7 @@ export function NoticeAccordionItem({
         aria-controls={contentId}
         className={cn(
           "group relative flex w-full flex-col gap-1 py-2 text-left focus-visible:outline-none",
-          "table:gap-2 tablet:py-4",
+          "tablet:gap-2 tablet:py-4",
         )}
       >
         <span

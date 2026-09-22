@@ -3,8 +3,9 @@ import InfoContent from "@/features/info/info.mdx";
 import { originEvent } from "@/data/event";
 import { cn } from "@/lib/utils";
 import { buildMusicEventJsonLd } from "@/lib/structured-data";
-import { Footer } from "@/components/Footer";
+import { INFO_SCROLL_CONTAINER_ID } from "@/features/info/info";
 import { HomeLink } from "@/components/HomeLink";
+import { PageScrollBody } from "@/components/PageScrollBody";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 
 // /info는 현재 안내 중인 공연(INFORMATION, info.tsx)의 상세 정보를 보여주는
@@ -13,7 +14,6 @@ import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 // 페이지가 안내하는 공연이 바뀌면 event.ts에서 어느 이벤트가 "현재"인지도
 // 함께 바뀌니 여기도 맞춰 갱신해야 합니다.
 const description = `${originEvent.tourName} 공연 일정과 장소, 유의사항 안내.`;
-const SCROLL_CONTAINER_ID = "info-scroll-container";
 
 export const metadata: Metadata = {
   title: "공연 정보",
@@ -34,14 +34,14 @@ export const metadata: Metadata = {
 export default function InfoPage() {
   return (
     <main
-      id={SCROLL_CONTAINER_ID}
+      id={INFO_SCROLL_CONTAINER_ID}
       className={cn(
         "min-h-0 w-full flex-1 overflow-y-auto scroll-smooth",
         "scrollbar-thin [scrollbar-color:transparent_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
         "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
       )}
     >
-      <ScrollToTopButton containerId={SCROLL_CONTAINER_ID} />
+      <ScrollToTopButton containerId={INFO_SCROLL_CONTAINER_ID} />
 
       <script
         type="application/ld+json"
@@ -50,23 +50,18 @@ export default function InfoPage() {
         }}
       />
 
-      <div className={cn("tablet:flex", "tablet:min-h-full tablet:flex-col")}>
-        <div
-          className={cn(
-            "mx-auto w-full px-3 pt-6 pb-10",
-            "tablet:max-w-4xl tablet:px-6 tablet:py-16",
-            "tablet:flex-1",
-          )}
-        >
-          <HomeLink label="홈으로" className="tablet:inline-flex hidden" />
+      <PageScrollBody
+        innerClassName={cn(
+          "mx-auto w-full px-3 pt-6 pb-10",
+          "tablet:max-w-4xl tablet:px-6 tablet:py-16",
+        )}
+      >
+        <HomeLink label="홈으로" className="tablet:inline-flex hidden" />
 
-          <div className="mt-6">
-            <InfoContent />
-          </div>
+        <div className="mt-6">
+          <InfoContent />
         </div>
-
-        <Footer inline />
-      </div>
+      </PageScrollBody>
     </main>
   );
 }

@@ -1,16 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/seo";
+import { useInstallPrompt } from "@/lib/use-install-prompt";
 import { DownloadIcon } from "@/components/icons/DownloadIcon";
 import { ShareIcon } from "@/components/icons/ShareIcon";
-
-// 표준 lib.dom.d.ts에 아직 없는 PWA 설치 프롬프트 이벤트.
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-}
 
 const PILL_CLASS =
   "flex items-center gap-1.5 rounded-full border border-white/15 bg-black/40 p-2.5 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:border-ztmy-magenta/60 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none";
@@ -25,42 +20,8 @@ const PILL_CLASS =
  * 텍스트 피드백으로 대체한다.
  */
 export function InstallShareBar() {
-  const [installEvent, setInstallEvent] =
-    useState<BeforeInstallPromptEvent | null>(null);
+  const { canInstall, promptInstall } = useInstallPrompt();
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    const isStandalone = window.matchMedia(
-      "(display-mode: standalone)",
-    ).matches;
-    if (isStandalone) return;
-
-    const handleBeforeInstallPrompt = (event: Event) => {
-      event.preventDefault();
-      setInstallEvent(event as BeforeInstallPromptEvent);
-    };
-    const handleAppInstalled = () => setInstallEvent(null);
-
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    window.addEventListener("appinstalled", handleAppInstalled);
-    return () => {
-      window.removeEventListener(
-        "beforeinstallprompt",
-        handleBeforeInstallPrompt,
-      );
-      window.removeEventListener("appinstalled", handleAppInstalled);
-    };
-  }, []);
-
-  const handleInstall = async () => {
-    if (!installEvent) return;
-    await installEvent.prompt();
-    // 프롬프트는 한 번 쓰면 재사용 불가 — 수락/거절 결과와 무관하게 비워서
-    // 버튼을 다시 누르면 (재발급된 이벤트가 없는 한) 조용히 아무 일도 안
-    // 일어나는 대신, 다음 beforeinstallprompt를 기다리게 한다.
-    await installEvent.userChoice;
-    setInstallEvent(null);
-  };
 
   const handleShare = async () => {
     const shareData = {
@@ -87,8 +48,8 @@ export function InstallShareBar() {
 
   return (
     <div className="pc:flex fixed bottom-4 left-4 z-20 hidden items-center gap-2">
-      {installEvent && (
-        <button type="button" onClick={handleInstall} className={PILL_CLASS}>
+      {canInstall && (
+        <button type="button" onClick={promptInstall} className={PILL_CLASS}>
           <DownloadIcon className="h-5 w-5" />
         </button>
       )}

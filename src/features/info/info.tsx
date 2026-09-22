@@ -1,5 +1,10 @@
 import { InfoEvent } from "@/features/info/lib/types";
 
+// app/(pages)/info/page.tsx의 <main> id이자 ScrollToTopButton의
+// containerId — InfoTabs가 탭 전환 시 이 컨테이너를 맨 위로 스크롤하는데,
+// 두 곳에서 같은 문자열을 따로 적으면 어긋날 수 있어 여기 하나로 둔다.
+export const INFO_SCROLL_CONTAINER_ID = "info-scroll-container";
+
 /** 정보 페이지 상단 탭 4종. */
 export type InfoTabId = "concert" | "matsuri" | "collabo" | "popup";
 
@@ -22,7 +27,6 @@ export const INFO_TAB_SECTIONS: Record<InfoTabId, string[]> = {
   matsuri: [
     "map",
     "matsuri-map",
-    "matsuri",
     "matsuri-notice",
     "matsuri-workshop",
     "matsuri-food",
@@ -47,7 +51,6 @@ export const INFORMATION: InfoEvent = {
     { id: "notice", label: "공연" },
     { id: "map", label: "전체 지도" },
     { id: "matsuri-map", label: "축제 AREA 지도" },
-    { id: "matsuri", label: "축제 AREA" },
     { id: "matsuri-notice", label: "축제 공지" },
     { id: "matsuri-workshop", label: "워크숍 & 미니 게임" },
     { id: "matsuri-food", label: "음식 코너" },

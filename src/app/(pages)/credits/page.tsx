@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cn } from "@/lib/utils";
-import { Footer } from "@/components/Footer";
 import { HomeLink } from "@/components/HomeLink";
+import { PageScrollBody } from "@/components/PageScrollBody";
 import { SiteLink } from "@/components/SiteLink";
 
 export const metadata: Metadata = {
@@ -39,48 +39,41 @@ export default function CreditsPage() {
         "min-h-0 w-full flex-1 overflow-y-auto scroll-smooth",
       )}
     >
-      <div className={cn("tablet:flex", "tablet:min-h-full tablet:flex-col")}>
-        <div
-          className={cn(
-            "mx-auto w-full px-3",
-            "tablet:max-w-2xl tablet:px-6 tablet:py-16",
-            "tablet:flex-1",
-          )}
-        >
-          <HomeLink label="홈으로" className="tablet:inline-flex hidden" />
+      <PageScrollBody
+        innerClassName={cn(
+          "mx-auto w-full px-3",
+          "tablet:max-w-2xl tablet:px-6 tablet:py-16",
+        )}
+      >
+        <HomeLink label="홈으로" className="tablet:inline-flex hidden" />
 
-          <h1 className="tablet:mt-6 mt-3 text-2xl font-bold text-white">
-            출처
-          </h1>
-          <p className="mt-2 text-sm text-white/60">
-            사이트에 사용된 리소스 저작자분들입니다.
-          </p>
+        <h1 className="tablet:mt-6 mt-3 text-2xl font-bold text-white">출처</h1>
+        <p className="mt-2 text-sm text-white/60">
+          사이트에 사용된 리소스 저작자분들입니다.
+        </p>
 
-          <ul className="tablet:mt-8 mt-3 space-y-3">
-            {CREDITS.map((credit) => (
-              <li key={credit.name} className="rounded-lg bg-black/30 p-4">
-                <p className="font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
-                  {credit.role}
+        <ul className="tablet:mt-8 mt-3 space-y-3">
+          {CREDITS.map((credit) => (
+            <li key={credit.name} className="rounded-lg bg-black/30 p-4">
+              <p className="font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
+                {credit.role}
+              </p>
+              {credit.url ? (
+                <SiteLink
+                  href={credit.url}
+                  className="mt-1 inline-block text-lg font-semibold"
+                >
+                  {credit.name}
+                </SiteLink>
+              ) : (
+                <p className="mt-1 text-lg font-semibold text-white">
+                  {credit.name}
                 </p>
-                {credit.url ? (
-                  <SiteLink
-                    href={credit.url}
-                    className="mt-1 inline-block text-lg font-semibold"
-                  >
-                    {credit.name}
-                  </SiteLink>
-                ) : (
-                  <p className="mt-1 text-lg font-semibold text-white">
-                    {credit.name}
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <Footer inline />
-      </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      </PageScrollBody>
     </main>
   );
 }
