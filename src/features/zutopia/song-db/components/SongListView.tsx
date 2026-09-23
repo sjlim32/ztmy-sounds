@@ -11,9 +11,11 @@ import {
   groupSongs,
 } from "@/features/zutopia/song-db/song-album-grouping";
 import { DIRECTION_OPTIONS } from "@/features/zutopia/song-db/sort";
+import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
 import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 import { SongDbDrawer } from "@/features/zutopia/song-db/components/SongDbDrawer";
 import { SongDetailPanel } from "@/features/zutopia/song-db/components/SongDetailPanel";
+import { UnreleasedBadge } from "@/features/zutopia/song-db/components/UnreleasedBadge";
 import { SortFilterBar } from "@/features/zutopia/components/SortFilterBar";
 import type {
   SongGroupBy,
@@ -193,6 +195,7 @@ export function SongListView({ songs }: SongListViewProps) {
                       }
                     };
                     const hasIcons = song.music_video_url || song.guideHref;
+                    const { isUnreleased } = parseSongMetadata(song.metadata);
 
                     return (
                       <div
@@ -215,7 +218,7 @@ export function SongListView({ songs }: SongListViewProps) {
                             "focus-visible:outline-ztmy-magenta focus-visible:outline-2 focus-visible:-outline-offset-2",
                           )}
                         >
-                          <span className="shrink-0">
+                          <span className="shrink-0 rounded bg-black/40">
                             {coverSrc ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img
@@ -232,13 +235,16 @@ export function SongListView({ songs }: SongListViewProps) {
                             )}
                           </span>
                           <span className="min-w-0 flex-1">
-                            <span
-                              className={cn(
-                                "block min-w-0 truncate text-base leading-tight font-medium text-white",
-                                "tablet:text-lg",
-                              )}
-                            >
-                              {song.title}
+                            <span className="flex min-w-0 items-center gap-2">
+                              <span
+                                className={cn(
+                                  "min-w-0 truncate text-base leading-tight font-medium text-white",
+                                  "tablet:text-lg",
+                                )}
+                              >
+                                {song.title}
+                              </span>
+                              {isUnreleased && <UnreleasedBadge />}
                             </span>
                             <span
                               className={cn(

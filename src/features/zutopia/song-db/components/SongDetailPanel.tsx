@@ -2,7 +2,9 @@ import { cn } from "@/lib/utils";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { ALBUM_TYPE_SHORT_LABEL } from "@/features/zutopia/song-db/labels";
 import { getSongCoverSrc } from "@/features/zutopia/song-db/song-album-grouping";
+import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
 import { DrawerCloseButton } from "@/features/zutopia/song-db/components/DrawerCloseButton";
+import { UnreleasedBadge } from "@/features/zutopia/song-db/components/UnreleasedBadge";
 import type {
   Album,
   SongAlbumRef,
@@ -10,7 +12,7 @@ import type {
 } from "@/features/zutopia/song-db/types";
 
 /**
- * SongDbDrawer가 곡 상세로 여는 내용 — 커버, 제목/가사 크레딧, 응원 가이드/MV
+ * SongDbDrawer가 곡 상세로 여는 내용 — 커버, 제목/가사 크레딧, 곡 설명, 응원 가이드/MV
  * 링크, 이 곡이 실린 다른 앨범 목록.
  */
 export function SongDetailPanel({
@@ -21,6 +23,7 @@ export function SongDetailPanel({
   const coverSrc = getSongCoverSrc(song);
   const hasArranger = (song.arranger?.length ?? 0) > 0;
   const hasMovieDirector = (song.movie_director?.length ?? 0) > 0;
+  const { description, isUnreleased } = parseSongMetadata(song.metadata);
 
   const contextAlbum = contextAlbumSlug
     ? (song.albums.find((album) => album.slug === contextAlbumSlug) ?? null)
@@ -42,7 +45,7 @@ export function SongDetailPanel({
           <img
             src={coverSrc}
             alt={song.title}
-            className="aspect-square h-6/7 max-h-full w-auto object-contain"
+            className="aspect-square h-6/7 max-h-full w-auto bg-black/40 object-contain"
           />
         ) : (
           <div className="h-full w-full bg-white/5" />
@@ -80,14 +83,17 @@ export function SongDetailPanel({
               <span>{song.title_en}</span>
               <span>{song.title_ko}</span>
             </div>
-            <p
-              className={cn(
-                "mt-1 font-mono text-sm text-white/50",
-                "tablet:text-base",
-              )}
-            >
-              {song.release_date}
-            </p>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <p
+                className={cn(
+                  "font-mono text-sm text-white/50",
+                  "tablet:text-base",
+                )}
+              >
+                {song.release_date}
+              </p>
+              {isUnreleased && <UnreleasedBadge />}
+            </div>
           </div>
 
           <DrawerCloseButton onClick={onClose} />
@@ -103,6 +109,17 @@ export function SongDetailPanel({
             {hasArranger && <p>편곡 - {song.arranger!.join(", ")}</p>}
             {hasMovieDirector && <p>M/V - {song.movie_director!.join(", ")}</p>}
           </div>
+        )}
+
+        {description && (
+          <p
+            className={cn(
+              "mt-3 text-sm leading-relaxed whitespace-pre-line text-white/80",
+              "tablet:text-base",
+            )}
+          >
+            {description}
+          </p>
         )}
 
         {song.guideHref && (
