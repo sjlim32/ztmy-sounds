@@ -5,6 +5,7 @@ import {
   ZUTOPIA_CATEGORIES,
   getZutopiaCategory,
 } from "@/features/zutopia/registry";
+import { LiveListView } from "@/features/zutopia/lives/components/LiveListView";
 
 export function generateStaticParams() {
   return ZUTOPIA_CATEGORIES.map((category) => ({ category: category.slug }));
@@ -25,6 +26,14 @@ export default async function ZutopiaCategoryPage(
         아직 등록된 항목이 없습니다.
       </p>
     );
+  }
+
+  // "lives" 카테고리는 형식(페스티벌/단독 공연)·연도 필터가 있는 전용 목록
+  // 뷰를 쓴다 — 다른 카테고리가 생기면 그때 자기 형식에 맞는 뷰를 고르면
+  // 되고, 지금은 이 분기 하나로 충분하다(카테고리가 하나뿐이라 범용 플러그인
+  // 구조를 미리 만들지 않는다).
+  if (category.slug === "lives") {
+    return <LiveListView categorySlug={category.slug} entries={entries} />;
   }
 
   return (

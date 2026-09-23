@@ -14,7 +14,7 @@ import { DIRECTION_OPTIONS } from "@/features/zutopia/song-db/sort";
 import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 import { SongDbDrawer } from "@/features/zutopia/song-db/components/SongDbDrawer";
 import { SongDetailPanel } from "@/features/zutopia/song-db/components/SongDetailPanel";
-import { SortFilterBar } from "@/features/zutopia/song-db/components/SortFilterBar";
+import { SortFilterBar } from "@/features/zutopia/components/SortFilterBar";
 import type {
   SongGroupBy,
   SongWithAlbums,

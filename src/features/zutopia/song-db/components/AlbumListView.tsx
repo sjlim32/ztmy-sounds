@@ -8,7 +8,7 @@ import { groupAlbums } from "@/features/zutopia/song-db/song-album-grouping";
 import { DIRECTION_OPTIONS } from "@/features/zutopia/song-db/sort";
 import { AlbumDetailPanel } from "@/features/zutopia/song-db/components/AlbumDetailPanel";
 import { SongDbDrawer } from "@/features/zutopia/song-db/components/SongDbDrawer";
-import { SortFilterBar } from "@/features/zutopia/song-db/components/SortFilterBar";
+import { SortFilterBar } from "@/features/zutopia/components/SortFilterBar";
 import type {
   AlbumGroupBy,
   AlbumWithSongs,
