@@ -5,6 +5,7 @@ import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 import { formatLiveDate } from "./data";
+import { LiveTypeBadge } from "./LiveTypeBadge";
 import { SongLink } from "./SongLink";
 import type { Live, LiveDetail } from "./types";
 
@@ -47,20 +48,6 @@ function splitVenue(venue: string): { main: string; suffix: string | null } {
   if (!match) return { main: venue, suffix: null };
   return { main: match[1], suffix: match[2] };
 }
-
-// 공연 타입 배지 점 색 — 페스티벌/콘서트/행사를 한눈에 구분하는 용도라
-// 텍스트는 항상 흰색으로 고정하고(배경색 대비 걱정 없이) 점 색으로만
-// 구분한다.
-const LIVE_TYPE_LABEL: Record<Live["type"], string> = {
-  FESTIVAL: "페스티벌",
-  CONCERT: "콘서트",
-  EVENT: "행사",
-};
-const LIVE_TYPE_DOT: Record<Live["type"], string> = {
-  FESTIVAL: "bg-ztmy-pink",
-  CONCERT: "bg-ztmy-magenta",
-  EVENT: "bg-ztmy-sky",
-};
 
 /**
  * CONTENT_BY_KEY에 이 공연 전용 콘텐츠가 없을 때 쓰는 기본 상세 뷰 —
@@ -108,22 +95,7 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
               "tablet:max-h-[65vh]",
             )}
           />
-          <span
-            className={cn(
-              "absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1 backdrop-blur-sm",
-              "font-mono text-xs tracking-[0.2em] text-white uppercase",
-              "tablet:top-4 tablet:left-4 tablet:px-3.5 tablet:py-1.5 tablet:text-sm",
-            )}
-          >
-            <span
-              className={cn(
-                "h-1.5 w-1.5 rounded-full",
-                "tablet:h-2 tablet:w-2",
-                LIVE_TYPE_DOT[live.type],
-              )}
-            />
-            {LIVE_TYPE_LABEL[live.type]}
-          </span>
+          <LiveTypeBadge type={live.type} />
         </div>
       )}
 
