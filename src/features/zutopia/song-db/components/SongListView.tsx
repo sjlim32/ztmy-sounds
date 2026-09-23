@@ -107,8 +107,8 @@ export function SongListView({ songs }: SongListViewProps) {
       ) : (
         <div className="flex flex-col gap-8">
           {groupSongs(songs, groupBy, sortDirection).map((group) => {
-            const albumSubtitle = group.album
-              ? `${ALBUM_TYPE_SHORT_LABEL[group.album.album_type]} ${group.album.album_number}집 · ${group.album.title_ko}`
+            const albumNumberLabel = group.album
+              ? `${ALBUM_TYPE_SHORT_LABEL[group.album.album_type]} ${group.album.album_number}집`
               : "";
 
             return (
@@ -143,8 +143,21 @@ export function SongListView({ songs }: SongListViewProps) {
                           "tablet:text-sm",
                         )}
                       >
-                        {albumSubtitle}
+                        <span className={cn("hidden", "tablet:inline")}>
+                          {albumNumberLabel} ·{" "}
+                        </span>
+                        {group.album.title_ko}
                       </p>
+                      {/* MO는 앨범 번호를 날짜 밑에, PC는 번호를 왼쪽 부제로
+                      돌리고 이 자리에 영어 제목을 둔다. */}
+                      <span
+                        className={cn(
+                          "shrink-0 text-xs text-white/50",
+                          "tablet:hidden",
+                        )}
+                      >
+                        {albumNumberLabel}
+                      </span>
                       <span
                         className={cn(
                           "hidden shrink-0 text-sm text-white/50",
