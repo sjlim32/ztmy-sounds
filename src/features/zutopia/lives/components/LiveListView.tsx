@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { MouseEvent } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { SortFilterBar } from "@/features/zutopia/components/SortFilterBar";
@@ -38,6 +39,59 @@ function entryYear(entry: ZutopiaEntry): string | null {
   return entry.startDate ? entry.startDate.slice(0, 4) : null;
 }
 
+/**
+ * 상세로 들어갔다가 목록으로 돌아왔을 때 복원할 상태. /zutopia는 window가
+ * 아니라 ZutopiaScrollArea의 <main>이 스크롤되는 구조라(docs/RULES.md) 브라우저
+ * 기본 스크롤 복원이 동작하지 않고, 필터도 로컬 state라 언마운트되면
+ * 사라진다 — 그래서 항목 클릭 시점에 직접 저장해 둔다.
+ *
+ * 복귀 경로가 둘이라 popstate 감지가 아니라 "저장 → 다음 마운트에서 한 번
+ * 소비" 방식을 쓴다: MO 헤더 뒤로가기는 router.back()(popstate)이지만 PC
+ * ZutopiaTopNav 뒤로가기는 상위 경로로 가는 일반 Link(push)라서다.
+ */
+interface ListSnapshot {
+  sortBy: SortBy;
+  formatFilter: FormatFilter;
+  yearFilter: string;
+  scrollTop: number;
+}
+
+function snapshotKey(categorySlug: string) {
+  return `zutopia-list-snapshot:${categorySlug}`;
+}
+
+// 이 모듈이 브라우저에서 한 번이라도 마운트됐는지. 첫 마운트는 정적
+// export HTML의 hydration일 수 있어(첫 렌더가 서버 HTML과 같아야 함) 저장값을
+// 쓰지 않는다 — 스냅샷은 목록에서 항목을 클릭해야만 생기므로, 실제로 복원할
+// 상황(클라이언트 이동으로 목록 재마운트)에서는 이미 true다.
+let hasMountedOnClient = false;
+
+function readSnapshot(categorySlug: string): ListSnapshot | null {
+  if (!hasMountedOnClient) return null;
+  try {
+    const raw = sessionStorage.getItem(snapshotKey(categorySlug));
+    return raw ? (JSON.parse(raw) as ListSnapshot) : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearSnapshot(categorySlug: string) {
+  try {
+    sessionStorage.removeItem(snapshotKey(categorySlug));
+  } catch {
+    // 저장소를 못 쓰는 환경이면 애초에 저장된 것도 없다.
+  }
+}
+
+function saveSnapshot(categorySlug: string, snapshot: ListSnapshot) {
+  try {
+    sessionStorage.setItem(snapshotKey(categorySlug), JSON.stringify(snapshot));
+  } catch {
+    // 저장소를 못 쓰는 환경(시크릿 모드 등)이면 복원만 포기한다.
+  }
+}
+
 interface EntryGroup {
   key: string;
   label: string;
@@ -61,9 +115,43 @@ export function LiveListView({
   categorySlug: string;
   entries: ZutopiaEntry[];
 }) {
-  const [sortBy, setSortBy] = useState<SortBy>("year");
-  const [formatFilter, setFormatFilter] = useState<FormatFilter>("all");
-  const [yearFilter, setYearFilter] = useState(ALL_YEAR);
+  // useState 초기값은 StrictMode에서 두 번 호출될 수 있어 읽기만 하고,
+  // 한 번만 소비되도록 지우는 건 아래 마운트 effect에서 한다.
+  const [initialSnapshot] = useState(() => readSnapshot(categorySlug));
+  const [sortBy, setSortBy] = useState<SortBy>(
+    initialSnapshot?.sortBy ?? "year",
+  );
+  const [formatFilter, setFormatFilter] = useState<FormatFilter>(
+    initialSnapshot?.formatFilter ?? "all",
+  );
+  const [yearFilter, setYearFilter] = useState(
+    initialSnapshot?.yearFilter ?? ALL_YEAR,
+  );
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // passive effect라 Next Link의 "페이지 상단으로 scrollIntoView"(layout
+  // 단계)보다 늦게 돌아 덮어쓰이지 않는다. <main>의 scroll-smooth 때문에
+  // instant를 명시한다.
+  useEffect(() => {
+    hasMountedOnClient = true;
+    clearSnapshot(categorySlug);
+    if (!initialSnapshot) return;
+    rootRef.current
+      ?.closest("main")
+      ?.scrollTo({ top: initialSnapshot.scrollTop, behavior: "instant" });
+  }, [categorySlug, initialSnapshot]);
+
+  const handleEntryClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    // 새 탭/창으로 여는 클릭은 이 탭이 목록을 떠나지 않으니 저장하지 않는다.
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0)
+      return;
+    saveSnapshot(categorySlug, {
+      sortBy,
+      formatFilter,
+      yearFilter,
+      scrollTop: rootRef.current?.closest("main")?.scrollTop ?? 0,
+    });
+  };
 
   const yearOptions = useMemo(() => {
     const years = new Set<string>();
@@ -119,7 +207,7 @@ export function LiveListView({
   }, [filtered, sortBy]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div ref={rootRef} className="flex flex-col gap-6">
       {/* SortFilterBar 자신은 폭을 스스로 정하지 않는다(AlbumListView처럼
       두 필터를 한 줄에 나란히 놓는 쓰임도 있어서 공용 컴포넌트에 w-full을
       강제하지 않음) — 여기서는 세 필터가 항상 세로로 쌓이므로 각 줄을
@@ -178,6 +266,7 @@ export function LiveListView({
                 <li key={entry.slug}>
                   <Link
                     href={`/zutopia/${categorySlug}/${entry.slug}`}
+                    onClick={handleEntryClick}
                     className="group relative block aspect-square overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
                   >
                     {entry.thumbnail ? (
