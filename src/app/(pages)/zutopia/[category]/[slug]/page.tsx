@@ -5,14 +5,16 @@ import {
   ZUTOPIA_CATEGORIES,
   getZutopiaCategory,
 } from "@/features/zutopia/registry";
-import { getLiveBySlug } from "@/features/zutopia/lives/data";
+import { getLiveBySlug, getTourBySlug } from "@/features/zutopia/lives/data";
 import { DefaultLiveContent } from "@/features/zutopia/lives/DefaultLiveContent";
+import { DefaultTourContent } from "@/features/zutopia/lives/DefaultTourContent";
 import type { LiveDetail } from "@/features/zutopia/lives/types";
 
 // 공연/항목마다 사진·티켓 등 손으로 채운 콘텐츠가 필요하면 이 맵에 등록해
 // 기본 뷰(DefaultLiveContent)를 덮어쓴다. 등록하지 않은 공연은 기본 뷰
 // (제목/날짜/장소/세트리스트)로 자동 렌더링되므로, 등록하지 않아도 상세
-// 페이지가 비어있지 않다.
+// 페이지가 비어있지 않다. 투어(단독 공연) 슬러그는 이 맵의 대상이 아니다 —
+// 필요해지면 그때 투어 전용 오버라이드 맵을 따로 둔다.
 const CONTENT_BY_KEY: Record<string, ComponentType<{ live: LiveDetail }>> = {};
 
 export async function generateStaticParams() {
@@ -36,12 +38,22 @@ export async function generateMetadata(
   if (!category) return {};
 
   const live = await getLiveBySlug(slug);
-  if (!live) return {};
+  if (live) {
+    return {
+      title: `${live.title_ko} | ${category.label}`,
+      description: `${live.title} 아카이브.`,
+    };
+  }
 
-  return {
-    title: `${live.title_ko} | ${category.label}`,
-    description: `${live.title} 아카이브.`,
-  };
+  const tour = await getTourBySlug(slug);
+  if (tour) {
+    return {
+      title: `${tour.title_ko} | ${category.label}`,
+      description: `${tour.title} 아카이브.`,
+    };
+  }
+
+  return {};
 }
 
 export default async function ZutopiaEntryPage(
@@ -51,11 +63,19 @@ export default async function ZutopiaEntryPage(
   const category = getZutopiaCategory(categorySlug);
   if (!category) notFound();
 
+  // lives(공연)와 tours(단독 공연) 두 출처가 같은 목록에 함께 나오므로
+  // (registry.ts의 getLiveEntries 참고), 슬러그가 어느 쪽인지 먼저 확인한다.
   const live = await getLiveBySlug(slug);
-  if (!live) notFound();
+  if (live) {
+    const Content =
+      CONTENT_BY_KEY[`${categorySlug}/${slug}`] ?? DefaultLiveContent;
+    return <Content live={live} />;
+  }
 
-  const Content =
-    CONTENT_BY_KEY[`${categorySlug}/${slug}`] ?? DefaultLiveContent;
+  const tour = await getTourBySlug(slug);
+  if (tour) {
+    return <DefaultTourContent tour={tour} />;
+  }
 
-  return <Content live={live} />;
+  notFound();
 }

@@ -249,6 +249,54 @@ export interface Database {
         };
         Relationships: [];
       };
+      tours: {
+        Row: {
+          id: string;
+          slug: string;
+          title: string;
+          title_ko: string;
+          title_en: string;
+          start_date: string;
+          end_date: string | null;
+          poster_image_url: string | null;
+          additional_image_urls: string[] | null;
+          metadata: Json | null;
+          status: RowStatus;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          slug: string;
+          title: string;
+          title_ko: string;
+          title_en: string;
+          start_date: string;
+          end_date?: string | null;
+          poster_image_url?: string | null;
+          additional_image_urls?: string[] | null;
+          metadata?: Json | null;
+          status?: RowStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          slug?: string;
+          title?: string;
+          title_ko?: string;
+          title_en?: string;
+          start_date?: string;
+          end_date?: string | null;
+          poster_image_url?: string | null;
+          additional_image_urls?: string[] | null;
+          metadata?: Json | null;
+          status?: RowStatus;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       setlists: {
         Row: {
           live_id: string;

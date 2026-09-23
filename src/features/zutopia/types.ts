@@ -17,6 +17,13 @@ export interface ZutopiaEntry {
   // 허브 카드 메타 문구("N개의 콘서트, N개의 페스티벌")를 만드는 데만 쓴다.
   // 나중에 이 카테고리처럼 나뉘지 않는 대분류가 생기면 생략해도 된다.
   type?: ZutopiaEntryType;
+  // 연도 추출·정렬용 원본 ISO 날짜("YYYY-MM-DD"). `date`는 이미
+  // "2026년 9월 5일" 같은 한글 표시 문자열로 가공돼 있어 파싱에 안 쓴다.
+  startDate?: string;
+  // 목록 카드에 날짜 옆에 표시할 도시명(한글). lives는 region 컬럼에서
+  // 뽑아 채우고, tours는 위치 컬럼 자체가 없어(투어 하나가 여러 도시를
+  // 돌 수 있어서) 항상 비워둔다.
+  city?: string;
 }
 
 export interface ZutopiaCategory {
