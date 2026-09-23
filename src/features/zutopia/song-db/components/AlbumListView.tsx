@@ -39,9 +39,10 @@ const SORT_OPTIONS: { value: AlbumGroupBy; label: string }[] = [
 function getAlbumHoverParts(album: AlbumWithSongs): {
   prefix: string;
   title: string;
+  title_ko: string;
 } {
   const prefix = `${ALBUM_TYPE_SHORT_LABEL[album.album_type]} ${album.album_number}집`;
-  return { prefix, title: album.title };
+  return { prefix, title: album.title, title_ko: album.title_ko };
 }
 
 function getAlbumCoverSrc(
@@ -153,7 +154,7 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
               >
                 {group.albums.map((album, index) => {
                   const isSelected = selected?.slug === album.slug;
-                  const { prefix, title } = getAlbumHoverParts(album);
+                  const { prefix, title, title_ko } = getAlbumHoverParts(album);
                   const coverSrc = getAlbumCoverSrc(album, showBookCover);
                   return (
                     <button
@@ -214,7 +215,7 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
 
                       <span
                         className={cn(
-                          "pointer-events-none absolute top-full left-1/2 z-10 mt-1 flex w-max max-w-60 -translate-x-1/2 translate-y-1 flex-col items-center opacity-0",
+                          "pointer-events-none absolute top-full left-1/2 z-10 mt-3 flex w-max max-w-60 -translate-x-1/2 translate-y-1 flex-col items-center opacity-0",
                           "rounded-lg bg-black/85 px-3 py-1.5 text-xs text-white",
                           "tablet:text-sm",
                           "transition-[opacity,transform] duration-300 ease-out",
@@ -227,7 +228,7 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
                         )}
                       >
                         <span className="text-white/60">{prefix}</span>
-                        <span>{title}</span>
+                        <span>{title_ko}</span>
                       </span>
                     </button>
                   );

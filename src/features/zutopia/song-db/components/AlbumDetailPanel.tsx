@@ -155,7 +155,7 @@ export function AlbumDetailPanel({
           <div className="min-w-0">
             <p className={cn("text-xs text-white/60", "tablet:text-sm")}>
               {ALBUM_TYPE_SHORT_LABEL[album.album_type]}
-              {album.album_number}집 · {album.title_ko}
+              {album.album_number}집 · {album.title}
             </p>
             <p
               className={cn(
@@ -163,7 +163,7 @@ export function AlbumDetailPanel({
                 "tablet:text-2xl",
               )}
             >
-              {album.title}
+              {album.title_ko}
             </p>
             <p className={cn("text-xs text-white/60", "tablet:text-sm")}>
               {album.title_en}
