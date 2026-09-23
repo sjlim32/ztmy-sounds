@@ -21,23 +21,24 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
       )}
     >
       {tour.poster_image_url && (
-        <div className="relative">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={tour.poster_image_url}
-            alt={tour.title}
-            className={cn(
-              "max-h-[60vh] max-w-full rounded-lg object-contain",
-              "tablet:max-h-[65vh]",
-            )}
-          />
-          <LiveTypeBadge type="TOUR" />
-        </div>
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={tour.poster_image_url}
+          alt={tour.title}
+          className={cn(
+            "max-h-[60vh] max-w-full rounded-lg object-contain",
+            "tablet:max-h-[65vh]",
+          )}
+        />
       )}
 
-      <div className="text-center">
+      <div className="flex flex-col items-center text-center">
+        <LiveTypeBadge type="TOUR" />
         <h1
-          className={cn("font-rocknroll text-xl text-white", "tablet:text-3xl")}
+          className={cn(
+            "font-rocknroll mt-3 text-xl text-white",
+            "tablet:mt-4 tablet:text-3xl",
+          )}
         >
           {tour.title_ko}
         </h1>

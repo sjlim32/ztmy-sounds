@@ -39,15 +39,25 @@ function parseLiveMetadata(metadata: Live["metadata"]): LiveStreamingLinks {
 }
 
 /**
- * live_venue 끝에 "장소명 (부연설명)" 형태로 괄호가 붙어 있으면 분리한다 —
- * NextEventCard의 placeDesc(장소명 아래 회색 보조 텍스트)와 동일한 자리에
- * 쓰기 위함. 괄호가 없으면 그대로 하나의 문자열로 취급한다.
+ * live_venue/region 끝에 "본문 (부연설명)" 형태로 괄호가 붙어 있으면
+ * 분리한다 — NextEventCard의 placeDesc(장소명 아래 회색 보조 텍스트)와
+ * 동일한 자리에 쓰기 위함. 괄호가 없으면 그대로 하나의 문자열로 취급한다.
  */
-function splitVenue(venue: string): { main: string; suffix: string | null } {
-  const match = venue.match(/^(.*\S)\s+(\([^()]*\))$/);
-  if (!match) return { main: venue, suffix: null };
+function splitParenSuffix(text: string): {
+  main: string;
+  suffix: string | null;
+} {
+  const match = text.match(/^(.*\S)\s+(\([^()]*\))$/);
+  if (!match) return { main: text, suffix: null };
   return { main: match[1], suffix: match[2] };
 }
+
+// 티켓 본문 칸 사이 절취선 — MO는 칸을 세로로 쌓아 가로선, PC는 가로로
+// 놓아 세로선이 된다.
+const TICKET_DIVIDER_CLASS = cn(
+  "border-ztmy-purple/40 border-t border-dashed",
+  "tablet:w-0 tablet:border-t-0 tablet:border-l",
+);
 
 /**
  * CONTENT_BY_KEY에 이 공연 전용 콘텐츠가 없을 때 쓰는 기본 상세 뷰 —
@@ -70,7 +80,8 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
     live.metadata,
   );
   const hasStreamingLinks = spotify || youtubeMusic || appleMusic;
-  const venue = splitVenue(live.live_venue);
+  const venue = splitParenSuffix(live.live_venue);
+  const region = live.region ? splitParenSuffix(live.region) : null;
 
   return (
     <div
@@ -80,23 +91,15 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
       )}
     >
       {live.poster_image_url && (
-        <div className="relative">
-          {/* w-full로 박스를 강제하면 세로가 긴 포스터에서 max-h가 높이만
-          줄여 object-contain이 여백(레터박스)을 만들고, 뱃지는 그 박스
-          모서리에 고정돼 실제 이미지 밖 여백에 떠 보인다. 박스를 이미지의
-          실제 렌더 크기(auto 폭 + max-h)에 맞춰야 뱃지가 항상 이미지
-          모서리에 붙는다. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={live.poster_image_url}
-            alt={live.title}
-            className={cn(
-              "max-h-[60vh] max-w-full rounded-lg object-contain",
-              "tablet:max-h-[65vh]",
-            )}
-          />
-          <LiveTypeBadge type={live.type} />
-        </div>
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={live.poster_image_url}
+          alt={live.title}
+          className={cn(
+            "max-h-[60vh] max-w-full rounded-lg object-contain",
+            "tablet:max-h-[65vh]",
+          )}
+        />
       )}
 
       {live.additional_image_urls && live.additional_image_urls.length > 0 && (
@@ -112,9 +115,13 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
         </div>
       )}
 
-      <div className="text-center">
+      <div className="flex flex-col items-center text-center">
+        <LiveTypeBadge type={live.type} />
         <h1
-          className={cn("font-rocknroll text-xl text-white", "tablet:text-3xl")}
+          className={cn(
+            "font-rocknroll mt-3 text-xl text-white",
+            "tablet:mt-4 tablet:text-3xl",
+          )}
         >
           {live.title_ko}
         </h1>
@@ -126,20 +133,17 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
         >
           {live.title}
         </p>
-        {variation && (
-          <p className={cn("mt-2 text-sm text-white/60", "tablet:text-base")}>
-            {variation}
-          </p>
-        )}
       </div>
 
-      {/* 티켓 스텁 — 상단 accent 띠, DATE/VENUE를 점선으로 나눈 본 티켓,
-      스트리밍 링크가 있으면 가로 절취선 아래 LISTEN 구간을 덧붙인다. */}
+      {/* 티켓 스텁 — 상단 accent 띠, DATE/REGION/VENUE를 점선으로 나눈 본
+      티켓(MO는 세로로 쌓고 가로 절취선, PC는 가로로 놓고 세로 절취선),
+      그 아래 가로 절취선으로 나뉜 variation 한 줄과 LISTEN 구간을 각각
+      값이 있을 때만 덧붙인다. */}
       <div className="relative w-full overflow-hidden bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]">
         <div className="from-ztmy-magenta to-ztmy-purple absolute inset-x-0 top-0 h-0.5 bg-linear-to-r" />
 
-        <div className="flex">
-          <div className={cn("flex-1 p-4", "tablet:p-6")}>
+        <div className={cn("flex flex-col", "tablet:flex-row")}>
+          <div className={cn("flex-1 p-3", "tablet:p-6")}>
             <p
               className={cn(
                 "font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase",
@@ -150,7 +154,7 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
             </p>
             <p
               className={cn(
-                "mt-1 font-mono text-base text-white",
+                "mt-1 font-mono text-sm text-white",
                 "tablet:text-lg",
               )}
             >
@@ -158,9 +162,44 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
             </p>
           </div>
 
-          <div className="border-ztmy-purple/40 w-0 border-l border-dashed" />
+          {region && (
+            <>
+              <div className={TICKET_DIVIDER_CLASS} />
 
-          <div className={cn("flex-1 p-4", "tablet:p-6")}>
+              <div className={cn("flex-1 p-3", "tablet:p-6")}>
+                <p
+                  className={cn(
+                    "font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase",
+                    "tablet:text-xs",
+                  )}
+                >
+                  Region
+                </p>
+                <p
+                  className={cn(
+                    "mt-1 text-sm break-keep text-white",
+                    "tablet:text-lg",
+                  )}
+                >
+                  {region.main}
+                </p>
+                {region.suffix && (
+                  <p
+                    className={cn(
+                      "text-xs font-bold text-white/50",
+                      "tablet:text-sm",
+                    )}
+                  >
+                    {region.suffix}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+
+          <div className={TICKET_DIVIDER_CLASS} />
+
+          <div className={cn("flex-1 p-3", "tablet:p-6")}>
             <p
               className={cn(
                 "font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase",
@@ -171,7 +210,7 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
             </p>
             <p
               className={cn(
-                "mt-1 text-base break-keep text-white",
+                "mt-1 text-sm break-keep text-white",
                 "tablet:text-lg",
               )}
             >
@@ -190,12 +229,41 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
           </div>
         </div>
 
+        {variation && (
+          <>
+            <div className="border-ztmy-purple/40 border-t border-dashed" />
+            <div
+              className={cn(
+                "flex items-center justify-between gap-3 p-3",
+                "tablet:p-6",
+              )}
+            >
+              <p
+                className={cn(
+                  "shrink-0 font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase",
+                  "tablet:text-xs",
+                )}
+              >
+                Variation
+              </p>
+              <p
+                className={cn(
+                  "text-right text-xs break-keep text-white",
+                  "tablet:text-base",
+                )}
+              >
+                {variation}
+              </p>
+            </div>
+          </>
+        )}
+
         {hasStreamingLinks && (
           <>
             <div className="border-ztmy-purple/40 border-t border-dashed" />
             <div
               className={cn(
-                "flex items-center justify-between gap-3 p-4",
+                "flex items-center justify-between gap-3 p-3",
                 "tablet:p-6",
               )}
             >
