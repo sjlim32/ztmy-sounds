@@ -24,6 +24,8 @@ export interface ZutopiaEntry {
   // 뽑아 채우고, tours는 위치 컬럼 자체가 없어(투어 하나가 여러 도시를
   // 돌 수 있어서) 항상 비워둔다.
   city?: string;
+  // 내한 공연이면 몇 번째 내한인지(metadata.visited) — 목록 카드 강조용.
+  visitOrdinal?: number | null;
 }
 
 export interface ZutopiaCategory {

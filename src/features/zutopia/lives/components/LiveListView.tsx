@@ -5,6 +5,7 @@ import type { MouseEvent } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { SortFilterBar } from "@/features/zutopia/components/SortFilterBar";
+import { formatVisitLabel } from "@/features/zutopia/lives/visit";
 import type { ZutopiaEntry, ZutopiaEntryType } from "@/features/zutopia/types";
 
 type SortBy = "year" | "format";
@@ -267,7 +268,11 @@ export function LiveListView({
                   <Link
                     href={`/zutopia/${categorySlug}/${entry.slug}`}
                     onClick={handleEntryClick}
-                    className="group relative block aspect-square overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
+                    className={cn(
+                      "group relative block aspect-square overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
+                      // 내한 공연은 카드 테두리를 ztmy-sun으로 둘러 목록에서 바로 눈에 띄게 한다.
+                      entry.visitOrdinal != null && "ring-ztmy-sun ring-2",
+                    )}
                   >
                     {entry.thumbnail ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -289,6 +294,11 @@ export function LiveListView({
                       빼서, 지금 실제로 보이는 텍스트의 줄 수만큼만 칸이
                       차지하게 한다(그래서 tablet 이상은 전환이 즉시
                       바뀐다). */}
+                      {entry.visitOrdinal != null && (
+                        <span className="text-ztmy-sun mb-0.5 block text-xs font-bold">
+                          {formatVisitLabel(entry.visitOrdinal)}
+                        </span>
+                      )}
                       <span className="block">
                         <span
                           className={cn(

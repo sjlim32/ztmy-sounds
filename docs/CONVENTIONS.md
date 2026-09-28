@@ -43,6 +43,10 @@ src/
                              # song-db와 lives가 공유
       lives/                # 지난 공연 데이터(data.ts, Supabase 기반) + 공용
                              # 컴포넌트(SongLink.tsx, DefaultLiveContent.tsx).
+                             # lives/tours.metadata.visited("first"/"second"…)가
+                             # 있으면 내한 공연 — visit.ts가 파싱하고, 상세는
+                             # VisitBadge, 목록 카드는 ztmy-sun 테두리 +
+                             # "N 번째 내한" 문구로 강조한다.
                              # 공연별 수동 콘텐츠가 필요하면 lives/<슬러그>/
                              # content.mdx를 만들어 [slug]/page.tsx의
                              # CONTENT_BY_KEY에 등록한다(선택 사항).

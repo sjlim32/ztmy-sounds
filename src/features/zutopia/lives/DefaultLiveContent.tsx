@@ -8,6 +8,8 @@ import { formatLiveDate } from "./data";
 import { LiveTypeBadge } from "./LiveTypeBadge";
 import { SongLink } from "./SongLink";
 import type { Live, LiveDetail } from "./types";
+import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
+import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
 
 interface LiveStreamingLinks {
   variation?: string;
@@ -82,6 +84,7 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
   const hasStreamingLinks = spotify || youtubeMusic || appleMusic;
   const venue = splitParenSuffix(live.live_venue);
   const region = live.region ? splitParenSuffix(live.region) : null;
+  const visitOrdinal = parseVisitOrdinal(live.metadata);
 
   return (
     <div
@@ -116,7 +119,10 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
       )}
 
       <div className="flex flex-col items-center text-center">
-        <LiveTypeBadge type={live.type} />
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <LiveTypeBadge type={live.type} />
+          {visitOrdinal !== null && <VisitBadge ordinal={visitOrdinal} />}
+        </div>
         <h1
           className={cn(
             "font-rocknroll mt-3 text-xl text-white",

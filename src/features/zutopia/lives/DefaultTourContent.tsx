@@ -3,6 +3,8 @@ import { cn } from "@/lib/utils";
 import { formatLiveDate } from "./data";
 import { LiveTypeBadge } from "./LiveTypeBadge";
 import type { TourDetail } from "./types";
+import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
+import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
 
 /**
  * 투어(단독 공연) 상세 페이지 — DefaultLiveContent와 같은 시각 언어(포스터
@@ -13,6 +15,8 @@ import type { TourDetail } from "./types";
  * 수 있는 상태다.
  */
 export function DefaultTourContent({ tour }: { tour: TourDetail }) {
+  const visitOrdinal = parseVisitOrdinal(tour.metadata);
+
   return (
     <div
       className={cn(
@@ -33,7 +37,10 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
       )}
 
       <div className="flex flex-col items-center text-center">
-        <LiveTypeBadge type="TOUR" />
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <LiveTypeBadge type="TOUR" />
+          {visitOrdinal !== null && <VisitBadge ordinal={visitOrdinal} />}
+        </div>
         <h1
           className={cn(
             "font-rocknroll mt-3 text-xl text-white",

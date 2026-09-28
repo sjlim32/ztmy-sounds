@@ -2,6 +2,7 @@ import { cache } from "react";
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
 import { getGuideHref } from "@/features/zutopia/guide-link";
 import type { ZutopiaEntry, ZutopiaEntryType } from "@/features/zutopia/types";
+import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
 import type { Live, LiveDetail, TourDetail } from "./types";
 
 /**
@@ -98,13 +99,15 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
     supabase
       .from("lives")
       .select(
-        "slug, title, title_ko, start_date, end_date, poster_image_url, icon_image_url, type, region",
+        "slug, title, title_ko, start_date, end_date, poster_image_url, icon_image_url, type, region, metadata",
       )
       .eq("status", "ACTIVE")
       .is("tour_id", null),
     supabase
       .from("tours")
-      .select("slug, title, title_ko, start_date, end_date, poster_image_url")
+      .select(
+        "slug, title, title_ko, start_date, end_date, poster_image_url, metadata",
+      )
       .eq("status", "ACTIVE"),
   ]);
 
@@ -128,6 +131,7 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
     type: LIVE_TYPE_TO_ENTRY_TYPE[live.type],
     startDate: live.start_date,
     city: extractKoreanCity(live.region),
+    visitOrdinal: parseVisitOrdinal(live.metadata),
   }));
 
   // 투어는 페스티벌 출연이 아니라 줏토마요 자신의 "단독 공연"이라 concert
@@ -140,6 +144,7 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
     thumbnail: tour.poster_image_url ?? "",
     type: "concert",
     startDate: tour.start_date,
+    visitOrdinal: parseVisitOrdinal(tour.metadata),
   }));
 
   return [...liveEntries, ...tourEntries].sort((a, b) =>
