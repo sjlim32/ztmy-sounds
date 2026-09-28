@@ -9,6 +9,7 @@ export interface LiveSetlistEntry {
   titleKo: string;
   // 이 곡의 응원 가이드(/guide/[songId])가 있으면 그 경로, 없으면 null.
   guideHref: string | null;
+  isEncore: boolean;
 }
 
 export interface LiveDetail extends Live {

@@ -183,6 +183,7 @@ export const getLiveBySlug = cache(
         title: entry.songs.title,
         titleKo: entry.songs.title_ko,
         guideHref: getGuideHref(entry.songs.slug),
+        isEncore: entry.is_encore,
       }));
 
     return { ...live, setlist };

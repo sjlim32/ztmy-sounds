@@ -340,7 +340,11 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
           <ul className="flex flex-col divide-y divide-white/5">
             {live.setlist.map((entry, i) => (
               <li key={entry.songId}>
-                <SongLink href={entry.guideHref} index={i + 1}>
+                <SongLink
+                  href={entry.guideHref}
+                  index={i + 1}
+                  encore={entry.isEncore}
+                >
                   {entry.title} ({entry.titleKo})
                 </SongLink>
               </li>
