@@ -290,10 +290,12 @@ export function LiveListView({
                       {/* 모바일은 호버가 없어 원제 밑에 한글 제목을 항상
                       같이 보여준다. 태블릿 이상은 마우스 오버가 있으니
                       평소엔 원제(최대 2줄)만 보이다가 호버 시 한글 제목
-                      1줄로 교체한다 — 안 보이는 쪽을 아예 display:none으로
+                      (최대 2줄)으로 교체한다 — 안 보이는 쪽을 아예 display:none으로
                       빼서, 지금 실제로 보이는 텍스트의 줄 수만큼만 칸이
                       차지하게 한다(그래서 tablet 이상은 전환이 즉시
-                      바뀐다). */}
+                      바뀐다). line-clamp는 display:-webkit-box라야 동작해서
+                      block(나중에 선언돼 display를 덮어씀)과 같이 쓰지
+                      않는다. */}
                       {entry.visitOrdinal != null && (
                         <span className="text-ztmy-sun mb-0.5 block text-xs font-bold">
                           {formatVisitLabel(entry.visitOrdinal)}
@@ -302,7 +304,7 @@ export function LiveListView({
                       <span className="block">
                         <span
                           className={cn(
-                            "line-clamp-2 block text-sm font-semibold break-keep text-white",
+                            "line-clamp-2 text-sm font-semibold break-keep text-white",
                             "tablet:group-hover:hidden tablet:text-sm",
                           )}
                         >
@@ -310,8 +312,8 @@ export function LiveListView({
                         </span>
                         <span
                           className={cn(
-                            "block truncate text-base text-white/80",
-                            "tablet:text-ztmy-pink tablet:mt-0 tablet:font-semibold tablet:hidden tablet:text-sm tablet:group-hover:block",
+                            "line-clamp-2 text-base break-keep text-white/80",
+                            "tablet:text-ztmy-pink tablet:mt-0 tablet:font-semibold tablet:hidden tablet:text-sm tablet:group-hover:line-clamp-2",
                           )}
                         >
                           {entry.label}
