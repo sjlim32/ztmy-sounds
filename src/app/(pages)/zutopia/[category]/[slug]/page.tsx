@@ -37,19 +37,21 @@ export async function generateMetadata(
   const category = getZutopiaCategory(categorySlug);
   if (!category) return {};
 
-  const live = await getLiveBySlug(slug);
-  if (live) {
-    return {
-      title: `${live.title_ko} | ${category.label}`,
-      description: `${live.title} 아카이브.`,
-    };
-  }
-
+  // 투어 공연일 lives 행이 투어 slug를 그대로 쓸 수 있어(여러 행이 같은
+  // slug) 투어를 먼저 확인한다 — lives부터 찾으면 단건 조회가 깨진다.
   const tour = await getTourBySlug(slug);
   if (tour) {
     return {
       title: `${tour.title_ko} | ${category.label}`,
       description: `${tour.title} 아카이브.`,
+    };
+  }
+
+  const live = await getLiveBySlug(slug);
+  if (live) {
+    return {
+      title: `${live.title_ko ?? live.title} | ${category.label}`,
+      description: `${live.title} 아카이브.`,
     };
   }
 
@@ -65,16 +67,17 @@ export default async function ZutopiaEntryPage(
 
   // lives(공연)와 tours(단독 공연) 두 출처가 같은 목록에 함께 나오므로
   // (registry.ts의 getLiveEntries 참고), 슬러그가 어느 쪽인지 먼저 확인한다.
+  // 투어 공연일이 투어 slug를 공유할 수 있어 투어를 먼저 본다.
+  const tour = await getTourBySlug(slug);
+  if (tour) {
+    return <DefaultTourContent tour={tour} />;
+  }
+
   const live = await getLiveBySlug(slug);
   if (live) {
     const Content =
       CONTENT_BY_KEY[`${categorySlug}/${slug}`] ?? DefaultLiveContent;
     return <Content live={live} />;
-  }
-
-  const tour = await getTourBySlug(slug);
-  if (tour) {
-    return <DefaultTourContent tour={tour} />;
   }
 
   notFound();

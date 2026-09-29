@@ -9,7 +9,8 @@ import { formatVisitLabel } from "@/features/zutopia/lives/visit";
 import type { ZutopiaEntry, ZutopiaEntryType } from "@/features/zutopia/types";
 
 type SortBy = "year" | "format";
-type FormatFilter = "all" | Extract<ZutopiaEntryType, "festival" | "concert">;
+type EntryFormat = Extract<ZutopiaEntryType, "festival" | "concert">;
+type FormatFilter = "all" | EntryFormat;
 
 const SORT_OPTIONS: { value: SortBy; label: string }[] = [
   { value: "year", label: "연도별" },
@@ -18,21 +19,27 @@ const SORT_OPTIONS: { value: SortBy; label: string }[] = [
 
 // "단독 공연"은 이 목록 문맥에서만 쓰는 라벨이다 — types.ts의 전역
 // ENTRY_TYPE_LABEL(허브 카드 요약용, "콘서트")과는 별개로, 줏토마요 자신이
-// 헤드라이너인 투어라는 의미를 이 페이지에서 더 분명히 드러낸다.
+// 헤드라이너인 공연(투어·행사)이라는 의미를 이 페이지에서 더 분명히
+// 드러낸다.
 const FORMAT_OPTIONS: { value: FormatFilter; label: string }[] = [
   { value: "all", label: "전체" },
   { value: "festival", label: "페스티벌" },
   { value: "concert", label: "단독 공연" },
 ];
-const FORMAT_GROUP_LABEL: Record<
-  Extract<ZutopiaEntryType, "festival" | "concert">,
-  string
-> = {
+const FORMAT_GROUP_LABEL: Record<EntryFormat, string> = {
   festival: "페스티벌",
   concert: "단독 공연",
 };
-const FORMAT_GROUP_ORDER: Extract<ZutopiaEntryType, "festival" | "concert">[] =
-  ["festival", "concert"];
+const FORMAT_GROUP_ORDER: EntryFormat[] = ["festival", "concert"];
+
+// 형식 필터는 페스티벌/단독 공연 둘뿐이라 행사(EVENT)는 단독 공연으로
+// 묶는다. entry.type 자체는 허브 카드 요약("N개의 행사")에 그대로 쓰이므로
+// 바꾸지 않는다.
+function entryFormat(entry: ZutopiaEntry): EntryFormat | null {
+  if (entry.type === "festival") return "festival";
+  if (entry.type === "concert" || entry.type === "event") return "concert";
+  return null;
+}
 
 const ALL_YEAR = "all";
 
@@ -171,7 +178,7 @@ export function LiveListView({
   const filtered = useMemo(
     () =>
       entries.filter((entry) => {
-        if (formatFilter !== "all" && entry.type !== formatFilter) {
+        if (formatFilter !== "all" && entryFormat(entry) !== formatFilter) {
           return false;
         }
         if (yearFilter !== ALL_YEAR && entryYear(entry) !== yearFilter) {
@@ -187,7 +194,7 @@ export function LiveListView({
       return FORMAT_GROUP_ORDER.map((type) => ({
         key: type,
         label: FORMAT_GROUP_LABEL[type],
-        entries: filtered.filter((entry) => entry.type === type),
+        entries: filtered.filter((entry) => entryFormat(entry) === type),
       })).filter((group) => group.entries.length > 0);
     }
 

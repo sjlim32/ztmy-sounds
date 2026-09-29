@@ -2,7 +2,7 @@ import type { Song, SongTitle } from "@/features/guide/lib/types";
 
 const nareai: SongTitle = {
   jp: "馴れ合いサーブ",
-  kr: "짜고 치는 서브",
+  kr: "친절한 서브",
   en: "Nareai Serve",
 };
 
@@ -105,7 +105,7 @@ const song: Song = {
       time: "1:01.1",
       original: "馴れ合いサーブでしょ",
       pronunciation: "나레아이 사-브데쇼",
-      translation: "짜고 치는 서브잖아",
+      translation: "친절한 서브잖아",
     },
     {
       time: "1:03.8",
@@ -242,7 +242,7 @@ const song: Song = {
       time: "2:50.8",
       original: "馴れ合いサーブでしょ",
       pronunciation: "나레아이 사-브데쇼",
-      translation: "짜고 치는 서브잖아",
+      translation: "친절한 서브잖아",
     },
     {
       time: "2:52.8",

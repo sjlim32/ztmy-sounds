@@ -177,15 +177,15 @@ export interface Database {
       lives: {
         Row: {
           id: string;
-          slug: string;
+          slug: string | null;
           tour_id: string | null;
           title: string;
-          title_ko: string;
-          title_en: string;
+          title_ko: string | null;
+          title_en: string | null;
           type: LiveType;
           start_date: string;
           end_date: string | null;
-          live_date: string;
+          live_date: string | null;
           country: string;
           region: string;
           live_venue: string;
@@ -201,15 +201,15 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          slug: string;
+          slug?: string | null;
           tour_id?: string | null;
           title: string;
-          title_ko: string;
-          title_en: string;
+          title_ko?: string | null;
+          title_en?: string | null;
           type: LiveType;
           start_date: string;
           end_date?: string | null;
-          live_date: string;
+          live_date?: string | null;
           country: string;
           region: string;
           live_venue: string;
@@ -225,15 +225,15 @@ export interface Database {
         };
         Update: {
           id?: string;
-          slug?: string;
+          slug?: string | null;
           tour_id?: string | null;
           title?: string;
-          title_ko?: string;
-          title_en?: string;
+          title_ko?: string | null;
+          title_en?: string | null;
           type?: LiveType;
           start_date?: string;
           end_date?: string | null;
-          live_date?: string;
+          live_date?: string | null;
           country?: string;
           region?: string;
           live_venue?: string;
@@ -299,28 +299,37 @@ export interface Database {
       };
       setlists: {
         Row: {
-          live_id: string;
+          id: string;
+          live_id: string | null;
+          tour_id: string | null;
           song_id: string;
           track_number: number;
           is_encore: boolean;
           note: Json | null;
           updated_at: string;
+          day_number: number | null;
         };
         Insert: {
-          live_id: string;
+          id?: string;
+          live_id?: string | null;
+          tour_id?: string | null;
           song_id: string;
           track_number: number;
           is_encore?: boolean;
           note?: Json | null;
           updated_at?: string;
+          day_number?: number | null;
         };
         Update: {
-          live_id?: string;
+          id?: string;
+          live_id?: string | null;
+          tour_id?: string | null;
           song_id?: string;
           track_number?: number;
           is_encore?: boolean;
           note?: Json | null;
           updated_at?: string;
+          day_number?: number | null;
         };
         Relationships: [
           {
@@ -328,6 +337,13 @@ export interface Database {
             columns: ["live_id"];
             isOneToOne: false;
             referencedRelation: "lives";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "setlists_tour_id_fkey";
+            columns: ["tour_id"];
+            isOneToOne: false;
+            referencedRelation: "tours";
             referencedColumns: ["id"];
           },
           {

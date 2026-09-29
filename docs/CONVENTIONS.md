@@ -42,7 +42,22 @@ src/
       guide-link.ts          # 응원 가이드(/guide/[songId]) 존재 여부 조회 —
                              # song-db와 lives가 공유
       lives/                # 지난 공연 데이터(data.ts, Supabase 기반) + 공용
-                             # 컴포넌트(SongLink.tsx, DefaultLiveContent.tsx).
+                             # 컴포넌트(SongLink.tsx, DefaultLiveContent.tsx,
+                             # 티켓 LiveTicket.tsx, 세트리스트 Setlist.tsx).
+                             # tour_id가 있거나 slug가 투어 slug와 같은 lives는
+                             # 투어에 종속된다 — 자기 상세 페이지 없이 투어
+                             # slug를 공유하고(같은 slug가 여러 행이라 상세
+                             # 라우트는 투어를 먼저 조회한다),
+                             # 티켓·음원 링크는 tours 컬럼을 쓰며, 투어 상세의
+                             # 공연 일정(TourDateList.tsx)에서 행을 누르면 곡/앨범
+                             # DB와 같은 우측 드로어(SongDbDrawer)로 그 공연의
+                             # 포스터·추가 이미지·세트리스트를 연다.
+                             # 투어 공연일 세트리스트는 투어 공통 곡
+                             # (setlists.tour_id) + 그 공연일 곡(setlists.live_id)을
+                             # track_number로 합치고, 공연일에만 있는 곡은
+                             # "선택곡"(ztmy-sky 띠·태그, 앙코르는 ztmy-sun)으로
+                             # 강조한다. 일차(day_number)가 있는 곡은 "첫째날",
+                             # "둘째날" 태그(ztmy-pink)로 일차를 표시한다.
                              # lives/tours.metadata.visited("first"/"second"…)가
                              # 있으면 내한 공연 — visit.ts가 파싱하고, 상세는
                              # VisitBadge, 목록 카드는 ztmy-sun 테두리 +
@@ -197,7 +212,7 @@ src/
   설치를 띄울 방법이 없습니다 — iOS에서는 "공유 버튼 → 홈 화면에 추가"
   안내 텍스트로 대체해야 합니다(`isIos()` 판별 필요, iPadOS 13+는 데스크톱
   Safari와 동일한 UA를 보내 `navigator.platform === "MacIntel" &&
-  navigator.maxTouchPoints > 1` 조합으로만 구분 가능 — `navigator.platform`이
+navigator.maxTouchPoints > 1` 조합으로만 구분 가능 — `navigator.platform`이
   타입 정의상 deprecated로 뜨지만 이 용도엔 대안이 없어 의도된 사용입니다).
 
 ## 브라우저 API 기반 초기 상태
@@ -213,7 +228,7 @@ src/
 - 이 패턴은 `react-hooks/set-state-in-effect` 린트 규칙과 충돌합니다(effect
   본문에서 직접 `setState`를 부르지 말라는 규칙) — 위 사유로 불가피한
   경우, 이유를 적은 `// eslint-disable-next-line react-hooks/set-state-in-effect --
-  ...` 주석과 함께 예외 처리하세요.
+...` 주석과 함께 예외 처리하세요.
 
 ## Git / 커밋
 
