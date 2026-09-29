@@ -219,7 +219,7 @@ function TourDateRow({
         </span>
         <span
           className={cn(
-            "font-mono text-[10px] font-medium tracking-[0.15em] text-white/60",
+            "font-mono text-[10px] font-medium tracking-[0.15em] text-white/40",
             "tablet:text-xs",
           )}
         >
