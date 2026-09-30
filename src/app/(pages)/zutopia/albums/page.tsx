@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ZutopiaAlbumsPage() {
-  const [songCount, albums] = await Promise.all([
+  const [songCounts, albums] = await Promise.all([
     getSongsCount(),
     getAlbumsWithSongs(),
   ]);
@@ -27,7 +27,7 @@ export default async function ZutopiaAlbumsPage() {
       />
 
       <div className="mt-3">
-        <SongDbNav songCount={songCount} albumCount={albums.length} />
+        <SongDbNav songCounts={songCounts} albumCount={albums.length} />
 
         <div className="mt-8">
           {/* AlbumListView가 드로어 상태를 URL 쿼리스트링(useSearchParams)

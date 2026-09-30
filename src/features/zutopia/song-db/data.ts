@@ -1,7 +1,7 @@
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
 import { getGuideHref } from "@/features/zutopia/guide-link";
 import type { Song } from "./types";
-import type { AlbumWithSongs, SongWithAlbums } from "./types";
+import type { AlbumWithSongs, SongCounts, SongWithAlbums } from "./types";
 
 type OriginalSongRef = Pick<
   Song,
@@ -91,17 +91,32 @@ function resolveDisplaySong<T extends Song>(
 // 이 기능에서 가장 비싼 쿼리를 페이지마다 불필요하게 한 번씩 더 실행하는
 // 것과 같다. count-only 쿼리(head: true라 실제 행 데이터는 아예 안 옴)로
 // 대체한다.
-export async function getSongsCount(): Promise<number> {
+// 미공개곡(metadata.unrelease)은 공개곡 수에서 빼고 따로 센다 —
+// song-metadata.ts의 parseSongMetadata와 같은 기준("true" 문자열/불리언,
+// ->>로 꺼내면 둘 다 텍스트 "true"가 된다).
+export async function getSongsCount(): Promise<SongCounts> {
   const supabase = createBuildTimeSupabaseClient();
-  const { count, error } = await supabase
-    .from("songs")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "ACTIVE");
+  const [total, unreleased] = await Promise.all([
+    supabase
+      .from("songs")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "ACTIVE"),
+    supabase
+      .from("songs")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "ACTIVE")
+      .eq("metadata->>unrelease", "true"),
+  ]);
 
+  const error = total.error ?? unreleased.error;
   if (error) {
     throw new Error(`곡 개수를 가져오지 못했습니다: ${error.message}`);
   }
-  return count ?? 0;
+  const unreleasedCount = unreleased.count ?? 0;
+  return {
+    released: (total.count ?? 0) - unreleasedCount,
+    unreleased: unreleasedCount,
+  };
 }
 
 export async function getAlbumsCount(): Promise<number> {

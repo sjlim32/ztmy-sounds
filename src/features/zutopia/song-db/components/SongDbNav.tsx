@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ACTIVE_TAB_CLASS, TAB_CLASS } from "../../components/tab-styles";
+import type { SongCounts } from "@/features/zutopia/song-db/types";
 
 /**
  * 곡/앨범을 탭처럼 보이지만 실제로는 별도 라우트(/zutopia/songs,
@@ -11,10 +12,10 @@ import { ACTIVE_TAB_CLASS, TAB_CLASS } from "../../components/tab-styles";
  * (클라이언트 상태 토글이 아니라 진짜 URL이라 북마크/공유가 그대로 됨).
  */
 export function SongDbNav({
-  songCount,
+  songCounts,
   albumCount,
 }: {
-  songCount: number;
+  songCounts: SongCounts;
   albumCount: number;
 }) {
   const pathname = usePathname();
@@ -31,7 +32,11 @@ export function SongDbNav({
         aria-current={isSongs ? "page" : undefined}
         className={cn(TAB_CLASS, isSongs && ACTIVE_TAB_CLASS)}
       >
-        곡 ({songCount})
+        곡 ({songCounts.released}
+        {songCounts.unreleased > 0 && (
+          <span className="opacity-60"> · 미공개 {songCounts.unreleased}</span>
+        )}
+        )
       </Link>
       <Link
         href="/zutopia/albums"

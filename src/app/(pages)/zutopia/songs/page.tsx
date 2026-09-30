@@ -5,6 +5,7 @@ import {
   getSongsWithAlbums,
 } from "@/features/zutopia/song-db/data";
 import { SongDbNav } from "@/features/zutopia/song-db/components/SongDbNav";
+import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
 import { SongListView } from "@/features/zutopia/song-db/components/SongListView";
 import { ZutopiaSectionHeader } from "@/features/zutopia/components/ZutopiaSectionHeader";
 
@@ -19,6 +20,11 @@ export default async function ZutopiaSongsPage() {
     getAlbumsCount(),
   ]);
 
+  const unreleased = songs.filter(
+    (song) => parseSongMetadata(song.metadata).isUnreleased,
+  ).length;
+  const songCounts = { released: songs.length - unreleased, unreleased };
+
   return (
     <div>
       <ZutopiaSectionHeader
@@ -27,7 +33,7 @@ export default async function ZutopiaSongsPage() {
       />
 
       <div className="mt-3">
-        <SongDbNav songCount={songs.length} albumCount={albumCount} />
+        <SongDbNav songCounts={songCounts} albumCount={albumCount} />
 
         <div className="tablet:mt-8 mt-3">
           {/* SongListView가 드로어 상태를 URL 쿼리스트링(useSearchParams)

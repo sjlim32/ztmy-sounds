@@ -7,7 +7,7 @@ import { ZutopiaSectionHeader } from "@/features/zutopia/components/ZutopiaSecti
 import { getSongsCount, getAlbumsCount } from "@/features/zutopia/song-db/data";
 
 export default async function ZutopiaHubPage() {
-  const [songCount, albumCount, categoryCards] = await Promise.all([
+  const [songCounts, albumCount, categoryCards] = await Promise.all([
     getSongsCount(),
     getAlbumsCount(),
     Promise.all(
@@ -31,7 +31,11 @@ export default async function ZutopiaHubPage() {
             href="/zutopia/songs"
             title="디스코그래피"
             description="전체 곡과 앨범 목록"
-            meta={`${songCount}곡 · ${albumCount}개 앨범`}
+            meta={`${songCounts.released}곡${
+              songCounts.unreleased > 0
+                ? ` (미공개 ${songCounts.unreleased}곡)`
+                : ""
+            } · ${albumCount}개 앨범`}
             imageUrl="/assets/zutopia/components/song_db.webp"
           />
         </li>
