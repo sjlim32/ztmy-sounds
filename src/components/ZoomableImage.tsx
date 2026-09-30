@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { RefObject } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { CloseIcon } from "@/components/icons/CloseIcon";
@@ -17,6 +18,24 @@ export const THUMBNAIL_CROP_CLASS: Record<ThumbnailCrop, string> = {
 };
 
 export const DEFAULT_THUMBNAIL_SIZE = 160;
+
+/**
+ * 확대(원본 크기)로 바뀌는 순간 모달 스크롤을 가운데로 맞춘다 — 안 그러면
+ * 이미지가 중앙에서 커지는 게 아니라 왼쪽 위 모서리가 고정된 채 커져서,
+ * 사용자가 누른 가운데 부분이 화면 밖으로 밀려난다. 페인트 전에 맞추려고
+ * layout effect를 쓴다. ZoomableImageGroup도 같이 쓴다.
+ */
+export function useCenterScrollOnZoom(
+  containerRef: RefObject<HTMLElement | null>,
+  isZoomedIn: boolean,
+) {
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    if (!isZoomedIn || !container) return;
+    container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+    container.scrollTop = (container.scrollHeight - container.clientHeight) / 2;
+  }, [containerRef, isZoomedIn]);
+}
 
 interface ZoomableImageProps {
   src: string;
@@ -52,6 +71,8 @@ export function ZoomableImage({
 }: ZoomableImageProps) {
   const [isOpen, setOpen] = useState(false);
   const [isZoomedIn, setZoomedIn] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useCenterScrollOnZoom(dialogRef, isZoomedIn);
 
   const closeModal = () => {
     setOpen(false);
@@ -122,10 +143,11 @@ export function ZoomableImage({
       {isOpen &&
         createPortal(
           <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             onClick={closeModal}
-            className="fixed inset-0 z-50 flex flex-col items-center overflow-auto bg-black/80 p-6"
+            className="fixed inset-0 z-50 flex flex-col overflow-auto bg-black/80 p-6"
           >
             {/* absolute가 아니라 fixed — 안내문이 길어 아래 콘텐츠가 스크롤될
                 때도 닫기 버튼이 뷰포트 모서리에 계속 붙어있도록. */}
@@ -138,11 +160,13 @@ export function ZoomableImage({
               <CloseIcon className="h-6 w-6" />
             </button>
 
-            {/* justify-center 대신 my-auto로 중앙 정렬 — 콘텐츠(이미지+설명)가
-                뷰포트보다 커지면 justify-center는 위쪽이 화면 밖으로 밀려나
-                스크롤해도 안 보이게 되는데, my-auto는 그 경우 0으로 줄어들어
-                위에서부터 자연스럽게 스크롤됩니다. */}
-            <div className="my-auto flex flex-col items-center gap-3">
+            {/* items-center/justify-center 대신 m-auto로 중앙 정렬 — 확대된
+                이미지가 뷰포트보다 커지면 center 정렬은 위·왼쪽으로도 넘쳐
+                그쪽은 스크롤로 닿지 않는다(모바일에서 왼쪽이 잘리던 원인).
+                auto margin은 넘칠 때 0이 되어 왼쪽 위부터 전부 스크롤된다.
+                같은 효과의 safe center(items-center-safe)는 구형 iOS Safari가
+                지원하지 않아 쓰지 않는다. */}
+            <div className="m-auto flex flex-col items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element -- width/height가 없으면 이미지 자체의 크기를 그대로 써야 해서 next/image의 필수 width/height 제약을 피함 (어차피 output:export라 next/image 최적화는 꺼져있음) */}
               <img
                 src={src}

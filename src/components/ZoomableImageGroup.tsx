@@ -9,6 +9,7 @@ import { SiteLink } from "@/components/SiteLink";
 import {
   THUMBNAIL_CROP_CLASS,
   DEFAULT_THUMBNAIL_SIZE,
+  useCenterScrollOnZoom,
   type ThumbnailCrop,
 } from "@/components/ZoomableImage";
 
@@ -59,6 +60,7 @@ export function ZoomableImageGroup({
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [isZoomedIn, setZoomedIn] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
+  useCenterScrollOnZoom(dialogRef, isZoomedIn);
   // 모달을 연 썸네일 버튼 — 닫을 때 포커스를 여기로 되돌립니다.
   const triggerRef = useRef<HTMLElement | null>(null);
   const openAt = (index: number) => {
@@ -233,17 +235,10 @@ export function ZoomableImageGroup({
             aria-label={current.alt || "이미지 확대 보기"}
             tabIndex={-1}
             onClick={closeModal}
-            className="fixed inset-0 z-50 flex flex-col items-center-safe overflow-auto bg-black/80 p-6 focus:outline-none"
+            className="fixed inset-0 z-50 flex flex-col overflow-auto bg-black/80 p-6 focus:outline-none"
           >
             {/* absolute가 아니라 fixed — 안내문이 길어 아래 콘텐츠가 스크롤될
                 때도 닫기/이전/다음 버튼이 뷰포트 모서리에 계속 붙어있도록. */}
-            {/* items-center(순수 center)면 확대된 이미지가 컨테이너보다 넓어질
-                때 좌우로 똑같이 넘치는데, overflow-auto는 스크롤 시작 위치(0)
-                기준 음수 방향(왼쪽) 오버플로우로는 스크롤이 닿지 않아 왼쪽
-                절반이 영영 안 보이게 됩니다(오른쪽은 스크롤 가능 영역에
-                포함돼 끝까지 갈 수 있는 것과 비대칭). safe center는 오버플로우가
-                생기면 자동으로 start 정렬로 물러나 전체가 스크롤로 닿게 해주고,
-                안 넘칠 땐 평소처럼 중앙 정렬을 유지합니다. */}
             <button
               type="button"
               onClick={closeModal}
@@ -311,11 +306,13 @@ export function ZoomableImageGroup({
               </>
             )}
 
-            {/* justify-center 대신 my-auto로 중앙 정렬 — 콘텐츠(이미지+설명)가
-                뷰포트보다 커지면 justify-center는 위쪽이 화면 밖으로 밀려나
-                스크롤해도 안 보이게 되는데, my-auto는 그 경우 0으로 줄어들어
-                위에서부터 자연스럽게 스크롤됩니다. */}
-            <div className="tablet:px-16 my-auto flex flex-col items-center gap-3 px-4 py-6">
+            {/* items-center/justify-center 대신 m-auto로 중앙 정렬 — 확대된
+                이미지가 뷰포트보다 커지면 center 정렬은 위·왼쪽으로도 넘쳐
+                그쪽은 스크롤로 닿지 않는다(모바일에서 왼쪽이 잘리던 원인).
+                auto margin은 넘칠 때 0이 되어 왼쪽 위부터 전부 스크롤된다.
+                같은 효과의 safe center(items-center-safe)는 구형 iOS Safari가
+                지원하지 않아 쓰지 않는다. */}
+            <div className="tablet:px-16 m-auto flex flex-col items-center gap-3 px-4 py-6">
               {/* aria-label을 img가 아니라 button에 둡니다 — img에 직접
                   aria-label을 주면 접근성 이름 계산에서 alt(사진 설명)를
                   완전히 덮어써버려, 정작 스크린리더가 사진 내용을 못 읽게
