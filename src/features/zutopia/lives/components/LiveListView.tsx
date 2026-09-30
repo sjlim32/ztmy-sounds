@@ -24,11 +24,11 @@ const SORT_OPTIONS: { value: SortBy; label: string }[] = [
 const FORMAT_OPTIONS: { value: FormatFilter; label: string }[] = [
   { value: "all", label: "전체" },
   { value: "festival", label: "페스티벌" },
-  { value: "concert", label: "단독 공연" },
+  { value: "concert", label: "공연" },
 ];
 const FORMAT_GROUP_LABEL: Record<EntryFormat, string> = {
   festival: "페스티벌",
-  concert: "단독 공연",
+  concert: "공연",
 };
 const FORMAT_GROUP_ORDER: EntryFormat[] = ["festival", "concert"];
 

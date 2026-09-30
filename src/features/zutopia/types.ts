@@ -1,9 +1,9 @@
 export type ZutopiaEntryType = "concert" | "festival" | "event";
 
 const ENTRY_TYPE_LABEL: Record<ZutopiaEntryType, string> = {
-  concert: "콘서트",
+  concert: "투어",
   festival: "페스티벌",
-  event: "행사",
+  event: "콘서트",
 };
 // summarizeEntryTypes가 항상 이 순서로 보여주기 위한 목록.
 const ENTRY_TYPE_ORDER: ZutopiaEntryType[] = ["concert", "festival", "event"];
@@ -56,6 +56,6 @@ export function summarizeEntryTypes(entries: ZutopiaEntry[]): string {
   }
 
   return ENTRY_TYPE_ORDER.filter((type) => counts.has(type))
-    .map((type) => `${counts.get(type)}개의 ${ENTRY_TYPE_LABEL[type]}`)
-    .join(", ");
+    .map((type) => `${counts.get(type)} ${ENTRY_TYPE_LABEL[type]}`)
+    .join(" · ");
 }

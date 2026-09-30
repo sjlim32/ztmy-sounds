@@ -56,7 +56,7 @@ export function ZutopiaHubCard({
         </p>
         <p className="mt-1 line-clamp-2 text-sm text-white/60">{description}</p>
         {meta && (
-          <p className="mt-2 font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
+          <p className="mt-2 font-mono text-xs tracking-[0.2em] text-white/60 uppercase">
             {meta}
           </p>
         )}
