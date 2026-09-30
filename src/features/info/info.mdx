@@ -76,6 +76,30 @@ export const toGroupImages = (imgs) =>
       </div>
     </TabSection>
 
+    <TabSection id="bonus">
+      <ImageLabel id="bonus" label="특전" />
+
+      <section className="flex flex-col tablet:flex-row items-center justify-center gap-3">
+        <div className="flex flex-col items-center gap-3">
+          <p className="font-semibold">1일차 10/3(토)</p>
+          <ZoomableImage
+            src={sections["bonus"][0].asset}
+            thumbnailWidth={300}
+            thumbnailCrop="top"
+          />
+        </div>
+
+        <div className="flex flex-col items-center gap-3">
+          <p className="font-semibold">2일차 10/4(일)</p>
+          <ZoomableImage
+            src={sections["bonus"][1].asset}
+            thumbnailWidth={300}
+            thumbnailCrop="top"
+          />
+        </div>
+      </section>
+    </TabSection>
+
     <TabSection id="popup">
       <DetailList title="ZUTOMAYO MART 출장소" note="※ 10/10일(토)·11일(일)은 11:00 ~ 21:00 (최종 입장 20:30)">
         <DetailField label="날짜">10/3(토) - 10/12(월)</DetailField>
@@ -106,6 +130,8 @@ export const toGroupImages = (imgs) =>
           thumbnailCrop="top"
         />
       </div>
+
+      <div className="h-px w-full my-6 bg-white/20" />
 
       <DetailList title="ZUTOMAYO STAND 야마토 사이다이지 역점" note="※ 10/10(토)・11(일)은 10:00 ~ 17:30, 점포 한정 상품 없음">
         <DetailField label="날짜">10/3(토) - 10/11(일)</DetailField>
@@ -157,24 +183,6 @@ export const toGroupImages = (imgs) =>
           src={sections["matsuri-map"][0].asset}
           thumbnailWidth={1000}
           thumbnailCrop="top"
-        />
-      </div>
-    </TabSection>
-
-    <TabSection id="matsuri-notice">
-      <ImageLabel id="matsuri-notice" label="축제 공지" />
-      <SiteLink href="https://zutomayo.net/special/bunka-denrai/matsuri-area/">
-        {`공식 사이트 이동`}
-      </SiteLink>
-
-      <div className="flex items-center justify-center">
-        <ZoomableImage
-          src={sections["matsuri-notice"][0].asset}
-          thumbnailWidth={1000}
-          thumbnailCrop="top"
-          sourceHref="https://zutomayo.net/special/bunka-denrai/matsuri-area/"
-          sourceLabel="축제 공지 페이지 이동"
-          captionTarget="_blank"
         />
       </div>
     </TabSection>
@@ -244,6 +252,41 @@ export const toGroupImages = (imgs) =>
         <ZoomableImageGroup
           images={toGroupImages(sections["matsuri-collabo"])}
           thumbnailWidth={800}
+          thumbnailCrop="top"
+        />
+      </div>
+    </TabSection>
+
+    <TabSection id="stamp-rally">
+      <ImageLabel id="stamp-rally" label="스탬프 랠리" />
+
+      <DetailList note="※ 스탬프 수집 자체에 대한 보상은 없음">
+        <DetailField label="기간">10/1(수) - 10/31(금)</DetailField>
+        <DetailField label="스탬프 용지">각 시설에서 배부</DetailField>
+        <DetailField label="응모 방법">스탬프 행사장 QR 코드로 설문조사 참여</DetailField>
+        <DetailField label="보상">
+          <div className="flex flex-col gap-0.5">
+            <strong className="text-ztmy-pink">{`【Nara × ずっと真夜中でいいのに。】 콜라보 스티커`}</strong>
+            <span className="text-sm text-white/60">추첨을 통해 1,000명</span>
+          </div>
+        </DetailField>
+        <DetailField label="링크">
+          <div className="flex flex-row flex-wrap gap-1">
+            <SiteLink href="https://maps.app.goo.gl/5bWLrt35bunDVaPm9">
+              {`장소 확인(구글맵스)`}
+            </SiteLink>
+            <span> / </span>
+            <SiteLink href="https://www.instagram.com/p/DdyW6BslC9P">
+              {`공식 정보(@sangakufesta)`}
+            </SiteLink>
+          </div>
+        </DetailField>
+      </DetailList>
+
+      <div className="flex items-center justify-center">
+        <ZoomableImage
+          src={sections["stamp-rally"][0].asset}
+          thumbnailWidth={500}
           thumbnailCrop="top"
         />
       </div>
