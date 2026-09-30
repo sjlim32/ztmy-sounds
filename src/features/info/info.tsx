@@ -6,13 +6,15 @@ import { InfoEvent } from "@/features/info/lib/types";
 export const INFO_SCROLL_CONTAINER_ID = "info-scroll-container";
 
 /** 정보 페이지 상단 탭 4종. */
-export type InfoTabId = "concert" | "matsuri" | "collabo" | "popup";
+export type InfoTabId =
+  "concert" | "matsuri" | "collabo" | "popup" | "stamp-rally";
 
 export const INFO_TABS: { id: InfoTabId; label: string }[] = [
   { id: "concert", label: "공연" },
   { id: "matsuri", label: "축제" },
   { id: "collabo", label: "콜라보" },
   { id: "popup", label: "팝업" },
+  { id: "stamp-rally", label: "스탬프 랠리" },
 ];
 
 /**
@@ -23,11 +25,10 @@ export const INFO_TABS: { id: InfoTabId; label: string }[] = [
  * 안에 흩어놓는 것보다 파악하기 쉽기 때문이다.
  */
 export const INFO_TAB_SECTIONS: Record<InfoTabId, string[]> = {
-  concert: ["notice", "map"],
+  concert: ["notice", "bonus", "map"],
   matsuri: [
     "map",
     "matsuri-map",
-    "matsuri-notice",
     "matsuri-workshop",
     "matsuri-food",
     "matsuri-sidestage",
@@ -35,6 +36,7 @@ export const INFO_TAB_SECTIONS: Record<InfoTabId, string[]> = {
   ],
   collabo: ["zutomarosh", "matsuri-collabo"],
   popup: ["popup", "ztmy-mart", "ztmy-stand"],
+  "stamp-rally": ["stamp-rally"],
 };
 
 // 여기서 다루는 공연이 바뀌면(다음 공연 안내로 교체), src/data/event.ts의
@@ -49,9 +51,9 @@ export const INFORMATION: InfoEvent = {
   place: "헤이조궁터 역사공원 (平城宮跡歴史公園)",
   sections: [
     { id: "notice", label: "공연" },
+    { id: "bonus", label: "특전" },
     { id: "map", label: "전체 지도" },
     { id: "matsuri-map", label: "축제 AREA 지도" },
-    { id: "matsuri-notice", label: "축제 공지" },
     { id: "matsuri-workshop", label: "워크숍 & 미니 게임" },
     { id: "matsuri-food", label: "음식 코너" },
     { id: "matsuri-sidestage", label: "사이드 스테이지" },
@@ -59,6 +61,7 @@ export const INFORMATION: InfoEvent = {
     { id: "zutomarosh", label: "즛토마로슈" },
     { id: "ztmy-mart", label: "팝업" },
     { id: "ztmy-stand", label: "팝업" },
+    { id: "stamp-rally", label: "스탬프 랠리" },
   ],
   url: {
     main: "https://zutomayo.net/bunka-denrai/",
@@ -85,6 +88,16 @@ export const INFORMATION: InfoEvent = {
         section: "notice",
       },
       {
+        name: "특전",
+        asset: "/assets/info/ztmy_heijyokyo_ltd-day001.jpg",
+        section: "bonus",
+      },
+      {
+        name: "특전",
+        asset: "/assets/info/ztmy_heijyokyo_ltd-day002.jpg",
+        section: "bonus",
+      },
+      {
         name: "전체 지도",
         asset: "/assets/info/heijyoukyo-map-all.webp",
         section: "map",
@@ -93,11 +106,6 @@ export const INFORMATION: InfoEvent = {
         name: "축제 지도",
         asset: "/assets/info/heijyoukyo-map-matsuri.webp",
         section: "matsuri-map",
-      },
-      {
-        name: "축제 공지",
-        asset: "/assets/info/matsuri_01.webp",
-        section: "matsuri-notice",
       },
       {
         name: "WORK SHOP & MINI GAME",
@@ -166,8 +174,18 @@ export const INFORMATION: InfoEvent = {
       },
       {
         name: "pop-up",
+        asset: "/assets/info/popup_04.webp",
+        section: "ztmy-mart",
+      },
+      {
+        name: "pop-up",
         asset: "/assets/info/popup_02.webp",
         section: "ztmy-stand",
+      },
+      {
+        name: "스탬프 랠리",
+        asset: "/assets/info/stamp-rally.webp",
+        section: "stamp-rally",
       },
     ],
   },
