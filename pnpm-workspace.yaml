@@ -3,3 +3,8 @@ allowBuilds:
   esbuild: true
   unrs-resolver: true
   workerd: true
+overrides:
+  # @serwist/turbopack이 browserslist를 취약 버전(4.28.6)으로 정확히 고정해
+  # pnpm audit high가 뜬다(GHSA: 무한 메모리 증가·prototype 쓰기) — serwist가
+  # 패치 버전으로 올리면 이 항목은 지워도 된다.
+  "browserslist@<4.28.7": ^4.28.7
