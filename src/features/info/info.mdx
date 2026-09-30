@@ -40,15 +40,18 @@ export const toGroupImages = (imgs) =>
 <EventDetails event={INFORMATION} />
 
 <section className="mt-6 flex flex-col gap-3">
-  <DetailList title="축제 Area 일정" note="입장 무료">
-    <DetailField label="입장" className="flex-row">  
+  <DetailList title="축제 Area 일정" note="입장 무료, 각 워크샵 및 미니게임은 별도 참가권 판매">
+    <DetailField label="입장 및 참가권 판매" className="flex-row">  
       09:30
     </DetailField>
-    <DetailField label="시작" className="flex-row">
+    <DetailField label="축제 AREA 개장" className="flex-row">
       10:00
     </DetailField>
-    <DetailField label="종료" className="flex-row">
+    <DetailField label="축제 AREA 종료" className="flex-row">
       17:30
+    </DetailField>
+    <DetailField label="SIDE STAGE '낮의 연회'" className="flex-row">
+      10:30 ~ 15:00
     </DetailField>
   </DetailList>
 
@@ -81,14 +84,6 @@ export const toGroupImages = (imgs) =>
           <SiteLink href="https://maps.app.goo.gl/p35sGj94Bcv2dDiP6">
             나라현 컨벤션 센터 2F 텐헤이 갤러리 〒630-8013 나라현 나라시 산조 오지 1 쵸메 691-1
           </SiteLink>
-        </DetailField>
-        <DetailField label="공식 사이트">
-        <div className="tablet:flex-col tablet:gap-0 flex flex-col gap-1">
-          <span>나라에서의 개최에 있어서, 평상시 역을 이용의 여러분에게도 공연을 알고 주셨으면 하고, 출점.</span>
-          <span>키오스크적인 꽤 작은 매점이므로, "ZUTOMAYO STAND"라고 명명했습니다,</span>
-          <span>소품 계를 중심으로 일부 상품만 판매합니다, 들러 주시는 것만으로 기쁩니다.</span>
-          <strong className="text-ztmy-pink">Premium 회원 한정, 9월 22일 18시에 사전 예약 진행 (LINE 계정 필요)</strong>
-        </div>
         </DetailField>
 
         <DetailField label="링크" >

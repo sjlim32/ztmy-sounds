@@ -24,7 +24,7 @@ export function DetailField({
           className,
         )}
       >
-        <span className="tablet:w-24 shrink-0">{label} :</span>
+        <span className="tablet:min-w-20 shrink-0">{label} :</span>
         {children}
       </div>
     </li>
