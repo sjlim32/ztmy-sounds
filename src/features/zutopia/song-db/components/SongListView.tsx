@@ -52,6 +52,15 @@ const SORT_OPTIONS: { value: SongGroupBy; label: string }[] = [
 export function SongListView({ songs }: SongListViewProps) {
   const [groupBy, setGroupBy] = useState<SongGroupBy>("album");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [hideUnreleased, setHideUnreleased] = useState(false);
+  const hasUnreleased = songs.some(
+    (song) => parseSongMetadata(song.metadata).isUnreleased,
+  );
+  // 드로어 선택 조회는 전체 songs로 한다 — 필터를 켜도 URL로 열린 미공개곡
+  // 드로어가 갑자기 닫히지 않게.
+  const visibleSongs = hideUnreleased
+    ? songs.filter((song) => !parseSongMetadata(song.metadata).isUnreleased)
+    : songs;
 
   /**
    * 드로어 열림 상태를 로컬 state가 아니라 URL 쿼리스트링(?song=&album=)
@@ -98,15 +107,34 @@ export function SongListView({ songs }: SongListViewProps) {
           value={sortDirection}
           onChange={setSortDirection}
         />
+        {hasUnreleased && (
+          <label
+            className={cn(
+              "flex w-fit cursor-pointer items-center gap-2 py-1 text-sm font-medium text-white/70 select-none",
+              "tablet:text-base",
+            )}
+          >
+            <input
+              type="checkbox"
+              checked={hideUnreleased}
+              onChange={(event) => setHideUnreleased(event.target.checked)}
+              className={cn(
+                "accent-ztmy-purple h-3.5 w-3.5",
+                "tablet:h-4 tablet:w-4",
+              )}
+            />
+            미공개곡 제외
+          </label>
+        )}
       </div>
 
-      {songs.length === 0 ? (
+      {visibleSongs.length === 0 ? (
         <p className={cn("text-base text-white/50", "tablet:text-lg")}>
           아직 등록된 곡이 없습니다.
         </p>
       ) : (
         <div className="flex flex-col gap-8">
-          {groupSongs(songs, groupBy, sortDirection).map((group) => {
+          {groupSongs(visibleSongs, groupBy, sortDirection).map((group) => {
             const albumNumberLabel = group.album
               ? `${ALBUM_TYPE_SHORT_LABEL[group.album.album_type]} ${group.album.album_number}집`
               : "";
