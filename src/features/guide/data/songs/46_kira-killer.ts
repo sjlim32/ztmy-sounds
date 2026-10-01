@@ -10,6 +10,7 @@ const song: Song = {
   id: "kira-killer",
   title: kira,
   youtubeId: "HZK_9uWAqeo",
+  swingGif: "/assets/guide/kira_killer.webp",
   lyrics: [
     {
       time: "0:0",
@@ -109,6 +110,7 @@ const song: Song = {
       original: "綺羅キラー",
       pronunciation: "키라 키라-",
       translation: "키라 킬러",
+      swingGif: true,
       cheer: {
         text: "V자로 흔들기 반복",
         tag: "swing",
@@ -119,6 +121,7 @@ const song: Song = {
       original: "嫌いなんて序の口 そう思うと楽だし",
       pronunciation: "키라이난테 죠노 쿠치 소우 오모우토 라쿠다시",
       translation: "싫은 건 시작에 불과해 그렇게 생각하면 편해",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -129,6 +132,7 @@ const song: Song = {
       original: "3.2.1で歪み合った",
       pronunciation: "3.2.1데 이가미앗타",
       translation: "3.2.1로 뒤틀려",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -139,6 +143,7 @@ const song: Song = {
       original: "君のその口 シガレット辛口",
       pronunciation: "키미노 소노 쿠치 시가렛토 카라쿠치",
       translation: "너의 그 입에 톡 쏘는 시가렛",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -149,6 +154,7 @@ const song: Song = {
       original: "割り切ったけど",
       pronunciation: "와리킷타케도",
       translation: "분명 체념했는데",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -159,6 +165,7 @@ const song: Song = {
       original: "知るか? 汁なら drink up we’re still tough",
       pronunciation: "시루카 시루나라 drink up we’re still tough",
       translation: "알 바야? 국이라면 drink up we’re still tough",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -169,6 +176,7 @@ const song: Song = {
       original: "最低なコンプだし 最高の昆布だし",
       pronunciation: "사이테이나 콘푸다시 사이코우노 콘부다시",
       translation: "최악의 콤프고, 최고의 육수고",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -179,6 +187,7 @@ const song: Song = {
       original: "揃ってるだけじゃつまらんし",
       pronunciation: "소롯테루 다케쟈 츠마란시",
       translation: "모여 있는 것만으론 재미가 없고",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -189,6 +198,7 @@ const song: Song = {
       original: "繋いだって綻ぶし しょっぱいな鰹節",
       pronunciation: "츠나이닷테 호코로부시 숏파이나 가츠오부시",
       translation: "이어 봤자 풀리고 짭짤한 가다랑어포",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -199,6 +209,7 @@ const song: Song = {
       original: "もっと甘えたいけどー？",
       pronunciation: "못토 아마에타이케도-?",
       translation: "좀 더 응석부리고 싶은데-？",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -209,6 +220,7 @@ const song: Song = {
       original: "ぞんざいでアップダウンな現状が今ヒット中",
       pronunciation: "존자이데 앗푸다운나 겐죠우가 이마 힛토 츄",
       translation: "소홀하고 업다운도 있는 현상이 지금 히트 중",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -219,6 +231,7 @@ const song: Song = {
       original: "落ち込んでる方が 進めるセオリー",
       pronunciation: "오치콘데루 호우가 스스메루 세오리-",
       translation: "침울해하면 더 진행되는 시어리",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -229,6 +242,7 @@ const song: Song = {
       original: "うpダウンな成長が いまひとつ",
       pronunciation: "앗푸다운나 세이쵸우가 이마 히토츠",
       translation: "업다운의 성장이 지금 하나",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -239,6 +253,7 @@ const song: Song = {
       original: "(底辺のてっぺんの味で 満たされたいわ)",
       pronunciation: "(테이헨노 텟펜노 아지데 미타사레타이와)",
       translation: "(밑바닥 정상의 맛으로 충족되고 싶어)",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -363,6 +378,7 @@ const song: Song = {
       original: "キラキラ",
       pronunciation: "키라키라",
       translation: "반짝반짝",
+      swingGif: true,
       cheer: {
         text: "V자로 흔들기 반복",
         tag: "swing",
@@ -373,6 +389,7 @@ const song: Song = {
       original: "嫌いなんて序の口 そう思うと楽だし",
       pronunciation: "키라이난테 죠노 쿠치 소우 오모우토 라쿠다시",
       translation: "싫은 건 시작에 불과해 그렇게 생각하면 편해",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -383,6 +400,7 @@ const song: Song = {
       original: "3.2.1で歪み合った",
       pronunciation: "3.2.1데 이가미앗타",
       translation: "3.2.1로 뒤틀려",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -393,6 +411,7 @@ const song: Song = {
       original: "君のその口 シガレット辛口",
       pronunciation: "키미노 소노 쿠치 시가렛토 카라쿠치",
       translation: "너의 그 입에 톡 쏘는 시가렛",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -403,6 +422,7 @@ const song: Song = {
       original: "割り切ったけど",
       pronunciation: "와리킷타케도",
       translation: "분명 체념했는데",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -413,6 +433,7 @@ const song: Song = {
       original: "知るか? 汁なら drink up we’re still tough",
       pronunciation: "시루카 시루나라 drink up we’re still tough",
       translation: "알 바야? 국이라면 drink up we’re still tough",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -423,6 +444,7 @@ const song: Song = {
       original: "最低なコンプだし 最高の昆布だし",
       pronunciation: "사이테이나 콘푸다시 사이코우노 콘부다시",
       translation: "최악의 콤프고, 최고의 육수고",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -433,6 +455,7 @@ const song: Song = {
       original: "揃ってるだけじゃつまらんし",
       pronunciation: "소롯테루 다케쟈 츠마란시",
       translation: "모여 있는 것만으론 재미가 없고",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -443,6 +466,7 @@ const song: Song = {
       original: "繋いだって綻ぶし しょっぱいな鰹節",
       pronunciation: "츠나이닷테 호코로부시 숏파이나 가츠오부시",
       translation: "이어 봤자 풀리고 짭짤한 가다랑어포",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -453,6 +477,7 @@ const song: Song = {
       original: "もっと甘えたいけどー？",
       pronunciation: "못토 아마에타이케도-?",
       translation: "좀 더 응석부리고 싶은데-？",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -507,6 +532,7 @@ const song: Song = {
       original: "綺羅綺羅",
       pronunciation: "키라키라",
       translation: "기라기라",
+      swingGif: true,
       cheer: {
         text: "V자로 흔들기 반복",
         tag: "swing",
@@ -517,6 +543,7 @@ const song: Song = {
       original: "羅鬼羅鬼",
       pronunciation: "라키라키",
       translation: "Like it Like it",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -527,6 +554,7 @@ const song: Song = {
       original: "きらーーいなんて序の口 そう思うと楽だし",
       pronunciation: "키라--이난테 죠노 쿠치 소우 오모우토 라쿠다시",
       translation: "싫어한다는 건 시작에 불과해 그렇게 생각하면 편해",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -537,6 +565,7 @@ const song: Song = {
       original: "3.2.1で歪み合った",
       pronunciation: "3.2.1데 이가미앗타",
       translation: "3.2.1로 뒤틀려",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -547,6 +576,7 @@ const song: Song = {
       original: "君のその口 シガレット辛口",
       pronunciation: "키미노 소노 쿠치 시가렛토 카라쿠치",
       translation: "너의 그 입에 톡 쏘는 시가렛",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -557,6 +587,7 @@ const song: Song = {
       original: "割り切ったけど",
       pronunciation: "와리킷타케도",
       translation: "분명 체념했는데",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -567,6 +598,7 @@ const song: Song = {
       original: "知るか? 汁なら drink up we’re still tough",
       pronunciation: "시루카 시루나라 drink up we’re still tough",
       translation: "알 바야? 국이라면 drink up we’re still tough",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -577,6 +609,7 @@ const song: Song = {
       original: "いつだって研修生 価値が小惑星",
       pronunciation: "이츠닷테 켄슈우세이 카치가 쇼우와쿠세이",
       translation: "언제나 연수생, 가치가 소행성",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -587,6 +620,7 @@ const song: Song = {
       original: "乗りこなす必要もないし",
       pronunciation: "노리코나스 히츠요우모 나이시",
       translation: "잘 탈 필요도 없으니까",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -597,6 +631,7 @@ const song: Song = {
       original: "君と共感勝ち 噛めば音の だち",
       pronunciation: "키미토 쿄우칸 카치 카메바 오토노 다치",
       translation: "너와의 공감이 승리, 깨물면 나는 소리",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -607,6 +642,7 @@ const song: Song = {
       original: "もっと甘えたいけどーー？",
       pronunciation: "못토 아마에타이케도--?",
       translation: "좀 더 응석부리고 싶은데--？",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",

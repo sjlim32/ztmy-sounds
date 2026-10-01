@@ -122,6 +122,14 @@ src/
   `getSong(id)`를 제공.
 - 새 곡 추가 시: 다음 번호로 파일 하나 만들고 `index.ts`에 import + `songList`
   배열 항목 추가.
+- 스윙 동작 예시 애니메이션이 있는 곡은 `public/assets/guide/<song-id>.webp`를
+  두고(원본 크기 그대로 표시, GIF는 용량이 커서 애니메이션 WebP로 변환해서 넣음) `Song.swingGif`에 경로를 적습니다. 응원 가이드(/guide)에서만 표시되며
+  (`SwingGuideGif.tsx`) tablet 이상은 영상 하단에 상시, 모바일은 현재 가사 줄에
+  `swingGif: true`(`LyricLine` 플래그)가 있을 때만 화면 우측 중앙에 고정으로
+  뜹니다. GIF 경로는 음원 버전에서도 정식(live) 데이터의 값을 씁니다.
+  원본 비율이 정사각형이 아니면 `Song.swingGifSize`(px)를 지정해 파일은 그대로 두고
+  화면에서만 그 크기 정사각형에 맞춰 가운데 부분만 보이게 할 수 있습니다
+  (예: 400x200 → `swingGifSize: 100`이면 가운데 200x200이 100x100으로 표시).
 - `data/not-yet/`은 아직 가이드가 준비되지 않은 곡, `data/origin/`은 수정 전
   원본 가사/정보 백업 — 둘 다 `songList`에는 포함되지 않습니다.
 

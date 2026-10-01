@@ -10,6 +10,7 @@ const song: Song = {
   id: "seigi",
   title: seigi,
   youtubeId: "toiX8Wio6fQ",
+  swingGif: "/assets/guide/seigi.webp",
   lyrics: [
     //================ 1절 ================//
     {
@@ -163,6 +164,7 @@ const song: Song = {
       original: "近づいて遠のいて 探り合ってみたんだ",
       pronunciation: "**치카즈이테** 토-노이데 **사구리앗테** 미탄다",
       translation: "다가오고 멀어지며 **살폈던** 거야",
+      swingGif: true,
       cheer: {
         text: "**앞** / 뒤로 스윙",
         tag: "swing",
@@ -173,6 +175,7 @@ const song: Song = {
       original: "近づいて遠のいて わかり合ってみたんだ",
       pronunciation: "**치카즈이테** 토-노이데 **와카리앗테** 미탄다",
       translation: "다가오고 멀어지며 알아봤던 거야",
+      swingGif: true,
       cheer: {
         text: "**앞** / 뒤로 스윙",
         tag: "swing",
@@ -183,6 +186,7 @@ const song: Song = {
       original: "近づいて遠のいて 笑いあってみたんだ",
       pronunciation: "**치카즈이테** 토-노이데 **와라이앗테** 미탄다",
       translation: "다가오고 멀어지며 웃어보인 거야",
+      swingGif: true,
       cheer: {
         text: "**앞** / 뒤로 스윙",
         tag: "swing",
@@ -193,6 +197,7 @@ const song: Song = {
       original: "近づいて遠のいて 巡り合っていたんだ",
       pronunciation: "**치카즈이테** 토-노이데 **메구리앗테** 이탄다",
       translation: "다가오고 멀어지며 **다시 만나게** 된 거야",
+      swingGif: true,
       cheer: {
         text: "**앞** / 뒤로 스윙",
         tag: "swing",
@@ -508,6 +513,7 @@ const song: Song = {
       original: "近づいて遠のいて 探り合ってみたんだ",
       pronunciation: "치카즈이테 토-노이테 사구리앗테 미탄다",
       translation: "다가오고 멀어지며 살폈던 거야",
+      swingGif: true,
       cheer: {
         text: "스윙하며 아카네의 지시에 따라 떼창",
         tag: "swing",
@@ -518,6 +524,7 @@ const song: Song = {
       original: "近づいて遠のいて わかり合ってみたンダ",
       pronunciation: "치카즈이테 토-노이테 와카리앗테 미탄다",
       translation: "다가오고 멀어지며 알아봤던 거야",
+      swingGif: true,
       cheer: {
         text: "스윙하며 아카네의 지시에 따라 떼창",
         tag: "swing",
@@ -528,6 +535,7 @@ const song: Song = {
       original: "地下着いて 問い解いて 笑いあってみタンダ",
       pronunciation: "치카즈이테 토-노이테 와라이앗테 미탄다",
       translation: "지하에 닿아 질문을 풀며 웃어보인 거야",
+      swingGif: true,
       cheer: {
         text: "스윙하며 아카네의 지시에 따라 떼창",
         tag: "call",
@@ -538,6 +546,7 @@ const song: Song = {
       original: "チカヅイテ トーノイテ 巡り合っていたんだ",
       pronunciation: "치카즈이테 토-노이테 메구리앗테 이탄다", // TODO : "미탄다"인데 라이브에서 실수한건가?
       translation: "다가오고 멀어지며 만나게 된 거야",
+      swingGif: true,
       cheer: {
         text: "스윙하며 아카네의 지시에 따라 떼창",
         tag: "swing",
@@ -548,6 +557,7 @@ const song: Song = {
       original: "チカヅイテ トーノイテ サングリアッテミタンダ",
       pronunciation: "치카즈이테 토-노이테 사구리앗테 미탄다", // 떼창
       translation: "다가오고 멀어지며 살폈던 거야",
+      swingGif: true,
       cheer: {
         text: "스윙하며 아카네의 지시에 따라 떼창",
         tag: "call",
@@ -558,6 +568,7 @@ const song: Song = {
       original: "チカヅイテ トーノイテ ワカリアッテミタンダ",
       pronunciation: "치카즈이테 토-노이테 와카리앗테 미탄다",
       translation: "다가오고 멀어지며 알아봤던 거야",
+      swingGif: true,
       cheer: {
         text: "스윙하며 아카네의 지시에 따라 떼창",
         tag: "swing",
@@ -568,6 +579,7 @@ const song: Song = {
       original: "チカヅイテ トーノイ十 ワライアッテミタンダ",
       pronunciation: "치카즈이테 토-노이테 와라이앗테 미탄다", // 떼창
       translation: "다가오고 멀어지며 웃어보인 거야",
+      swingGif: true,
       cheer: {
         text: "스윙하며 아카네의 지시에 따라 떼창",
         tag: "call",
@@ -578,6 +590,7 @@ const song: Song = {
       original: "チカヅイテ 十ー退イテ 巡り合ってみたんだ",
       pronunciation: "치카즈이테 토-노이테 메구리앗테 미탄다",
       translation: "다가오다 열 번 물러서며 만나게 된 거야",
+      swingGif: true,
       cheer: {
         text: "스윙하며 아카네의 지시에 따라 떼창",
         tag: "swing",

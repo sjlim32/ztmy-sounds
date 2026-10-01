@@ -10,6 +10,7 @@ const song: Song = {
   id: "mirror-tune",
   title: tune,
   youtubeId: "jd9tEPZVuy8",
+  swingGif: "/assets/guide/milabo.webp",
   lyrics: [
     {
       time: "0:0",
@@ -207,6 +208,7 @@ const song: Song = {
       original: "君がいなきゃ始まんない",
       pronunciation: "키미가 이나캬 하지만나이",
       translation: "네가 없으면 시작하지 않아",
+      swingGif: true,
       cheer: {
         text: "좌우로 반복 ~",
         tag: "swing",
@@ -217,6 +219,7 @@ const song: Song = {
       original: "繋ぐぜ笑っとく",
       pronunciation: "츠나구제 와랏토쿠",
       translation: "이어갈게 웃어 줘",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -227,6 +230,7 @@ const song: Song = {
       original: "どんな逆境だって 煮詰まった",
       pronunciation: "돈나 걋쿄오닷테 니츠맛타",
       translation: "어떤 역경이라도 견뎌낸",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -237,6 +241,7 @@ const song: Song = {
       original: "頑固な僕だって",
       pronunciation: "간코나 보쿠닷테",
       translation: "완고한 나조차도",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -247,6 +252,7 @@ const song: Song = {
       original: "めんどくさい☆諦め悪いみたい",
       pronunciation: "멘도쿠사이☆ 아키라메 와루이미타이",
       translation: "귀찮아☆라며 포기하지 못하는 것 같아",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -257,6 +263,7 @@ const song: Song = {
       original: "まだ重々謙遜したい yey",
       pronunciation: "마다 쥬우쥬우 켄손시타이 yey",
       translation: "아직 계속 겸손하고 싶어 yey",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -267,6 +274,7 @@ const song: Song = {
       original: "止まらないよ心臓 揺るがないんだ",
       pronunciation: "토마라나이요 신조 유루가나인다",
       translation: "멈추지 않아 심장이 동요하지 않아",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -377,6 +385,7 @@ const song: Song = {
       original: "君がいなきゃ始まんない",
       pronunciation: "키미가 이나캬 하지만나이",
       translation: "네가 없으면 시작되지 않아",
+      swingGif: true,
       cheer: {
         text: "좌우로 반복 ~",
         tag: "swing",
@@ -387,6 +396,7 @@ const song: Song = {
       original: "繋ぐぜ笑っとく",
       pronunciation: "츠나구제 와랏토쿠",
       translation: "손 잡자 웃어 줘",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -397,6 +407,7 @@ const song: Song = {
       original: "どんな逆境だって 煮詰まった",
       pronunciation: "돈나 걋쿄오닷테 니츠맛타",
       translation: "어떤 역경이라도 견뎌낸",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -407,6 +418,7 @@ const song: Song = {
       original: "頑固な僕だって",
       pronunciation: "간코나 보쿠닷테",
       translation: "완고한 나조차도",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -417,6 +429,7 @@ const song: Song = {
       original: "めんどくさい☆諦め悪いみたい",
       pronunciation: "멘도쿠사이☆ 아키라메 와루이미타이",
       translation: "귀찮아☆라며 포기하지 못하는 것 같아",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -427,6 +440,7 @@ const song: Song = {
       original: "まだ重々謙遜したい yey",
       pronunciation: "마다 쥰쥰켓쇼오 시타이 yey",
       translation: "아직 계속 겸손해지고 싶어 yey",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -437,6 +451,7 @@ const song: Song = {
       original: "止まらないよ心臓 揺るがないんだ",
       pronunciation: "토마라나이요 신조 유루가나인다",
       translation: "멈추지 않아 심장이 동요하지 않아",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -506,6 +521,7 @@ const song: Song = {
       original: "君がいなきゃ始まんない",
       pronunciation: "키미가 이나캬 하지만나이",
       translation: "네가 없으면 시작되지 않아",
+      swingGif: true,
       cheer: {
         text: "좌우로 반복 ~",
         tag: "swing",
@@ -516,6 +532,7 @@ const song: Song = {
       original: "歌うぜ GACHIフォーㆍユー",
       pronunciation: "우타우제 GACHI 포- 유-",
       translation: "노래할게 GACHI for you",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -526,6 +543,7 @@ const song: Song = {
       original: "どんな逆境だってあっちゅう間だ",
       pronunciation: "돈나 걋쿄오닷테 앗츄우맛다",
       translation: "어떤 역경도 순식간에 지나가",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -536,6 +554,7 @@ const song: Song = {
       original: "頑固な僕だって",
       pronunciation: "간코나 보쿠닷테",
       translation: "완고한 나조차도",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -546,6 +565,7 @@ const song: Song = {
       original: "めんどくさい☆諦め悪いみたい",
       pronunciation: "멘도쿠사이☆ 아키라메 와루이미타이",
       translation: "귀찮아☆라며 포기하지 못하는 것 같아",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -556,6 +576,7 @@ const song: Song = {
       original: "まだ準々決勝したい yey",
       pronunciation: "마다 쥰쥰켓쇼오 시타이 yey",
       translation: "아직 준준결승전을 하고 싶어 yey",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -566,6 +587,7 @@ const song: Song = {
       original: "染まらないよ心臓 揺るがないんだ",
       pronunciation: "소마라나이요 신조 유루가나인다", // TODO : 토마라나이요 인가?
       translation: "물들지 않아 심장은 흔들리지 않아",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",

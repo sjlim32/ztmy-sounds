@@ -8,6 +8,7 @@ import {
   PlayerNextButton,
   PlayerSongListLink,
 } from "@/features/guide/components/PlayerControls";
+import { SwingGuideGif } from "@/features/guide/components/SwingGuideGif";
 
 const playerAreaStyles = cva(
   [
@@ -74,6 +75,7 @@ export function GuidePlayerArea() {
       </div>
       <PlayerSongListLink />
       <PlayerNextButton />
+      <SwingGuideGif />
     </div>
   );
 }

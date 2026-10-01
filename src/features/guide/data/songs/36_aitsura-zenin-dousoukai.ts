@@ -10,6 +10,8 @@ const song: Song = {
   id: "inside-joke",
   title: dousoukai,
   youtubeId: "o2tonXY8lCY",
+  swingGif: "/assets/guide/dousoukai.webp",
+  swingGifSize: 100,
   lyrics: [
     //================ 1절 ================//
     {
@@ -138,6 +140,7 @@ const song: Song = {
       original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
+      swingGif: true,
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -179,6 +182,7 @@ const song: Song = {
       original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
+      swingGif: true,
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -219,6 +223,7 @@ const song: Song = {
       original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
+      swingGif: true,
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -259,6 +264,7 @@ const song: Song = {
       original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
+      swingGif: true,
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -391,6 +397,7 @@ const song: Song = {
       original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
+      swingGif: true,
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -432,6 +439,7 @@ const song: Song = {
       original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
+      swingGif: true,
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -473,6 +481,7 @@ const song: Song = {
       original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
+      swingGif: true,
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -514,6 +523,7 @@ const song: Song = {
       original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
+      swingGif: true,
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -656,6 +666,7 @@ const song: Song = {
       original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
+      swingGif: true,
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -697,6 +708,7 @@ const song: Song = {
       original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
+      swingGif: true,
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -714,7 +726,7 @@ const song: Song = {
       },
     },
     {
-      time: "3:285",
+      time: "3:28.5",
       original: "あいつら全員同窓会",
       pronunciation: "아이츠라 젠인 도오소오카이",
       translation: "쟤네들 전부 동창회",
@@ -738,6 +750,7 @@ const song: Song = {
       original: "シャイな空騒ぎ",
       pronunciation: "샤이나 카라사와**^기^**",
       translation: "Shy한 헛소동",
+      swingGif: true,
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",
@@ -779,6 +792,7 @@ const song: Song = {
       original: "身勝手な僕でいい",
       pronunciation: "미갓테나 보쿠데이**^이^**",
       translation: "제멋대로인 나로 좋아",
+      swingGif: true,
       cheer: {
         text: "스프링처럼 몸을 낮추다 마지막에 Jump",
         tag: "swing",

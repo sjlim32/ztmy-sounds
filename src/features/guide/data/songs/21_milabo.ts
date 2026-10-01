@@ -10,6 +10,7 @@ const song: Song = {
   id: "milabo",
   title: milabo,
   youtubeId: "YoEg32VNyoQ",
+  swingGif: "/assets/guide/milabo.webp",
   lyrics: [
     {
       time: "0:0",
@@ -201,6 +202,7 @@ const song: Song = {
       original: "もっと",
       pronunciation: "못토",
       translation: "좀 더",
+      swingGif: true,
       cheer: {
         text: "좌우로 반복 ~",
         tag: "swing",
@@ -211,6 +213,7 @@ const song: Song = {
       original: "仕草に揺れて 抑えきれないほどに",
       pronunciation: "시구사니 유레테 오사에키레나이 호도니",
       translation: "몸짓에 흔들려 억누를 수 없을 정도로",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -221,6 +224,7 @@ const song: Song = {
       original: "リズムがなきゃ 話も味っけない",
       pronunciation: "리즈무가 나캬 하나시모 아짓케나이",
       translation: "리듬이 없다면 이야기도 재미없어",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -231,6 +235,7 @@ const song: Song = {
       original: "ミラーボール怖がって アコギ持ち替えたら",
       pronunciation: "미라-보-루 코와갓테 아코기 모치카에타라",
       translation: "미러볼이 무서워서 어쿠스틱 기타를 고쳐 쥔다면",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -241,6 +246,7 @@ const song: Song = {
       original: "まだ 恥ずかしく踊れるから",
       pronunciation: "마다 하즈카시쿠 오도레루카라",
       translation: "아직 부끄럽지만 춤출 수 있으니까",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -251,6 +257,7 @@ const song: Song = {
       original: "ずっと 浅はかです",
       pronunciation: "즛토 아사하카데스",
       translation: "항상 바보같아요",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -261,6 +268,7 @@ const song: Song = {
       original: "帰りたくないけれど",
       pronunciation: "카에리타쿠나이케레도",
       translation: "돌아가긴 싫지만",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -271,6 +279,7 @@ const song: Song = {
       original: "言わないで",
       pronunciation: "이와나이데",
       translation: "말하지 말아줘",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -281,6 +290,7 @@ const song: Song = {
       original: "もう身体に慣れない",
       pronunciation: "모우 카라다니 나레나이",
       translation: "아직 몸에 적응이 안 돼",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -291,6 +301,7 @@ const song: Song = {
       original: "変わってゆくから",
       pronunciation: "카왓테유쿠카라",
       translation: "변해갈 테니까",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -301,6 +312,7 @@ const song: Song = {
       original: "私ねもっと",
       pronunciation: "와타시네 못토",
       translation: "나 말야, 좀더",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -311,6 +323,7 @@ const song: Song = {
       original: "ねぇ、見届けて 欲しがりでも",
       pronunciation: "네에, 미토도케테 호시가리데모",
       translation: "있잖아, 배웅해 줘 욕심일지라도",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -398,6 +411,7 @@ const song: Song = {
       original: "もっと",
       pronunciation: "못토",
       translation: "좀 더",
+      swingGif: true,
       cheer: {
         text: "좌우로 반복 ~",
         tag: "swing",
@@ -408,6 +422,7 @@ const song: Song = {
       original: "仕草に揺れて 抑えきれないほどに",
       pronunciation: "^시구사니 유레테^ 오사에키레나이 호도니",
       translation: "몸짓에 흔들려 억누를 수 없을 정도로",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -419,6 +434,7 @@ const song: Song = {
       original: "リズムが泣きゃ 話も味っけない",
       pronunciation: "리즈무가 나캬 하나시모 아짓케나이",
       translation: "리듬이 울어야만 이야기도 재미없어",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -429,6 +445,7 @@ const song: Song = {
       original: "ミラーボール怖がって アコギ持ち替えたら",
       pronunciation: "미라-보-루 코와갓테 아코기 모치카에타라",
       translation: "미러볼이 무서워서 어쿠스틱 기타를 고쳐 쥐면",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -439,6 +456,7 @@ const song: Song = {
       original: "まだ 恥ずかしく踊れるから",
       pronunciation: "마다 하즈카시쿠 오도레루카라",
       translation: "아직 부끄럽지만 춤출 수 있으니까",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -449,6 +467,7 @@ const song: Song = {
       original: "ずっと 浅はかです",
       pronunciation: "즛토 아사하카데스",
       translation: "항상 바보같아요",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -459,6 +478,7 @@ const song: Song = {
       original: "帰りたくないけれど",
       pronunciation: "카에리타쿠나이케레도",
       translation: "돌아가긴 싫지만",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -469,6 +489,7 @@ const song: Song = {
       original: "言わないで",
       pronunciation: "이와나이데",
       translation: "말하지 말아줘",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -479,6 +500,7 @@ const song: Song = {
       original: "もう身体に鳴れない",
       pronunciation: "모우 카라다니 나레나이",
       translation: "아직 몸에 고동치지 않아",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -489,6 +511,7 @@ const song: Song = {
       original: "変わってゆくから",
       pronunciation: "카왓테유쿠카라",
       translation: "변해갈 테니까",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -499,6 +522,7 @@ const song: Song = {
       original: "私ねもっと",
       pronunciation: "와타시네 못토",
       translation: "나 말야, 좀더",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",
@@ -509,6 +533,7 @@ const song: Song = {
       original: "寝ぇ, 見届けて 欲しがりでも zz",
       pronunciation: "네에, 미토도케테 호시가리데모 zz",
       translation: "수면, 배웅해 줘 욕심일지라도 zz",
+      swingGif: true,
       cheer: {
         text: "",
         tag: "swing",

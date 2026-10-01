@@ -4,6 +4,7 @@ import { GuidePlayerArea } from "@/features/guide/components/GuidePlayerArea";
 import { GuideListScroll } from "@/features/guide/components/GuideListScroll";
 import { GuideMainScrollArea } from "@/features/guide/components/GuideMainScrollArea";
 import { SongPanel } from "@/features/guide/components/SongPanel";
+import { SwingGuideGifOverlay } from "@/features/guide/components/SwingGuideGif";
 import { NoticePanel } from "@/features/notice/components/NoticePanel";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +31,8 @@ export default function GuideLayout({ children }: LayoutProps<"/guide">) {
             <SongPanel />
           </div>
         </GuideListScroll>
+        {/* GuideListScroll 바깥에 둬야 그 스크롤 페이드 마스크에 안 잘림 */}
+        <SwingGuideGifOverlay />
         {children}
       </PlayerProvider>
     </GuideModeProvider>
