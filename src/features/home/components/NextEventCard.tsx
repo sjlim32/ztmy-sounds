@@ -105,7 +105,7 @@ function NextEventCardComponent({
           className={cn(
             "group cursor-pointer",
             isDone ? "tablet:flex hidden" : "flex",
-            "h-10 w-full items-center justify-center gap-1.5 rounded-t-md bg-black/40 font-mono text-xs tracking-[0.3em] text-white/70 uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] transition-colors duration-300 hover:bg-black/55 hover:text-white",
+            "h-10 w-full items-center justify-center gap-1.5 rounded-t-md bg-black/40 font-mono text-xs tracking-[0.3em] text-white/70 uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] transition-colors duration-300 hover:bg-black/55 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
             "tablet:h-auto tablet:bg-transparent tablet:justify-start tablet:text-sm tablet:hover:bg-transparent tablet:font-semibold",
           )}
         >
@@ -177,7 +177,7 @@ function NextEventCardComponent({
                     </Link>
 
                     <div>
-                      <p className="font-mono text-[8px] tracking-[0.2em] text-white/40 uppercase">
+                      <p className="font-mono text-[10px] tracking-[0.2em] text-white/55 uppercase">
                         Date
                       </p>
                       <p
@@ -192,7 +192,7 @@ function NextEventCardComponent({
                     </div>
 
                     <div>
-                      <p className="font-mono text-[8px] tracking-[0.2em] text-white/40 uppercase">
+                      <p className="font-mono text-[10px] tracking-[0.2em] text-white/55 uppercase">
                         Venue
                       </p>
                       <span className="text-xs text-white">{event.place}</span>
@@ -236,7 +236,7 @@ function NextEventCardComponent({
                   {/* 콘서트 티켓 스텁을 참고한 레이아웃 — DATE/VENUE 두 반쪽을
                   점선 절취선으로 나누고, 절취선과 상단 띠 둘 다 accent 색을
                   씁니다. */}
-                  <div className="relative flex w-full overflow-hidden bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]">
+                  <div className="relative flex w-full overflow-hidden rounded-md border border-white/10 bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]">
                     <div
                       className={cn(
                         "absolute inset-x-0 top-0 h-0.5 bg-linear-to-r",
@@ -245,7 +245,7 @@ function NextEventCardComponent({
                     />
 
                     <div className="flex-1 p-3">
-                      <p className="font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase">
+                      <p className="font-mono text-[10px] tracking-[0.25em] text-white/55 uppercase">
                         Date
                       </p>
                       <p
@@ -270,7 +270,7 @@ function NextEventCardComponent({
                     />
 
                     <div className="flex-1 p-3">
-                      <p className="font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase">
+                      <p className="font-mono text-[10px] tracking-[0.25em] text-white/55 uppercase">
                         Venue
                       </p>
                       <p

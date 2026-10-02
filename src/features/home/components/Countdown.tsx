@@ -35,7 +35,7 @@ export function Countdown({
     <div
       data-role="countdown"
       className={cn(
-        "flex w-full items-center justify-center gap-3 rounded-lg bg-black/30 py-1 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
+        "flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-black/30 py-1 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
         "tablet:gap-4 tablet:p-4",
       )}
     >
@@ -99,7 +99,7 @@ export function Countdown({
           )
         ) : (
           <>
-            <p className="tablet:text-xs font-mono text-[9px] tracking-[0.3em] text-white/50 uppercase">
+            <p className="tablet:text-xs font-mono text-[10px] tracking-[0.3em] text-white/55 uppercase">
               공연까지
             </p>
             <p
@@ -115,19 +115,19 @@ export function Countdown({
                     "0",
                   )}
                 </span>
-                <span className="tablet:text-[10px] text-[8px] font-normal text-white/50">
+                <span className="text-[10px] font-normal text-white/55">
                   시
                 </span>
               </span>
               <span className="tablet:gap-1 inline-flex items-baseline gap-0.5">
                 <span>{String(remaining.minutes).padStart(2, "0")}</span>
-                <span className="tablet:text-[10px] text-[8px] font-normal text-white/50">
+                <span className="text-[10px] font-normal text-white/55">
                   분
                 </span>
               </span>
               <span className="tablet:gap-1 inline-flex items-baseline gap-0.5">
                 <span>{String(remaining.seconds).padStart(2, "0")}</span>
-                <span className="tablet:text-[10px] text-[8px] font-normal text-white/50">
+                <span className="text-[10px] font-normal text-white/55">
                   초
                 </span>
               </span>

@@ -77,18 +77,18 @@ function MainNavLinkComponent({
     <Link
       href={href}
       className={cn(
-        "group flex items-center gap-3 rounded-lg bg-black/40 px-4 py-1 focus-visible:outline-none",
-        "tablet:px-4 tablet:py-2 tablet:min-w-48 tablet:bg-transparent",
+        "group flex items-center gap-3 rounded-lg border border-white/10 bg-black/45 px-4 py-1.5 transition-colors hover:bg-black/55 focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+        "tablet:px-4 tablet:py-2 tablet:min-w-48 tablet:border-0 tablet:bg-transparent tablet:hover:bg-transparent",
       )}
     >
       <span className={badgeStyles({ accent })}>
-        <Icon className={cn("h-3 w-3", "tablet:h-4 w-4")} />
+        <Icon className={cn("h-3 w-3", "tablet:h-4 tablet:w-4")} />
       </span>
 
       <span className="flex flex-col drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
         <span
           className={cn(
-            "font-mono text-[9px] font-medium tracking-[0.3em] text-white/50 uppercase",
+            "font-mono text-[10px] font-medium tracking-[0.3em] text-white/55 uppercase",
             "tablet:text-xs",
           )}
         >

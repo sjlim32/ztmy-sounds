@@ -25,15 +25,22 @@ export function Header({ artist }: { artist: artist }) {
         </div>
       </div>
 
-      {/* 메인 텍스트: 기존과 동일한 깔끔한 화이트 솔리드 */}
+      {/* 메인 텍스트: 마젠타 그림자를 살짝 어긋나게 겹쳐 레트로 인쇄물의
+      판 어긋남(미스레지스트레이션) 느낌을 낸다. drop-shadow 필터를 쓰면 그
+      마젠타 그림자에까지 그림자가 져서 text-shadow 한 줄로 같이 처리. */}
       <span
         className={cn(
           "font-mkpop leading-tight font-extrabold tracking-tight text-white",
+          "[text-shadow:0.05em_0.05em_0_var(--ztmy-magenta),0_4px_16px_rgba(0,0,0,0.6)]",
           "pc:text-6xl tablet:text-5xl",
-          "drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)]",
         )}
       >
         {artist.name.jp}
+      </span>
+
+      {/* 일본어 제목만으로는 읽기 어려운 방문자를 위한 한국어 표기 */}
+      <span className="mt-2 pl-1 text-sm font-medium tracking-wide text-white/75 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+        {artist.name.kr}
       </span>
     </header>
   );
