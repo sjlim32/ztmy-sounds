@@ -1,4 +1,21 @@
 import Image from "next/image";
+import { SiteLink } from "@/components/SiteLink";
+
+<div className="flex flex-col gap-1 p-4 bg-white/5 mb-4 rounded-lg border border-white/10">
+  <SiteLink
+    href="https://zutomayo.net/shamoji/"
+    className="justify-center font-semibold"
+  >
+    {"Shamoji란?"}
+  </SiteLink>
+
+  <SiteLink
+    href="https://zutomayo.net/live_guideline/"
+    className="justify-center font-semibold"
+  >
+    {"공식 라이브 가이드라인"}
+  </SiteLink>
+</div>
 
 <b className="text-white/80">
   해당 가이드는 단순 참고 및 예습의 도구로서만 활용해주시고,
@@ -16,15 +33,6 @@ import Image from "next/image";
     '"멈춤"은 해당 가이드에선 사용하지 않으며 실제 공연 시 전광판의 표시에 따라주세요.'
   }
 </p>
-
-<a
-  href="https://zutomayo.net/shamoji/"
-  rel="noopener noreferrer"
-  target="_blank"
-  className="hover:text-ztmy-pink my-4 block text-center underline underline-offset-2 transition-colors"
->
-  {"공식 홈페이지 - 샤모지 가이드"}
-</a>
 
 <section className="flex text-center justify-center tablet:gap-12 gap-6 mt-3">
   <figure className="flex flex-col text-center gap-0">
