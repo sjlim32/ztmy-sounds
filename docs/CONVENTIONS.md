@@ -94,8 +94,13 @@ src/
     seo.ts                   # 사이트 전역 메타데이터 상수 (SITE_NAME 등)
     use-install-prompt.ts    # PWA beforeinstallprompt/appinstalled 공용 훅
                              # (아래 "PWA 설치 프롬프트" 참고)
-  fonts/                    # 로컬 폰트 파일 (LINE Seed KR, 851MkPOP)
+  fonts/                    # 로컬 폰트 원본 (LINE Seed KR, 851MkPOP) — 직접 로드하지 않음
+    subset/                 # 실제로 로드되는 서브셋. dev·build 시작 때 자동 생성되며
+                             # git에는 올리지 않음
 ```
+
+`src/` 밖에는 빌드 보조 스크립트를 두는 `scripts/`가 있습니다
+(`subset-fonts.mjs` — 폰트 서브셋 생성).
 
 ## Import
 
@@ -134,6 +139,12 @@ src/
   `getSong(id)`를 제공.
 - 새 곡 추가 시: 다음 번호로 파일 하나 만들고 `index.ts`에 import + `songList`
   배열 항목 추가.
+- 곡 제목 폰트(851MkPOP)는 제목에 쓰인 글자만 담은 서브셋인데, dev·build가
+  시작할 때 자동으로 다시 만들어지므로 곡을 추가해도 따로 할 일은 없습니다.
+  개발 서버를 켠 채 추가했다면 `pnpm fonts:subset`을 실행해야(재시작 불필요) 새
+  제목의 한자가 제 폰트로 보입니다. 제목을 `jp: "…"` 문자열이 아닌 형태로 적어
+  글자가 빠지면 `pnpm build`가 끝에서 에러로 알려 줍니다(`docs/RULES.md`의 폰트
+  서브셋 항목).
 - 스윙 동작 예시 애니메이션이 있는 곡은 `public/assets/guide/<song-id>.webp`를
   두고(원본 크기 그대로 표시, GIF는 용량이 커서 애니메이션 WebP로 변환해서 넣음) `Song.swingGif`에 경로를 적습니다. 응원 가이드(/guide)에서만 표시되며
   (`SwingGuideGif.tsx`) tablet 이상은 영상 하단에 상시, 모바일은 현재 가사 줄에
@@ -206,7 +217,9 @@ src/
   따릅니다 (예: `public/assets/notice/festival/*.webp`). `/assets` 접두사를
   빠뜨리면 404가 납니다.
 - 배경 이미지는 `public/backgrounds/`, PWA/매니페스트 아이콘은 `public/icons/`,
-  Open Graph 이미지는 `public/og/`, 폰트는 `public/fonts/`에 둡니다.
+  Open Graph 이미지는 `public/og/`에 둡니다. 폰트는 `public/`이 아니라 원본을
+  `src/fonts/`에 두고, `scripts/subset-fonts.mjs`가 만든 `src/fonts/subset/`
+  파일을 `next/font/local`로 로드합니다.
 
 ## 페이지 스크롤 레이아웃 + Footer
 

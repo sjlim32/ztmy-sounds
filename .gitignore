@@ -18,6 +18,9 @@ bower_components
 /out/
 /build
 
+# 폰트 서브셋 (next.config.ts가 dev·build 시작 때 scripts/subset-fonts.mjs로 생성)
+/src/fonts/subset/
+
 # cloudflare
 .wrangler
 dist

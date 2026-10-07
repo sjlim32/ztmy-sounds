@@ -5,11 +5,13 @@
   "scripts": {
     "dev": "next dev -p3303",
     "build": "next build",
+    "postbuild": "node scripts/subset-fonts.mjs --check-out",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "pages:deploy": "next build && wrangler pages deploy out"
+    "fonts:subset": "node scripts/subset-fonts.mjs",
+    "pages:deploy": "pnpm build && wrangler pages deploy out"
   },
   "dependencies": {
     "@fontsource/line-seed-jp": "^5.3.1",
@@ -39,6 +41,7 @@
     "eslint-config-next": "16.3.7",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "subset-font": "^2.9.0",
     "supabase": "^2.117.0",
     "tailwindcss": "^4",
     "typescript": "^5",

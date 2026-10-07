@@ -22,6 +22,7 @@ export interface LyricLine {
 }
 
 export interface SongTitle {
+  /** 곡 목록에 851MkPOP으로 표시 — 폰트 서브셋이 `jp: "…"` 문자열에서 글자를 모으므로 문자열 하나로 적기 */
   jp: string;
   kr: string;
   en: string;

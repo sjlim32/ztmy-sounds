@@ -60,3 +60,20 @@
   스케일에 없는 임의 숫자)을 빌드 에러 없이 조용히 무시합니다 — 클래스가
   그냥 아무 효과 없이 사라질 뿐이라 눈으로 봐도 잘 안 티가 납니다(둘 다 실제
   발생한 버그). 의심되면 빌드 결과 HTML에서 그 클래스 문자열을 grep해보세요.
+- 로컬 폰트(851MkPOP, LINE Seed KR)는 원본이 아니라 `scripts/subset-fonts.mjs`가
+  만든 서브셋(`src/fonts/subset/`, git 미포함)을 로드합니다 — 원본을 그대로
+  preload했을 때 첫 로딩 5.6MB 중 4.3MB가 이 폰트들이었습니다. `layout.tsx`의
+  경로를 원본으로 되돌리지 마세요.
+  - 서브셋은 `next.config.ts`가 dev·build 시작 때 만듭니다(입력이 같으면
+    건너뜀). 개발 서버가 떠 있는 동안 바뀐 글자는 `pnpm fonts:subset`을 실행하면
+    재시작 없이 반영됩니다.
+  - 851MkPOP에는 가나·ASCII와 소스의 `jp: "…"` 글자만, LINE Seed KR에는 KS X
+    1001 한글과 `src/`에 등장하는 한글만 들어 있습니다(한글 외 글리프는 전부
+    유지). 그 밖의 글자는 시스템 폰트로 보입니다.
+  - 그래서 `pnpm build`가 끝에 `out/`을 검사해(`postbuild`), `font-mkpop` 클래스
+    요소의 글자나 한글 중 서브셋에 없는 것이 있으면 빌드를 실패시키고 고칠 곳을
+    알려 줍니다 — 다른 형태로 선언한 제목, 제목이 아닌 텍스트에 쓴 `font-mkpop`,
+    Supabase에서 온 드문 음절(→ 스크립트의 `EXTRA_HANGUL`)이 여기서 걸립니다.
+    `next build`를 직접 실행하면 이 검사를 건너뛰니 배포는 `pnpm pages:deploy`로
+    하세요.
+  - Thin(100) 굵기는 로드하지 않습니다 — `font-thin`은 Regular로 보입니다.

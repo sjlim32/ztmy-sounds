@@ -1,6 +1,13 @@
+import { execFileSync } from "node:child_process";
 import type { NextConfig } from "next";
 import createMDX from "@next/mdx";
 import { withSerwist } from "@serwist/turbopack";
+
+// 로컬 폰트 서브셋(src/fonts/subset/, git 미포함)을 dev·build가 시작하기 전에
+// 만듭니다 — layout.tsx의 next/font가 이 파일들을 읽습니다. 입력이 같으면 바로 끝납니다.
+execFileSync(process.execPath, ["scripts/subset-fonts.mjs"], {
+  stdio: "inherit",
+});
 
 const nextConfig: NextConfig = {
   output: "export",

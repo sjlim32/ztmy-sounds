@@ -3,7 +3,6 @@ import { IBM_Plex_Mono, RocknRoll_One } from "next/font/google";
 import localFont from "next/font/local";
 import "@fontsource/line-seed-jp/400.css";
 import "@fontsource/line-seed-jp/700.css";
-import "@fontsource/line-seed-jp/800.css";
 import { SerwistProvider } from "@serwist/turbopack/react";
 import { BodyScrollGuard } from "@/components/BodyScrollGuard";
 import { CustomCursor } from "@/components/CustomCursor";
@@ -18,35 +17,32 @@ import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
 import { buildSiteJsonLdGraph } from "@/lib/structured-data";
 import "../globals.css";
 
+// 로컬 폰트는 원본이 아니라 scripts/subset-fonts.mjs가 만든 서브셋을 씁니다 —
+// 원본을 그대로 preload하면 첫 로딩 전송량 대부분을 폰트가 차지합니다.
 const lineSeedKR = localFont({
   src: [
     {
-      path: "../../fonts/LINESeedKR-Th.woff2",
-      weight: "100",
-      style: "normal",
-    },
-    {
-      path: "../../fonts/LINESeedKR-Rg.woff2",
+      path: "../../fonts/subset/LINESeedKR-Rg.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../../fonts/LINESeedKR-Rg.woff2",
+      path: "../../fonts/subset/LINESeedKR-Rg.woff2",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../../fonts/LINESeedKR-Bd.woff2",
+      path: "../../fonts/subset/LINESeedKR-Bd.woff2",
       weight: "600",
       style: "normal",
     },
     {
-      path: "../../fonts/LINESeedKR-Bd.woff2",
+      path: "../../fonts/subset/LINESeedKR-Bd.woff2",
       weight: "700",
       style: "normal",
     },
     {
-      path: "../../fonts/LINESeedKR-Bd.woff2",
+      path: "../../fonts/subset/LINESeedKR-Bd.woff2",
       weight: "800",
       style: "normal",
     },
@@ -68,7 +64,7 @@ const rocknrollOne = RocknRoll_One({
 });
 
 const mkpop = localFont({
-  src: "../../fonts/851MkPOP_101.ttf",
+  src: "../../fonts/subset/851MkPOP_101.woff2",
   variable: "--font-mkpop-101",
   display: "swap",
 });
