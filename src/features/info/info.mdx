@@ -6,6 +6,7 @@ import {
   EventDetails,
   ImageLabel,
 } from "@/features/info/components/EventDetails";
+import { ImageGallery } from "@/features/info/components/ImageGallery";
 import { InfoTabProvider } from "@/features/info/components/InfoTabContext";
 import { InfoTabs } from "@/features/info/components/InfoTabs";
 import { TabSection } from "@/features/info/components/TabSection";
@@ -41,23 +42,24 @@ export const toGroupImages = (imgs) =>
 
 <section className="mt-6 flex flex-col gap-3">
   <DetailList title="축제 Area 일정" note="입장 무료, 각 워크샵 및 미니게임은 별도 참가권 판매">
-    <DetailField label="입장 및 참가권 판매" className="flex-row">  
+    <DetailField label="입장 및 참가권 판매" inline>  
       09:30
     </DetailField>
-    <DetailField label="축제 AREA 개장" className="flex-row">
+    <DetailField label="축제 AREA 개장" inline>
       10:00
     </DetailField>
-    <DetailField label="축제 AREA 종료" className="flex-row">
+    <DetailField label="축제 AREA 종료" inline>
       17:30
     </DetailField>
-    <DetailField label="SIDE STAGE '낮의 연회'" className="flex-row">
+    <DetailField label="SIDE STAGE '낮의 연회'" inline>
       10:30 ~ 15:00
     </DetailField>
   </DetailList>
 
   <DetailList title="공연 일정" note="※ 우천 결행 ・ 황천 중지">
-    <DetailField label="개장" className="flex-row">15:30</DetailField>
-    <DetailField label="개연" className="flex-row">17:30</DetailField>
+    <DetailField label="집합 시간" inline>15:00 ~ 16:15 (입장구역 별 확인)</DetailField>
+    <DetailField label="개장" inline>15:30</DetailField>
+    <DetailField label="개연" inline>17:30</DetailField>
   </DetailList>
 </section>
 
@@ -65,6 +67,57 @@ export const toGroupImages = (imgs) =>
   <InfoTabs />
 
   <div className="flex flex-col gap-3">
+    <TabSection id="gather">
+      <ImageLabel id="gather" label="입장·집합 안내" />
+
+      <DetailList>
+        <DetailField label="집합 시간">
+          <div className="flex flex-col gap-0.5">
+            <span><strong className="text-ztmy-pink">15:00</strong>{` 일반 Area "A, B, C, G, H"`}</span>
+            <span><strong className="text-ztmy-pink">16:00</strong>{` 프리미엄 Area "P1~P6"`}</span>
+            <span><strong className="text-ztmy-pink">16:15</strong>{` 일반 Area "D, E, F, N"`}</span>
+          </div>
+        </DetailField>
+        <DetailField label="집합 장소">{`아래 이미지 참고`}</DetailField>
+        <DetailField label="늦은 경우">
+          <span>{`집합 시간에 늦어도 입장할 수 있습니다. 그 시점에 호출 중인 입장 정리 번호에 맞춰 입장하니, 각 입장구로 와 주세요.`}</span>
+        </DetailField>
+        <DetailField label="입장 방법">
+          <span>{`전자 티켓 앱과 티켓을 미리 다운로드해 주세요.`}</span>
+        </DetailField>
+        <DetailField label="티켓피아 (MOALA Pocket)">
+          <div className="flex flex-row flex-wrap items-center gap-x-2">
+            <SiteLink href="https://play.google.com/store/apps/details?id=fun.moala.pocket">{`Google Play`}</SiteLink>
+            <span>/</span>
+            <SiteLink href="https://apps.apple.com/jp/app/moala-pocket/id1626245204">{`App Store`}</SiteLink>
+          </div>
+        </DetailField>
+        <DetailField label="로치케">
+          <div className="flex flex-row flex-wrap items-center gap-x-2">
+            <SiteLink href="https://play.google.com/store/apps/details?id=jp.lhe.ebillet">{`Google Play`}</SiteLink>
+            <span>/</span>
+            <SiteLink href="https://apps.apple.com/jp/app/%E3%83%AD%E3%83%BC%E3%83%81%E3%82%B1%E9%9B%BB%E5%AD%90%E3%83%81%E3%82%B1%E3%83%83%E3%83%88/id1175974437">{`App Store`}</SiteLink>
+          </div>
+        </DetailField>
+        <DetailField label="이플러스 (e+)">
+          <div className="flex flex-row flex-wrap items-center gap-x-2">
+            <SiteLink href="https://play.google.com/store/apps/details?id=jp.eplus.android.all.app">{`Google Play`}</SiteLink>
+            <span>/</span>
+            <SiteLink href="https://apps.apple.com/jp/app/e-%E3%82%A4%E3%83%BC%E3%83%97%E3%83%A9%E3%82%B9-%E3%83%81%E3%82%B1%E3%83%83%E3%83%88-%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9-%E3%82%B9%E3%83%9E%E3%83%81%E3%82%B1/id465887673">{`App Store`}</SiteLink>
+          </div>
+        </DetailField>
+        <DetailField label="링크">
+          <SiteLink href="https://zutomayo.net/news/657/">{`공식 공지사항`}</SiteLink>
+        </DetailField>
+      </DetailList>
+
+      <ImageGallery
+        images={toGroupImages(sections["gather"])}
+        className="tablet:grid-cols-2"
+        itemClassNames={["tablet:row-span-2"]}
+      />
+    </TabSection>
+
     <TabSection id="notice">
       <ImageLabel id="notice" label="공연" />
       <div className="tablet:flex-row flex flex-col items-center justify-center gap-3">
@@ -123,13 +176,18 @@ export const toGroupImages = (imgs) =>
         </DetailField>
       </DetailList>
 
-      <div className="flex items-center gap-2 justify-center">
-        <ZoomableImageGroup
-          images={toGroupImages(sections["ztmy-mart"])}
-          thumbnailWidth={800}
-          thumbnailCrop="top"
-        />
-      </div>
+      <ImageGallery
+        images={toGroupImages(sections["ztmy-mart"])}
+        className="tablet:mx-auto tablet:max-w-2xl tablet:grid-cols-1"
+      />
+
+      <h3 className="mt-3 text-center font-semibold">상품 라인업과 구매 특전</h3>
+      <ImageGallery
+        images={toGroupImages(sections["ztmy-mart-lineup"])}
+        mobile="swipe"
+        swipeHeightClassName="h-96"
+        className="tablet:grid-cols-3"
+      />
 
       <div className="h-px w-full my-6 bg-white/20" />
 
@@ -156,13 +214,10 @@ export const toGroupImages = (imgs) =>
         </DetailField>
       </DetailList>
 
-      <div className="flex items-center justify-center">
-        <ZoomableImage
-          src={sections["ztmy-stand"][0].asset}
-          thumbnailWidth={1000}
-          thumbnailCrop="top"
-        />
-      </div>
+      <ImageGallery
+        images={toGroupImages(sections["ztmy-stand"])}
+        className="tablet:mx-auto tablet:max-w-2xl tablet:grid-cols-1"
+      />
     </TabSection>
 
     <TabSection id="map">
@@ -189,24 +244,31 @@ export const toGroupImages = (imgs) =>
 
     <TabSection id="matsuri-workshop">
       <ImageLabel id="matsuri-workshop" label="워크숍 & 미니 게임" />
-      <div className="tablet:flex-row flex flex-col items-center justify-center gap-3">
-        <ZoomableImageGroup
-          images={toGroupImages(sections["matsuri-workshop"])}
+      <div className="flex items-center justify-center">
+        <ZoomableImage
+          src={sections["matsuri-workshop-guide"][0].asset}
+          alt={sections["matsuri-workshop-guide"][0].name}
           thumbnailWidth={500}
           thumbnailCrop="top"
         />
       </div>
+
+      <ImageGallery
+        images={toGroupImages(sections["matsuri-workshop"])}
+        mobile="swipe"
+        swipeHeightClassName="h-[26rem]"
+        className="tablet:grid-cols-4 pc:grid-cols-5"
+      />
     </TabSection>
 
     <TabSection id="matsuri-food">
       <ImageLabel id="matsuri-food" label="음식 코너" />
-      <div className="flex items-center justify-center">
-        <ZoomableImage
-          src={sections["matsuri-food"][0].asset}
-          thumbnailWidth={1000}
-          thumbnailCrop="top"
-        />
-      </div>
+      <ImageGallery
+        images={toGroupImages(sections["matsuri-food"])}
+        mobile="swipe"
+        swipeHeightClassName="h-64"
+        className="tablet:grid-cols-2"
+      />
     </TabSection>
 
     <TabSection id="matsuri-sidestage">
@@ -247,20 +309,12 @@ export const toGroupImages = (imgs) =>
       <SiteLink href="https://zutomayo.net/special/bunka-denrai/#collab">
         {`공식 사이트 이동`}
       </SiteLink>
-
-      <div className="tablet:grid-cols-2 tablet:grid flex flex-col items-center justify-center gap-3">
-        <ZoomableImageGroup
-          images={toGroupImages(sections["matsuri-collabo"])}
-          thumbnailWidth={800}
-          thumbnailCrop="top"
-        />
-      </div>
     </TabSection>
 
     <TabSection id="stamp-rally">
       <ImageLabel id="stamp-rally" label="스탬프 랠리" />
 
-      <DetailList note="※ 스탬프 수집 자체에 대한 보상은 없음">
+      <DetailList title="나라 둘러보기" note="※ 스탬프 수집 자체에 대한 보상은 없음">
         <DetailField label="기간">10/1(수) - 10/31(금)</DetailField>
         <DetailField label="스탬프 용지">각 시설에서 배부</DetailField>
         <DetailField label="응모 방법">스탬프 행사장 QR 코드로 설문조사 참여</DetailField>
@@ -286,7 +340,26 @@ export const toGroupImages = (imgs) =>
       <div className="flex items-center justify-center">
         <ZoomableImage
           src={sections["stamp-rally"][0].asset}
+          alt={sections["stamp-rally"][0].name}
           thumbnailWidth={500}
+          thumbnailCrop="top"
+        />
+      </div>
+
+      <div className="h-px w-full my-6 bg-white/20" />
+
+      <DetailList title="전뢰집인 순회" note="※ 용지는 각 집인 장소에 있습니다. (특전 교환 등은 없습니다.)">
+        <DetailField label="일시">{`10/10(토)・10/11(일)`}</DetailField>
+        <DetailField label="내용">
+          <span>{`헤이조궁터 역사공원 안을 돌며 8개의 표시를 모으는 「전뢰집인 순회」. 포토 패널도 설치됩니다.`}</span>
+        </DetailField>
+      </DetailList>
+
+      <div className="flex items-center justify-center">
+        <ZoomableImage
+          src={sections["denrai-shuin"][0].asset}
+          alt={sections["denrai-shuin"][0].name}
+          thumbnailWidth={800}
           thumbnailCrop="top"
         />
       </div>

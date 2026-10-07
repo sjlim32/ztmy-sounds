@@ -25,7 +25,7 @@ export const INFO_TABS: { id: InfoTabId; label: string }[] = [
  * 안에 흩어놓는 것보다 파악하기 쉽기 때문이다.
  */
 export const INFO_TAB_SECTIONS: Record<InfoTabId, string[]> = {
-  concert: ["notice", "bonus", "map"],
+  concert: ["gather", "notice", "bonus", "map"],
   matsuri: [
     "map",
     "matsuri-map",
@@ -50,18 +50,22 @@ export const INFORMATION: InfoEvent = {
   date: "2026년 10월 10일·11일, 17시 30분",
   place: "헤이조궁터 역사공원 (平城宮跡歴史公園)",
   sections: [
+    { id: "gather", label: "입장·집합 안내" },
     { id: "notice", label: "공연" },
     { id: "bonus", label: "특전" },
     { id: "map", label: "전체 지도" },
     { id: "matsuri-map", label: "축제 AREA 지도" },
+    { id: "matsuri-workshop-guide", label: "워크숍 참여 방법" },
     { id: "matsuri-workshop", label: "워크숍 & 미니 게임" },
     { id: "matsuri-food", label: "음식 코너" },
     { id: "matsuri-sidestage", label: "사이드 스테이지" },
     { id: "matsuri-collabo", label: "나라현 콜라보 상품" },
     { id: "zutomarosh", label: "즛토마로슈" },
     { id: "ztmy-mart", label: "팝업" },
+    { id: "ztmy-mart-lineup", label: "MART 상품" },
     { id: "ztmy-stand", label: "팝업" },
     { id: "stamp-rally", label: "스탬프 랠리" },
+    { id: "denrai-shuin", label: "전뢰집인 순회" },
   ],
   url: {
     main: "https://zutomayo.net/bunka-denrai/",
@@ -78,6 +82,26 @@ export const INFORMATION: InfoEvent = {
     main: "/assets/next-stage/bunka-denrai.webp",
     sub: [
       {
+        name: "방문 시 협조 부탁",
+        asset: "/assets/info/gather_01.webp",
+        section: "gather",
+      },
+      {
+        name: "집합 시간·집합 장소 일람",
+        asset: "/assets/info/gather_02.webp",
+        section: "gather",
+      },
+      {
+        name: "Premium Area 집합 안내",
+        asset: "/assets/info/gather_03.webp",
+        section: "gather",
+      },
+      {
+        name: "집합 장소 지도",
+        asset: "/assets/info/gather_map.webp",
+        section: "gather",
+      },
+      {
         name: "티켓 정보",
         asset: "/assets/info/ticket.webp",
         section: "notice",
@@ -85,6 +109,11 @@ export const INFORMATION: InfoEvent = {
       {
         name: "공연장 지도",
         asset: "/assets/info/heijyoukyo-map-0617.webp",
+        section: "notice",
+      },
+      {
+        name: "STAGE AREA 지도",
+        asset: "/assets/info/area_map.webp",
         section: "notice",
       },
       {
@@ -108,44 +137,94 @@ export const INFORMATION: InfoEvent = {
         section: "matsuri-map",
       },
       {
-        name: "WORK SHOP & MINI GAME",
-        asset: "/assets/info/matsuri_02.webp",
-        section: "matsuri-workshop",
-      },
-      {
-        name: "WORK SHOP & MINI GAME",
+        name: "워크숍 참여 방법",
         asset: "/assets/info/matsuri_03.webp",
+        section: "matsuri-workshop-guide",
+      },
+      {
+        name: "워크숍 & 미니 게임 1",
+        asset: "/assets/info/matsuri_02-01.webp",
         section: "matsuri-workshop",
       },
       {
-        name: "Food",
-        asset: "/assets/info/matsuri_04.webp",
+        name: "워크숍 & 미니 게임 2",
+        asset: "/assets/info/matsuri_02-02.webp",
+        section: "matsuri-workshop",
+      },
+      {
+        name: "워크숍 & 미니 게임 3",
+        asset: "/assets/info/matsuri_02-03.webp",
+        section: "matsuri-workshop",
+      },
+      {
+        name: "워크숍 & 미니 게임 4",
+        asset: "/assets/info/matsuri_02-04.webp",
+        section: "matsuri-workshop",
+      },
+      {
+        name: "워크숍 & 미니 게임 5",
+        asset: "/assets/info/matsuri_02-05.webp",
+        section: "matsuri-workshop",
+      },
+      {
+        name: "워크숍 & 미니 게임 6",
+        asset: "/assets/info/matsuri_02-06.webp",
+        section: "matsuri-workshop",
+      },
+      {
+        name: "워크숍 & 미니 게임 7",
+        asset: "/assets/info/matsuri_02-07.webp",
+        section: "matsuri-workshop",
+      },
+      {
+        name: "워크숍 & 미니 게임 8",
+        asset: "/assets/info/matsuri_02-08.webp",
+        section: "matsuri-workshop",
+      },
+      {
+        name: "워크숍 & 미니 게임 9",
+        asset: "/assets/info/matsuri_02-09.webp",
+        section: "matsuri-workshop",
+      },
+      {
+        name: "워크숍 & 미니 게임 10",
+        asset: "/assets/info/matsuri_02-10.webp",
+        section: "matsuri-workshop",
+      },
+      {
+        name: "음식 코너 1",
+        asset: "/assets/info/matsuri_04-01.webp",
+        section: "matsuri-food",
+      },
+      {
+        name: "음식 코너 2",
+        asset: "/assets/info/matsuri_04-02.webp",
+        section: "matsuri-food",
+      },
+      {
+        name: "음식 코너 3",
+        asset: "/assets/info/matsuri_04-03.webp",
+        section: "matsuri-food",
+      },
+      {
+        name: "음식 코너 4",
+        asset: "/assets/info/matsuri_04-04.webp",
+        section: "matsuri-food",
+      },
+      {
+        name: "음식 코너 5",
+        asset: "/assets/info/matsuri_04-05.webp",
+        section: "matsuri-food",
+      },
+      {
+        name: "음식 코너 6",
+        asset: "/assets/info/matsuri_04-06.webp",
         section: "matsuri-food",
       },
       {
         name: "Side Stage",
         asset: "/assets/info/matsuri_05.webp",
         section: "matsuri-sidestage",
-      },
-      {
-        name: "Collabo",
-        asset: "/assets/info/matsuri_06.webp",
-        section: "matsuri-collabo",
-      },
-      {
-        name: "Collabo",
-        asset: "/assets/info/matsuri_07.webp",
-        section: "matsuri-collabo",
-      },
-      {
-        name: "Collabo",
-        asset: "/assets/info/matsuri_08.webp",
-        section: "matsuri-collabo",
-      },
-      {
-        name: "Collabo",
-        asset: "/assets/info/matsuri_09.webp",
-        section: "matsuri-collabo",
       },
       {
         name: "zutomarosh",
@@ -163,8 +242,8 @@ export const INFORMATION: InfoEvent = {
         section: "zutomarosh",
       },
       {
-        name: "pop-up",
-        asset: "/assets/info/popup_01.webp",
+        name: "ZUTOMAYO MART 출장소 안내",
+        asset: "/assets/info/popup-nara.webp",
         section: "ztmy-mart",
       },
       {
@@ -178,14 +257,39 @@ export const INFORMATION: InfoEvent = {
         section: "ztmy-mart",
       },
       {
-        name: "pop-up",
-        asset: "/assets/info/popup_02.webp",
+        name: "MART 상품 라인업 1",
+        asset: "/assets/info/nara_lineup-01.jpg",
+        section: "ztmy-mart-lineup",
+      },
+      {
+        name: "MART 상품 라인업 2",
+        asset: "/assets/info/nara_lineup-02.jpg",
+        section: "ztmy-mart-lineup",
+      },
+      {
+        name: "MART 구매 특전",
+        asset: "/assets/info/nara_tokten.webp",
+        section: "ztmy-mart-lineup",
+      },
+      {
+        name: "ZUTOMAYO STAND 안내",
+        asset: "/assets/info/popup-stand.webp",
+        section: "ztmy-stand",
+      },
+      {
+        name: "STAND 상품 라인업",
+        asset: "/assets/info/stand_lineup.jpg",
         section: "ztmy-stand",
       },
       {
         name: "스탬프 랠리",
         asset: "/assets/info/stamp-rally.webp",
         section: "stamp-rally",
+      },
+      {
+        name: "전뢰집인 순회 지도",
+        asset: "/assets/info/stamp_rally-02.jpg",
+        section: "denrai-shuin",
       },
     ],
   },

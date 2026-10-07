@@ -9,7 +9,7 @@ interface EventDetailsProps {
 
 export function EventDetails({ event }: EventDetailsProps) {
   return (
-    <ul className="space-y-2.5 text-white">
+    <ul className="tablet:space-y-2.5 text-white">
       <DetailField label="일시">
         <span className="font-semibold">{event.date}</span>
       </DetailField>

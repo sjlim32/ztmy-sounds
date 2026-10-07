@@ -32,8 +32,14 @@ src/
                              # (섹션 쪽엔 안 붙임 — 섹션 하나가 여러 탭에
                              # 동시에 속할 수 있어서), InfoTabs/TabSection/
                              # InfoTabContext가 이를 읽어 렌더링한다.
+                             # 열린 탭은 주소 해시(/info#popup)에 두어 새로고침·
+                             # 링크 공유에도 유지된다(탭 id = 해시).
                              # DetailField/DetailList(라벨: 값 카드)는
                              # 티켓/굿즈 안내처럼 반복되는 목록에 재사용한다.
+                             # ImageGallery는 이미지 묶음을 태블릿 이상에선
+                             # 그리드로, 모바일에선 세로(stack) 또는 가로 넘김
+                             # (swipe, 장수가 많을 때)으로 보여주고 어느 걸 눌러도
+                             # 같은 확대 뷰에서 묶음 전체를 넘겨 본다.
     notice/                 # 공지사항 (MDX 콘텐츠 + 데이터 + 노출/해제 로직)
       content/              # 공지 MDX 프로즈
     zutopia/                 # 즛토피아 허브: 카테고리→항목 2단 구조(registry.ts) +
