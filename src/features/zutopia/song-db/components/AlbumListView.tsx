@@ -185,6 +185,10 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
                         "transition-[transform,filter] duration-500 ease-in-out",
                         SHELF_TILT[index % SHELF_TILT.length],
                         SHELF_LEAN[index % SHELF_LEAN.length],
+                        // 커버들이 책장처럼 겹쳐 있고 각자 기울어져(transform) 있어서,
+                        // 뒤에 오는 커버가 앞 커버의 툴팁 위에 그려진다. 누르는
+                        // 동안엔 그 커버를 맨 위로 올려 툴팁이 가려지지 않게 한다.
+                        "active:z-40",
                         "tablet:hover:z-40 tablet:hover:rotate-0 tablet:hover:-translate-y-6 tablet:hover:scale-110 tablet:hover:brightness-110",
                         isSelected && "z-30 rotate-0",
                       )}
@@ -221,8 +225,7 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
                           "transition-[opacity,transform] duration-300 ease-out",
                           // 모바일엔 hover가 없어 터치 중(group-active)
                           // 에만 잠깐 보여준다 — position:absolute라
-                          // 그리드 레이아웃을 건드리지 않고 다른 카드와도
-                          // 안 겹친다.
+                          // 그리드 레이아웃을 건드리지 않는다.
                           "group-active:translate-y-0 group-active:opacity-100",
                           "tablet:group-hover:translate-y-0 tablet:group-hover:opacity-100",
                         )}
