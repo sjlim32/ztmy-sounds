@@ -5,7 +5,7 @@ import type { MouseEvent } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { SortFilterBar } from "@/features/zutopia/components/SortFilterBar";
-import { formatVisitLabel } from "@/features/zutopia/lives/visit";
+import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
 import type { ZutopiaEntry, ZutopiaEntryType } from "@/features/zutopia/types";
 
 type SortBy = "year" | "format";
@@ -265,8 +265,10 @@ export function LiveListView({
             </h2>
             <ul
               className={cn(
-                "grid gap-4",
-                "tablet:grid-cols-2",
+                // 모바일도 2열 — 1열이면 정사각 카드 한 장이 화면을 다 차지해
+                // 목록을 훑기 어렵다. 3열은 카드 위 글자가 포스터를 덮어서 안 쓴다.
+                "grid grid-cols-2 gap-3",
+                "tablet:gap-4",
                 "pc:grid-cols-3",
               )}
             >
@@ -275,61 +277,70 @@ export function LiveListView({
                   <Link
                     href={`/zutopia/${categorySlug}/${entry.slug}`}
                     onClick={handleEntryClick}
-                    className={cn(
-                      "group relative block aspect-square overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
-                      // 내한 공연은 카드 테두리를 ztmy-sun으로 둘러 목록에서 바로 눈에 띄게 한다.
-                      entry.visitOrdinal != null && "ring-ztmy-sun ring-2",
-                    )}
+                    className="group flex flex-col gap-2 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
                   >
-                    {entry.thumbnail ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={entry.thumbnail}
-                        alt={entry.name}
-                        loading="lazy"
-                        className="h-full w-full object-contain transition-opacity group-hover:opacity-80"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-white/5" />
-                    )}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-black/80 to-transparent" />
-                    <div className="absolute inset-x-0 bottom-0 p-2">
-                      {/* 모바일은 호버가 없어 원제 밑에 한글 제목을 항상
-                      같이 보여준다. 태블릿 이상은 마우스 오버가 있으니
-                      평소엔 원제(최대 2줄)만 보이다가 호버 시 한글 제목
-                      (최대 2줄)으로 교체한다 — 안 보이는 쪽을 아예 display:none으로
-                      빼서, 지금 실제로 보이는 텍스트의 줄 수만큼만 칸이
-                      차지하게 한다(그래서 tablet 이상은 전환이 즉시
-                      바뀐다). line-clamp는 display:-webkit-box라야 동작해서
-                      block(나중에 선언돼 display를 덮어씀)과 같이 쓰지
-                      않는다. */}
-                      {entry.visitOrdinal != null && (
-                        <span className="text-ztmy-sun mb-0.5 block text-xs font-bold">
-                          {formatVisitLabel(entry.visitOrdinal)}
-                        </span>
+                    <div
+                      className={cn(
+                        "relative aspect-square overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
+                        // 내한 공연은 테두리와 그림 위 뱃지를 ztmy-sun으로 표시해
+                        // 목록에서 바로 눈에 띄게 한다.
+                        entry.visitOrdinal != null && "ring-ztmy-sun ring-2",
                       )}
-                      <span className="block">
-                        <span
+                    >
+                      {entry.thumbnail ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={entry.thumbnail}
+                          alt={entry.name}
+                          loading="lazy"
+                          className="h-full w-full object-contain transition-opacity group-hover:opacity-80"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-white/5" />
+                      )}
+                      {entry.visitOrdinal != null && (
+                        // 상세 화면과 같은 뱃지를 작게 줄여 그림 왼쪽 위에 얹는다.
+                        <VisitBadge
+                          ordinal={entry.visitOrdinal}
                           className={cn(
-                            "line-clamp-2 text-sm font-semibold break-keep text-white",
-                            "tablet:group-hover:hidden tablet:text-sm",
+                            "absolute top-2 left-2 px-2 py-0.5 text-[11px] tracking-normal shadow-[0_2px_8px_rgba(0,0,0,0.5)]",
+                            "tablet:px-2.5 tablet:py-0.5 tablet:text-xs",
                           )}
-                        >
-                          {entry.name}
-                        </span>
+                        />
+                      )}
+                    </div>
+
+                    {/* 글자는 그림 위에 겹치지 않고 아래에 둔다 — 겹쳐 놓으면
+                    포스터 무늬에 묻혀 잘 안 읽힌다. */}
+                    <div className="flex flex-col gap-0.5 px-0.5">
+                      <span
+                        className={cn(
+                          // 모바일 2열 카드는 좁아서 원제는 1줄만
+                          "group-hover:text-ztmy-pink line-clamp-1 text-xs font-semibold break-keep text-white transition-colors",
+                          "tablet:line-clamp-2 tablet:text-sm",
+                        )}
+                      >
+                        {entry.name}
+                      </span>
+                      {entry.label !== entry.name && (
                         <span
                           className={cn(
-                            "line-clamp-2 text-base break-keep text-white/80",
-                            "tablet:text-ztmy-pink tablet:mt-0 tablet:font-semibold tablet:hidden tablet:text-sm tablet:group-hover:line-clamp-2",
+                            "line-clamp-2 text-xs break-keep text-white/70",
+                            "tablet:text-sm",
                           )}
                         >
                           {entry.label}
                         </span>
-                      </span>
-                      <p className="mt-1 text-sm text-white/70">
+                      )}
+                      <span
+                        className={cn(
+                          "text-[10px] text-white/55",
+                          "tablet:text-xs",
+                        )}
+                      >
                         {entry.city && `${entry.city} · `}
                         {entry.date}
-                      </p>
+                      </span>
                     </div>
                   </Link>
                 </li>
