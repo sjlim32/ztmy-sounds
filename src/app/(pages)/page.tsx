@@ -163,31 +163,37 @@ export default function Home() {
         <section
           id="main-left"
           data-role="visit-info"
+          // 화면 정가운데(top-1/2)에 고정하면 높이가 낮을 때 위쪽이 Header와
+          // 겹친다. 위아래를 Header 높이만큼 똑같이 비운 영역에 가둬서, 여유가
+          // 있으면 예전처럼 화면 가운데에 오고 모자라면 Header 바로 아래에서
+          // 시작해 아래로만 넘치게 한다(my-auto는 넘칠 때 0이 된다).
           className={cn(
-            "fixed top-1/2 left-10 hidden -translate-y-1/2 flex-col gap-3",
+            "fixed top-44 bottom-44 left-10 hidden flex-col",
             "tablet:flex",
           )}
         >
-          <NextEventCard
-            event={visitEvent}
-            remaining={visit.remaining}
-            isEventDay={visit.isEventDay}
-            daysUntilEvent={visit.daysUntilEvent}
-            isDone={visit.isDone}
-            isOpen={tabletOpenAccent === visitEvent.accent}
-            onToggle={openVisit}
-          />
+          <div className="my-auto flex flex-col gap-3">
+            <NextEventCard
+              event={visitEvent}
+              remaining={visit.remaining}
+              isEventDay={visit.isEventDay}
+              daysUntilEvent={visit.daysUntilEvent}
+              isDone={visit.isDone}
+              isOpen={tabletOpenAccent === visitEvent.accent}
+              onToggle={openVisit}
+            />
 
-          {/* 태블릿 이상에서는 내한/원정 둘 다 각자의 타이머와 함께 노출. */}
-          <NextEventCard
-            event={originEvent}
-            remaining={origin.remaining}
-            isEventDay={origin.isEventDay}
-            daysUntilEvent={origin.daysUntilEvent}
-            isDone={origin.isDone}
-            isOpen={tabletOpenAccent === originEvent.accent}
-            onToggle={openOrigin}
-          />
+            {/* 태블릿 이상에서는 내한/원정 둘 다 각자의 타이머와 함께 노출. */}
+            <NextEventCard
+              event={originEvent}
+              remaining={origin.remaining}
+              isEventDay={origin.isEventDay}
+              daysUntilEvent={origin.daysUntilEvent}
+              isDone={origin.isDone}
+              isOpen={tabletOpenAccent === originEvent.accent}
+              onToggle={openOrigin}
+            />
+          </div>
         </section>
 
         <nav

@@ -212,7 +212,10 @@ function NextEventCardComponent({
                           src={event.tourImg}
                           alt={event.tourName}
                           loading="lazy"
-                          className="max-h-[30dvh] rounded-lg object-cover transition-opacity hover:opacity-80"
+                          // 포스터만 화면 높이를 따라 줄어든다 — 37rem은 Header(top-44)와
+                          // 포스터를 뺀 카드 나머지(토글·제목·티켓·카운트다운), 하단
+                          // 여백을 합친 높이라, 화면이 낮아져도 카드가 화면 안에 남는다.
+                          className="max-h-[min(30dvh,calc(100dvh-37rem))] rounded-lg object-cover transition-opacity hover:opacity-80"
                         />
                         {/* 이미지 하단이 아래 텍스트 영역으로 자연스럽게 이어지도록 스크림 처리 */}
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/60 to-transparent" />
