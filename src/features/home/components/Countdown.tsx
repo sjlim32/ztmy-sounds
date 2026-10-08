@@ -29,7 +29,18 @@ export function Countdown({
   isDone,
   accent,
 }: CountdownProps) {
-  if (!remaining) return null;
+  // 남은 시간은 마운트 후 첫 계산 때 정해진다. 그 전에도 같은 크기의 빈 상자를
+  // 둬서, 카운트다운이 뒤늦게 나타나며 주변을 밀어내지 않게 한다.
+  if (!remaining) {
+    return (
+      <div
+        aria-hidden
+        className={cn("invisible flex w-full border py-1", "tablet:p-4")}
+      >
+        <div className={cn("h-16 w-16", "tablet:h-24 tablet:w-24")} />
+      </div>
+    );
+  }
 
   return (
     <div

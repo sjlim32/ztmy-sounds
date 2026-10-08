@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   SCHEDULE,
+  SCHEDULE_DAYS,
   SCHEDULE_DAYS_LABEL,
   SCHEDULE_KIND_LABEL,
   type ScheduleItem,
@@ -14,6 +15,16 @@ import { ScheduleTimeline } from "@/features/info/components/ScheduleTimeline";
 import { ConcertLinks } from "@/features/info/components/ConcertLinks";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { CloseIcon } from "@/components/icons/CloseIcon";
+
+// 이 빌드가 공연 마지막 날이 끝나기 전에 만들어졌는지. 그렇다면 대부분의
+// 방문에서 요약 바가 뜰 테니, 지금 시각을 알기 전에도 모바일에 같은 높이의
+// 빈 자리를 잡아둬서 바가 뒤늦게 끼어들며 화면을 밀어내지 않게 한다. 공연이
+// 끝난 뒤의 빌드는 자리를 안 잡는다(어차피 아무것도 안 뜬다).
+const SCHEDULE_END_MS =
+  Date.parse(`${SCHEDULE_DAYS[SCHEDULE_DAYS.length - 1]}T00:00:00+09:00`) +
+  86_400_000;
+const BUILT_BEFORE_SCHEDULE_END =
+  Number(process.env.NEXT_PUBLIC_BUILD_TIME) < SCHEDULE_END_MS;
 
 // 집합 일정은 라벨이 구역 이름뿐이라("일반 Area …") 요약에선 종류를 앞에 붙인다.
 function summaryLabel(item: ScheduleItem): string {
@@ -65,8 +76,18 @@ export function ConcertQuickPanel() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
 
-  // 지금 시각을 알기 전(빌드된 HTML)과 공연이 끝난 뒤엔 아무것도 그리지 않는다.
-  if (!status || status.phase === "ended") return null;
+  // 지금 시각을 알기 전(빌드된 HTML): 모바일에만 요약 바 높이(테두리 + 여백 +
+  // 두 줄 글자 = 3.375rem)만큼 빈 자리를 둔다. 태블릿 이상은 화면에 고정이라
+  // 자리를 잡을 필요가 없다.
+  if (!status) {
+    return BUILT_BEFORE_SCHEDULE_END ? (
+      <div aria-hidden className={cn("px-4 pb-3", "tablet:hidden")}>
+        <div className="h-[3.375rem]" />
+      </div>
+    ) : null;
+  }
+  // 공연이 끝난 뒤엔 아무것도 그리지 않는다.
+  if (status.phase === "ended") return null;
 
   const summary = getSummary(status);
 

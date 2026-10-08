@@ -57,6 +57,12 @@ export default function Home() {
   const mobileEvent = isVisitAvailable ? visitEvent : originEvent;
   const mobile = isVisitAvailable ? visit : origin;
 
+  // 첫 카운트다운 계산 전에는 어느 공연을 보여줄지(종료 여부)가 아직 틀린
+  // 상태라, 그대로 보여주면 NEXT VISIT가 떴다가 곧바로 NEXT STAGE로 바뀐다.
+  // 자리는 그대로 차지한 채(invisible) 계산이 끝난 뒤에 보여준다.
+  const isCountdownReady =
+    visit.remaining !== null && origin.remaining !== null;
+
   // 모바일은 카드가 1개뿐이라 독립적으로 접고 펼 수 있습니다(기본은 접힘).
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
@@ -142,7 +148,12 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-auto flex flex-col items-center gap-2.5 px-4 py-3">
+          <div
+            className={cn(
+              "mt-auto flex flex-col items-center gap-2.5 px-4 py-3",
+              !isCountdownReady && "invisible",
+            )}
+          >
             <NextEventCard
               event={mobileEvent}
               remaining={mobile.remaining}
@@ -172,7 +183,12 @@ export default function Home() {
             "tablet:flex",
           )}
         >
-          <div className="my-auto flex flex-col gap-3">
+          <div
+            className={cn(
+              "my-auto flex flex-col gap-3",
+              !isCountdownReady && "invisible",
+            )}
+          >
             <NextEventCard
               event={visitEvent}
               remaining={visit.remaining}
