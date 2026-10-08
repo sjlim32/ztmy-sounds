@@ -34,9 +34,8 @@ const SELF_MANAGED_FOOTER_PREFIXES = ["/zutopia", "/info", "/credits"];
  * inline=true는 PageScrollBody.tsx가 자기 스크롤 컨테이너 안에서 직접
  * 렌더링할 때 쓴다 — 그 경로 자신이 바로 SELF_MANAGED_FOOTER_PREFIXES가
  * 가리키는 예외이므로, 그 숨김 규칙을 적용하지 않는다. PageScrollBody가
- * 콘텐츠를 `tablet:flex tablet:min-h-full tablet:flex-col` wrapper로 감싸서,
- * 모바일은 콘텐츠 맨 아래에 일반 흐름으로 붙고 태블릿 이상은 콘텐츠가
- * 짧으면 화면 하단에 고정되고 콘텐츠가 길어지면 그 뒤로 밀려난다.
+ * 콘텐츠를 `flex min-h-full flex-col` wrapper로 감싸서, 콘텐츠가 짧으면
+ * 화면 하단에 고정되고 콘텐츠가 길어지면 그 뒤로 밀려난다.
  */
 export function Footer({ inline = false }: { inline?: boolean } = {}) {
   const pathname = usePathname();

@@ -228,9 +228,8 @@ src/
 - 앱 셸(`body`)은 스크롤되지 않는 고정 레이아웃입니다(`docs/RULES.md` 참고).
   자기 `<main>`에서 직접 스크롤을 여는 페이지(`/info`, `/credits`,
   `/zutopia`)는 안쪽 레이아웃을 직접 짜지 말고 `src/components/PageScrollBody.tsx`를
-  씁니다 — 모바일은 콘텐츠 바로 다음에 Footer가 일반 흐름으로 붙고, 태블릿
-  이상은 콘텐츠가 짧으면 화면 하단에 고정되고 길어지면 밀려나는 동작을
-  한 곳에서 관리합니다.
+  씁니다 — 콘텐츠가 짧으면 Footer가 화면 하단에 고정되고 길어지면 밀려나는
+  동작을 한 곳에서 관리합니다.
 - `PageScrollBody`는 내부적으로 `<Footer inline />`을 렌더링합니다. 이 방식을
   새로 쓰는 페이지를 추가하면 `src/components/Footer.tsx`의
   `SELF_MANAGED_FOOTER_PREFIXES`에도 그 경로 prefix를 반드시 추가하세요 —
