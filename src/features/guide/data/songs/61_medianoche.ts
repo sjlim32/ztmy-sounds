@@ -104,42 +104,70 @@ const song: Song = {
       pronunciation: "^다레토 이마마데^ 아라솟테타노",
       translation: "지금까지 누구와 싸워온 걸까",
       slam: "슬램 !",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "0:52.4",
       original: "泣き叫んだり 生まれた通り",
       pronunciation: "나키사켄다리 우마레타 토오리",
       translation: "울부짖었어, 태어난 모습 그대로",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "0:55",
       original: "生きられたらなぁ 外側の自分だけでも",
       pronunciation: "이키라레타라나아 소토가와노 지분다케데모",
       translation: "살아갈 수 있다면 좋을 텐데, 내 겉모습만이라도",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "1:00.5",
       original: "とっくに心 弓矢は焦げる",
       pronunciation: "톳쿠니 코코로 유미야와 코게루",
       translation: "진작부터 마음속에서 활 화살은 타올랐어",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "1:03.4",
       original: "永遠燃えると 思えてたのに",
       pronunciation: "에이엔 모에루토 오모에테타노니",
       translation: "영원히 타오를 거라 생각했었는데",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "1:06.2",
       original: "遠く放てたら 何処でもいいよ",
       pronunciation: "토오쿠 하나테타라 도코데모 이이요",
       translation: "멀리 쏘아 보낼 수 있다면 어디든 상관없어",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "1:10.2",
       original: "冴えない夜で 待ち伏せ",
       pronunciation: "사에나이 요루데 마치부세",
       translation: "어두운 밤에서 숨어서 기다려",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "1:11.9",
@@ -257,42 +285,70 @@ const song: Song = {
       pronunciation: "^다레토 이마마데^ 아라솟테타노",
       translation: "지금까지 누구와 싸워온 걸까",
       slam: "슬램 !",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:01.2",
       original: "泣き叫んだり 生まれた通り",
       pronunciation: "나키사켄다리 우마레타 토오리",
       translation: "울부짖었어, 태어난 모습 그대로",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:04",
       original: "生きられたらなぁ 外側の自分だけでも",
       pronunciation: "이키라레타라나아 소토가와노 지분다케데모",
       translation: "살아갈 수 있다면 좋을 텐데, 내 겉모습만이라도",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:09.5",
       original: "とっくに心 弓矢は焦げる",
       pronunciation: "톳쿠니 코코로 유미야와 코게루",
       translation: "진작부터 마음속에서 활 화살은 타올랐어",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:12.3",
       original: "永遠燃えると 思えてたのに",
       pronunciation: "에이엔 모에루토 오모에테타노니",
       translation: "영원히 타오를 거라 생각했었는데",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:15",
       original: "遠く放てたら 何処でもいいよ",
       pronunciation: "토오쿠 하나테타라 도코데모 이이요",
       translation: "멀리 쏘아 보낼 수 있다면 어디든 상관없어",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:19.1",
       original: "冴えない夜で 待ち伏せ",
       pronunciation: "사에나이 요루데 마치부세",
       translation: "어두운 밤에서 숨어서 기다려",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:23",
@@ -309,6 +365,10 @@ const song: Song = {
       pronunciation: "니테모 야이테모 타베레마센요",
       translation: "삶아도 구워도 먹을 수 없어요",
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:39.9",
@@ -316,6 +376,10 @@ const song: Song = {
       pronunciation: "혼네노 햑키야코오오",
       translation: "진심의 백귀야행을",
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:42.9",
@@ -323,6 +387,10 @@ const song: Song = {
       pronunciation: "쟈마스루 아야츠라와 켓시테 유루시마센요",
       translation: "방해하는 그들은 절대 용서 못 해요",
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:48",
@@ -330,6 +398,10 @@ const song: Song = {
       pronunciation: "네테모 사메테모 산타 콤파냐",
       translation: "눈을 떠도 감아도 Santa Compaña",
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:50.9",
@@ -337,6 +409,10 @@ const song: Song = {
       pronunciation: "온넨노 투 다 브레이크 다운",
       translation: "원한의 집념 to da break down",
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:53.5",
@@ -344,6 +420,10 @@ const song: Song = {
       pronunciation: "나니사마 토보케자마",
       translation: '뭐 하는 사람? "시치미 떼는 사람"',
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:56.1",
@@ -351,6 +431,10 @@ const song: Song = {
       pronunciation: "치다케 사와이데루",
       translation: "오직 피만 들끓고 있어",
       slam: "기차놀이 끝",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "2:59.4",
@@ -377,18 +461,30 @@ const song: Song = {
       pronunciation: "^톳쿠니^ 코코로 유미야와 코게루",
       translation: "진작부터 마음속에서 활 화살은 타오르고 있어",
       slam: "슬램 !",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "3:12.9",
       original: "永遠燃えると 思えてたのに",
       pronunciation: "에이엔 모에루토 오모에테타노니",
       translation: "영원히 타오를 거라 생각했었는데",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "3:15.9",
       original: "遠く放てたら 何処でもいいよ",
       pronunciation: "토오쿠 하나테타라 도코데모 이이요",
       translation: "멀리 쏘아 보낼 수 있다면 어디든 상관없어",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "3:19.8",
@@ -396,6 +492,10 @@ const song: Song = {
       pronunciation: "다레모 시라누 요루데 마치부세",
       translation: "아무도 모르는 밤에서 숨어 기다려",
       slam: "(가사 끝난 뒤) 기차놀이 시작",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "3:23.4",
@@ -403,6 +503,10 @@ const song: Song = {
       pronunciation: "보쿠와 나니사마 난다로우",
       translation: "나는 대체 뭘까",
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "3:26.8",
@@ -410,6 +514,10 @@ const song: Song = {
       pronunciation: "아이 아이 아이",
       translation: "슬프다",
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "3:29.2",
@@ -417,6 +525,10 @@ const song: Song = {
       pronunciation: "사이고 도코오 메자시 아루이테 유쿠노",
       translation: "마지막엔 어디를 향해 걸어가게 될까",
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "3:32.3",
@@ -424,6 +536,10 @@ const song: Song = {
       pronunciation: "료우신테키나 엔기시테루",
       translation: "양심적인 연기를 하고 있어",
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "3:34.5",
@@ -431,6 +547,10 @@ const song: Song = {
       pronunciation: "아바라가 쿠다케테쿠 마이니치니",
       translation: "갈비뼈가 부서져 가는 나날",
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "3:37.7",
@@ -438,6 +558,10 @@ const song: Song = {
       pronunciation: "구챠구챠나 이타즈라",
       translation: "엉망진창인 장난",
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
     {
       time: "3:39.8",
@@ -445,6 +569,10 @@ const song: Song = {
       pronunciation: "츠치니 이마다 카에라나이카라",
       translation: "흙으로는 아직 돌아가지 않을 테니까",
       slam: "기차놀이",
+      cheer: {
+        text: "",
+        tag: "swing",
+      },
     },
   ],
 };
