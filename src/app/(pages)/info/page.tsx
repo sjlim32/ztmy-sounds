@@ -4,6 +4,7 @@ import { originEvent } from "@/data/event";
 import { cn } from "@/lib/utils";
 import { buildMusicEventJsonLd } from "@/lib/structured-data";
 import { INFO_SCROLL_CONTAINER_ID } from "@/features/info/info";
+import { EntranceFade } from "@/components/EntranceFade";
 import { HomeLink } from "@/components/HomeLink";
 import { PageScrollBody } from "@/components/PageScrollBody";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
@@ -56,11 +57,13 @@ export default function InfoPage() {
           "tablet:max-w-4xl tablet:px-6 tablet:py-16",
         )}
       >
-        <HomeLink label="홈으로" className="tablet:inline-flex hidden" />
+        <EntranceFade>
+          <HomeLink label="홈으로" className="tablet:inline-flex hidden" />
 
-        <div className="mt-6">
-          <InfoContent />
-        </div>
+          <div className="mt-6">
+            <InfoContent />
+          </div>
+        </EntranceFade>
       </PageScrollBody>
     </main>
   );

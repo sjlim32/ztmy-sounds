@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { EntranceFade } from "@/components/EntranceFade";
 import { PageScrollBody } from "@/components/PageScrollBody";
 import { cn } from "@/lib/utils";
 import { useScrollFadeMask } from "@/lib/use-scroll-fade-mask";
@@ -29,7 +30,7 @@ export function ZutopiaScrollArea({ children }: { children: ReactNode }) {
           "tablet:max-w-4xl tablet:px-6 tablet:py-16",
         )}
       >
-        {children}
+        <EntranceFade>{children}</EntranceFade>
       </PageScrollBody>
     </main>
   );

@@ -9,7 +9,7 @@ import { getActiveLineIndex } from "@/features/guide/lib/lyric-sync";
 import { getSongForVersion } from "@/features/guide/lib/song-version";
 import { SongList } from "@/features/guide/components/SongList";
 import { LyricsView } from "@/features/guide/components/LyricsView";
-import { usePanelEntranceVisible } from "@/features/guide/components/list-entrance";
+import { usePanelEntranceVisible } from "@/lib/use-entrance-visible";
 
 const LYRICS_ENTER_DELAY_MS = 600; // 목록 접힘 애니메이션(600ms)이 끝난 뒤 가사가 이어서 나타나도록 주는 지연
 

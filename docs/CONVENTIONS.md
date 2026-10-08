@@ -234,6 +234,11 @@ src/
   `SELF_MANAGED_FOOTER_PREFIXES`에도 그 경로 prefix를 반드시 추가하세요 —
   안 그러면 루트 레이아웃의 전역 Footer와 이중으로 렌더링됩니다.
 
+- 메인에서 들어올 때 내용이 서서히 나타나게 하려면 `src/components/EntranceFade.tsx`로
+  감쌉니다(/info, /zutopia). /guide의 패널과 같은 훅(`src/lib/use-entrance-visible.ts`)을
+  써서 배경이 어두워지는 타이밍과 맞습니다. 하위 페이지를 오갈 때 다시 재생되지
+  않게 하려면 페이지가 아니라 레이아웃 쪽에 둡니다.
+
 ## PWA 설치 프롬프트
 
 - `beforeinstallprompt`/`appinstalled` 구독 로직은 `src/lib/use-install-prompt.ts`의

@@ -3,7 +3,7 @@
 import { useSelectedLayoutSegment } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { NoticeList } from "@/features/notice/components/NoticeList";
-import { usePanelEntranceVisible } from "@/features/guide/components/list-entrance";
+import { usePanelEntranceVisible } from "@/lib/use-entrance-visible";
 
 /**
  * SongPanel 옆 메인 영역에 뜨는 안내문 패널. 곡이 선택되면(=상세보기)
