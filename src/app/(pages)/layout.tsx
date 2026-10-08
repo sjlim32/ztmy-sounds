@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, RocknRoll_One } from "next/font/google";
 import localFont from "next/font/local";
 import "@fontsource/line-seed-jp/400.css";
@@ -69,6 +69,13 @@ const mkpop = localFont({
   display: "swap",
 });
 
+// 이 사이트는 어두운 화면 하나뿐이다. color-scheme을 dark로 알려두면 브라우저가
+// 스타일을 적용하기 전의 빈 문서도 어둡게 칠한다 — 안 그러면 홈 화면 앱·인앱
+// 브라우저를 켤 때 기본 흰 바탕이 잠깐 비쳐 화면이 번쩍인다.
+export const viewport: Viewport = {
+  colorScheme: "dark",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -129,7 +136,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       // 우리 코드가 만든 불일치가 아니라서 이 요소의 속성 경고만 끈다(자식
       // 요소에는 적용되지 않는다).
       suppressHydrationWarning
-      className={`${lineSeedKR.variable} ${plexMono.variable} ${rocknrollOne.variable} ${mkpop.variable} h-full antialiased`}
+      className={`${lineSeedKR.variable} ${plexMono.variable} ${rocknrollOne.variable} ${mkpop.variable} bg-background h-full antialiased`}
     >
       <body className="flex h-dvh flex-col overflow-hidden">
         <script

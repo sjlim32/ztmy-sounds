@@ -76,6 +76,10 @@ body {
       ),
       url("/backgrounds/ztmy-bg-responsive.webp");
     background-size: cover, cover;
+    /* body는 스크롤되지 않아서(h-dvh 고정) fixed가 아니어도 똑같이 보인다. iOS는
+       fixed 배경을 따로 다시 그리는 동안 한 프레임씩 그림을 빠뜨려서(화면이
+       깜빡임) 모바일에선 일반 배경으로 둔다. */
+    background-attachment: scroll, scroll;
   }
 }
 
