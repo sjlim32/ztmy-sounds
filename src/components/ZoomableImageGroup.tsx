@@ -281,7 +281,7 @@ export function ZoomableImageGroup({
                     한 줄(이전 · 카운터 · 다음)로 모아 엄지로 누르기 쉽게. */}
                 <div
                   onClick={(event) => event.stopPropagation()}
-                  className="tablet:hidden fixed bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-4"
+                  className="tablet:hidden fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-1/2 flex -translate-x-1/2 items-center gap-4"
                 >
                   <button
                     type="button"
