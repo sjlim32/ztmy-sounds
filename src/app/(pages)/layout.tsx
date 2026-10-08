@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { IBM_Plex_Mono, RocknRoll_One } from "next/font/google";
 import localFont from "next/font/local";
 import "@fontsource/line-seed-jp/400.css";
@@ -68,14 +68,6 @@ const mkpop = localFont({
   variable: "--font-mkpop-101",
   display: "swap",
 });
-
-// viewport-fit=cover여야 iOS가 env(safe-area-inset-*)에 실제 값을 준다 — 하단
-// 도구막대가 없는 인앱 브라우저·홈 화면 앱에서 홈 표시줄이 화면 맨 아래
-// 요소(가사 화면의 Auto Scroll 등)를 가리지 않도록, 아래 #app-root가 그 값만큼
-// 안쪽으로 들어온다. 도구막대가 있는 일반 Safari에선 값이 0이라 변화가 없다.
-export const viewport: Viewport = {
-  viewportFit: "cover",
-};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -153,7 +145,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SerwistProvider swUrl="/serwist/sw.js">
           <div
             id="app-root"
-            className="relative z-10 flex min-h-0 flex-1 flex-col pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]"
+            className="relative z-10 flex min-h-0 flex-1 flex-col"
           >
             <MobileHeader />
             <InstallPromptBanner />

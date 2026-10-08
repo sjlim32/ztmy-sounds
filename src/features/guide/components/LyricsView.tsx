@@ -77,7 +77,15 @@ export function LyricsView({
   if (!song) return null;
 
   return (
-    <div className="tablet:order-0 relative order-3 min-h-0 flex-1">
+    <div
+      className={cn(
+        // mb-4: 하단 도구막대가 없는 아이폰 인앱 브라우저에선 화면 맨 아래에
+        // 홈 표시줄이 겹쳐서, 맨 아래 버튼(Auto Scroll)이 가려지지 않게 띄운다
+        // (docs/RULES.md 참고).
+        "relative order-3 mb-4 min-h-0 flex-1",
+        "tablet:order-0 tablet:mb-0",
+      )}
+    >
       <ol
         ref={listRef}
         data-role="lyric-list"

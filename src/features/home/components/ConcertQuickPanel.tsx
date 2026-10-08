@@ -90,7 +90,7 @@ export function ConcertQuickPanel() {
             role="dialog"
             aria-label="공연 당일 안내"
             className={cn(
-              "bg-background/95 fixed inset-x-0 bottom-0 z-40 flex max-h-[85dvh] flex-col rounded-t-2xl border-t border-white/15 pb-[env(safe-area-inset-bottom)]",
+              "bg-background/95 fixed inset-x-0 bottom-0 z-40 flex max-h-[85dvh] flex-col rounded-t-2xl border-t border-white/15 pb-4",
               "tablet:absolute tablet:bottom-full tablet:mb-2 tablet:max-h-[70dvh] tablet:rounded-xl tablet:border tablet:pb-0",
             )}
           >

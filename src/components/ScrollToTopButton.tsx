@@ -48,8 +48,7 @@ export function ScrollToTopButton({ containerId }: { containerId: string }) {
       aria-label="맨 위로"
       tabIndex={visible ? 0 : -1}
       className={cn(
-        // 하단 여백에 iOS 홈 표시줄 영역을 더한다(docs/RULES.md 참고)
-        "shadow-[0_4px_16px_rgba(255, 255, 255, 0.6)] fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-20 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-white/60 text-black backdrop-blur-sm",
+        "shadow-[0_4px_16px_rgba(255, 255, 255, 0.6)] fixed right-4 bottom-4 z-20 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-white/60 text-black backdrop-blur-sm",
         "hover:bg-ztmy-purple transition duration-200 hover:text-white",
         "tablet:bottom-6 tablet:h-10 tablet:w-10",
         visible ? "opacity-100" : "pointer-events-none opacity-0",
