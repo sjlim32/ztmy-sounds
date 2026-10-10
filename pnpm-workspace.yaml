@@ -8,3 +8,7 @@ overrides:
   # pnpm audit high가 뜬다(GHSA: 무한 메모리 증가·prototype 쓰기) — serwist가
   # 패치 버전으로 올리면 이 항목은 지워도 된다.
   "browserslist@<4.28.7": ^4.28.7
+  # wrangler의 miniflare가 sharp를 취약 버전(0.35.4)으로 정확히 고정해
+  # pnpm audit high가 뜬다(GHSA-wq5f-xc86-pv6w: librsvg 취약점) — miniflare가
+  # 패치 버전으로 올리면 이 항목은 지워도 된다.
+  "sharp@<0.35.5": ^0.35.5

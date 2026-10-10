@@ -34,6 +34,12 @@ src/
                              # InfoTabContext가 이를 읽어 렌더링한다.
                              # 열린 탭은 주소 해시(/info#popup)에 두어 새로고침·
                              # 링크 공유에도 유지된다(탭 id = 해시).
+                             # 공연 당일 시간표는 schedule.ts 한 곳에만 둔다 —
+                             # /info의 일정표(ScheduleTimeline)와 홈의 당일 안내
+                             # (features/home ConcertQuickPanel)가 같이 읽고,
+                             # 당일엔 지금 시간대 줄을 강조한다(lib/schedule-
+                             # status.ts, 현지 일본 시각 기준). 공연 관련 링크
+                             # 모음은 links.ts. 공연이 바뀌면 둘 다 교체한다.
                              # DetailField/DetailList(라벨: 값 카드)는
                              # 티켓/굿즈 안내처럼 반복되는 목록에 재사용한다.
                              # ImageGallery는 이미지 묶음을 태블릿 이상에선

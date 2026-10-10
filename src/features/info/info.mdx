@@ -9,6 +9,7 @@ import {
 import { ImageGallery } from "@/features/info/components/ImageGallery";
 import { InfoTabProvider } from "@/features/info/components/InfoTabContext";
 import { InfoTabs } from "@/features/info/components/InfoTabs";
+import { LiveScheduleTimeline } from "@/features/info/components/ScheduleTimeline";
 import { TabSection } from "@/features/info/components/TabSection";
 import { groupImagesBySection } from "@/features/info/lib/group-images";
 import { INFORMATION } from "@/features/info/info";
@@ -40,27 +41,8 @@ export const toGroupImages = (imgs) =>
 
 <EventDetails event={INFORMATION} />
 
-<section className="mt-6 flex flex-col gap-3">
-  <DetailList title="축제 Area 일정" note="입장 무료, 각 워크샵 및 미니게임은 별도 참가권 판매">
-    <DetailField label="입장 및 참가권 판매" inline>  
-      09:30
-    </DetailField>
-    <DetailField label="축제 AREA 개장" inline>
-      10:00
-    </DetailField>
-    <DetailField label="축제 AREA 종료" inline>
-      17:30
-    </DetailField>
-    <DetailField label="SIDE STAGE '낮의 연회'" inline>
-      10:30 ~ 15:00
-    </DetailField>
-  </DetailList>
-
-  <DetailList title="공연 일정" note="※ 우천 결행 ・ 황천 중지">
-    <DetailField label="집합 시간" inline>15:00 ~ 16:15 (입장구역 별 확인)</DetailField>
-    <DetailField label="개장" inline>15:30</DetailField>
-    <DetailField label="개연" inline>17:30</DetailField>
-  </DetailList>
+<section className="mt-6">
+  <LiveScheduleTimeline />
 </section>
 
 <InfoTabProvider defaultTab="concert">
@@ -85,7 +67,7 @@ export const toGroupImages = (imgs) =>
         <DetailField label="입장 방법">
           <span>{`전자 티켓 앱과 티켓을 미리 다운로드해 주세요.`}</span>
         </DetailField>
-        <DetailField label="티켓피아 (MOALA Pocket)">
+        <DetailField label="티켓피아 (MOALA)">
           <div className="flex flex-row flex-wrap items-center gap-x-2">
             <SiteLink href="https://play.google.com/store/apps/details?id=fun.moala.pocket">{`Google Play`}</SiteLink>
             <span>/</span>

@@ -7,6 +7,7 @@ import { ARTIST } from "@/data/artist";
 import { Header } from "@/features/home/components/Header";
 import { NextEventCard } from "@/features/home/components/NextEventCard";
 import { MainNavLink } from "@/features/home/components/MainNavLink";
+import { ConcertQuickPanel } from "@/features/home/components/ConcertQuickPanel";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { InfoIcon } from "@/components/icons/InfoIcon";
 import { FlagIcon } from "@/components/icons/FlagIcon";
@@ -154,6 +155,10 @@ export default function Home() {
           </div>
         </div>
         {/* MOBILE END */}
+
+        {/* 모바일은 하단 공연 카드 아래 한 줄, 태블릿 이상은 화면 가운데 아래에
+            고정 — 한 인스턴스가 반응형으로 자리를 옮긴다(타이머 중복 방지). */}
+        <ConcertQuickPanel />
 
         <section
           id="main-left"
