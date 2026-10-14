@@ -384,24 +384,24 @@ const song: Song = {
     {
       time: "2:42.9",
       original: "邪魔する彼奴等は 決して許しませんよ",
-      pronunciation: "쟈마스루 아야츠라와 켓시테 유루시마센요",
+      pronunciation: "**쟈마스루 아야츠라와 켓시테 유루시마센요**",
       translation: "방해하는 그들은 절대 용서 못 해요",
-      slam: "기차놀이",
       cheer: {
-        text: "",
-        tag: "swing",
+        tag: "call",
+        text: "떼창 표시 나올 때",
       },
+      slam: "기차놀이",
     },
     {
       time: "2:48",
       original: "寝ても覚めても サンタコンパーニャ",
-      pronunciation: "네테모 사메테모 산타 콤파냐",
+      pronunciation: "**네테모 사메테모 산타 콤파냐**",
       translation: "눈을 떠도 감아도 Santa Compaña",
-      slam: "기차놀이",
       cheer: {
-        text: "",
-        tag: "swing",
+        tag: "call",
+        text: "떼창 표시 나올 때",
       },
+      slam: "기차놀이",
     },
     {
       time: "2:50.9",

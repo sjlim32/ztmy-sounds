@@ -97,42 +97,70 @@ const song: Song = {
       original: "​​​泳ぐ必要も 傷も無いのに",
       pronunciation: "오요구 히츠요-모 키즈모 나이노니",
       translation: "헤엄칠 필요도 상처도 없는데",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "1:09.5",
       original: "何故か覚えた息継ぎをして",
       pronunciation: "나제카 오보에타 이키츠기오 시테",
       translation: "어째선지 외워둔 호흡법을 하며",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "1:12.8",
       original: "​​​​先に溺れるよ それで消し切れるなら",
       pronunciation: "사키니 오보레루요 소레데 케시키레루나라",
       translation: "먼저 잠겨 갈게, 그걸로 완전히 지울 수만 있다면",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "1:17.1",
       original: "​​​何処までも ただ 遠くへ",
       pronunciation: "도코마데모 타다 토오쿠에",
       translation: "어디까지나 그저 먼 곳으로",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "1:20.2",
       original: "​​​綺麗事 言うよ 価値を値付けたまま",
       pronunciation: "키레이고토 유우요 카치오 네즈케타마마",
       translation: "겉치레를 입에 담을 거야, 가치를 매긴 채로",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "1:24.1",
       original: "​​​​おいでって おいでって おいでって なんで",
-      pronunciation: "오이뎃테 오이뎃테 오이뎃테 난데",
+      pronunciation: "**오이뎃테 오이뎃테 오이뎃테 난데**",
       translation: "이리로 오라고, 이리로 오라고, 이리로 오라니, 어째서",
+      cheer: {
+        tag: "call",
+        text: "",
+      },
     },
     {
       time: "1:27.5",
       original: "​​​​明日にはもう 忘れてしまうのに。。",
       pronunciation: "아시타니와 모- 와스레테시마우노니。。",
       translation: "내일이면 이제 잊어버릴 텐데..",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "1:31.6",
@@ -219,18 +247,30 @@ const song: Song = {
       original: "​​​泳ぐ必要も 傷も無いのに",
       pronunciation: "오요구 히츠요-모 키즈모 나이노니",
       translation: "헤엄칠 필요도, 상처도 없는데",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "2:18.2",
       original: "何故か覚えた息継ぎをして",
       pronunciation: "나제카 오보에타 이키츠기오 시테",
       translation: "어째선지 외워둔 호흡법을 하며",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "2:21.5",
       original: "​​​先に溺れるよ それで消し切れるなら",
       pronunciation: "사키니 오보레루요 소레데 케시키레루나라",
       translation: "먼저 잠겨 갈게, 그걸로 완전히 지울 수만 있다면",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "2:25.8",
@@ -238,18 +278,30 @@ const song: Song = {
       pronunciation: "^도코마데모 타다 토오쿠에^",
       translation: "어디까지나 그저 먼 곳으로",
       slam: "핏 벌리기",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "2:28.8",
       original: "​​綺麗事 言うよ 価値を値付けたまま",
       pronunciation: "키레이고토 유우요 카치오 네즈케타마마",
       translation: "겉치레를 입에 담을 거야, 가치를 매긴 채로",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "2:32.8",
-      original: "​​おいでって おいでって おいでって なんで",
-      pronunciation: "오이뎃테 오이뎃테 오이뎃테 난데",
+      original: "おいでって おいでって おいでって なんで",
+      pronunciation: "**오이뎃테 오이뎃테 오이뎃테 난데**",
       translation: "이리로 오라고, 이리로 오라고, 이리로 오라니, 어째서",
+      cheer: {
+        tag: "call",
+        text: "",
+      },
     },
     {
       time: "2:36.5",
@@ -257,6 +309,10 @@ const song: Song = {
       pronunciation: "아시타니와 모- 와스레테시마우노니。。",
       translation: "내일이면 이제 잊어버릴 텐데..",
       slam: "하제 댄스",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "2:40.4",
@@ -264,6 +320,10 @@ const song: Song = {
       pronunciation: "",
       translation: "",
       interlude: true,
+      cheer: {
+        tag: "swing",
+        text: "하제 댄스",
+      },
       slam: "하제 댄스",
     },
     //================ 3절 ================//
@@ -294,43 +354,71 @@ const song: Song = {
       pronunciation: "^오요구 히츠요-모 키즈모 나이노니^",
       translation: "헤엄칠 필요도, 상처도 없는데",
       slam: "핏 벌리기 (재정비)",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "3:07.8",
       original: "何故か覚えた息継ぎをして",
       pronunciation: "나제카 오보에타 이키츠기오 시테",
       translation: "어째선지 외워둔 호흡법을 하며",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "3:11.2",
       original: "​​​先に溺れるよ 指で消し切れるなら",
       pronunciation: "사키니 오보레루요 유비데 케시키레루나라",
       translation: "먼저 잠겨 갈게, 손가락으로 전부 지워낼 수 있다면",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "3:15.2",
       original: "​​どこまでも ただ 遠くへ​",
       pronunciation: "도코마데모 타다 토오쿠에",
       translation: "어디까지나 그저 먼 곳으로",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "3:18.3",
       original: "​​​綺麗事 言うよ 価値を値付けたまま",
       pronunciation: "키레이^고토^ 유우요 카치오 네츠케타마마",
       translation: "겉치레를 입에 담을 거야, 가치를 매긴 채로",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
       slam: "슬램 !",
     },
     {
       time: "3:22.4",
       original: "​​おいでって おいでって おいでって なんで​",
-      pronunciation: "오이뎃테 오이뎃테 오이뎃테 난데",
+      pronunciation: "**오이뎃테 오이뎃테 오이뎃테 난데**",
       translation: "이리로 오라고, 이리로 오라고, 이리로 오라니, 어째서",
+      cheer: {
+        tag: "call",
+        text: "",
+      },
     },
     {
       time: "3:25.9",
       original: "​​​明日にはもう 逃れてしまうのに​",
       pronunciation: "아시타니와 모- 노가레테 시마우노니",
       translation: "내일이면 이제 달아나 버릴 텐데",
+      cheer: {
+        tag: "swing",
+        text: "",
+      },
     },
     {
       time: "3:29.4",
@@ -341,8 +429,12 @@ const song: Song = {
     {
       time: "3:33",
       original: "​​​今宵も水に 溶けてお休み",
-      pronunciation: "코요이모 미즈니 토케테 오야스미",
+      pronunciation: "**코요이모 미즈니 토케테 오야스미**",
       translation: "오늘 밤도 물에 녹아들어서 잘 자",
+      cheer: {
+        tag: "call",
+        text: "",
+      },
     },
     {
       time: "3:36.5",
@@ -353,8 +445,12 @@ const song: Song = {
     {
       time: "3:40",
       original: "​​​単純に慎重に 泳いでいたいの",
-      pronunciation: "탄쥰니 신쵸-니 오요이데이타이노",
+      pronunciation: "**탄쥰니 신쵸-니 오요이데이타이노**",
       translation: "단순히 신중하게 헤엄치고 싶은걸",
+      cheer: {
+        tag: "call",
+        text: "",
+      },
     },
     {
       time: "3:43.6",
@@ -365,8 +461,12 @@ const song: Song = {
     {
       time: "3:47.1",
       original: "​​今宵も水に 溶けておやすみ​",
-      pronunciation: "코요이모 미즈니 토케테 오야스미",
+      pronunciation: "**코요이모 미즈니 토케테 오야스미**",
       translation: "오늘 밤도 물에 녹아들어서 잘 자",
+      cheer: {
+        tag: "call",
+        text: "",
+      },
     },
     {
       time: "3:50.9",
