@@ -26,6 +26,7 @@ import shade from "./57_shade";
 import cream from "./59_cream";
 import medianoche from "./61_medianoche";
 import almostHuman from "./64_almost-human";
+import fujimiNoKunren from "./69_fujimi-no-kunren";
 
 export const songList: Song[] = [
   byoushinwoKamu,
@@ -55,6 +56,7 @@ export const songList: Song[] = [
   cream,
   medianoche,
   almostHuman,
+  fujimiNoKunren,
 ];
 
 export function getSong(id: string): Song | null {
