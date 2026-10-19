@@ -5,11 +5,18 @@ export interface ConcertLink {
   href: string;
 }
 
-/** 공연 당일에 바로 찾게 되는 공식 안내. */
+/** 공연 관련 공식 안내 링크. */
 export const OFFICIAL_LINKS: ConcertLink[] = [
-  { label: "공식 사이트", href: INFORMATION.url.main },
-  { label: "공식 공지 (집합 안내)", href: "https://zutomayo.net/news/657/" },
-  { label: "공연장 위치 (구글 지도)", href: INFORMATION.url.place },
+  { label: "공식 사이트 (특설 페이지)", href: INFORMATION.url.main },
+  { label: "전체 공연장 (구글 지도)", href: INFORMATION.url.place },
+  {
+    label: "티켓 신청 (국내)",
+    href: "https://zutomayo.net/apicula-denki_apply_pre/",
+  },
+  {
+    label: "티켓 신청 (해외)",
+    href: "https://zutomayo.net/apicula-denki_apply_pre_en/",
+  },
 ];
 
 /** 입장에 필요한 전자 티켓 앱 — 예매처마다 앱이 다르다. */
@@ -35,7 +42,7 @@ export const TICKET_APPS: { name: string; android: string; ios: string }[] = [
 /** /info의 탭 바로가기 — 해시가 탭 id다(InfoTabContext). */
 export const INFO_TAB_LINKS: ConcertLink[] = [
   { label: "공연 정보 전체", href: "/info" },
-  { label: "축제", href: "/info#matsuri" },
-  { label: "팝업", href: "/info#popup" },
-  { label: "스탬프 랠리", href: "/info#stamp-rally" },
+  { label: "투어 일정", href: "/info#schedule" },
+  { label: "티켓 정보", href: "/info#ticket" },
+  { label: "투어 소개", href: "/info#prologue" },
 ];

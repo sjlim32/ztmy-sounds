@@ -1,16 +1,14 @@
 import { ZoomableImage } from "@/components/ZoomableImage";
-import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { DetailField } from "@/features/info/components/DetailField";
 import { DetailList } from "@/features/info/components/DetailList";
 import {
   EventDetails,
   ImageLabel,
 } from "@/features/info/components/EventDetails";
-import { ImageGallery } from "@/features/info/components/ImageGallery";
 import { InfoTabProvider } from "@/features/info/components/InfoTabContext";
 import { InfoTabs } from "@/features/info/components/InfoTabs";
-import { LiveScheduleTimeline } from "@/features/info/components/ScheduleTimeline";
 import { TabSection } from "@/features/info/components/TabSection";
+import { TourSchedule } from "@/features/info/components/TourSchedule";
 import { groupImagesBySection } from "@/features/info/lib/group-images";
 import { INFORMATION } from "@/features/info/info";
 import { SiteLink } from "@/components/SiteLink";
@@ -19,8 +17,6 @@ export const sections = groupImagesBySection(
   INFORMATION.img.sub,
   INFORMATION.sections,
 );
-export const toGroupImages = (imgs) =>
-  imgs.map((img) => ({ src: img.asset, alt: img.name }));
 
 <h1 className="tablet:mb-6 tablet:text-3xl mb-3 text-center text-lg font-bold">
   {INFORMATION.name}
@@ -30,318 +26,152 @@ export const toGroupImages = (imgs) =>
   <ZoomableImage
     src={INFORMATION.img.main}
     alt={INFORMATION.name}
-    thumbnailWidth={300}
+    thumbnailWidth={320}
     thumbnailCrop="top"
   />
 </div>
 
 <div className="tablet:mb-6 mb-3 text-center text-sm font-semibold text-white/60">
-  {"모든 이미지들은 클릭 시 확대됩니다."}
+  {"모든 이미지는 클릭 시 확대됩니다."}
 </div>
 
 <EventDetails event={INFORMATION} />
 
-<section className="mt-6">
-  <LiveScheduleTimeline />
-</section>
-
-<InfoTabProvider defaultTab="concert">
+<InfoTabProvider defaultTab="schedule">
   <InfoTabs />
 
   <div className="flex flex-col gap-3">
-    <TabSection id="gather">
-      <ImageLabel id="gather" label="입장·집합 안내" />
+    <TabSection id="schedule">
+      <ImageLabel id="schedule" label="투어 일정" />
 
-      <DetailList>
-        <DetailField label="집합 시간">
-          <div className="flex flex-col gap-0.5">
-            <span><strong className="text-ztmy-pink">15:00</strong>{` 일반 Area "A, B, C, G, H"`}</span>
-            <span><strong className="text-ztmy-pink">16:00</strong>{` 프리미엄 Area "P1~P6"`}</span>
-            <span><strong className="text-ztmy-pink">16:15</strong>{` 일반 Area "D, E, F, N"`}</span>
-          </div>
-        </DetailField>
-        <DetailField label="집합 장소">{`아래 이미지 참고`}</DetailField>
-        <DetailField label="늦은 경우">
-          <span>{`집합 시간에 늦어도 입장할 수 있습니다. 그 시점에 호출 중인 입장 정리 번호에 맞춰 입장하니, 각 입장구로 와 주세요.`}</span>
-        </DetailField>
-        <DetailField label="입장 방법">
-          <span>{`전자 티켓 앱과 티켓을 미리 다운로드해 주세요.`}</span>
-        </DetailField>
-        <DetailField label="티켓피아 (MOALA)">
-          <div className="flex flex-row flex-wrap items-center gap-x-2">
-            <SiteLink href="https://play.google.com/store/apps/details?id=fun.moala.pocket">{`Google Play`}</SiteLink>
-            <span>/</span>
-            <SiteLink href="https://apps.apple.com/jp/app/moala-pocket/id1626245204">{`App Store`}</SiteLink>
-          </div>
-        </DetailField>
-        <DetailField label="로치케">
-          <div className="flex flex-row flex-wrap items-center gap-x-2">
-            <SiteLink href="https://play.google.com/store/apps/details?id=jp.lhe.ebillet">{`Google Play`}</SiteLink>
-            <span>/</span>
-            <SiteLink href="https://apps.apple.com/jp/app/%E3%83%AD%E3%83%BC%E3%83%81%E3%82%B1%E9%9B%BB%E5%AD%90%E3%83%81%E3%82%B1%E3%83%83%E3%83%88/id1175974437">{`App Store`}</SiteLink>
-          </div>
-        </DetailField>
-        <DetailField label="이플러스 (e+)">
-          <div className="flex flex-row flex-wrap items-center gap-x-2">
-            <SiteLink href="https://play.google.com/store/apps/details?id=jp.eplus.android.all.app">{`Google Play`}</SiteLink>
-            <span>/</span>
-            <SiteLink href="https://apps.apple.com/jp/app/e-%E3%82%A4%E3%83%BC%E3%83%97%E3%83%A9%E3%82%B9-%E3%83%81%E3%82%B1%E3%83%83%E3%83%88-%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9-%E3%82%B9%E3%83%9E%E3%83%81%E3%82%B1/id465887673">{`App Store`}</SiteLink>
-          </div>
-        </DetailField>
-        <DetailField label="링크">
-          <SiteLink href="https://zutomayo.net/news/657/">{`공식 공지사항`}</SiteLink>
-        </DetailField>
-      </DetailList>
+      <TourSchedule />
 
-      <ImageGallery
-        images={toGroupImages(sections["gather"])}
-        className="tablet:grid-cols-2"
-        itemClassNames={["tablet:row-span-2"]}
-      />
-    </TabSection>
-
-    <TabSection id="notice">
-      <ImageLabel id="notice" label="공연" />
-      <div className="tablet:flex-row flex flex-col items-center justify-center gap-3">
-        <ZoomableImageGroup
-          images={toGroupImages(sections["notice"])}
+      <h3 className="mt-8 mb-3 text-center font-semibold text-white">공식 스케줄 포스터</h3>
+      <div className="flex items-center justify-center">
+        <ZoomableImage
+          src={sections["schedule"][0].asset}
+          alt={sections["schedule"][0].name}
           thumbnailWidth={600}
           thumbnailCrop="top"
         />
       </div>
     </TabSection>
 
-    <TabSection id="bonus">
-      <ImageLabel id="bonus" label="특전" />
+    <TabSection id="ticket">
+      <ImageLabel id="ticket" label="티켓 정보" />
 
-      <section className="flex flex-col tablet:flex-row items-center justify-center gap-3">
-        <div className="flex flex-col items-center gap-3">
-          <p className="font-semibold">1일차 10/3(토)</p>
-          <ZoomableImage
-            src={sections["bonus"][0].asset}
-            thumbnailWidth={300}
-            thumbnailCrop="top"
-          />
-        </div>
-
-        <div className="flex flex-col items-center gap-3">
-          <p className="font-semibold">2일차 10/4(일)</p>
-          <ZoomableImage
-            src={sections["bonus"][1].asset}
-            thumbnailWidth={300}
-            thumbnailCrop="top"
-          />
-        </div>
-      </section>
-    </TabSection>
-
-    <TabSection id="popup">
-      <DetailList title="ZUTOMAYO MART 출장소" note="※ 10/10일(토)·11일(일)은 11:00 ~ 21:00 (최종 입장 20:30)">
-        <DetailField label="날짜">10/3(토) - 10/12(월)</DetailField>
-        <DetailField label="시간">11:00～19:00 (최종 입장 18:30)</DetailField>
-        <DetailField label="장소">
-          <SiteLink href="https://maps.app.goo.gl/p35sGj94Bcv2dDiP6">
-            나라현 컨벤션 센터 2F 텐헤이 갤러리 〒630-8013 나라현 나라시 산조 오지 1 쵸메 691-1
-          </SiteLink>
+      <DetailList title="좌석 종류 및 가격">
+        <DetailField label="지정석">
+          <span className="font-semibold text-white">9,900엔 (소비세 포함)</span>
         </DetailField>
-
-        <DetailField label="링크" >
-        <div className="flex-row flex gap-1">
-          <SiteLink href="https://zutomayo.net/mart_nara202610/">
-            {`공식 사이트`}
-          </SiteLink>
-          <span> / </span>
-          <SiteLink href="https://www.0101.co.jp/405/info/index.html?contents_id=1212&from=01_pc_anime-contents_article1209">
-            {`사전 예약`}
-          </SiteLink>
-          </div>
-        </DetailField>
-      </DetailList>
-
-      <ImageGallery
-        images={toGroupImages(sections["ztmy-mart"])}
-        className="tablet:mx-auto tablet:max-w-2xl tablet:grid-cols-1"
-      />
-
-      <h3 className="mt-3 text-center font-semibold">상품 라인업과 구매 특전</h3>
-      <ImageGallery
-        images={toGroupImages(sections["ztmy-mart-lineup"])}
-        mobile="swipe"
-        swipeHeightClassName="h-96"
-        className="tablet:grid-cols-3"
-      />
-
-      <div className="h-px w-full my-6 bg-white/20" />
-
-      <DetailList title="ZUTOMAYO STAND 야마토 사이다이지 역점" note="※ 10/10(토)・11(일)은 10:00 ~ 17:30, 점포 한정 상품 없음">
-        <DetailField label="날짜">10/3(토) - 10/11(일)</DetailField>
-        <DetailField label="시간">10:00～20:00</DetailField>
-        <DetailField label="장소">
-          <SiteLink href="https://maps.app.goo.gl/51zaNuYxbRgBoTrg9">
-            긴테츠 야마토-사이다이지 역 Time's Place 니시 다이지 17번 부스
-          </SiteLink>
-        </DetailField>
-        <DetailField label="설명">
-        <div className="tablet:flex-col tablet:gap-0 flex flex-col gap-1">
-          <span>나라에서의 개최에 있어서, 평상시 역을 이용의 여러분에게도 공연을 알고 주셨으면 하고, 출점.</span>
-          <span>키오스크적인 꽤 작은 매점이므로, "ZUTOMAYO STAND"라고 명명했습니다,</span>
-          <span>소품 계를 중심으로 일부 상품만 판매합니다, 들러 주시는 것만으로 기쁩니다.</span>
-        </div>
-        </DetailField>
-
-        <DetailField label="링크">
-          <SiteLink href="https://zutomayo.net/bunka-denrai/">
-            {`공식 사이트`}
-          </SiteLink>
-        </DetailField>
-      </DetailList>
-
-      <ImageGallery
-        images={toGroupImages(sections["ztmy-stand"])}
-        className="tablet:mx-auto tablet:max-w-2xl tablet:grid-cols-1"
-      />
-    </TabSection>
-
-    <TabSection id="map">
-      <ImageLabel id="map" label="전체 지도" />
-      <div className="flex items-center justify-center">
-        <ZoomableImage
-          src={sections["map"][0].asset}
-          thumbnailWidth={1000}
-          thumbnailCrop="top"
-        />
-      </div>
-    </TabSection>
-
-    <TabSection id="matsuri-map">
-      <ImageLabel id="matsuri-map" label="축제 AREA 지도" />
-      <div className="flex items-center justify-center">
-        <ZoomableImage
-          src={sections["matsuri-map"][0].asset}
-          thumbnailWidth={1000}
-          thumbnailCrop="top"
-        />
-      </div>
-    </TabSection>
-
-    <TabSection id="matsuri-workshop">
-      <ImageLabel id="matsuri-workshop" label="워크숍 & 미니 게임" />
-      <div className="flex items-center justify-center">
-        <ZoomableImage
-          src={sections["matsuri-workshop-guide"][0].asset}
-          alt={sections["matsuri-workshop-guide"][0].name}
-          thumbnailWidth={500}
-          thumbnailCrop="top"
-        />
-      </div>
-
-      <ImageGallery
-        images={toGroupImages(sections["matsuri-workshop"])}
-        mobile="swipe"
-        swipeHeightClassName="h-[26rem]"
-        className="tablet:grid-cols-4 pc:grid-cols-5"
-      />
-    </TabSection>
-
-    <TabSection id="matsuri-food">
-      <ImageLabel id="matsuri-food" label="음식 코너" />
-      <ImageGallery
-        images={toGroupImages(sections["matsuri-food"])}
-        mobile="swipe"
-        swipeHeightClassName="h-64"
-        className="tablet:grid-cols-2"
-      />
-    </TabSection>
-
-    <TabSection id="matsuri-sidestage">
-      <ImageLabel id="matsuri-sidestage" label="사이드 스테이지" />
-      <div className="flex items-center justify-center">
-        <ZoomableImage
-          src={sections["matsuri-sidestage"][0].asset}
-          thumbnailWidth={1000}
-          thumbnailCrop="top"
-        />
-      </div>
-    </TabSection>
-
-    <TabSection id="zutomarosh">
-      <ImageLabel id="zutomarosh" label="즛토마로슈" />
-
-      <DetailList note="*각 점포 20장 한정, 소진 시 종료">
-        <DetailField label="일정">26년 9월 22일 - 10월 7일</DetailField>
-        <DetailField label="장소">일본 내 세븐일레븐</DetailField>
-        <DetailField label="특전">오리지널 스티커 1종 (총 5종)</DetailField>
-        <DetailField label="특전 수령 방법">
-          26년 9월 24일 10:00 이후, 대상의 구미・캔디를 한 번에 2개(조합
-          자유) 구입
-        </DetailField>
-      </DetailList>
-
-      <div className="tablet:grid-cols-3 tablet:grid flex flex-col items-center justify-center gap-3">
-        <ZoomableImageGroup
-          images={toGroupImages(sections["zutomarosh"])}
-          thumbnailWidth={500}
-          thumbnailCrop="top"
-        />
-      </div>
-    </TabSection>
-
-    <TabSection id="matsuri-collabo">
-      <ImageLabel id="matsuri-collabo" label="나라현 콜라보 상품" />
-      <SiteLink href="https://zutomayo.net/special/bunka-denrai/#collab">
-        {`공식 사이트 이동`}
-      </SiteLink>
-    </TabSection>
-
-    <TabSection id="stamp-rally">
-      <ImageLabel id="stamp-rally" label="스탬프 랠리" />
-
-      <DetailList title="나라 둘러보기" note="※ 스탬프 수집 자체에 대한 보상은 없음">
-        <DetailField label="기간">10/1(수) - 10/31(금)</DetailField>
-        <DetailField label="스탬프 용지">각 시설에서 배부</DetailField>
-        <DetailField label="응모 방법">스탬프 행사장 QR 코드로 설문조사 참여</DetailField>
-        <DetailField label="보상">
+        <DetailField label="프리미엄석">
           <div className="flex flex-col gap-0.5">
-            <strong className="text-ztmy-pink">{`【Nara × ずっと真夜中でいいのに。】 콜라보 스티커`}</strong>
-            <span className="text-sm text-white/60">추첨을 통해 1,000명</span>
-          </div>
-        </DetailField>
-        <DetailField label="링크">
-          <div className="flex flex-row flex-wrap gap-1">
-            <SiteLink href="https://maps.app.goo.gl/5bWLrt35bunDVaPm9">
-              {`장소 확인(구글맵스)`}
-            </SiteLink>
-            <span> / </span>
-            <SiteLink href="https://www.instagram.com/p/DdyW6BslC9P">
-              {`공식 정보(@sangakufesta)`}
-            </SiteLink>
+            <span className="font-semibold text-ztmy-pink">Upgrade +1,500엔 (소비세 포함)</span>
+            <span className="text-xs text-white/60">[접수 기간] 12/1(화) 20:00 ~ 12/6(일) 23:59</span>
           </div>
         </DetailField>
       </DetailList>
 
-      <div className="flex items-center justify-center">
-        <ZoomableImage
-          src={sections["stamp-rally"][0].asset}
-          alt={sections["stamp-rally"][0].name}
-          thumbnailWidth={500}
-          thumbnailCrop="top"
-        />
-      </div>
-
-      <div className="h-px w-full my-6 bg-white/20" />
-
-      <DetailList title="전뢰집인 순회" note="※ 용지는 각 집인 장소에 있습니다. (특전 교환 등은 없습니다.)">
-        <DetailField label="일시">{`10/10(토)・10/11(일)`}</DetailField>
-        <DetailField label="내용">
-          <span>{`헤이조궁터 역사공원 안을 돌며 8개의 표시를 모으는 「전뢰집인 순회」. 포토 패널도 설치됩니다.`}</span>
+      <DetailList title="티켓 선행 접수 일정" note="※ 여러 공연을 원하는 경우, 반드시 한 번의 신청에 모두 포함하여 신청해야 합니다.">
+        <DetailField label="PREMIUM 최속 선행">
+          <div className="flex flex-col gap-1">
+            <span><strong>접수 기간:</strong> 10/16(금) 21:00 ~ 10/29(목) 23:59</span>
+            <span><strong>당락·입금:</strong> 11/7(토) 18:00 ~ 11/10(화) 23:59</span>
+            <span className="text-xs text-white/70">1공연당 2매까지 (동반자는 비회원 가능, 지정석 접수)</span>
+            <div className="flex flex-row flex-wrap items-center gap-x-2 pt-1">
+              <SiteLink href="https://zutomayo.net/apicula-denki_apply_pre/">국내 신청 바로가기</SiteLink>
+              <span>/</span>
+              <SiteLink href="https://zutomayo.net/apicula-denki_apply_pre_en/">Apply (Outside Japan)</SiteLink>
+            </div>
+          </div>
+        </DetailField>
+        <DetailField label="PREMIUM 2차 선행">
+          <div className="flex flex-col gap-1">
+            <span><strong>접수 기간:</strong> 11/7(토) 20:00 ~ 11/9(월) 23:59</span>
+            <span><strong>당락·입금:</strong> 11/17(화) 18:00 ~ 11/20(금) 23:59</span>
+            <span className="text-xs text-white/70">1공연당 2매까지</span>
+          </div>
+        </DetailField>
+        <DetailField label="일반 최속 선행">
+          <div className="flex flex-col gap-1">
+            <span><strong>접수 기간:</strong> 11/17(화) 20:00 ~ 11/29(일) 23:59</span>
+            <span><strong>당락·입금:</strong> 12/5(토) 18:00 ~ 12/8(화) 23:59</span>
+            <span className="text-xs text-white/70">1공연당 4매까지</span>
+          </div>
+        </DetailField>
+        <DetailField label="프리미엄석 Upgrade">
+          <div className="flex flex-col gap-1">
+            <span><strong>접수 기간:</strong> 12/1(화) 20:00 ~ 12/6(일) 23:59</span>
+            <span><strong>당락·입금:</strong> 12/12(토) 18:00 ~ 12/15(화) 23:59</span>
+            <span className="text-xs text-white/70">PREMIUM 선행(1차·2차) 지정석 구매 회원 대상 (1공연당 2매)</span>
+          </div>
         </DetailField>
       </DetailList>
 
-      <div className="flex items-center justify-center">
+      <DetailList title="공연 및 티켓 유의사항">
+        <DetailField label="신청 주의사항">
+          <div className="flex flex-col gap-1 text-sm text-white/90">
+            <span>• 1인당 1회 신청만 유효하며, 여러 번 신청 시 마지막 신청 내용만 유효합니다.</span>
+            <span>• 내용 변경을 원하실 경우, 변경할 공연뿐 아니라 원하는 모든 공연을 다시 함께 신청해야 합니다.</span>
+            <span>• 공연 중지·연기의 경우를 제외하고 신청 후 취소 및 환불은 불가합니다.</span>
+            <span>• 티켓 전매는 금지되며, 양도가 필요한 경우 추후 공식 리세일을 이용해 주세요.</span>
+          </div>
+        </DetailField>
+        <DetailField label="공연 주의사항">
+          <div className="flex flex-col gap-1 text-sm text-white/90">
+            <span>• 미취학 아동은 입장할 수 없습니다.</span>
+            <span>• 출연진의 출퇴근길 대기는 엄격히 금지됩니다.</span>
+            <span>• 출연진을 향한 편지, 꽃다발, 선물 등은 일체 수령하지 않습니다.</span>
+            <span>• 휠체어석 이용을 희망하시는 분은 공연 3일 전까지 각 지역 문의처로 신청해 주세요.</span>
+          </div>
+        </DetailField>
+        <DetailField label="해외 접수">
+          <div className="flex flex-col gap-1 text-sm text-white/90">
+            <span>• 해외 거주자는 반드시 사전 등록된 본인이 입장해야 하며, 신분증 확인이 진행됩니다.</span>
+            <span>• 해외 접수는 시스템상 공식 리세일을 이용하실 수 없습니다.</span>
+            <span>• 해외 접수 시 신청 1건당 인바운드 수수료 950엔이 부과됩니다.</span>
+            <span>• 일본 내 계약 전화번호가 없는 경우 해외 전용 접수(Apply Outside Japan)를 이용해 주세요.</span>
+          </div>
+        </DetailField>
+        <DetailField label="티켓 문의">
+          <div className="flex flex-row flex-wrap items-center gap-x-2">
+            <SiteLink href="https://t.pia.jp/help/index.jsp">티켓피아 헬프</SiteLink>
+            <span>/</span>
+            <SiteLink href="https://w.pia.jp/t/zutomayo-tour27-faq">투어 FAQ 안내</SiteLink>
+          </div>
+        </DetailField>
+      </DetailList>
+    </TabSection>
+
+    <TabSection id="prologue">
+      <ImageLabel id="prologue" label="투어 소개" />
+
+      <DetailList title="프롤로그 (Prologue)">
+        <DetailField label="슬로건">
+          <span className="font-semibold text-ztmy-pink">
+            {"雷はやがて灯りと鳴り / 蜂のように刺す(sus)"}
+          </span>
+        </DetailField>
+        <DetailField label="소개">
+          <div className="flex flex-col gap-2 text-sm leading-relaxed text-white/90">
+            <span>덕분에 창업 100년. 여러분의 동네 전기 가게 「아피쿠라 전기」입니다.</span>
+            <span>수리・판매・설치・채취・배달. 가전이나 PC, 벌에 관한 것이라면 무엇이든 맡겨주세요.</span>
+            <span>BUG 전문 전기 기사에 의한, 안심 애프터 케어. 전구 하나부터 교체하러 방문합니다.</span>
+          </div>
+        </DetailField>
+        <DetailField label="방문 주의사항">
+          <div className="flex flex-col gap-1 text-xs text-white/70">
+            <span>※ 대단히 송구스럽게도, 당점은 수작업 중심이므로 AI 제품에는 아직 대응하지 못하고 있습니다.</span>
+            <span>※ 당점에서는 창업 당시부터 기괴한 노이즈가 울리고 있습니다만, 정상적인 이상음이오니 안심해 주시기 바랍니다.</span>
+          </div>
+        </DetailField>
+      </DetailList>
+
+      <div className="mt-4 flex items-center justify-center">
         <ZoomableImage
-          src={sections["denrai-shuin"][0].asset}
-          alt={sections["denrai-shuin"][0].name}
-          thumbnailWidth={800}
+          src={sections["prologue"][0].asset}
+          alt={sections["prologue"][0].name}
+          thumbnailWidth={600}
           thumbnailCrop="top"
         />
       </div>

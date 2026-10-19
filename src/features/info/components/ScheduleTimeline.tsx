@@ -108,7 +108,7 @@ export function ScheduleTimeline({
         onClick={() => setMapOpen((open) => !open)}
         className="text-ztmy-pink flex items-center justify-center gap-1 rounded-md border border-white/15 px-3 py-1.5 text-sm font-bold transition-colors hover:border-white/40 focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
       >
-        집합 장소 지도 {isMapOpen ? "접기" : "보기"}
+        투어 일정표 {isMapOpen ? "접기" : "보기"}
         <ChevronDownIcon
           className={cn(
             "h-3 w-3 transition-transform",

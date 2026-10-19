@@ -18,39 +18,27 @@ export const SCHEDULE_KIND_LABEL: Record<ScheduleKind, string> = {
 };
 
 /**
- * 공연 당일 시간표 — 축제 AREA, 집합, 공연 일정을 시간순 한 줄기로 합친 것.
- * /info의 일정표와 홈의 당일 안내가 같이 쓰므로 시간이 바뀌면 여기만 고친다.
- * 양일(10/10·11) 일정이 같아서 날짜별로 나누지 않았다.
+ * 투어 첫 공연(히로시마 HBG홀) 당일 일정 안내.
  */
 export const SCHEDULE: ScheduleItem[] = [
-  { start: "09:30", label: "입장 및 참가권 판매", kind: "matsuri" },
-  { start: "10:00", label: "축제 AREA 개장", kind: "matsuri" },
-  {
-    start: "10:30",
-    end: "15:00",
-    label: "SIDE STAGE '낮의 연회'",
-    kind: "matsuri",
-  },
-  { start: "15:00", label: '일반 Area "A, B, C, G, H"', kind: "gather" },
-  { start: "15:30", label: "개장", kind: "concert" },
-  { start: "16:00", label: '프리미엄 Area "P1~P6"', kind: "gather" },
-  { start: "16:15", label: '일반 Area "D, E, F, N"', kind: "gather" },
-  { start: "17:30", label: "축제 AREA 종료", kind: "matsuri" },
-  { start: "17:30", label: "개연", kind: "concert" },
+  { start: "17:00", label: "개장 (OPEN)", kind: "concert" },
+  { start: "18:00", label: "개연 (START)", kind: "concert" },
 ];
 
 export const SCHEDULE_NOTES = [
-  "축제 AREA는 입장 무료, 각 워크샵 및 미니게임은 별도 참가권 판매",
-  "※ 우천 결행 ・ 황천 중지",
+  "※ 공연별 개장/개연 시각은 투어 일정표를 확인해 주세요.",
+  "※ 미취학 아동 입장 불가",
 ];
 
-/** 일정표의 "집합 장소 지도"로 펼쳐 보여줄 이미지. */
+/** 일정표 펼침 시 보여줄 투어 스케줄 이미지. */
 export const GATHER_MAP_IMAGES = [
-  { src: "/assets/info/gather_map.webp", alt: "집합 장소 지도" },
-  { src: "/assets/info/gather_02.webp", alt: "집합 시간·집합 장소 일람" },
+  {
+    src: "/assets/info/apicula-denki_schedule.webp",
+    alt: "아피쿠라 전기 투어 일정",
+  },
 ];
 
-// "2026.10.10" ~ "2026.10.11" → ["2026-10-10", "2026-10-11"]
+// "2027.01.15" ~ "2027.01.15" → ["2027-01-15"]
 function listDays(start: string, end: string): string[] {
   const toMs = (date: string) => {
     const [year, month, day] = date.split(".").map(Number);
@@ -71,7 +59,7 @@ export const SCHEDULE_DAYS = listDays(
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
-// ["2026-10-10", "2026-10-11"] → "10/10(토)·11(일)"
+// ["2027-01-15"] → "1/15(금)"
 export const SCHEDULE_DAYS_LABEL = SCHEDULE_DAYS.map((day, index) => {
   const [year, month, date] = day.split("-").map(Number);
   const weekday =
