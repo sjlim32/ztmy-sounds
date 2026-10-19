@@ -5,11 +5,12 @@ import { InfoEvent } from "@/features/info/lib/types";
 // 두 곳에서 같은 문자열을 따로 적으면 어긋날 수 있어 여기 하나로 둔다.
 export const INFO_SCROLL_CONTAINER_ID = "info-scroll-container";
 
-/** 정보 페이지 상단 탭 3종. */
-export type InfoTabId = "schedule" | "ticket" | "prologue";
+/** 정보 페이지 상단 탭 4종. */
+export type InfoTabId = "schedule" | "map" | "ticket" | "prologue";
 
 export const INFO_TABS: { id: InfoTabId; label: string }[] = [
   { id: "schedule", label: "투어 일정" },
+  { id: "map", label: "공연 지도" },
   { id: "ticket", label: "티켓 정보" },
   { id: "prologue", label: "투어 소개" },
 ];
@@ -19,6 +20,7 @@ export const INFO_TABS: { id: InfoTabId; label: string }[] = [
  */
 export const INFO_TAB_SECTIONS: Record<InfoTabId, string[]> = {
   schedule: ["schedule"],
+  map: ["map"],
   ticket: ["ticket"],
   prologue: ["prologue"],
 };
@@ -35,6 +37,7 @@ export const INFORMATION: InfoEvent = {
   place: "전국 23개 도시 (총 36공연)",
   sections: [
     { id: "schedule", label: "투어 일정" },
+    { id: "map", label: "공연 지도" },
     { id: "ticket", label: "티켓 정보" },
     { id: "prologue", label: "투어 소개" },
   ],
@@ -68,9 +71,24 @@ export const INFORMATION: InfoEvent = {
     main: "/assets/info/apicula-denki_kv.webp",
     sub: [
       {
-        name: "투어 일정표",
+        name: "전체 공연 지도 (전국 23개 도시 배치도)",
+        asset: "/assets/info/apicula-denki_tour-maps.webp",
+        section: "schedule",
+      },
+      {
+        name: "일정 번역본 (홀별 정원수)",
+        asset: "/assets/info/apicula-denki_schedule-kr.webp",
+        section: "schedule",
+      },
+      {
+        name: "투어 일정표 (공식 원문)",
         asset: "/assets/info/apicula-denki_schedule.webp",
         section: "schedule",
+      },
+      {
+        name: "전체 공연 지도",
+        asset: "/assets/info/apicula-denki_tour-maps.webp",
+        section: "map",
       },
       {
         name: "키비주얼",

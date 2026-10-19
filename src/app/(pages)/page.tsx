@@ -15,6 +15,7 @@ import { CalendarIcon } from "@/components/icons/CalendarIcon";
 import {
   useEventCountdown,
   getEventTargetMs,
+  getActiveTourPerformance,
   DONE_AFTER_HOURS,
 } from "@/features/home/lib/event-countdown";
 
@@ -34,8 +35,12 @@ import {
 function getInitialTabletOpenAccent(): Event["accent"] {
   const now = Date.now();
   const urgency = (event: Event) => {
-    const diffMs = getEventTargetMs(event) - now;
-    const isDone = -diffMs / 3_600_000 >= DONE_AFTER_HOURS;
+    const targetMs = getEventTargetMs(event, now);
+    const diffMs = targetMs - now;
+    const isDone =
+      event.performances && event.performances.length > 0
+        ? !getActiveTourPerformance(event, now)
+        : -diffMs / 3_600_000 >= DONE_AFTER_HOURS;
     return isDone ? Infinity : diffMs;
   };
   return urgency(visitEvent) <= urgency(originEvent)
@@ -160,6 +165,7 @@ export default function Home() {
               isEventDay={mobile.isEventDay}
               daysUntilEvent={mobile.daysUntilEvent}
               isDone={mobile.isDone}
+              activePerformance={mobile.activePerformance}
               isOpen={isMobileOpen}
               onToggle={toggleMobile}
             />
@@ -195,6 +201,7 @@ export default function Home() {
               isEventDay={visit.isEventDay}
               daysUntilEvent={visit.daysUntilEvent}
               isDone={visit.isDone}
+              activePerformance={visit.activePerformance}
               isOpen={tabletOpenAccent === visitEvent.accent}
               onToggle={openVisit}
             />
@@ -206,6 +213,7 @@ export default function Home() {
               isEventDay={origin.isEventDay}
               daysUntilEvent={origin.daysUntilEvent}
               isDone={origin.isDone}
+              activePerformance={origin.activePerformance}
               isOpen={tabletOpenAccent === originEvent.accent}
               onToggle={openOrigin}
             />

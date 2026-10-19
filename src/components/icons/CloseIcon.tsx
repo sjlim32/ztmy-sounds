@@ -7,7 +7,11 @@ export function CloseIcon({ className }: { className?: string }) {
       strokeWidth={2}
       className={className}
     >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6 6l12 12M18 6L6 18"
+      />
     </svg>
   );
 }

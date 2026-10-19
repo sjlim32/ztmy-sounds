@@ -50,9 +50,7 @@ export async function generateMetadata(
 // 실제 UI는 SongPanel(slam/layout.tsx에 상주)이 라우트 세그먼트를 보고 그립니다.
 // 이 페이지는 존재 여부 확인(404)과 라우트 매칭 역할만 합니다. 곡 자체는
 // 있어도 슬램 태그가 없으면 404 처리.
-export default async function SlamSongPage(
-  props: PageProps<"/slam/[songId]">,
-) {
+export default async function SlamSongPage(props: PageProps<"/slam/[songId]">) {
   const { songId } = await props.params;
 
   if (!getSlamSong(songId)) {

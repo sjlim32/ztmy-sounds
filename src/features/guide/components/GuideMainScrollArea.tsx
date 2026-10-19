@@ -27,9 +27,7 @@ export function GuideMainScrollArea({ children }: { children: ReactNode }) {
         "tablet:flex tablet:min-w-0 tablet:flex-1 tablet:flex-col tablet:items-center tablet:justify-center-safe tablet:overflow-y-auto",
         "tablet:scrollbar-thin tablet:[scrollbar-color:transparent_transparent] tablet:hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
         "tablet:[&::-webkit-scrollbar]:w-1.5 tablet:[&::-webkit-scrollbar-thumb]:rounded-full tablet:[&::-webkit-scrollbar-thumb]:bg-transparent tablet:hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
-        segment
-          ? "tablet:h-[88vh]"
-          : "tablet:h-[min(65vh,calc(140dvh-10rem))]",
+        segment ? "tablet:h-[88vh]" : "tablet:h-[min(65vh,calc(140dvh-10rem))]",
       )}
     >
       {children}

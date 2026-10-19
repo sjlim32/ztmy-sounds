@@ -5,6 +5,7 @@ import Link from "next/link";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { formatEventDate, accentBorder, type Event } from "@/data/event";
+import type { TourPerformanceItem } from "@/data/tour-performances";
 import type { Remaining } from "@/features/home/lib/countdown";
 import { ExternalLinkIcon } from "@/components/icons/ExternalLinkIcon";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
@@ -55,6 +56,7 @@ interface NextEventCardProps {
   isEventDay: boolean;
   daysUntilEvent: number;
   isDone: boolean;
+  activePerformance?: TourPerformanceItem;
   isOpen: boolean;
   onToggle: () => void;
 }
@@ -86,6 +88,7 @@ function NextEventCardComponent({
   isEventDay,
   daysUntilEvent,
   isDone,
+  activePerformance,
   isOpen,
   onToggle,
 }: NextEventCardProps) {
@@ -185,17 +188,29 @@ function NextEventCardComponent({
                         className="font-mono text-xs font-bold text-white"
                       >
                         {formatEventDate(event)}
-                        <span className="ml-1.5 text-xs font-normal text-white/70">
-                          {event.time}
-                        </span>
+                        {!activePerformance && (
+                          <span className="ml-1.5 text-xs font-normal text-white/70">
+                            {event.time}
+                          </span>
+                        )}
                       </p>
+                      {activePerformance && (
+                        <p className="font-mono text-[11px] font-medium text-white/70">
+                          {activePerformance.datesLabel}{" "}
+                          {activePerformance.time}
+                        </p>
+                      )}
                     </div>
 
                     <div>
                       <p className="font-mono text-[10px] tracking-[0.2em] text-white/55 uppercase">
                         Venue
                       </p>
-                      <span className="text-xs text-white">{event.place}</span>
+                      <span className="text-xs text-white">
+                        {activePerformance
+                          ? activePerformance.venue
+                          : event.place}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -255,13 +270,15 @@ function NextEventCardComponent({
                         data-role="date"
                         className={cn(
                           "mt-1 font-mono text-lg text-white",
-                          "wide:text-lg pc:text-base tablet:text-sm",
+                          "pc:text-base tablet:text-sm",
                         )}
                       >
                         {formatEventDate(event)}
                       </p>
                       <p className="font-mono text-xs font-bold text-white/50">
-                        {event.time}
+                        {activePerformance
+                          ? `${activePerformance.datesLabel} ${activePerformance.time}`
+                          : event.time}
                       </p>
                     </div>
 
@@ -279,15 +296,23 @@ function NextEventCardComponent({
                       <p
                         className={cn(
                           "mt-1 text-lg break-keep text-white",
-                          "wide:text-lg pc:text-base tablet:text-sm",
+                          "pc:text-base tablet:text-sm",
                         )}
                       >
-                        {event.place}
+                        {activePerformance
+                          ? activePerformance.venue
+                          : event.place}
                       </p>
-                      {event.placeDesc && (
+                      {activePerformance ? (
                         <p className="text-xs font-bold text-white/50">
-                          {event.placeDesc}
+                          {activePerformance.pref} · 전국 23개 도시
                         </p>
+                      ) : (
+                        event.placeDesc && (
+                          <p className="text-xs font-bold text-white/50">
+                            {event.placeDesc}
+                          </p>
+                        )
                       )}
                     </div>
                   </div>

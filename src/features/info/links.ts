@@ -43,6 +43,7 @@ export const TICKET_APPS: { name: string; android: string; ios: string }[] = [
 export const INFO_TAB_LINKS: ConcertLink[] = [
   { label: "공연 정보 전체", href: "/info" },
   { label: "투어 일정", href: "/info#schedule" },
+  { label: "공연 지도", href: "/info#map" },
   { label: "티켓 정보", href: "/info#ticket" },
   { label: "투어 소개", href: "/info#prologue" },
 ];

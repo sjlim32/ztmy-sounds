@@ -1,3 +1,8 @@
+import {
+  APIKURA_PERFORMANCES,
+  type TourPerformanceItem,
+} from "@/data/tour-performances";
+
 export interface Event {
   label: string;
   accent: "home" | "away";
@@ -8,7 +13,10 @@ export interface Event {
   placeDesc?: string;
   placeUrl: string;
   date: string;
+  dateDisplay?: string;
+  endDate?: string;
   time: string;
+  performances?: TourPerformanceItem[];
 }
 
 // event.accent(home: 내한 / away: 원정)에 따른 상단 테두리 색.
@@ -38,20 +46,21 @@ export function getEventStartDate(event: Event): string {
   return event.date.split("·")[0];
 }
 
-// 다일차 공연의 마지막 날짜. "YYYY.MM.DD·DD" 형식이면 시작일과 같은 해/월에
-// 가운데 점 뒤 일(day)을 붙여 "YYYY.MM.DD"로 복원합니다. 가운데 점이 없으면
-// 시작일과 동일합니다.
+// 다일차 공연의 마지막 날짜. endDate가 명시되어 있으면 우선 반환하고,
+// "YYYY.MM.DD·DD" 형식이면 시작일과 같은 해/월에 가운데 점 뒤 일(day)을
+// 붙여 "YYYY.MM.DD"로 복원합니다. 가운데 점이 없으면 시작일과 동일합니다.
 export function getEventEndDate(event: Event): string {
+  if (event.endDate) return event.endDate;
   const [start, endDay] = event.date.split("·");
   if (!endDay) return start;
   const [year, month] = start.split(".");
   return `${year}.${month}.${endDay}`;
 }
 
-// 화면 표시용 날짜 문자열. "YYYY.MM.DD·DD" 표기는 그 자체가 이미 원하는
-// 표시 형태라 가공 없이 그대로 보여줍니다.
+// 화면 표시용 날짜 문자열. dateDisplay가 지정되어 있으면 우선 사용하고,
+// 없으면 event.date 표기를 그대로 보여줍니다.
 export function formatEventDate(event: Event): string {
-  return event.date;
+  return event.dateDisplay ?? event.date;
 }
 
 export const originEvent: Event = {
@@ -60,9 +69,12 @@ export const originEvent: Event = {
   tourName: "아피쿠라 전기 「アピクラ電機」",
   tourImg: "/assets/info/apicula-denki_kv.webp",
   tourUrl: "https://zutomayo.net/apicula/",
-  place: "전국 홀 투어 (23개 도시)",
-  placeDesc: "히로시마 문화학원 HBG홀 외 22곳",
+  place: "전국 홀 투어",
+  placeDesc: "23개 도시",
   placeUrl: "https://maps.app.goo.gl/6JdViGdHH1Vwn6hX9",
   date: "2027.01.15",
+  dateDisplay: "1월 15일 ~ 5월 23일",
+  endDate: "2027.05.23",
   time: "18:00",
+  performances: APIKURA_PERFORMANCES,
 };

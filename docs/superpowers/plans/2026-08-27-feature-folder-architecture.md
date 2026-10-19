@@ -24,44 +24,44 @@
 
 ## 파일 이동 매핑 (전체, spec에서 확정됨)
 
-| 기존 경로 | 새 경로 |
-|---|---|
-| `components/guide/detail/AutoScrollStatusIcon.tsx` | `features/guide/components/AutoScrollStatusIcon.tsx` |
-| `components/guide/detail/AutoScrollToggle.tsx` | `features/guide/components/AutoScrollToggle.tsx` |
-| `components/guide/detail/CallIcon.tsx` | `features/guide/components/CallIcon.tsx` |
-| `components/guide/detail/GuidePlayerArea.tsx` | `features/guide/components/GuidePlayerArea.tsx` |
-| `components/guide/detail/LyricLine.tsx` | `features/guide/components/LyricLine.tsx` |
-| `components/guide/detail/LyricsView.tsx` | `features/guide/components/LyricsView.tsx` |
-| `components/guide/detail/PlayerControls.tsx` | `features/guide/components/PlayerControls.tsx` |
-| `components/guide/detail/YouTubePlayer.tsx` | `features/guide/components/YouTubePlayer.tsx` |
-| `components/guide/list/SongList.tsx` | `features/guide/components/SongList.tsx` |
-| `components/guide/SongPanel.tsx` | `features/guide/components/SongPanel.tsx` |
-| `data/songs/*.ts`(14개) + `index.ts` | `features/guide/data/songs/*.ts` + `index.ts` |
-| `lib/guide/types.ts` | `features/guide/lib/types.ts` |
-| `lib/guide/timestamp.ts` | `features/guide/lib/timestamp.ts` |
-| `lib/guide/lyric-sync.ts` | `features/guide/lib/lyric-sync.ts` |
-| `lib/guide/icon-tokens.ts` | `features/guide/lib/icon-tokens.ts` |
-| `lib/guide/auto-scroll.ts` | `features/guide/lib/auto-scroll.ts` |
-| `context/player-context.tsx` | `features/guide/player-context.tsx` |
-| `components/guide/notice/NoticeAccordionItem.tsx` | `features/guide/notice/components/NoticeAccordionItem.tsx` |
-| `components/guide/notice/NoticeList.tsx` | `features/guide/notice/components/NoticeList.tsx` |
-| `components/guide/notice/NoticePanel.tsx` | `features/guide/notice/components/NoticePanel.tsx` |
-| `data/notices/01_fan-page-disclaimer.ts` | `features/guide/notice/data/01_fan-page-disclaimer.ts` |
-| `data/notices/02_fight-the-shamoji.ts` | `features/guide/notice/data/02_fight-the-shamoji.ts` |
-| `data/notices/index.ts` | `features/guide/notice/data/index.ts` |
-| `content/notices/fan-page-disclaimer.mdx` | `features/guide/notice/content/fan-page-disclaimer.mdx` |
-| `content/notices/fight-the-shamoji.mdx` | `features/guide/notice/content/fight-the-shamoji.mdx` |
-| `content/notices/warn-festival.mdx` | `features/guide/notice/content/warn-festival.mdx` |
-| `lib/notice/types.ts` | `features/guide/notice/lib/types.ts` |
-| `lib/notice/dismissal.ts` | `features/guide/notice/lib/dismissal.ts` |
-| `components/home/Header.tsx` | `features/home/components/Header.tsx` |
-| `components/home/NextVisit.tsx` | `features/home/components/NextVisit.tsx` |
-| `components/home/Countdown.tsx` | `features/home/components/Countdown.tsx` |
-| `components/home/MainNavLink.tsx` | `features/home/components/MainNavLink.tsx` |
-| `lib/guide/countdown.ts` | `features/home/lib/countdown.ts` |
-| `lib/guide/event-countdown.ts` | `features/home/lib/event-countdown.ts` |
-| `content/info.mdx` | `features/info/info.mdx` |
-| `components/home/Footer.tsx` | `components/Footer.tsx` |
+| 기존 경로                                          | 새 경로                                                    |
+| -------------------------------------------------- | ---------------------------------------------------------- |
+| `components/guide/detail/AutoScrollStatusIcon.tsx` | `features/guide/components/AutoScrollStatusIcon.tsx`       |
+| `components/guide/detail/AutoScrollToggle.tsx`     | `features/guide/components/AutoScrollToggle.tsx`           |
+| `components/guide/detail/CallIcon.tsx`             | `features/guide/components/CallIcon.tsx`                   |
+| `components/guide/detail/GuidePlayerArea.tsx`      | `features/guide/components/GuidePlayerArea.tsx`            |
+| `components/guide/detail/LyricLine.tsx`            | `features/guide/components/LyricLine.tsx`                  |
+| `components/guide/detail/LyricsView.tsx`           | `features/guide/components/LyricsView.tsx`                 |
+| `components/guide/detail/PlayerControls.tsx`       | `features/guide/components/PlayerControls.tsx`             |
+| `components/guide/detail/YouTubePlayer.tsx`        | `features/guide/components/YouTubePlayer.tsx`              |
+| `components/guide/list/SongList.tsx`               | `features/guide/components/SongList.tsx`                   |
+| `components/guide/SongPanel.tsx`                   | `features/guide/components/SongPanel.tsx`                  |
+| `data/songs/*.ts`(14개) + `index.ts`               | `features/guide/data/songs/*.ts` + `index.ts`              |
+| `lib/guide/types.ts`                               | `features/guide/lib/types.ts`                              |
+| `lib/guide/timestamp.ts`                           | `features/guide/lib/timestamp.ts`                          |
+| `lib/guide/lyric-sync.ts`                          | `features/guide/lib/lyric-sync.ts`                         |
+| `lib/guide/icon-tokens.ts`                         | `features/guide/lib/icon-tokens.ts`                        |
+| `lib/guide/auto-scroll.ts`                         | `features/guide/lib/auto-scroll.ts`                        |
+| `context/player-context.tsx`                       | `features/guide/player-context.tsx`                        |
+| `components/guide/notice/NoticeAccordionItem.tsx`  | `features/guide/notice/components/NoticeAccordionItem.tsx` |
+| `components/guide/notice/NoticeList.tsx`           | `features/guide/notice/components/NoticeList.tsx`          |
+| `components/guide/notice/NoticePanel.tsx`          | `features/guide/notice/components/NoticePanel.tsx`         |
+| `data/notices/01_fan-page-disclaimer.ts`           | `features/guide/notice/data/01_fan-page-disclaimer.ts`     |
+| `data/notices/02_fight-the-shamoji.ts`             | `features/guide/notice/data/02_fight-the-shamoji.ts`       |
+| `data/notices/index.ts`                            | `features/guide/notice/data/index.ts`                      |
+| `content/notices/fan-page-disclaimer.mdx`          | `features/guide/notice/content/fan-page-disclaimer.mdx`    |
+| `content/notices/fight-the-shamoji.mdx`            | `features/guide/notice/content/fight-the-shamoji.mdx`      |
+| `content/notices/warn-festival.mdx`                | `features/guide/notice/content/warn-festival.mdx`          |
+| `lib/notice/types.ts`                              | `features/guide/notice/lib/types.ts`                       |
+| `lib/notice/dismissal.ts`                          | `features/guide/notice/lib/dismissal.ts`                   |
+| `components/home/Header.tsx`                       | `features/home/components/Header.tsx`                      |
+| `components/home/NextVisit.tsx`                    | `features/home/components/NextVisit.tsx`                   |
+| `components/home/Countdown.tsx`                    | `features/home/components/Countdown.tsx`                   |
+| `components/home/MainNavLink.tsx`                  | `features/home/components/MainNavLink.tsx`                 |
+| `lib/guide/countdown.ts`                           | `features/home/lib/countdown.ts`                           |
+| `lib/guide/event-countdown.ts`                     | `features/home/lib/event-countdown.ts`                     |
+| `content/info.mdx`                                 | `features/info/info.mdx`                                   |
+| `components/home/Footer.tsx`                       | `components/Footer.tsx`                                    |
 
 이동 없음: `components/icons/**`, `components/mobile/**`, `components/GuideDimOverlay.tsx`, `lib/utils.ts`, `lib/seo.ts`, `data/artist.ts`, `data/event.ts`, `mdx-components.tsx`, `app/**` 전체.
 
@@ -70,6 +70,7 @@
 ### Task 1: guide 코어 lib 이동 (`lib/guide/{types,timestamp,lyric-sync,icon-tokens,auto-scroll}.ts`)
 
 **Files:**
+
 - Move: `src/lib/guide/types.ts` → `src/features/guide/lib/types.ts`
 - Move: `src/lib/guide/timestamp.ts` → `src/features/guide/lib/timestamp.ts`
 - Move: `src/lib/guide/lyric-sync.ts` → `src/features/guide/lib/lyric-sync.ts`
@@ -78,6 +79,7 @@
 - Modify (import path rewrite only): `src/data/songs/*.ts`(15개), `src/components/guide/detail/{CallIcon,LyricLine,LyricsView,AutoScrollToggle}.tsx`, `src/components/guide/SongPanel.tsx`, 그리고 지금 옮기는 5개 파일 자기 자신(서로 참조함)
 
 **Interfaces:**
+
 - Consumes: 없음 (첫 태스크)
 - Produces: `@/features/guide/lib/types` (Song, SongTitle, LyricLine, CallTag, Timestamp, CALL_TAGS 등), `@/features/guide/lib/timestamp`(parseTimestamp), `@/features/guide/lib/lyric-sync`(getActiveLineIndex), `@/features/guide/lib/icon-tokens`(parseEmphasis, parseIconTokens), `@/features/guide/lib/auto-scroll`(useAutoScrollPreference) — 이후 모든 태스크에서 이 경로들을 사용
 
@@ -125,11 +127,13 @@ git commit -m "refactor: move guide core lib to features/guide/lib"
 ### Task 2: home 전용으로 오배치된 lib 이동 (`lib/guide/{countdown,event-countdown}.ts`)
 
 **Files:**
+
 - Move: `src/lib/guide/countdown.ts` → `src/features/home/lib/countdown.ts`
 - Move: `src/lib/guide/event-countdown.ts` → `src/features/home/lib/event-countdown.ts`
 - Modify (import path rewrite only): `src/components/home/Countdown.tsx`, `src/components/home/NextVisit.tsx`, 그리고 이 두 파일 자기 자신(`event-countdown.ts`가 `countdown.ts`의 `Remaining` 타입을 가져다 씀)
 
 **Interfaces:**
+
 - Consumes: 없음 (Task 1과 독립)
 - Produces: `@/features/home/lib/countdown`(getRemaining, Remaining), `@/features/home/lib/event-countdown`(DONE_AFTER_HOURS, useEventCountdown) — Task 7에서 이동할 `Countdown.tsx`/`NextVisit.tsx`가 이 경로를 그대로 사용
 
@@ -177,10 +181,12 @@ git commit -m "refactor: relocate misplaced countdown lib from lib/guide to feat
 ### Task 3: player context 이동 (`context/player-context.tsx`)
 
 **Files:**
+
 - Move: `src/context/player-context.tsx` → `src/features/guide/player-context.tsx`
 - Modify (import path rewrite only): `src/components/guide/detail/YouTubePlayer.tsx`, `src/components/guide/SongPanel.tsx`, `src/app/(pages)/guide/layout.tsx`
 
 **Interfaces:**
+
 - Consumes: 없음
 - Produces: `@/features/guide/player-context`(PlayerProvider, usePlayer)
 
@@ -219,10 +225,12 @@ git commit -m "refactor: move player context into features/guide"
 ### Task 4: 곡 데이터 이동 (`data/songs/**`)
 
 **Files:**
+
 - Move: `src/data/songs/*.ts`(14개) + `src/data/songs/index.ts` → `src/features/guide/data/songs/` (동일 파일명)
 - Modify (import path rewrite only): `src/app/(pages)/guide/[songId]/page.tsx`, `src/app/sitemap.ts`, `src/components/guide/detail/{PlayerControls,YouTubePlayer}.tsx`, `src/components/guide/SongPanel.tsx`, `src/components/guide/list/SongList.tsx`
 
 **Interfaces:**
+
 - Consumes: `@/features/guide/lib/types`의 `Song` 타입 (Task 1에서 이동 완료)
 - Produces: `@/features/guide/data/songs`(songList, getSong)
 
@@ -265,6 +273,7 @@ git commit -m "refactor: move song data into features/guide/data/songs"
 ### Task 5: guide 컴포넌트 이동 (`components/guide/detail/**`, `components/guide/list/SongList.tsx`, `components/guide/SongPanel.tsx`)
 
 **Files:**
+
 - Move: `src/components/guide/detail/AutoScrollStatusIcon.tsx` → `src/features/guide/components/AutoScrollStatusIcon.tsx`
 - Move: `src/components/guide/detail/AutoScrollToggle.tsx` → `src/features/guide/components/AutoScrollToggle.tsx`
 - Move: `src/components/guide/detail/CallIcon.tsx` → `src/features/guide/components/CallIcon.tsx`
@@ -278,6 +287,7 @@ git commit -m "refactor: move song data into features/guide/data/songs"
 - Modify (import path rewrite only): 위 10개 파일 자기 자신(서로 참조), `src/app/(pages)/guide/layout.tsx`
 
 **Interfaces:**
+
 - Consumes: `@/features/guide/lib/*`(Task 1), `@/features/guide/data/songs`(Task 4), `@/features/guide/player-context`(Task 3)
 - Produces: `@/features/guide/components/{AutoScrollStatusIcon,AutoScrollToggle,CallIcon,GuidePlayerArea,LyricLine,LyricsView,PlayerControls,YouTubePlayer,SongList,SongPanel}`
 
@@ -329,6 +339,7 @@ git commit -m "refactor: move guide components into features/guide/components"
 ### Task 6: notice 하위 도메인 전체 이동 (`components/guide/notice/**`, `data/notices/**`, `content/notices/**`, `lib/notice/**`)
 
 **Files:**
+
 - Move: `src/components/guide/notice/NoticeAccordionItem.tsx` → `src/features/guide/notice/components/NoticeAccordionItem.tsx`
 - Move: `src/components/guide/notice/NoticeList.tsx` → `src/features/guide/notice/components/NoticeList.tsx`
 - Move: `src/components/guide/notice/NoticePanel.tsx` → `src/features/guide/notice/components/NoticePanel.tsx`
@@ -343,6 +354,7 @@ git commit -m "refactor: move guide components into features/guide/components"
 - Modify (import path rewrite only): 위 이동 파일들 자기 자신, `src/app/(pages)/guide/layout.tsx`
 
 **Interfaces:**
+
 - Consumes: 없음 (notice는 자기 완결적 하위 도메인)
 - Produces: `@/features/guide/notice/components/{NoticeAccordionItem,NoticeList,NoticePanel}`, `@/features/guide/notice/data`(noticeList), `@/features/guide/notice/lib/{types,dismissal}`
 
@@ -405,6 +417,7 @@ git commit -m "refactor: move notice sub-domain into features/guide/notice"
 ### Task 7: home 컴포넌트 이동 (`components/home/{Header,NextVisit,Countdown,MainNavLink}.tsx`)
 
 **Files:**
+
 - Move: `src/components/home/Header.tsx` → `src/features/home/components/Header.tsx`
 - Move: `src/components/home/NextVisit.tsx` → `src/features/home/components/NextVisit.tsx`
 - Move: `src/components/home/Countdown.tsx` → `src/features/home/components/Countdown.tsx`
@@ -412,6 +425,7 @@ git commit -m "refactor: move notice sub-domain into features/guide/notice"
 - Modify (import path rewrite only): `src/app/(pages)/page.tsx`
 
 **Interfaces:**
+
 - Consumes: `@/features/home/lib/{countdown,event-countdown}`(Task 2에서 이미 이 경로로 존재)
 - Produces: `@/features/home/components/{Header,NextVisit,Countdown,MainNavLink}`
 
@@ -457,10 +471,12 @@ git commit -m "refactor: move home components into features/home/components"
 ### Task 8: Footer를 공용 컴포넌트로 재배치 (`components/home/Footer.tsx`)
 
 **Files:**
+
 - Move: `src/components/home/Footer.tsx` → `src/components/Footer.tsx`
 - Modify (import path rewrite only): `src/app/(pages)/layout.tsx`
 
 **Interfaces:**
+
 - Consumes: `@/data/artist`(변경 없음, 그대로 사용)
 - Produces: `@/components/Footer` — 모든 페이지 공용 컴포넌트로 명확화
 
@@ -499,10 +515,12 @@ git commit -m "refactor: relocate Footer to shared components (used on every pag
 ### Task 9: info 콘텐츠 이동 (`content/info.mdx`)
 
 **Files:**
+
 - Move: `src/content/info.mdx` → `src/features/info/info.mdx`
 - Modify (import path rewrite only): `src/app/(pages)/info/page.tsx`
 
 **Interfaces:**
+
 - Consumes: 없음
 - Produces: `@/features/info/info.mdx` (default export: InfoContent 컴포넌트)
 
@@ -544,6 +562,7 @@ git commit -m "refactor: move info page content into features/info"
 **Files:** 없음 (검증 전용 태스크)
 
 **Interfaces:**
+
 - Consumes: Task 1~9의 모든 결과물
 - Produces: 없음 (리팩토링 완료 확인)
 

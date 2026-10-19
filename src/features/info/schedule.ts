@@ -30,11 +30,15 @@ export const SCHEDULE_NOTES = [
   "※ 미취학 아동 입장 불가",
 ];
 
-/** 일정표 펼침 시 보여줄 투어 스케줄 이미지. */
+/** 일정표 펼침 시 보여줄 투어 스케줄 및 지도 이미지. */
 export const GATHER_MAP_IMAGES = [
   {
-    src: "/assets/info/apicula-denki_schedule.webp",
-    alt: "아피쿠라 전기 투어 일정",
+    src: "/assets/info/apicula-denki_tour-maps.webp",
+    alt: "일본 전국 공연 지도 및 좌석 규모",
+  },
+  {
+    src: "/assets/info/apicula-denki_schedule-kr.webp",
+    alt: "아피쿠라 전기 2027 전국 투어 홀별 정원수 번역본",
   },
 ];
 
@@ -52,19 +56,20 @@ function listDays(start: string, end: string): string[] {
 }
 
 // /info가 안내하는 공연은 originEvent와 같은 공연이다(info.tsx 주석 참고).
-export const SCHEDULE_DAYS = listDays(
-  getEventStartDate(originEvent),
-  getEventEndDate(originEvent),
-);
+export const SCHEDULE_DAYS = originEvent.performances
+  ? originEvent.performances.map((p) => p.date)
+  : listDays(getEventStartDate(originEvent), getEventEndDate(originEvent));
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
-// ["2027-01-15"] → "1/15(금)"
-export const SCHEDULE_DAYS_LABEL = SCHEDULE_DAYS.map((day, index) => {
-  const [year, month, date] = day.split("-").map(Number);
-  const weekday =
-    WEEKDAYS[new Date(Date.UTC(year, month - 1, date)).getUTCDay()];
-  const sameMonth =
-    index > 0 && Number(SCHEDULE_DAYS[index - 1].split("-")[1]) === month;
-  return `${sameMonth ? "" : `${month}/`}${date}(${weekday})`;
-}).join("·");
+// 투어 기간 라벨 ("1월 15일 ~ 5월 23일" 또는 단일/다일 공연 라벨)
+export const SCHEDULE_DAYS_LABEL =
+  originEvent.dateDisplay ??
+  SCHEDULE_DAYS.map((day, index) => {
+    const [year, month, date] = day.split("-").map(Number);
+    const weekday =
+      WEEKDAYS[new Date(Date.UTC(year, month - 1, date)).getUTCDay()];
+    const sameMonth =
+      index > 0 && Number(SCHEDULE_DAYS[index - 1].split("-")[1]) === month;
+    return `${sameMonth ? "" : `${month}/`}${date}(${weekday})`;
+  }).join("·");

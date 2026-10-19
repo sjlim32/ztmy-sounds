@@ -9,6 +9,7 @@ import { InfoTabProvider } from "@/features/info/components/InfoTabContext";
 import { InfoTabs } from "@/features/info/components/InfoTabs";
 import { TabSection } from "@/features/info/components/TabSection";
 import { TourSchedule } from "@/features/info/components/TourSchedule";
+import { TicketSchedule } from "@/features/info/components/TicketSchedule";
 import { groupImagesBySection } from "@/features/info/lib/group-images";
 import { INFORMATION } from "@/features/info/info";
 import { SiteLink } from "@/components/SiteLink";
@@ -46,14 +47,109 @@ export const sections = groupImagesBySection(
 
       <TourSchedule />
 
-      <h3 className="mt-8 mb-3 text-center font-semibold text-white">공식 스케줄 포스터</h3>
-      <div className="flex items-center justify-center">
-        <ZoomableImage
-          src={sections["schedule"][0].asset}
-          alt={sections["schedule"][0].name}
-          thumbnailWidth={600}
-          thumbnailCrop="top"
-        />
+      <h3 className="mt-8 mb-3 text-center font-semibold text-white">공연 지도 및 일정 포스터</h3>
+
+      <div className="flex flex-col gap-4">
+        {/* 전체 공연 지도 */}
+        <div
+          id="tour-map"
+          className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-black/30 p-3"
+        >
+          <div className="flex w-full items-center justify-between px-1">
+            <span className="text-sm font-semibold text-white">
+              전체 공연 지도 (전국 23개 도시 배치도)
+            </span>
+            <SiteLink
+              href="https://gall.dcinside.com/mgallery/board/view/?id=zuttomayo&no=490204"
+              className="text-xs text-white/55 hover:text-ztmy-pink"
+            >
+              출처: 즛토마요 갤러리
+            </SiteLink>
+          </div>
+          <ZoomableImage
+            src={sections["schedule"][0].asset}
+            alt={sections["schedule"][0].name}
+            thumbnailWidth={1000}
+            thumbnailCrop="top"
+          />
+        </div>
+
+        {/* 일정 번역본 & 공식 포스터 */}
+        <div className="grid grid-cols-1 tablet:grid-cols-2 gap-4">
+          <div className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-black/30 p-3">
+            <div className="flex w-full items-center justify-between px-1">
+              <span className="text-sm font-semibold text-white">
+                일정 번역본 (홀별 정원수)
+              </span>
+              <SiteLink
+                href="https://gall.dcinside.com/mgallery/board/view/?id=zuttomayo&no=490116"
+                className="text-xs text-white/55 hover:text-ztmy-pink"
+              >
+                출처: 즛토마요 갤러리
+              </SiteLink>
+            </div>
+            <ZoomableImage
+              src={sections["schedule"][1].asset}
+              alt={sections["schedule"][1].name}
+              thumbnailWidth={500}
+              thumbnailCrop="top"
+            />
+          </div>
+
+          <div className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-black/30 p-3">
+            <div className="flex w-full items-center justify-between px-1">
+              <span className="text-sm font-semibold text-white">
+                공식 스케줄 포스터 (원문)
+              </span>
+              <span className="text-xs text-white/40">공식 안내문</span>
+            </div>
+            <ZoomableImage
+              src={sections["schedule"][2].asset}
+              alt={sections["schedule"][2].name}
+              thumbnailWidth={500}
+              thumbnailCrop="top"
+            />
+          </div>
+        </div>
+      </div>
+    </TabSection>
+
+    <TabSection id="map">
+      <ImageLabel id="map" label="전체 공연 지도" />
+
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between rounded-lg border border-white/10 bg-black/30 px-3.5 py-2.5">
+          <span className="text-xs tablet:text-sm text-white/80">
+            23개 공연장 · 36회 공연 (1/15 ~ 5/23) 전국 배치도
+          </span>
+          <div className="flex items-center gap-3">
+            <SiteLink
+              href="https://gall.dcinside.com/mgallery/board/view/?id=zuttomayo&no=490204"
+              className="text-xs text-white/55 hover:text-ztmy-pink"
+            >
+              출처: 즛토마요 갤러리
+            </SiteLink>
+            <SiteLink
+              href={INFORMATION.url.place}
+              className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white hover:bg-white/20"
+            >
+              Google Maps 열기
+            </SiteLink>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/40 p-2">
+          <ZoomableImage
+            src={sections["map"][0].asset}
+            alt={sections["map"][0].name}
+            thumbnailWidth={1000}
+            thumbnailCrop="top"
+          />
+        </div>
+
+        <span className="text-center text-xs text-white/55">
+          일본 전국 지도와 함께 도쿄권 및 간사이권 확대도가 수록되어 있습니다.
+        </span>
       </div>
     </TabSection>
 
@@ -72,41 +168,7 @@ export const sections = groupImagesBySection(
         </DetailField>
       </DetailList>
 
-      <DetailList title="티켓 선행 접수 일정" note="※ 여러 공연을 원하는 경우, 반드시 한 번의 신청에 모두 포함하여 신청해야 합니다.">
-        <DetailField label="PREMIUM 최속 선행">
-          <div className="flex flex-col gap-1">
-            <span><strong>접수 기간:</strong> 10/16(금) 21:00 ~ 10/29(목) 23:59</span>
-            <span><strong>당락·입금:</strong> 11/7(토) 18:00 ~ 11/10(화) 23:59</span>
-            <span className="text-xs text-white/70">1공연당 2매까지 (동반자는 비회원 가능, 지정석 접수)</span>
-            <div className="flex flex-row flex-wrap items-center gap-x-2 pt-1">
-              <SiteLink href="https://zutomayo.net/apicula-denki_apply_pre/">국내 신청 바로가기</SiteLink>
-              <span>/</span>
-              <SiteLink href="https://zutomayo.net/apicula-denki_apply_pre_en/">Apply (Outside Japan)</SiteLink>
-            </div>
-          </div>
-        </DetailField>
-        <DetailField label="PREMIUM 2차 선행">
-          <div className="flex flex-col gap-1">
-            <span><strong>접수 기간:</strong> 11/7(토) 20:00 ~ 11/9(월) 23:59</span>
-            <span><strong>당락·입금:</strong> 11/17(화) 18:00 ~ 11/20(금) 23:59</span>
-            <span className="text-xs text-white/70">1공연당 2매까지</span>
-          </div>
-        </DetailField>
-        <DetailField label="일반 최속 선행">
-          <div className="flex flex-col gap-1">
-            <span><strong>접수 기간:</strong> 11/17(화) 20:00 ~ 11/29(일) 23:59</span>
-            <span><strong>당락·입금:</strong> 12/5(토) 18:00 ~ 12/8(화) 23:59</span>
-            <span className="text-xs text-white/70">1공연당 4매까지</span>
-          </div>
-        </DetailField>
-        <DetailField label="프리미엄석 Upgrade">
-          <div className="flex flex-col gap-1">
-            <span><strong>접수 기간:</strong> 12/1(화) 20:00 ~ 12/6(일) 23:59</span>
-            <span><strong>당락·입금:</strong> 12/12(토) 18:00 ~ 12/15(화) 23:59</span>
-            <span className="text-xs text-white/70">PREMIUM 선행(1차·2차) 지정석 구매 회원 대상 (1공연당 2매)</span>
-          </div>
-        </DetailField>
-      </DetailList>
+      <TicketSchedule />
 
       <DetailList title="공연 및 티켓 유의사항">
         <DetailField label="신청 주의사항">
