@@ -97,7 +97,7 @@ function splitRegion(region: string): {
  *   여기 해당한다. 투어 소속 공연(tour_id가 있거나 slug가 투어 slug와
  *   같은 행 — isTourDate 참고)은 그 투어 항목 안에 묶이므로 따로
  *   노출하지 않는다.
- * - tours: 줏토마요 자신이 헤드라이너인 단독 공연(투어) — 아직 개별
+ * - tours: 줏토마요 자신이 헤드라이너인 콘서트(투어) — 아직 개별
  *   공연일(lives) 데이터가 하나도 없어도, 투어 자체는 목록에 나와야
  *   한다(포스터·기간만으로 카드 하나를 만든다).
  *
@@ -152,8 +152,8 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
       : [],
   );
 
-  // 투어는 페스티벌 출연이 아니라 줏토마요 자신의 "단독 공연"이라 concert
-  // 타입으로 분류한다 — 목록 필터의 "단독 공연" 카테고리가 이걸 가리킨다.
+  // 투어는 페스티벌 출연이 아니라 줏토마요 자신의 콘서트(투어)라 concert
+  // 타입으로 분류한다.
   const tourEntries: ZutopiaEntry[] = toursResult.data.map((tour) => ({
     slug: tour.slug,
     label: tour.title_ko,

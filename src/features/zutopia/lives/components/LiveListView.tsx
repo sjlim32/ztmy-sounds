@@ -17,9 +17,9 @@ const SORT_OPTIONS: { value: SortBy; label: string }[] = [
   { value: "format", label: "형식별" },
 ];
 
-// "단독 공연"은 이 목록 문맥에서만 쓰는 라벨이다 — types.ts의 전역
-// ENTRY_TYPE_LABEL(허브 카드 요약용, "콘서트")과는 별개로, 줏토마요 자신이
-// 헤드라이너인 공연(투어·행사)이라는 의미를 이 페이지에서 더 분명히
+// "공연"은 이 목록 문맥에서 쓰는 라벨이다 — types.ts의 전역
+// ENTRY_TYPE_LABEL과는 별개로, 줏토마요 자신이
+// 헤드라이너인 공연(투어·콘서트·행사)이라는 의미를 이 페이지에서 더 분명히
 // 드러낸다.
 const FORMAT_OPTIONS: { value: FormatFilter; label: string }[] = [
   { value: "all", label: "전체" },
@@ -32,7 +32,7 @@ const FORMAT_GROUP_LABEL: Record<EntryFormat, string> = {
 };
 const FORMAT_GROUP_ORDER: EntryFormat[] = ["festival", "concert"];
 
-// 형식 필터는 페스티벌/단독 공연 둘뿐이라 행사(EVENT)는 단독 공연으로
+// 형식 필터는 페스티벌/공연 둘뿐이라 행사(EVENT)는 공연으로
 // 묶는다. entry.type 자체는 허브 카드 요약("N개의 행사")에 그대로 쓰이므로
 // 바꾸지 않는다.
 function entryFormat(entry: ZutopiaEntry): EntryFormat | null {

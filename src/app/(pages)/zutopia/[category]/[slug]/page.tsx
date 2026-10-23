@@ -13,7 +13,7 @@ import type { LiveDetail } from "@/features/zutopia/lives/types";
 // 공연/항목마다 사진·티켓 등 손으로 채운 콘텐츠가 필요하면 이 맵에 등록해
 // 기본 뷰(DefaultLiveContent)를 덮어쓴다. 등록하지 않은 공연은 기본 뷰
 // (제목/날짜/장소/세트리스트)로 자동 렌더링되므로, 등록하지 않아도 상세
-// 페이지가 비어있지 않다. 투어(단독 공연) 슬러그는 이 맵의 대상이 아니다 —
+// 페이지가 비어있지 않다. 투어 슬러그는 이 맵의 대상이 아니다 —
 // 필요해지면 그때 투어 전용 오버라이드 맵을 따로 둔다.
 const CONTENT_BY_KEY: Record<string, ComponentType<{ live: LiveDetail }>> = {};
 
@@ -65,7 +65,7 @@ export default async function ZutopiaEntryPage(
   const category = getZutopiaCategory(categorySlug);
   if (!category) notFound();
 
-  // lives(공연)와 tours(단독 공연) 두 출처가 같은 목록에 함께 나오므로
+  // lives(개별 공연)와 tours(투어) 두 출처가 같은 목록에 함께 나오므로
   // (registry.ts의 getLiveEntries 참고), 슬러그가 어느 쪽인지 먼저 확인한다.
   // 투어 공연일이 투어 slug를 공유할 수 있어 투어를 먼저 본다.
   const tour = await getTourBySlug(slug);

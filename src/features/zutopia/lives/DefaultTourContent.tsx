@@ -9,7 +9,7 @@ import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
 import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
 
 /**
- * 투어(단독 공연) 상세 페이지 — DefaultLiveContent와 같은 시각 언어(포스터
+ * 투어(콘서트) 상세 페이지 — DefaultLiveContent와 같은 시각 언어(포스터
  * + 뱃지, 로고 서체 제목, 티켓 스텁)를 쓴다. 티켓(기간·variation·음원
  * 링크)은 tours 행의 컬럼으로 그리고, 투어에 묶인 개별 공연일(dates)은
  * 자기 페이지 없이 아래 일정 목록에서 펼쳐 세트리스트를 보여준다. 아직

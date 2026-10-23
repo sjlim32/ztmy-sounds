@@ -1,17 +1,18 @@
 import { cn } from "@/lib/utils";
 import type { Live } from "./types";
 
-// "TOUR"은 lives.type에는 없는 값이다 — tours 테이블 항목(투어/단독 공연)은
+// "TOUR"은 lives.type에는 없는 값이다 — tours 테이블 항목(투어)은
 // lives.type 값을 안 갖고 있어서, 뱃지 종류를 하나 늘려 표현한다.
+// 단독 콘서트(CONCERT)와 투어(TOUR) 모두 "콘서트"로 통일해 표기한다.
 export type LiveBadgeType = Live["type"] | "TOUR";
 
-// 페스티벌/콘서트/행사/투어를 한눈에 구분하는 점 색 — 텍스트는 항상
+// 페스티벌/콘서트/행사를 한눈에 구분하는 점 색 — 텍스트는 항상
 // 흰색으로 고정하고(배경색 대비 걱정 없이) 점 색으로만 구분한다.
 const LABEL: Record<LiveBadgeType, string> = {
   FESTIVAL: "페스티벌",
   CONCERT: "콘서트",
   EVENT: "행사",
-  TOUR: "단독 공연",
+  TOUR: "콘서트",
 };
 const DOT: Record<LiveBadgeType, string> = {
   FESTIVAL: "bg-ztmy-purple",

@@ -28,14 +28,14 @@ const TICKET_LABEL_CLASS = cn(
 
 /**
  * "본문 (부연설명)" 형태로 끝에 괄호가 붙어 있으면 분리한다 —
- * NextEventCard의 placeDesc(장소명 아래 회색 보조 텍스트)와 동일한 자리에
- * 쓰기 위함. 괄호가 없으면 그대로 하나의 문자열로 취급한다.
+ * NextEventCard의 placeDesc(장소명 아래 회색 보조 텍스트)와 동일하게
+ * 소괄호 없이 두 줄로 보여주기 위함. 괄호가 없으면 그대로 하나의 문자열로 취급한다.
  */
 export function splitParenSuffix(text: string): {
   main: string;
   suffix: string | null;
 } {
-  const match = text.match(/^(.*\S)\s+(\([^()]*\))$/);
+  const match = text.match(/^(.*\S)\s+\(([^()]*)\)$/);
   if (!match) return { main: text, suffix: null };
   return { main: match[1], suffix: match[2] };
 }
