@@ -9,7 +9,7 @@ const Hippocampal: SongTitle = {
 const song: Song = {
   id: "hippocampal-pain",
   title: Hippocampal,
-  youtubeId: "1mSAnqZSNYQ",
+  youtubeId: "LD0_ebWBc_A",
   lyrics: [
     {
       time: "0:0",
