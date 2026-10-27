@@ -14,7 +14,7 @@ export const DONE_AFTER_HOURS = 3;
 
 // Countdown의 물풍선/달 위상 비주얼이 완전히 채워지기까지 걸리는 기간(일).
 // WaterBalloon과 MoonPhase가 같은 기준으로 "얼마나 찼는지"를 계산하도록 공유합니다.
-export const EMPTY_AT_DAYS = 90;
+export const EMPTY_AT_DAYS = 100;
 
 /**
  * 투어 공연 목록이 있을 때 현재 시각(nowMs) 기준 아직 종료되지 않은(시작 후 3시간 이내이거나 시작 전인)

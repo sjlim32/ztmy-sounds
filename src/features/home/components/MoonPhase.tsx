@@ -33,17 +33,14 @@ export function MoonPhase({
     remaining.hours * 3600 +
     remaining.minutes * 60 +
     remaining.seconds;
-  // EMPTY_AT_DAYS(90일) 기준 선형 값을 그대로 쓰면, 공연이 며칠 안 남은
-  // 시점에도 이미 0.9를 넘겨 거의 보름달과 구분이 안 됩니다(예: 4일 남았을
-  // 때 0.949). 4제곱으로 눌러서 남은 기간이 넉넉할 땐 천천히, 임박해서야
-  // 빠르게 차오르게 합니다 — 마지막 며칠도 그믐달/이지러진 모양이 뚜렷이
-  // 남도록.
+  // EMPTY_AT_DAYS(100일) 전부터 남은 기간에 비례해 차오른다 — 물풍선과 같은
+  // 기준이라 D-80이면 20%, D-50이면 반달.
   const rawFraction = 1 - Math.min(totalSeconds / (EMPTY_AT_DAYS * 86400), 1);
-  const fillFraction = isDone ? 0 : isToday ? 1 : rawFraction ** 4;
+  const fillFraction = isDone ? 0 : isToday ? 1 : rawFraction;
 
   // x: 1(신월, 좌측 절반이 그림자에 완전히 덮여 면적 0) -> 0(반달) -> -1(보름, 우측까지 채워져 원 전체)
-  // cos 매핑 대신 선형으로: cos는 양 끝(0/1)에서 기울기가 0이라 위의 4제곱
-  // 압축 효과가 다시 흐려지는데, 선형이어야 압축 효과가 그대로 보입니다.
+  // cos 매핑 대신 선형으로: cos는 양 끝(0/1)에서 기울기가 0이라 처음과 마지막
+  // 며칠의 변화가 거의 안 보인다.
   const x = 1 - 2 * fillFraction;
   const terminatorRx = 42 * Math.abs(x);
   // 두 번째 호는 첫 번째 호와 반대 방향(아래→위)으로 그려져서, sweep 값과
