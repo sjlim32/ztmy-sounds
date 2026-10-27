@@ -129,6 +129,17 @@ body {
   }
 }
 
+/* 가이드 가사 음표 간주(MusicBreak) — 재생 중 음표가 박자 타듯 들썩임 */
+@keyframes note-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-8deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(8deg);
+  }
+}
+
 /* ZUTOMAYO 픽셀 커서 (제작: 乱涂乱画ben — https://x.com/ben404yg, 무료 사용
    가능/이름 바꿔 재배포·판매만 금지). 원본은 32x256 8프레임 스프라이트시트라
    정적 적용을 위해 첫 프레임(32x32)만 잘라 public/cursors에 저장해뒀습니다.

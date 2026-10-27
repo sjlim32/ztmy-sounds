@@ -44,6 +44,17 @@ export type EmphasisPart =
  * ("**" 안에서 * 하나만 짝 없이 나오는 경우처럼) 단독 별표는 토글하지 않고
  * 그냥 텍스트로 남겨둡니다 — 기존 "**텍스트**" 데이터와 호환하기 위함.
  */
+/**
+ * 텍스트에 지정한 범위(cheer = "**…**", slam = "^…^")의 강조 표시가 하나라도
+ * 있는지. 응원 줄에 강조 단어가 없으면 줄 전체를 강조하는 데 쓴다.
+ */
+export function hasEmphasis(text: string, scope: "cheer" | "slam"): boolean {
+  return parseEmphasis(text).some(
+    (part) =>
+      part.type === "emphasis" && (scope === "cheer" ? part.cheer : part.slam),
+  );
+}
+
 export function parseEmphasis(text: string): EmphasisPart[] {
   const parts: EmphasisPart[] = [];
   let cheerOpen = false;

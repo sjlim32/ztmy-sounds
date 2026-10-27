@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { Song } from "@/features/guide/lib/types";
 import { LyricLine } from "@/features/guide/components/LyricLine";
@@ -8,6 +8,8 @@ import { AutoScrollToggle } from "@/features/guide/components/AutoScrollToggle";
 import { SongVersionToggle } from "@/features/guide/components/SongVersionToggle";
 import { useAutoScrollPreference } from "@/features/guide/lib/auto-scroll";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
+import { useGuideMode } from "@/features/guide/guide-mode-context";
+import { getTagRunPositions } from "@/features/guide/lib/line-tag";
 
 export function LyricsView({
   song,
@@ -25,6 +27,12 @@ export function LyricsView({
   // 목록 맨 아래 sentinel이 아직 안 보이면(교차 안 함) 더 스크롤할 게 남은 것.
   const [canScrollDown, setCanScrollDown] = useState(false);
   const [autoScroll] = useAutoScrollPreference();
+  const { visibleTags } = useGuideMode();
+  // 곡·모드가 바뀔 때만 계산 — 재생 중 매 tick 다시 만들면 각 줄의 memo가 깨진다.
+  const runPositions = useMemo(
+    () => (song ? getTagRunPositions(song.lyrics, visibleTags) : []),
+    [song, visibleTags],
+  );
 
   useEffect(() => {
     const list = listRef.current;
@@ -84,6 +92,9 @@ export function LyricsView({
         // (docs/RULES.md 참고).
         "relative order-3 mb-4 min-h-0 flex-1",
         "tablet:order-0 tablet:mb-0",
+        // 가사 뒤 사이트 배경(보라 계열 사진)을 흐리고 살짝 어둡게 — 재생 중인
+        // 줄의 보라 배경이 배경 사진과 섞이지 않고 또렷하게 보이도록.
+        "bg-black/20 backdrop-blur-md",
       )}
     >
       <ol
@@ -91,7 +102,10 @@ export function LyricsView({
         data-role="lyric-list"
         className={cn(
           // bottom-12 = 스크롤 화살표 영역 확보
-          "absolute inset-x-0 top-0 bottom-0 scrollbar-none overflow-y-auto py-10 [&::-webkit-scrollbar]:hidden",
+          "absolute inset-x-0 top-0 bottom-0 scrollbar-none overflow-x-hidden overflow-y-auto py-10 [&::-webkit-scrollbar]:hidden",
+          // 재생 중인 줄이 있을 때만 나머지 줄 글자를 흐리게 — 재생 전에는
+          // 전부 또렷하게 두고, 재생 중엔 지금 줄이 확 드러나게.
+          "[&:has(>li[data-active])>li:not([data-active])]:text-white/55",
           "tablet:bottom-12 tablet:py-7",
           // 사라질 땐 트랜지션 없이 즉시, 나타날 때만 fade-in — 그래야 곡이
           // 빠르게 연달아 바뀌어도 이미 교체된 다음 곡 내용이 fade-out
@@ -104,6 +118,7 @@ export function LyricsView({
             key={line.time}
             line={line}
             isActive={index === activeLineIndex}
+            runPosition={runPositions[index]}
             onSeek={seekTo}
           />
         ))}
