@@ -336,18 +336,19 @@ const song: Song = {
     //################ Shamoji ################//
     {
       time: "3:40.7",
-      original: "このまま (✋ - ✋ ✋) (✋ - ✋ ✋) (✋ - ✋ - ✋)",
-      pronunciation: "코노 마마 (짝 - 짝짝) (짝 - 짝짝) (짝 - 짝 - 짝)",
+      original: "このまま ✋ ✋✋/✋ ✋✋/✋ ✋ ✋",
+      pronunciation: "코노 마마",
       translation: "",
       cheer: {
         text: "민나데 (다같이)",
         tag: "clap",
       },
+      claps: [1.0, 1.2, 1.4, 1.6, 2.0],
     },
     {
       time: "3:48",
-      original: "このまま (✋ - ✋ ✋) (✋ - ✋ ✋) (✋ - ✋ - ✋)",
-      pronunciation: "코노 마마 (짝 - 짝짝) (짝 - 짝짝) (짝 - 짝 - 짝)",
+      original: "このまま ✋ ✋✋/✋ ✋✋/✋ ✋ ✋",
+      pronunciation: "코노 마마",
       translation: "",
       cheer: {
         text: "못토 못토 못토 (크게)",
@@ -356,8 +357,8 @@ const song: Song = {
     },
     {
       time: "3:55.6",
-      original: "このまま (✋ - ✋ ✋) (✋ - ✋ ✋) (✋ - ✋ - ✋)",
-      pronunciation: "코노 마마 (짝 - 짝짝) (짝 - 짝짝) (짝 - 짝 - 짝)",
+      original: "このまま ✋ ✋✋/✋ ✋✋/✋ ✋ ✋",
+      pronunciation: "코노 마마",
       translation: "",
       cheer: {
         text: "단단 오키쿠 (작게 치다가 점점 크게)",
@@ -366,8 +367,8 @@ const song: Song = {
     },
     {
       time: "4:03.1",
-      original: "このまま",
-      pronunciation: "코노 마마 (짝 - 짝짝) (짝 - 짝짝) (짝 - 짝 - 짝)",
+      original: "このまま ✋ ✋✋/✋ ✋✋/✋ ✋ ✋",
+      pronunciation: "코노 마마",
       translation: "",
       cheer: {
         text: "마에카라 우시로 (앞에서부터 뒤로 파도타기)",
@@ -376,8 +377,8 @@ const song: Song = {
     },
     {
       time: "4:10.6",
-      original: "このまま (✋ - ✋ ✋) (✋ - ✋ ✋) (✋ - ✋ - ✋)",
-      pronunciation: "코노 마마 (짝 - 짝짝) (짝 - 짝짝) (짝 - 짝 - 짝)",
+      original: "このまま ✋ ✋✋/✋ ✋✋/✋ ✋ ✋",
+      pronunciation: "코노 마마",
       translation: "",
       cheer: {
         text: "우시로카라 마에 (뒤에서부터 앞으로 파도타기)",
@@ -386,8 +387,8 @@ const song: Song = {
     },
     {
       time: "4:17",
-      original: "このまま (✋ - ✋ ✋) (✋ - ✋ ✋) (✋ - ✋ - ✋)",
-      pronunciation: "코노 마마 (짝 - 짝짝) (짝 - 짝짝) (짝 - 짝 - 짝)",
+      original: "このまま ✋ ✋✋/✋ ✋✋/✋ ✋ ✋",
+      pronunciation: "코노 마마",
       translation: "",
       cheer: {
         text: "민나데 타노시쿠 (다같이 즐겁게)",
