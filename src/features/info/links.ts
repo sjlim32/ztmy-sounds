@@ -1,49 +1,35 @@
-import { INFORMATION } from "@/features/info/info";
+import { INFO_TABS, INFORMATION } from "@/features/info/info";
 
 export interface ConcertLink {
   label: string;
   href: string;
+  disabled?: boolean;
 }
 
-/** 공연 관련 공식 안내 링크. */
+// 홈 공연 안내 패널(ConcertLinks)의 링크 — 따로 적지 않고 /info 페이지가 실제로
+// 보여주는 데이터(INFORMATION, INFO_TABS)에서 그대로 만든다. 공연이 바뀌어
+// info.tsx만 고쳐도 패널이 이전 공연 정보를 보여주는 일이 없게.
+
+/** 공식 안내 — /info 상단의 공식 링크 + 장소(전체 공연장 지도). */
 export const OFFICIAL_LINKS: ConcertLink[] = [
-  { label: "공식 사이트 (특설 페이지)", href: INFORMATION.url.main },
+  ...(INFORMATION.url.official ?? []).map((official) => ({
+    label: official.name,
+    href: official.href,
+  })),
   { label: "전체 공연장 (구글 지도)", href: INFORMATION.url.place },
-  {
-    label: "티켓 신청 (국내)",
-    href: "https://zutomayo.net/apicula-denki_apply_pre/",
-  },
-  {
-    label: "티켓 신청 (해외)",
-    href: "https://zutomayo.net/apicula-denki_apply_pre_en/",
-  },
 ];
 
-/** 입장에 필요한 전자 티켓 앱 — 예매처마다 앱이 다르다. */
-export const TICKET_APPS: { name: string; android: string; ios: string }[] = [
-  {
-    name: "티켓피아 (MOALA)",
-    android: "https://play.google.com/store/apps/details?id=fun.moala.pocket",
-    ios: "https://apps.apple.com/jp/app/moala-pocket/id1626245204",
-  },
-  {
-    name: "로치케",
-    android: "https://play.google.com/store/apps/details?id=jp.lhe.ebillet",
-    ios: "https://apps.apple.com/jp/app/%E3%83%AD%E3%83%BC%E3%83%81%E3%82%B1%E9%9B%BB%E5%AD%90%E3%83%81%E3%82%B1%E3%83%83%E3%83%88/id1175974437",
-  },
-  {
-    name: "이플러스 (e+)",
-    android:
-      "https://play.google.com/store/apps/details?id=jp.eplus.android.all.app",
-    ios: "https://apps.apple.com/jp/app/e-%E3%82%A4%E3%83%BC%E3%83%97%E3%83%A9%E3%82%B9-%E3%83%81%E3%82%B1%E3%83%83%E3%83%88-%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9-%E3%82%B9%E3%83%9E%E3%83%81%E3%82%B1/id465887673",
-  },
-];
+/** 티켓 신청 — /info 상단 "티켓" 항목과 같은 링크. */
+export const TICKET_LINKS: ConcertLink[] = (INFORMATION.url.ticket ?? []).map(
+  (ticket) => ({
+    label: ticket.name,
+    href: ticket.href,
+    disabled: ticket.disabled,
+  }),
+);
 
 /** /info의 탭 바로가기 — 해시가 탭 id다(InfoTabContext). */
 export const INFO_TAB_LINKS: ConcertLink[] = [
   { label: "공연 정보 전체", href: "/info" },
-  { label: "투어 일정", href: "/info#schedule" },
-  { label: "공연 지도", href: "/info#map" },
-  { label: "티켓 정보", href: "/info#ticket" },
-  { label: "투어 소개", href: "/info#prologue" },
+  ...INFO_TABS.map((tab) => ({ label: tab.label, href: `/info#${tab.id}` })),
 ];
