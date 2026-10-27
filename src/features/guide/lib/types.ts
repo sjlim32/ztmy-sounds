@@ -37,6 +37,8 @@ export interface Song {
   id: string;
   title: SongTitle;
   youtubeId: string;
+  /** 곡 목록 중요도 필터용 — "essential"(필수 숙지) / "recommended"(예습 중요) */
+  importance?: SongImportance;
   /** 스윙 동작 예시 애니메이션 경로 (`/assets/guide/<song-id>.webp`, 원본 크기로 표시) */
   swingGif?: string;
   /** 지정하면 swingGif를 이 크기(px)의 정사각형에 맞춰 가운데만 보이게 표시 (파일은 그대로) */
@@ -45,6 +47,9 @@ export interface Song {
   description?: SongDescription;
   lyrics: LyricLine[];
 }
+
+export const SONG_IMPORTANCES = ["essential", "recommended"] as const;
+export type SongImportance = (typeof SONG_IMPORTANCES)[number];
 
 export interface SongDescription {
   /** 곡 소개 한두 문장 */

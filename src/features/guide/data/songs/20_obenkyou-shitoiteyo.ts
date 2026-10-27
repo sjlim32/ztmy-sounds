@@ -10,6 +10,7 @@ const song: Song = {
   id: "study-me",
   title: obenkyou,
   youtubeId: "_WQNWVZqw4Q",
+  importance: "essential",
   lyrics: [
     {
       time: "0:00",

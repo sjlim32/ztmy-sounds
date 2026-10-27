@@ -10,6 +10,7 @@ const song: Song = {
   id: "taidada",
   title: taidada,
   youtubeId: "rdKOnKhK8GU",
+  importance: "essential",
   lyrics: [
     {
       time: "0:0",

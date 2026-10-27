@@ -10,6 +10,7 @@ const song: Song = {
   id: "medianoche",
   title: medi,
   youtubeId: "sBpITQ7oXxM",
+  importance: "recommended",
   lyrics: [
     {
       time: "0:00",

@@ -71,13 +71,11 @@ export function SongPanel() {
         "pc:w-[30vw] pc:max-w-none contents",
         "tablet:flex tablet:w-full tablet:max-w-sm tablet:shrink-0 tablet:flex-col",
         "tablet:transition-[height,opacity] tablet:duration-300",
-        song
-          ? "tablet:h-[88vh]"
-          : // 목록 화면(/guide)에는 하단에 Footer가 같이 떠 있어서, 패널이
-            // 세로 중앙 정렬된 채 40vh를 그대로 쓰면 화면이 짧을 때
-            // 아래쪽이 Footer 위로 겹칩니다. Footer 높이(~약 5rem)만큼을
-            // 위아래로 두 번 뺀 값(10rem)과 40vh 중 더 작은 쪽을 사용.
-            "tablet:h-[min(65vh,calc(140dvh-10rem))]",
+        // 목록 화면도 상세 화면과 같은 높이(88vh)를 쓴다 — 목록 ↔ 상세를
+        // 오갈 때 패널 크기가 바뀌지 않도록. 목록 화면은 하단에 Footer가
+        // 같이 떠 있어서, 화면이 아주 낮을 때만 Footer(~5rem)와 겹치지 않게
+        // 100dvh-6rem으로 상한을 둔다(보통 화면에선 88vh 그대로).
+        song ? "tablet:h-[88vh]" : "tablet:h-[min(88vh,calc(100dvh-6rem))]",
         isPanelVisible ? "tablet:opacity-100" : "tablet:opacity-0",
       )}
     >

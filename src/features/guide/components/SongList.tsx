@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { HomeLink } from "@/components/HomeLink";
@@ -9,6 +10,13 @@ import { getCachedSongCallTags } from "@/features/guide/lib/song-call-tags";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
 import { accentBarStyles } from "@/features/guide/components/list-entrance";
 import { useScrollFadeMask } from "@/lib/use-scroll-fade-mask";
+import { SongFilterBar } from "@/features/guide/components/SongFilterBar";
+import {
+  EMPTY_SONG_FILTER,
+  SONG_IMPORTANCE_LABEL,
+  filterSongs,
+  type SongFilter,
+} from "@/features/guide/lib/song-filter";
 
 interface SongListProps {
   selectedSongId: string | null;
@@ -115,7 +123,13 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
   // tablet 이상에서는 이 ul 자체가 스크롤 컨테이너(모바일은 GuideListScroll이
   // NoticeList와 함께 전담 — 아래 className 참고).
   const listRef = useScrollFadeMask<HTMLUListElement>();
-  const { songs, basePath, visibleTags, label } = useGuideMode();
+  const { mode, songs, basePath, visibleTags, label } = useGuideMode();
+  // 필터는 이 레이아웃이 살아 있는 동안 유지된다 — 곡을 보고 목록으로
+  // 돌아와도 고른 필터가 그대로. 곡이 선택된 상태에선 선택된 곡이 항상
+  // 목록에 있어야 접힘 애니메이션이 맞으므로 필터를 적용하지 않는다.
+  const [filter, setFilter] = useState<SongFilter>(EMPTY_SONG_FILTER);
+  const showFilter = mode === "cheer" && !selectedSongId;
+  const listedSongs = showFilter ? filterSongs(songs, filter) : songs;
 
   return (
     <>
@@ -130,6 +144,15 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
             {label.title}
           </span>
         </h2>
+
+        {showFilter && (
+          <SongFilterBar
+            filter={filter}
+            callTags={visibleTags}
+            onChange={setFilter}
+            className="tablet:order-0 order-1 shrink-0"
+          />
+        )}
 
         <ul
           ref={listRef}
@@ -149,7 +172,12 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
             visible ? "opacity-100" : "opacity-0",
           )}
         >
-          {songs.map((item) => {
+          {listedSongs.length === 0 && (
+            <li className="px-4 py-8 text-center text-sm text-white/50">
+              조건에 맞는 곡이 없어요
+            </li>
+          )}
+          {listedSongs.map((item) => {
             const isSelected = selectedSongId === item.id;
             const isCollapsed = !!selectedSongId && !isSelected;
             const itemState = isCollapsed
@@ -185,8 +213,20 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                           >
                             {item.title.jp}
                           </span>
-                          <span className="tablet:text-sm text-xs leading-tight text-gray-400 transition-colors group-hover:text-white">
+                          <span className="tablet:text-sm flex items-center gap-1.5 text-xs leading-tight text-gray-400 transition-colors group-hover:text-white">
                             {item.title.kr}
+                            {item.importance && (
+                              <span
+                                className={cn(
+                                  "rounded px-1 py-px text-[10px] font-bold",
+                                  item.importance === "essential"
+                                    ? "bg-ztmy-magenta/30 text-ztmy-pink"
+                                    : "bg-white/10 text-white/70",
+                                )}
+                              >
+                                {SONG_IMPORTANCE_LABEL[item.importance]}
+                              </span>
+                            )}
                           </span>
                         </div>
                         <div className="flex shrink-0 items-center gap-1">

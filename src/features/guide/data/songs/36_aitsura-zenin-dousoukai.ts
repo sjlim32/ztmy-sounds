@@ -10,6 +10,7 @@ const song: Song = {
   id: "inside-joke",
   title: dousoukai,
   youtubeId: "o2tonXY8lCY",
+  importance: "essential",
   swingGif: "/assets/guide/dousoukai.webp",
   swingGifSize: 100,
   lyrics: [

@@ -10,6 +10,7 @@ const song: Song = {
   id: "byoushinwo-kamu",
   title: byoushin,
   youtubeId: "2Ux6BA8Jlr4",
+  importance: "essential",
   lyrics: [
     {
       time: "0:0",

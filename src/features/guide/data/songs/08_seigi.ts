@@ -10,6 +10,7 @@ const song: Song = {
   id: "seigi",
   title: seigi,
   youtubeId: "toiX8Wio6fQ",
+  importance: "recommended",
   swingGif: "/assets/guide/seigi.webp",
   lyrics: [
     //================ 1절 ================//

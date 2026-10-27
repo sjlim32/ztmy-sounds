@@ -10,6 +10,7 @@ const song: Song = {
   id: "nouriueno-cracker",
   title: cracker,
   youtubeId: "OGyCeGGha2Y",
+  importance: "recommended",
   lyrics: [
     {
       time: "0:0",

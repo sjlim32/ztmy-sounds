@@ -10,6 +10,7 @@ const song: Song = {
   id: "mirror-tune",
   title: tune,
   youtubeId: "jd9tEPZVuy8",
+  importance: "recommended",
   swingGif: "/assets/guide/milabo.webp",
   lyrics: [
     {
