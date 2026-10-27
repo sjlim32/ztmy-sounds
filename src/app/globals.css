@@ -104,6 +104,31 @@ body {
   }
 }
 
+/* 가이드 가사 ✋ 박수 타이밍 animation (ClapText) — 짝 치듯 튀어 오름 */
+@keyframes clap-pop {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  35% {
+    transform: scale(1.6) rotate(-14deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* ClapText — 박수 순간 퍼지는 파동 */
+@keyframes clap-ring {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
 /* ZUTOMAYO 픽셀 커서 (제작: 乱涂乱画ben — https://x.com/ben404yg, 무료 사용
    가능/이름 바꿔 재배포·판매만 금지). 원본은 32x256 8프레임 스프라이트시트라
    정적 적용을 위해 첫 프레임(32x32)만 잘라 public/cursors에 저장해뒀습니다.

@@ -15,6 +15,8 @@ interface PlayerApi {
   seekTo: (seconds: number) => void;
   play: () => void;
   pause: () => void;
+  /** 유튜브 플레이어가 지금 알고 있는 재생 위치(초). 준비 전이면 undefined. */
+  getCurrentTime: () => number | undefined;
 }
 
 interface PlayerContextValue {
@@ -32,6 +34,12 @@ interface PlayerContextValue {
   seekTo: (seconds: number) => void;
   play: () => void;
   pause: () => void;
+  /**
+   * currentTime(250ms마다 갱신)보다 정밀한 재생 위치가 필요할 때(박수 타이밍
+   * 등) 매 프레임 직접 읽는 용도. 참조가 안정적인 함수라 effect 의존성에 넣어도
+   * 다시 실행되지 않습니다.
+   */
+  getCurrentTime: () => number | undefined;
 }
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
@@ -68,6 +76,11 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     apiRef.current?.pause();
   }, []);
 
+  const getCurrentTime = useCallback(
+    () => apiRef.current?.getCurrentTime(),
+    [],
+  );
+
   const value = useMemo<PlayerContextValue>(
     () => ({
       activeSongId,
@@ -82,6 +95,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       seekTo,
       play,
       pause,
+      getCurrentTime,
     }),
     [
       activeSongId,
@@ -93,6 +107,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       seekTo,
       play,
       pause,
+      getCurrentTime,
     ],
   );
 

@@ -17,6 +17,11 @@ export interface LyricLine {
   cheer?: string | LyricSegment;
   slam?: string;
   interlude?: boolean;
+  /**
+   * 박수 타이밍 — 이 줄의 time으로부터 몇 초 뒤인지. original 안의 ✋를 앞에서부터
+   * 순서대로 하나씩 대응합니다(개수가 모자라면 남는 ✋는 애니메이션 없이 표시).
+   */
+  claps?: number[];
   /** 모바일에서 이 줄이 재생 중일 때 곡의 swingGif를 띄움 */
   swingGif?: boolean;
 }

@@ -111,6 +111,7 @@ export function YouTubePlayer() {
               seekTo: (seconds) => playerRef.current?.seekTo(seconds, true),
               play: () => playerRef.current?.playVideo(),
               pause: () => playerRef.current?.pauseVideo(),
+              getCurrentTime: () => playerRef.current?.getCurrentTime(),
             });
           },
           onStateChange: (event) => {
