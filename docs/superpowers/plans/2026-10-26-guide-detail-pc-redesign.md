@@ -33,11 +33,13 @@
 ### Task 1: 단락 데이터 필드 + 주석 마이그레이션
 
 **Files:**
+
 - Modify: `src/features/guide/lib/types.ts` (`LyricLine`)
 - Modify: `src/features/guide/data/{songs,not-yet,origin}/*.ts` (스크립트로 일괄)
 - Scratch: 마이그레이션 스크립트는 세션 scratchpad에 두고 저장소에 넣지 않는다(일회성).
 
 **Interfaces:**
+
 - Produces: `LyricLine.section?: string` — 이 줄부터 새 단락. 값 예: `"1절"`, `"2절"`, `"3절"`, `"RAP"`.
 
 - [ ] **Step 1:** `LyricLine`에 `section?: string` 추가(JSDoc: "이 줄부터 시작하는 단락 이름 — 가사 목록에 머리글로 표시").
@@ -48,10 +50,12 @@
 ### Task 2: 가사 줄 표시 — 배지·형광펜·단락 머리글
 
 **Files:**
+
 - Modify: `src/features/guide/components/LyricLine.tsx`
 - Modify: `src/features/guide/components/CallIcon.tsx` (라벨 export)
 
 **Interfaces:**
+
 - Consumes: `LyricLine.section` (Task 1)
 - Produces: `export const CALL_TAG_LABEL: Record<CallTag, string>` (기존 `ICON_LABEL` 이름 변경·export), `export const CALL_TAG_COLOR: Record<CallTag, string>` (기존 `TAG_BORDER_COLOR`를 `src/features/guide/lib/call-tag-style.ts`로 옮겨 export) — Task 3 범례가 사용.
 
@@ -66,12 +70,14 @@
 ### Task 3: 플레이어 영역 — 상단 툴바, 작은 영상, 범례, 곡 정보 자리
 
 **Files:**
+
 - Create: `src/features/guide/components/GuideDetailToolbar.tsx` — `[☰ 곡 목록] [◀ 이전 곡] [다음 곡 ▶]` (tablet 이상만)
 - Create: `src/features/guide/components/CallLegend.tsx` — `visibleTags`별 아이콘 + 라벨 + 설명
 - Create: `src/features/guide/components/SongInfoPanel.tsx` — 제목 jp(`font-mkpop`)/kr/en + 비어 있는 설명 자리(`data-role="song-description-slot"`, 내용 없으면 렌더 안 함 — 지금은 항상 빈 자리 주석만)
 - Modify: `src/features/guide/components/GuidePlayerArea.tsx`, `PlayerControls.tsx`, `YouTubePlayer.tsx`
 
 **Interfaces:**
+
 - Consumes: `CALL_TAG_LABEL`, `CALL_TAG_COLOR` (Task 2), `useGuideMode()`, `getNeighborIds` (PlayerControls에서 export)
 - Produces: `GuideDetailToolbar({ onOpenList }: { onOpenList: () => void })`, `CallLegend()`, `SongInfoPanel({ song }: { song: Song })`
 
@@ -85,10 +91,12 @@
 ### Task 4: 곡 목록 드로어
 
 **Files:**
+
 - Create: `src/features/guide/components/SongListDrawer.tsx`
 - Modify: `GuidePlayerArea.tsx` (open 상태 보유, 툴바와 연결)
 
 **Interfaces:**
+
 - Consumes: `useGuideMode()` (`songs`, `basePath`, `visibleTags`), `getCachedSongCallTags`, `CallIcon`
 - Produces: `SongListDrawer({ open, onClose, currentSongId }: { open: boolean; onClose: () => void; currentSongId: string | null })`
 
@@ -100,6 +108,7 @@
 ### Task 5: 가사 패널 정리 + 문서
 
 **Files:**
+
 - Modify: `src/features/guide/components/SongList.tsx` (곡 선택 시 tablet 이상에서 래퍼 숨김)
 - Modify: `README.md`, `docs/CONVENTIONS.md`
 

@@ -21,22 +21,29 @@ export function CallLegend() {
       aria-label="응원 표시 안내"
       className="rounded-lg border border-white/10 bg-black/40 px-4 py-3 backdrop-blur-sm"
     >
-      <h3 className="mb-2 text-xs font-bold tracking-wide text-white/60">
+      <h3 className="mb-2 text-sm font-bold tracking-wide text-white/70">
         응원 표시 안내
       </h3>
       <ul className="flex flex-wrap gap-2">
         {visibleTags.map((tag) => (
           <li
             key={tag}
-            className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm"
+            className="inline-flex items-center gap-2 rounded-xl border py-1 pr-3.5 pl-1.5 text-sm"
             style={{
               backgroundColor: withAlpha(tag, "1f"),
               borderColor: withAlpha(tag, "66"),
             }}
           >
-            <CallIcon name={tag} size={20} className="mr-0" />
-            <span className="font-bold text-white">{CALL_TAG_LABEL[tag]}</span>
-            <span className="text-white/70">{CALL_TAG_DESCRIPTION[tag]}</span>
+            {/* 처음 온 사람도 뜻을 바로 알도록 한자·영문 라벨이 있는 큰 아이콘 */}
+            <CallIcon name={tag} size={48} withLabel className="mr-0" />
+            <span className="flex flex-col leading-tight">
+              <span className="font-bold text-white">
+                {CALL_TAG_LABEL[tag]}
+              </span>
+              <span className="text-sm text-white/70">
+                {CALL_TAG_DESCRIPTION[tag]}
+              </span>
+            </span>
           </li>
         ))}
       </ul>

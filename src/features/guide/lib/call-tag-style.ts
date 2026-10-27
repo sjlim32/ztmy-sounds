@@ -1,11 +1,15 @@
 import type { CallTag } from "@/features/guide/lib/types";
 
-/** 응원 종류별 대표색 — 가사 배지, 단어 형광펜, 응원 표시 안내가 같이 씁니다. */
+/**
+ * 응원 종류별 대표색 — 가사 배지, 단어 형광펜, 응원 표시 안내가 같이 씁니다.
+ * 스윙/클랩/떼창은 샤모지 아이콘(public/assets/guide/shamoji/) 색에서 뽑은
+ * 값이라 아이콘과 같이 바꿔야 합니다. 슬램은 클랩 빨강과 겹치지 않게 노랑.
+ */
 export const CALL_TAG_COLOR: Record<CallTag, string> = {
-  call: "#f97316",
-  swing: "#82fa2a",
-  clap: "#6dd6fc",
-  slam: "#ef4444",
+  call: "#fe4399",
+  swing: "#24d6fe",
+  clap: "#f43737",
+  slam: "#facc15",
 };
 
 /** 응원 종류 이름 — 아이콘 대체 텍스트와 배지·안내 문구에 씁니다. */

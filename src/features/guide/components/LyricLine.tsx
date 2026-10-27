@@ -145,7 +145,7 @@ function LyricLineComponent({
   const body = line.interlude ? (
     content
   ) : (
-    <div className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-x-2 [&>*]:col-start-2">
+    <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-x-2 [&>*]:col-start-2">
       <span
         aria-hidden
         // 높이 0인 칸의 세로 가운데에 표시만 넘쳐 보이게 — 아이콘이 줄
@@ -266,7 +266,7 @@ function MusicBreak({ tag, isActive }: { tag?: CallTag; isActive: boolean }) {
 
 /****** 왼쪽 아이콘 칸 ******/
 // 같은 태그가 이어지는 구간을 줄 높이 전체에 걸친 응원 색 세로선으로 잇는다.
-// 칸 위치(왼쪽 8px, 폭 24px)는 위 그리드의 아이콘 칸과 같아야 한다.
+// 칸 위치(왼쪽 8px, 폭 32px)는 위 그리드의 아이콘 칸과 같아야 한다.
 function RunLine({
   tag,
   position,
@@ -279,7 +279,7 @@ function RunLine({
   return (
     <span
       aria-hidden
-      className="pointer-events-none absolute inset-y-0 left-2 w-6"
+      className="pointer-events-none absolute inset-y-0 left-2 w-8"
     >
       <span
         className={cn(
@@ -309,17 +309,17 @@ function GutterMarker({
 
   if (position === "start" || position === "single") {
     return (
-      // 아이콘은 처음부터 강조 크기(24px)로 그리고 재생 중에도 크기는 그대로 —
+      // 아이콘은 처음부터 강조 크기(32px)로 그리고 재생 중에도 크기는 그대로 —
       // 강조는 후광 + 퍼지는 고리 + 빛으로만 한다.
-      <span className="relative flex h-6 w-6 shrink-0 items-center justify-center">
-        {isActive && <ActiveHalo color={color} size="h-9 w-9" />}
+      <span className="relative flex h-8 w-8 shrink-0 items-center justify-center">
+        {isActive && <ActiveHalo color={color} size="h-11 w-11" />}
         <span
           className="relative flex"
           style={
             isActive ? { filter: `drop-shadow(0 0 4px ${color})` } : undefined
           }
         >
-          <CallIcon name={tag} size={24} className="mr-0" />
+          <CallIcon name={tag} size={32} className="mr-0" />
         </span>
       </span>
     );
@@ -328,7 +328,7 @@ function GutterMarker({
   if (!isActive) return null;
 
   return (
-    <span className="relative flex h-2.5 w-6 shrink-0 items-center justify-center">
+    <span className="relative flex h-2.5 w-8 shrink-0 items-center justify-center">
       <ActiveHalo color={color} size="h-5 w-5" />
       <span
         className="relative h-2.5 w-2.5 rounded-full"
@@ -374,7 +374,7 @@ function CheerText({
     return (
       <p
         data-role="cheer"
-        className="tablet:text-sm tablet:leading-relaxed text-xs leading-loose font-bold text-[silver]"
+        className="text-sm leading-relaxed font-bold text-[silver]"
       >
         {renderTextParts(text, "cheer")}
       </p>
@@ -387,7 +387,7 @@ function CheerText({
       <span
         className={cn(
           "inline-flex max-w-full flex-wrap items-center gap-x-1.5 rounded-2xl border px-2.5 py-0.5 text-left",
-          "tablet:text-sm text-xs leading-relaxed font-bold",
+          "text-sm leading-relaxed font-bold",
         )}
         style={{
           color: CALL_TAG_COLOR[tag],

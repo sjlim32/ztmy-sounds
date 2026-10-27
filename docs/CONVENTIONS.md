@@ -29,6 +29,13 @@ src/
                              # 예시 목데이터를 "예시" 표시와 함께). 이 세로 열의
                              # 폭은 lib/player-layout.ts 한 곳에서 정한다.
                              # 응원 색·이름·설명은 lib/call-tag-style.ts.
+                             # 응원 아이콘은 public/assets/guide/shamoji/의 샤모지
+                             # 세트(그림만 256px `<이름>.webp`, 한자·영문 포함
+                             # 512px `<이름>-label.webp`) — 스윙=swing, 클랩=clap,
+                             # 떼창=sing. 응원 색은 이 아이콘 색에서 뽑았으므로
+                             # 아이콘을 바꾸면 색도 함께 바꾼다. 슬램은 기존
+                             # slam.svg(노랑). 가사 아이콘 칸은 32px, 응원 표시
+                             # 안내는 라벨 포함 버전 48px(CallIcon withLabel).
                              # 곡 목록(/guide) 필터: SongFilterBar(중요도 /
                              # 응원법 두 줄, AND) + lib/song-filter.ts. 중요도는
                              # Song.importance("essential" 필수 숙지 /
@@ -53,7 +60,7 @@ src/
                              # 선택자)으로 표시하고, 가사 영역(LyricsView)은 배경
                              # 흐림 + 살짝 어둡게 해서 그 보라가 사이트 배경과
                              # 섞이지 않게 한다. 재생 중인 응원 줄은 아이콘 칸도
-                             # 강조 — 아이콘 줄은(아이콘은 늘 24px, 크기 변화 없음) 응원 색 후광 +
+                             # 강조 — 아이콘 줄은(아이콘은 늘 32px, 크기 변화 없음) 응원 색 후광 +
                              # 퍼지는 고리(ActiveHalo), 구간 안 줄은 세로선 위
                              # 재생 점 + 같은 후광.
       data/

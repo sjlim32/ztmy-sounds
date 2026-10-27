@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { usePlayer } from "@/features/guide/player-context";
 import { CALL_TAG_COLOR } from "@/features/guide/lib/call-tag-style";
@@ -143,8 +144,9 @@ export function ClapText({
                   state === "pending" && "opacity-35 grayscale",
                   // 상태가 hit으로 바뀌는 순간 애니메이션이 새로 붙어 처음부터 재생된다.
                   state === "hit" &&
-                    "after:pointer-events-none after:absolute after:inset-0 after:rounded-full after:border-2 after:border-[#6dd6fc] after:opacity-0 motion-safe:animate-[clap-pop_380ms_ease-out] motion-safe:after:animate-[clap-ring_480ms_ease-out]",
+                    "after:pointer-events-none after:absolute after:inset-0 after:rounded-full after:border-2 after:border-(--clap-color) after:opacity-0 motion-safe:animate-[clap-pop_380ms_ease-out] motion-safe:after:animate-[clap-ring_480ms_ease-out]",
                 )}
+                style={{ "--clap-color": CLAP_COLOR } as CSSProperties}
               >
                 {CLAP}
               </span>
