@@ -1,43 +1,38 @@
+import Image from "next/image";
 import { artist } from "@/data/artist";
 import { cn } from "@/lib/utils";
+import { LOGO } from "@/lib/seo";
 
 export function Header({ artist }: { artist: artist }) {
   return (
+    // 모바일에선 화면에 안 그리지만(로고는 MobileHeader가 보여줌) h1은 남겨서
+    // 스크린 리더·검색엔진이 어느 화면 폭에서든 페이지 제목을 읽게 한다 —
+    // hidden(display: none)이면 접근성 트리에서 빠진다.
     <header
       className={cn(
-        "hidden w-fit flex-col items-start",
-        "tablet:absolute tablet:top-8 tablet:left-8 tablet:flex",
+        "max-tablet:sr-only w-fit",
+        "tablet:absolute tablet:top-8 tablet:left-8",
       )}
     >
-      {/* 서브 텍스트: 장식 막대 없이 글자만 — 한 태그로 읽히도록 폰트/트래킹 통일, 색만 대비 */}
-      <div className="mb-2 flex items-center pl-1">
-        <div className="font-rocknroll flex items-baseline gap-2">
-          <span className="text-ztmy-magenta text-base font-bold tracking-[0.3em] uppercase">
-            {artist.name.en}
-          </span>
-          <span className="text-base font-bold tracking-widest text-white/50 uppercase">
-            Fan Page
-          </span>
-        </div>
-      </div>
-
-      {/* 메인 텍스트: 마젠타 그림자를 살짝 어긋나게 겹쳐 레트로 인쇄물의
-      판 어긋남(미스레지스트레이션) 느낌을 낸다. drop-shadow 필터를 쓰면 그
-      마젠타 그림자에까지 그림자가 져서 text-shadow 한 줄로 같이 처리. */}
-      <span
-        className={cn(
-          "font-mkpop leading-tight font-extrabold tracking-tight text-white",
-          "[text-shadow:0.05em_0.05em_0_var(--ztmy-magenta),0_4px_16px_rgba(0,0,0,0.6)]",
-          "pc:text-6xl tablet:text-5xl",
-        )}
-      >
-        {artist.name.jp}
-      </span>
-
-      {/* 일본어 제목만으로는 읽기 어려운 방문자를 위한 한국어 표기 */}
-      <span className="mt-2 pl-1 text-sm font-medium tracking-wide text-white/75 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-        {artist.name.kr}
-      </span>
+      <h1>
+        {/* 로고 글자가 남색이라 어두운 배경에 묻혀서, 흰 테두리 + 그림자로
+        스티커처럼 띄운다. */}
+        <Image
+          src={LOGO.src}
+          alt={LOGO.alt}
+          width={LOGO.width}
+          height={LOGO.height}
+          preload
+          className={cn(
+            "tablet:w-64 pc:w-72 h-auto",
+            "[filter:drop-shadow(1px_0_0_#fff)_drop-shadow(-1px_0_0_#fff)_drop-shadow(0_1px_0_#fff)_drop-shadow(0_-1px_0_#fff)_drop-shadow(0_4px_16px_rgba(0,0,0,0.6))]",
+          )}
+        />
+        {/* 로고에 없는 아티스트명을 h1 텍스트에 포함시켜 검색 키워드로 잡히게 한다. */}
+        <span className="sr-only">
+          {` — ${artist.name.jp}(${artist.name.kr}) 비공식 팬페이지`}
+        </span>
+      </h1>
     </header>
   );
 }

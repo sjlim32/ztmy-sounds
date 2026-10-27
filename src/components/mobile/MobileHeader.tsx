@@ -1,13 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ARTIST } from "@/data/artist";
 import { BackLink } from "@/components/BackLink";
 import { HomeLink } from "@/components/HomeLink";
 import { MOBILE_HEADER_ROUTES } from "@/components/mobile/mobile-header.constants";
+import { LOGO } from "@/lib/seo";
 
 /**
- * 모바일 전용 전역 상단 헤더. 메인(/)에서는 아티스트명을, 그 외 페이지에서는
+ * 모바일 전용 전역 상단 헤더. 메인(/)에서는 로고를, 그 외 페이지에서는
  * 페이지 이름 + 좌측 뒤로가기(브라우저 히스토리 back) + 우측 메인 바로가기
  * 버튼을 보여줍니다.
  */
@@ -18,9 +20,7 @@ export function MobileHeader() {
   const matchedRoute = MOBILE_HEADER_ROUTES.find((route) =>
     pathname.startsWith(route.path),
   );
-  const title = isHome
-    ? ARTIST.name.en
-    : (matchedRoute?.title ?? ARTIST.name.en);
+  const title = matchedRoute?.title ?? ARTIST.name.en;
 
   return (
     // 루트 레이아웃에서 body/상위 컨테이너가 전부 스크롤되지 않는 구조라
@@ -47,7 +47,19 @@ export function MobileHeader() {
           />
         )}
 
-        <div className="text-lg font-bold tracking-tight">{title}</div>
+        {isHome ? (
+          // 제목(h1)은 메인 페이지의 Header가 이미 갖고 있어서 여기선 장식용.
+          <Image
+            src={LOGO.src}
+            alt=""
+            aria-hidden
+            width={LOGO.width}
+            height={LOGO.height}
+            className="h-10 w-auto [filter:drop-shadow(0.5px_0_0_#fff)_drop-shadow(-0.5px_0_0_#fff)_drop-shadow(0_0.5px_0_#fff)_drop-shadow(0_-0.5px_0_#fff)]"
+          />
+        ) : (
+          <div className="text-lg font-bold tracking-tight">{title}</div>
+        )}
 
         {!isHome && (
           <HomeLink

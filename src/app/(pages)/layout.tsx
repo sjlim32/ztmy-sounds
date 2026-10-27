@@ -13,7 +13,7 @@ import { MobileHeader } from "@/components/mobile/MobileHeader";
 import { Footer } from "@/components/Footer";
 import { InstallShareBar } from "@/components/InstallShareBar";
 import { ARTIST } from "@/data/artist";
-import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
+import { SITE_URL, SITE_NAME, SITE_BRAND, SITE_DESCRIPTION } from "@/lib/seo";
 import { buildSiteJsonLdGraph } from "@/lib/structured-data";
 import "../globals.css";
 
@@ -84,6 +84,7 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   keywords: [
+    SITE_BRAND,
     ARTIST.name.jp,
     ARTIST.name.kr,
     ARTIST.name.en,

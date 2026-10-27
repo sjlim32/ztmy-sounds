@@ -1,7 +1,7 @@
 import { ARTIST } from "@/data/artist";
 import { SOCIAL_LINKS } from "@/data/social-links";
 import { getEventStartDate, getEventEndDate, type Event } from "@/data/event";
-import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/seo";
+import { SITE_URL, SITE_NAME, SITE_BRAND, SITE_DESCRIPTION } from "@/lib/seo";
 
 const OFFICIAL_URL = "https://zutomayo.net";
 
@@ -21,6 +21,8 @@ export function buildWebSiteJsonLd() {
   return {
     "@type": "WebSite",
     name: SITE_NAME,
+    // 로고·도메인에 쓰인 브랜드명 — 검색 결과의 사이트 이름 후보로 쓰인다.
+    alternateName: SITE_BRAND,
     url: SITE_URL,
     description: SITE_DESCRIPTION,
     inLanguage: "ko",
