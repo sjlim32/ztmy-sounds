@@ -9,7 +9,7 @@ const ICON_SRC: Record<CallTag, string> = {
   swing: "/assets/guide/shamoji/swing.webp",
   clap: "/assets/guide/shamoji/clap.webp",
   call: "/assets/guide/shamoji/sing.webp",
-  slam: "/assets/song/slam.svg",
+  slam: "/assets/guide/slam.svg",
 };
 
 // 한자·영문 라벨이 들어간 큰 자리용(응원 표시 안내). 없는 종류는 기본 아이콘.

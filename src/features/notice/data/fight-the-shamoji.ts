@@ -8,7 +8,7 @@ const notice: Notice = {
   version: 1,
   content: FightTheShamojiContent,
   visible: true,
-  isAlwaysOpen: false,
+  isAlwaysOpen: true,
   isSlamVisible: false,
 };
 
