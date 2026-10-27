@@ -14,10 +14,10 @@ export function SongDescriptionPanel({ song }: { song: Song }) {
       aria-label="곡 설명"
       className="rounded-lg border border-white/10 bg-black/40 px-4 py-3 backdrop-blur-sm"
     >
-      <h3 className="mb-2 flex items-center gap-2 text-xs font-bold tracking-wide text-white/60">
+      <h3 className="mb-2 flex items-center gap-2 text-sm font-bold tracking-wide text-white/70">
         곡 설명
         {isMock && (
-          <span className="rounded border border-white/20 px-1.5 py-px text-[10px] font-medium text-white/45">
+          <span className="rounded border border-white/20 px-1.5 py-px text-xs font-medium text-white/50">
             예시
           </span>
         )}

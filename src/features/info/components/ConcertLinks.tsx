@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { SiteLink } from "@/components/SiteLink";
+import { LINK_BUTTON_CLASS } from "@/components/button-styles";
+import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import {
   INFO_TAB_LINKS,
   OFFICIAL_LINKS,
@@ -44,11 +46,9 @@ export function ConcertLinks() {
         <ul className="flex flex-wrap gap-1.5">
           {INFO_TAB_LINKS.map((link) => (
             <li key={link.href}>
-              <Link
-                href={link.href}
-                className="hover:border-ztmy-magenta/60 block rounded-full border border-white/15 bg-black/40 px-3 py-1 text-white/80 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
-              >
+              <Link href={link.href} className={LINK_BUTTON_CLASS}>
                 {link.label}
+                <ChevronLeftIcon className="h-3.5 w-3.5 rotate-180 opacity-60" />
               </Link>
             </li>
           ))}

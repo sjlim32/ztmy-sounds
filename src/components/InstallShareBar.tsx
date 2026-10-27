@@ -6,12 +6,15 @@ import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/seo";
 import { useInstallPrompt } from "@/lib/use-install-prompt";
 import { DownloadIcon } from "@/components/icons/DownloadIcon";
 import { ShareIcon } from "@/components/icons/ShareIcon";
+import { NAV_BUTTON_CLASS } from "@/components/button-styles";
 
-const PILL_CLASS =
-  "flex items-center gap-1.5 rounded-full border border-white/15 bg-black/40 p-2.5 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm transition-colors hover:border-ztmy-magenta/60 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none";
+// 아이콘만 있는 정사각형 검은 반투명 버튼
+const ICON_BUTTON_CLASS = cn(NAV_BUTTON_CLASS, "h-9 w-9");
 
 /**
- * PC 전용, 화면 좌측 하단에 고정된 "앱 설치"/"공유" 버튼 묶음.
+ * PC 전용, 화면 왼쪽 아래 구석에 떠 있는 "앱 설치"/"공유" 버튼 묶음.
+ * 푸터가 보이는 화면(PC는 메인 화면)에서는 푸터 바로 위에 뜨도록, Footer가
+ * 자기 높이를 --footer-height CSS 변수로 알려주면 그만큼 위로 올라간다.
  *
  * 설치 버튼은 브라우저가 beforeinstallprompt를 쏴줄 때만(=실제로 설치
  * 가능할 때만) 나타난다 — 이미 설치돼 실행 중(standalone)이거나 지원하지
@@ -47,9 +50,20 @@ export function InstallShareBar() {
   };
 
   return (
-    <div className="pc:flex fixed bottom-4 left-4 z-20 hidden items-center gap-2">
+    <div
+      className={cn(
+        "fixed bottom-[calc(var(--footer-height,0px)+1rem)] left-4 z-20 hidden items-center gap-2",
+        "pc:flex",
+      )}
+    >
       {canInstall && (
-        <button type="button" onClick={promptInstall} className={PILL_CLASS}>
+        <button
+          type="button"
+          onClick={promptInstall}
+          aria-label="앱 설치"
+          title="앱 설치"
+          className={ICON_BUTTON_CLASS}
+        >
           <DownloadIcon className="h-5 w-5" />
         </button>
       )}
@@ -57,11 +71,13 @@ export function InstallShareBar() {
       <button
         type="button"
         onClick={handleShare}
-        className={cn(PILL_CLASS, "relative")}
+        aria-label="공유하기"
+        title="공유하기"
+        className={cn(ICON_BUTTON_CLASS, "relative")}
       >
         <ShareIcon className="h-5 w-5" />
         {copied && (
-          <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-full bg-black/80 px-3 py-1 text-[11px] whitespace-nowrap text-white">
+          <span className="absolute -top-9 left-0 rounded-lg bg-black/85 px-3 py-1 text-sm whitespace-nowrap text-white">
             링크가 복사되었습니다
           </span>
         )}

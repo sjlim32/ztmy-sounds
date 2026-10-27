@@ -32,7 +32,7 @@ export type Url = {
   disabled?: boolean;
 };
 
-/** Footer의 SOCIAL_LINKS와 같은 platform 키를 공유해서 같은 아이콘 매핑을 씁니다. */
+/** SOCIAL_LINKS와 같은 platform 키를 공유해서 같은 아이콘 매핑(SOCIAL_PLATFORM_ICON)을 씁니다. */
 export type SocialUrl = Url & {
   platform: SocialPlatform;
 };

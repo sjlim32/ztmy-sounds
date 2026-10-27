@@ -9,6 +9,10 @@ import {
 } from "@/lib/use-install-prompt";
 import { CloseIcon } from "@/components/icons/CloseIcon";
 import { IosShareIcon } from "@/components/icons/IosShareIcon";
+import {
+  ACTION_BUTTON_CLASS,
+  GHOST_ICON_BUTTON_CLASS,
+} from "@/components/button-styles";
 import { SITE_NAME } from "@/lib/seo";
 
 // 값은 "이 시각까지는 다시 보여주지 않는다"는 타임스탬프(ms) — 매번 켜자마자
@@ -110,13 +114,13 @@ export function InstallPromptBanner() {
       <div className="min-w-0 flex-1">
         <p className="text-xs font-semibold text-white">홈 화면에 추가하기</p>
         {platform === "ios" ? (
-          <p className="flex flex-wrap items-center gap-0 text-[10px] text-white/60">
+          <p className="flex flex-wrap items-center gap-0 text-xs text-white/60">
             Safari 하단의
             <IosShareIcon className="h-3.5 w-3.5 shrink-0 text-white/80" />
             공유 버튼을 누른 뒤 “홈 화면에 추가”를 선택하세요
           </p>
         ) : (
-          <p className="text-[11px] text-white/60">
+          <p className="text-xs text-white/60">
             {SITE_NAME}을 앱처럼 빠르게 열어볼 수 있어요
           </p>
         )}
@@ -126,7 +130,7 @@ export function InstallPromptBanner() {
         <button
           type="button"
           onClick={handleInstall}
-          className="from-ztmy-purple to-ztmy-magenta shrink-0 rounded-full bg-linear-to-br px-3 py-1.5 text-xs font-semibold text-white shadow-md transition-all hover:brightness-110"
+          className={cn(ACTION_BUTTON_CLASS, "shrink-0 px-3 py-1.5 text-sm")}
         >
           추가
         </button>
@@ -136,7 +140,7 @@ export function InstallPromptBanner() {
         type="button"
         onClick={dismiss}
         aria-label="닫기"
-        className="shrink-0 text-white/50 transition-colors hover:text-white"
+        className={cn(GHOST_ICON_BUTTON_CLASS, "shrink-0 p-1")}
       >
         <CloseIcon className="h-4 w-4" />
       </button>

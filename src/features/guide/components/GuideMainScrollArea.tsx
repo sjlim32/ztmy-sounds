@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useSelectedLayoutSegment } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useScrollFadeMask } from "@/lib/use-scroll-fade-mask";
 
@@ -16,7 +15,6 @@ import { useScrollFadeMask } from "@/lib/use-scroll-fade-mask";
  * 컴포넌트가 같은 행(row)에서 나란히 있으니 높이 공식도 그대로 맞춥니다.
  */
 export function GuideMainScrollArea({ children }: { children: ReactNode }) {
-  const segment = useSelectedLayoutSegment();
   const scrollRef = useScrollFadeMask<HTMLDivElement>();
 
   return (
@@ -27,8 +25,8 @@ export function GuideMainScrollArea({ children }: { children: ReactNode }) {
         "tablet:flex tablet:min-w-0 tablet:flex-1 tablet:flex-col tablet:items-center tablet:justify-center-safe tablet:overflow-y-auto",
         "tablet:scrollbar-thin tablet:[scrollbar-color:transparent_transparent] tablet:hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
         "tablet:[&::-webkit-scrollbar]:w-1.5 tablet:[&::-webkit-scrollbar-thumb]:rounded-full tablet:[&::-webkit-scrollbar-thumb]:bg-transparent tablet:hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
-        // SongPanel과 같은 높이 공식(목록 화면도 상세와 같은 88vh)
-        segment ? "tablet:h-[88vh]" : "tablet:h-[min(88vh,calc(100dvh-6rem))]",
+        // SongPanel과 같은 높이(목록 화면도 상세와 같은 88vh)
+        "tablet:h-[88vh]",
       )}
     >
       {children}

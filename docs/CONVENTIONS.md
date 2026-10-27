@@ -310,6 +310,19 @@ src/
   새로 쓰는 페이지를 추가하면 `src/components/Footer.tsx`의
   `SELF_MANAGED_FOOTER_PREFIXES`에도 그 경로 prefix를 반드시 추가하세요 —
   안 그러면 루트 레이아웃의 전역 Footer와 이중으로 렌더링됩니다.
+- 푸터(`src/components/Footer.tsx`)는 위쪽 경계선 + 어두운 배경 띠로 콘텐츠와 구분하고,
+  컴팩트하게 왼쪽 정렬로 공식 링크 아이콘 줄(`data/social-links.ts`의
+  `FOOTER_SOCIAL_LINKS` — zutomayocalendar.net 푸터와 같은 유튜브, X 메인·스태프,
+  인스타그램 메인·스태프·mart, 아이콘도 같은 이미지를 `public/assets/footer/`에 두고
+  그대로 씀) → 저작권 문구("본 사이트는 비공식 팬 페이지로서, 사이트 내의 모든
+  음원·영상·이미지의 저작권은 아티스트에게 있습니다. © 2026 ずっと真夜中でいいのに。" —
+  운영자가 정한 문구 그대로, PC에선 한 줄 고정)을 두고, 건의·출처 버튼은 오른쪽
+  구석(모바일은 아래)에 둡니다.
+  PC(tablet 이상)에서는 메인 화면(/)에서만 보이고, 모바일은 가이드 상세를 뺀 모든
+  화면에 보입니다. 그래서 PC에서 `/info` 등 다른 페이지의 높이 계산은 푸터 몫을
+  빼지 않습니다(예: 가이드 패널 88vh).
+- PC 설치·공유 버튼(`InstallShareBar`)은 화면 왼쪽 아래에 떠 있고, 푸터가 보일 때는
+  Footer가 알려주는 `--footer-height` CSS 변수만큼 올라가 푸터 바로 위에 뜹니다.
 
 - 메인에서 들어올 때 내용이 서서히 나타나게 하려면 `src/components/EntranceFade.tsx`로
   감쌉니다(/info, /zutopia). /guide의 패널과 같은 훅(`src/lib/use-entrance-visible.ts`)을

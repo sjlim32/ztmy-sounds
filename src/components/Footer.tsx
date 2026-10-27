@@ -1,14 +1,20 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
-import { ARTIST } from "@/data/artist";
-import { SOCIAL_LINKS } from "@/data/social-links";
-import { SOCIAL_PLATFORM_ICON } from "@/lib/social-platform";
 import { cn } from "@/lib/utils";
+import { ARTIST } from "@/data/artist";
+import { FOOTER_SOCIAL_LINKS } from "@/data/social-links";
+import { FOCUS_RING, NAV_BUTTON_CLASS } from "@/components/button-styles";
 
 const TALLY_FORM_ID = "814rXx";
+
+// 푸터용 컴팩트 버튼(이동 버튼 스타일을 작게). 푸터는 컴팩트해야 해서 "버튼
+// 글자는 text-sm부터" 규칙의 예외로 text-xs를 쓴다(docs/CONVENTIONS.md).
+const FOOTER_BUTTON_CLASS = cn(NAV_BUTTON_CLASS, "h-7 px-2.5 text-xs");
 
 // 자기 스크롤 영역 안에 Footer를 직접 넣는 페이지들 — 루트 레이아웃의 전역
 // 인스턴스(placement 기본값, inline=false)는 이 경로들에서 대신 자기 자신을
@@ -28,8 +34,10 @@ const TALLY_FORM_ID = "814rXx";
 const SELF_MANAGED_FOOTER_PREFIXES = ["/zutopia", "/info", "/credits"];
 
 /**
- * 전역 저작권 푸터.
- * 노래 가사 페이지(/guide/[songId])는 화면을 전부 가사에 쓰므로 표시하지 않습니다.
+ * 전역 푸터 — 왼쪽에 공식 링크·저작권 문구, 오른쪽 구석에 건의·출처 버튼.
+ * 노래 가사 페이지(/guide/[songId])는 화면을 전부 가사에 쓰므로 표시하지 않고,
+ * PC(tablet 이상)에서는 메인 화면(/)에서만 보인다 — 다른 페이지는 PC에서
+ * 콘텐츠 영역을 넓게 쓰도록.
  *
  * inline=true는 PageScrollBody.tsx가 자기 스크롤 컨테이너 안에서 직접
  * 렌더링할 때 쓴다 — 그 경로 자신이 바로 SELF_MANAGED_FOOTER_PREFIXES가
@@ -39,6 +47,28 @@ const SELF_MANAGED_FOOTER_PREFIXES = ["/zutopia", "/info", "/credits"];
  */
 export function Footer({ inline = false }: { inline?: boolean } = {}) {
   const pathname = usePathname();
+  const footerRef = useRef<HTMLElement>(null);
+
+  // 화면 왼쪽 아래에 떠 있는 설치·공유 버튼(InstallShareBar)이 푸터 바로 위에
+  // 오도록 푸터 높이를 --footer-height로 알려준다. 숨겨져 있거나(display:none)
+  // 렌더링되지 않으면 0.
+  useEffect(() => {
+    const root = document.documentElement;
+    const el = footerRef.current;
+    if (!el) {
+      root.style.setProperty("--footer-height", "0px");
+      return;
+    }
+    const observer = new ResizeObserver(() =>
+      root.style.setProperty("--footer-height", `${el.offsetHeight}px`),
+    );
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      root.style.setProperty("--footer-height", "0px");
+    };
+  }, [pathname]);
+
   if (pathname.startsWith("/guide/")) return null;
   if (
     !inline &&
@@ -46,31 +76,71 @@ export function Footer({ inline = false }: { inline?: boolean } = {}) {
   ) {
     return null;
   }
+  const isHome = pathname === "/";
 
   return (
+    // 일반적인 사이트 푸터: 위 콘텐츠와 경계선 + 어두운 배경 띠로 구분
+    // (zutomayocalendar.net 푸터 참고). 왼쪽에 공식 링크 줄 → 저작권 문구,
+    // 오른쪽 구석에 건의·출처, 컴팩트.
     <footer
+      ref={footerRef}
       className={cn(
-        "flex flex-col items-center gap-1 border-t border-white/10 py-1 text-center text-[10px] font-medium text-white/50",
-        "tablet:items-end tablet:border-t-0 tablet:text-end tablet:px-3 tablet:text-white/40 tablet:text-xs",
+        "shrink-0 border-t border-white/15 bg-black/70 backdrop-blur-md",
+        !isHome && "tablet:hidden",
       )}
     >
-      <p className="tablet:tracking-[0.4rem] tracking-widest">
-        ©{ARTIST.name.jp}
-        <span className="tablet:hidden"> Fan Page · </span>
-        <span>2026</span>
-      </p>
+      {/* 왼쪽: 공식 링크 + 저작권 문구 / 오른쪽 구석: 건의·출처. 모바일은 위아래로 */}
+      <div
+        className={cn(
+          "flex flex-col gap-2 px-4 py-3",
+          "tablet:flex-row tablet:items-end tablet:justify-between tablet:gap-6 tablet:px-8",
+        )}
+      >
+        <div className="flex min-w-0 flex-col items-start gap-2">
+          <nav aria-label="공식 링크" className="flex items-center gap-2">
+            {FOOTER_SOCIAL_LINKS.map(({ name, url, icon }) => (
+              <a
+                key={url}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={name}
+                className={cn(
+                  "opacity-85 transition-opacity hover:opacity-100",
+                  FOCUS_RING,
+                )}
+              >
+                <Image
+                  src={icon.src}
+                  alt={name}
+                  width={Math.round(icon.width / 2)}
+                  height={Math.round(icon.height / 2)}
+                />
+              </a>
+            ))}
+          </nav>
 
-      <div className="flex flex-nowrap items-center justify-center gap-3">
-        <div className="flex gap-2">
+          {/* 저작권 표기 — 문구는 운영자가 정한 그대로. PC에선 한 줄 고정
+              (모바일은 화면 폭보다 길어서 줄바꿈 허용) */}
+          <p
+            className={cn(
+              "text-xs leading-relaxed break-keep text-white/60",
+              "tablet:whitespace-nowrap",
+            )}
+          >
+            본 사이트는 비공식 팬 페이지로서, 사이트 내의 모든
+            음원·영상·이미지의 저작권은 아티스트에게 있습니다. © 2026{" "}
+            {ARTIST.name.jp}
+          </p>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1.5">
+          {/* 건의(모바일은 폼 페이지로, PC는 팝업으로 연다)·출처 */}
           <a
             href={`https://tally.so/r/${TALLY_FORM_ID}`}
             target="_blank"
             rel="noopener noreferrer"
-            className={cn(
-              "rounded-full border border-white/15 bg-black/40 px-3 py-0.5 text-[10px] font-medium tracking-wide text-white/80 backdrop-blur-sm",
-              "tablet:hidden",
-              "hover:border-ztmy-magenta/60 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
-            )}
+            className={cn(FOOTER_BUTTON_CLASS, "tablet:hidden")}
           >
             건의
           </a>
@@ -79,49 +149,13 @@ export function Footer({ inline = false }: { inline?: boolean } = {}) {
             data-tally-open={TALLY_FORM_ID}
             data-tally-emoji-text="👋"
             data-tally-emoji-animation="wave"
-            className={cn(
-              "hidden rounded-full border border-white/15 bg-black/40 px-3 py-0.5 text-xs font-medium tracking-wide text-white/80 backdrop-blur-sm",
-              "tablet:inline-block",
-              "hover:border-ztmy-magenta/60 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
-            )}
+            className={cn(FOOTER_BUTTON_CLASS, "hidden", "tablet:inline-flex")}
           >
             건의
           </button>
-
-          <Link
-            href="/credits"
-            className={cn(
-              "rounded-full border border-white/15 bg-black/40 px-3 py-0.5 text-[10px] font-medium tracking-wide text-white/80 backdrop-blur-sm",
-              "hover:border-ztmy-magenta/60 tablet:text-xs transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
-            )}
-          >
+          <Link href="/credits" className={FOOTER_BUTTON_CLASS}>
             출처
           </Link>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="tablet:inline-block hidden font-mono text-[10px] font-medium tracking-[0.3em] text-white/40 uppercase">
-            Official Link
-          </span>
-          <nav className="flex items-center gap-3">
-            {SOCIAL_LINKS.map(({ name, url, platform }) => {
-              const Icon = SOCIAL_PLATFORM_ICON[platform];
-              return (
-                <a
-                  key={url}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={name}
-                  className="hover:text-ztmy-purple transition-colors"
-                >
-                  <Icon
-                    className={cn("h-3.5 w-3.5", "tablet:h-4 tablet:w-4")}
-                  />
-                </a>
-              );
-            })}
-          </nav>
         </div>
       </div>
 
