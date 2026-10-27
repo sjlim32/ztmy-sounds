@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ACTIVE_TAB_CLASS, TAB_CLASS } from "../../components/tab-styles";
+import {
+  ACTIVE_TAB_CLASS,
+  TAB_CLASS,
+  TAB_LIST_CLASS,
+} from "@/components/button-styles";
 import type { SongCounts } from "@/features/zutopia/song-db/types";
 
 /**
@@ -23,28 +27,30 @@ export function SongDbNav({
   const isAlbums = pathname === "/zutopia/albums";
 
   return (
-    <nav
-      aria-label="디스코그래피"
-      className="flex flex-wrap gap-2 border-b border-white/10 pb-4"
-    >
-      <Link
-        href="/zutopia/songs"
-        aria-current={isSongs ? "page" : undefined}
-        className={cn(TAB_CLASS, isSongs && ACTIVE_TAB_CLASS)}
-      >
-        곡 ({songCounts.released}
-        {songCounts.unreleased > 0 && (
-          <span className="opacity-60"> · 미공개 {songCounts.unreleased}</span>
-        )}
-        )
-      </Link>
-      <Link
-        href="/zutopia/albums"
-        aria-current={isAlbums ? "page" : undefined}
-        className={cn(TAB_CLASS, isAlbums && ACTIVE_TAB_CLASS)}
-      >
-        앨범 ({albumCount})
-      </Link>
+    <nav aria-label="디스코그래피" className="border-b border-white/10 pb-4">
+      <div className={TAB_LIST_CLASS}>
+        <Link
+          href="/zutopia/songs"
+          aria-current={isSongs ? "page" : undefined}
+          className={cn(TAB_CLASS, isSongs && ACTIVE_TAB_CLASS)}
+        >
+          곡 ({songCounts.released}
+          {songCounts.unreleased > 0 && (
+            <span className="opacity-60">
+              {" "}
+              · 미공개 {songCounts.unreleased}
+            </span>
+          )}
+          )
+        </Link>
+        <Link
+          href="/zutopia/albums"
+          aria-current={isAlbums ? "page" : undefined}
+          className={cn(TAB_CLASS, isAlbums && ACTIVE_TAB_CLASS)}
+        >
+          앨범 ({albumCount})
+        </Link>
+      </div>
     </nav>
   );
 }

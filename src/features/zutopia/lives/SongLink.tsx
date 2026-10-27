@@ -54,10 +54,10 @@ export function SongLink({
     <div
       className={cn(
         rowClass,
-        "border-l-2",
         encore || selected ? "text-white" : "text-white/80",
         encore && "bg-ztmy-sun/5",
-        selected ? "border-ztmy-sky" : "border-transparent",
+        // 선택된 곡은 한쪽 막대 대신 행 전체를 옅게 칠한다
+        selected && "bg-ztmy-sky/15",
       )}
     >
       <span
@@ -83,7 +83,7 @@ export function SongLink({
       {dayLabel && (
         <span
           className={cn(
-            "border-ztmy-pink/60 text-ztmy-pink shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-bold",
+            "border-ztmy-pink/60 text-ztmy-pink shrink-0 rounded-full border px-1.5 py-0.5 text-xs font-bold",
             "tablet:text-xs",
           )}
         >
@@ -93,7 +93,7 @@ export function SongLink({
       {selected && (
         <span
           className={cn(
-            "border-ztmy-sky/60 text-ztmy-sky shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-bold",
+            "border-ztmy-sky/60 text-ztmy-sky shrink-0 rounded-full border px-1.5 py-0.5 text-xs font-bold",
             "tablet:text-xs",
           )}
         >
@@ -103,7 +103,7 @@ export function SongLink({
       {encore && (
         <span
           className={cn(
-            "text-ztmy-sun shrink-0 font-mono text-[10px] tracking-[0.2em] uppercase",
+            "text-ztmy-sun shrink-0 font-mono text-xs tracking-[0.2em] uppercase",
             "tablet:text-xs",
           )}
         >

@@ -4,13 +4,14 @@ import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ListIcon } from "@/components/icons/ListIcon";
 import { BackLink } from "@/components/BackLink";
+import { NAV_BUTTON_CLASS } from "@/components/button-styles";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
 import { getNeighborIds } from "@/features/guide/components/PlayerControls";
 import { PLAYER_COLUMN_CLASS } from "@/features/guide/lib/player-layout";
 
 const buttonClass = cn(
-  "inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/40 px-3.5 py-1.5 text-sm font-medium text-white/85 backdrop-blur-sm transition-colors",
-  "hover:border-ztmy-magenta/60 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+  NAV_BUTTON_CLASS,
+  "px-3.5 py-2 text-sm",
   "disabled:pointer-events-none disabled:opacity-35",
 );
 

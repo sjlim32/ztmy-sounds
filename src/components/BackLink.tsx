@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
+import { NAV_BUTTON_CLASS } from "@/components/button-styles";
 
 interface BackLinkProps {
   // 지정하면 그 경로로 고정 이동(Link) — 예: zutopia는 브라우저 history가
@@ -20,11 +21,10 @@ interface BackLinkProps {
   iconClassName?: string;
 }
 
-// HomeLink와 동일한 "떠 있는 필" 스타일을 기본값으로 채택해 사이트 전역
-// 뒤로가기 버튼 모양을 통일한다. group을 여기서 직접 걸어서, 호출부가
+// HomeLink와 같은 이동 버튼 스타일(button-styles.ts NAV_BUTTON_CLASS)로 사이트
+// 전역 뒤로가기 버튼 모양을 통일한다. group을 여기서 직접 걸어서, 호출부가
 // className을 따로 안 줘도 아이콘이 hover 시 항상 살짝 왼쪽으로 튄다.
-const BASE_CLASS =
-  "group inline-flex items-center justify-center gap-1.5 rounded-full border border-white/15 bg-black/40 text-white/70 backdrop-blur-sm transition-colors hover:border-ztmy-magenta/60 hover:text-white";
+const BASE_CLASS = cn("group", NAV_BUTTON_CLASS);
 
 /**
  * 사이트 어디서든 "뒤로가기"에 쓰는 공용 링크/버튼. HomeLink와 짝을 이룬다.
@@ -47,7 +47,7 @@ export function BackLink({
   );
   const resolvedClassName = cn(
     BASE_CLASS,
-    showLabel ? "px-3 py-1.5 text-sm" : "h-9 w-9",
+    showLabel ? "px-3.5 py-2 text-sm" : "h-9 w-9",
     className,
   );
 

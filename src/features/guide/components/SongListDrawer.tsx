@@ -3,6 +3,11 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { CloseIcon } from "@/components/icons/CloseIcon";
+import {
+  ACTIVE_LIST_ITEM_CLASS,
+  GHOST_ICON_BUTTON_CLASS,
+  LIST_ITEM_CLASS,
+} from "@/components/button-styles";
 import { CallIcon } from "@/features/guide/components/CallIcon";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
 import { getCachedSongCallTags } from "@/features/guide/lib/song-call-tags";
@@ -86,7 +91,7 @@ export function SongListDrawer({
             type="button"
             onClick={onClose}
             aria-label="곡 목록 닫기"
-            className="rounded-full p-1 text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+            className={cn(GHOST_ICON_BUTTON_CLASS, "p-1")}
           >
             <CloseIcon className="h-5 w-5" />
           </button>
@@ -103,17 +108,16 @@ export function SongListDrawer({
                   onClick={onClose}
                   aria-current={isCurrent ? "page" : undefined}
                   className={cn(
-                    "flex items-center justify-between gap-3 border-l-[3px] px-5 py-2.5 transition-colors hover:bg-white/10",
-                    isCurrent
-                      ? "border-ztmy-magenta bg-ztmy-magenta/15"
-                      : "border-transparent",
+                    LIST_ITEM_CLASS,
+                    "mx-2 flex items-center justify-between gap-3 px-3 py-2.5",
+                    isCurrent && ACTIVE_LIST_ITEM_CLASS,
                   )}
                 >
                   <span className="flex min-w-0 flex-col gap-0.5">
                     <span className="font-mkpop truncate text-lg leading-tight text-white">
                       {song.title.jp}
                     </span>
-                    <span className="truncate text-xs text-white/55">
+                    <span className="truncate text-sm text-white/60">
                       {song.title.kr}
                     </span>
                   </span>

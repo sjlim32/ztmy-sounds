@@ -9,12 +9,8 @@ export function Header({ artist }: { artist: artist }) {
         "tablet:absolute tablet:top-8 tablet:left-8 tablet:flex",
       )}
     >
-      {/* 서브 텍스트 영역: Next Visit과 동일하게 가로 정렬(flex row) 및 포인트 대시 배치 */}
-      <div className="mb-2 flex items-center gap-3 pl-1">
-        {/* 포인트 대시: 사이트 시그니처인 pink → purple 그라데이션 (Next Visit / Countdown과 동일) */}
-        <div className="from-ztmy-magenta to-ztmy-purple h-1 w-6 shrink-0 rounded-full bg-linear-to-r shadow-[0_0_10px_rgba(225,71,191,0.6)]" />
-
-        {/* 텍스트 그룹: 한 태그로 읽히도록 폰트/트래킹 통일, 색만 대비 */}
+      {/* 서브 텍스트: 장식 막대 없이 글자만 — 한 태그로 읽히도록 폰트/트래킹 통일, 색만 대비 */}
+      <div className="mb-2 flex items-center pl-1">
         <div className="font-rocknroll flex items-baseline gap-2">
           <span className="text-ztmy-magenta text-base font-bold tracking-[0.3em] uppercase">
             {artist.name.en}

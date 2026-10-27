@@ -11,6 +11,7 @@ import {
   type SongFilter,
 } from "@/features/guide/lib/song-filter";
 import { CALL_TAG_LABEL } from "@/features/guide/lib/call-tag-style";
+import { ACTIVE_TAB_CLASS, TAB_CLASS } from "@/components/button-styles";
 
 /**
  * 곡 목록 위 필터 두 줄 — 중요도 / 응원법. 각 줄에서 하나를 고르고, 이미
@@ -42,7 +43,7 @@ export function SongFilterBar({
     <div
       role="group"
       aria-label="곡 목록 필터"
-      className={cn("flex flex-col gap-1.5 px-4 py-2", className)}
+      className={cn("flex flex-col gap-2 px-4 py-2.5", className)}
     >
       <FilterRow label="중요도">
         <Chip
@@ -71,7 +72,7 @@ export function SongFilterBar({
             active={filter.callTag === tag}
             onClick={() => setCallTag(tag)}
           >
-            <CallIcon name={tag} size={16} className="mr-0" />
+            <CallIcon name={tag} size={20} className="mr-0" />
             {CALL_TAG_LABEL[tag]}
           </Chip>
         ))}
@@ -88,8 +89,8 @@ function FilterRow({
   children: ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="w-10 shrink-0 text-xs font-medium text-white/50">
+    <div className="flex items-center gap-3">
+      <span className="w-12 shrink-0 text-sm font-medium text-white/60">
         {label}
       </span>
       <div className="flex flex-wrap gap-1.5">{children}</div>
@@ -111,12 +112,11 @@ function Chip({
       type="button"
       aria-pressed={active}
       onClick={onClick}
+      // 탭과 같은 "여러 개 중 고르기" 스타일(button-styles.ts) — 고른 칸은 흰 면
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs transition-colors",
-        "focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
-        active
-          ? "border-ztmy-magenta bg-ztmy-magenta/25 text-white"
-          : "border-white/15 bg-black/30 text-white/70 hover:border-white/40 hover:text-white",
+        TAB_CLASS,
+        "inline-flex items-center gap-1.5 px-3 py-1.5",
+        active && ACTIVE_TAB_CLASS,
       )}
     >
       {children}

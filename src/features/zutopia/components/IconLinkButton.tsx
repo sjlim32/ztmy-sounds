@@ -5,10 +5,9 @@ type Tone = "youtube" | "guide" | "spotify" | "appleMusic";
 type Variant = "pill" | "solid";
 
 const PILL_TONE_STYLES: Record<Tone, string> = {
-  youtube:
-    "bg-linear-to-br from-red-700 to-red-400 text-white shadow-sm hover:brightness-110 focus-visible:brightness-110",
+  youtube: "bg-red-600 text-white hover:bg-red-500 focus-visible:bg-red-500",
   guide:
-    "bg-linear-to-br from-ztmy-purple to-ztmy-magenta text-white shadow-sm hover:brightness-110 focus-visible:brightness-110",
+    "bg-ztmy-magenta hover:bg-ztmy-magenta/85 focus-visible:bg-ztmy-magenta/85 text-white",
   spotify:
     "text-white/60 hover:bg-green-500/15 hover:text-green-400 focus-visible:bg-green-500/15 focus-visible:text-green-400",
   appleMusic:
@@ -79,7 +78,7 @@ export function IconLinkButton({
           "inline-flex items-center justify-center transition-all duration-200",
           "hover:scale-110 active:scale-95",
           "focus-visible:outline-ztmy-magenta focus-visible:outline-2 focus-visible:outline-offset-2",
-          isSolid ? "rounded-md" : "rounded-full",
+          "rounded-md",
           sizing.square,
           colorClass,
         )}

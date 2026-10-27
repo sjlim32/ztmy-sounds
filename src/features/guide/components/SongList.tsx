@@ -8,8 +8,11 @@ import { HomeLink } from "@/components/HomeLink";
 import { CallIcon } from "@/features/guide/components/CallIcon";
 import { getCachedSongCallTags } from "@/features/guide/lib/song-call-tags";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
-import { accentBarStyles } from "@/features/guide/components/list-entrance";
 import { useScrollFadeMask } from "@/lib/use-scroll-fade-mask";
+import {
+  ACTIVE_LIST_ITEM_CLASS,
+  LIST_ITEM_CLASS,
+} from "@/components/button-styles";
 import { SongFilterBar } from "@/features/guide/components/SongFilterBar";
 import {
   EMPTY_SONG_FILTER,
@@ -137,7 +140,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
           contents로 사라져 mobile의 order-1 흐름에 영향을 주지 않음. */}
       <div className={wrapperStyles({ compact: !!selectedSongId })}>
         <h2 className={titleStyles({ collapsed: !!selectedSongId })}>
-          <span className="font-mono text-[10px] font-medium tracking-[0.3em] text-white/40 uppercase">
+          <span className="font-mono text-xs font-medium tracking-[0.3em] text-white/50 uppercase">
             {label.eyebrow}
           </span>
           <span className="text-xl font-bold tracking-wide text-white">
@@ -195,15 +198,14 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                   <div className="overflow-hidden">
                     <Link
                       href={isSelected ? basePath : `${basePath}/${item.id}`}
+                      // 선택·hover는 한쪽 막대 대신 칸 전체의 옅은 면으로 표시
                       className={cn(
-                        "group tablet:py-2 relative block rounded-md px-4 transition-colors",
-                        isSelected ? "py-1" : "tablet:py-2",
+                        LIST_ITEM_CLASS,
+                        "group relative block px-4",
+                        "tablet:py-2",
+                        isSelected && cn(ACTIVE_LIST_ITEM_CLASS, "py-1"),
                       )}
                     >
-                      <span
-                        className={accentBarStyles({ selected: isSelected })}
-                      />
-
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex flex-col gap-0.5">
                           <span
@@ -213,12 +215,12 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                           >
                             {item.title.jp}
                           </span>
-                          <span className="tablet:text-sm flex items-center gap-1.5 text-xs leading-tight text-gray-400 transition-colors group-hover:text-white">
+                          <span className="flex items-center gap-1.5 text-sm leading-tight text-gray-400 transition-colors group-hover:text-white">
                             {item.title.kr}
                             {item.importance && (
                               <span
                                 className={cn(
-                                  "rounded px-1 py-px text-[10px] font-bold",
+                                  "rounded px-1.5 py-px text-xs font-bold",
                                   item.importance === "essential"
                                     ? "bg-ztmy-magenta/30 text-ztmy-pink"
                                     : "bg-white/10 text-white/70",

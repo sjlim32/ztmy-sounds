@@ -11,26 +11,22 @@ import { ExternalLinkIcon } from "@/components/icons/ExternalLinkIcon";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { Countdown } from "@/features/home/components/Countdown";
 
-// event.accent(home: 내한 / away: 원정)에 따라 라벨 옆 그라데이션 바 색을 구분.
-// 평소엔 짧게 유지해 어떤 이벤트인지 구분하는 색 표식 역할을 하다가, 버튼에
-// 호버하면 MainNavLink의 시그니처 스캔라인처럼 옆으로 자라납니다.
-const accentBarStyles = cva(
-  "h-1 w-4 shrink-0 bg-linear-to-r transition-[width] duration-300 ease-out tablet:w-6 group-hover:w-8 tablet:group-hover:w-12",
-  {
-    variants: {
-      accent: {
-        home: "from-ztmy-magenta to-ztmy-pink",
-        away: "from-ztmy-sky to-ztmy-sun",
-      } satisfies Record<Event["accent"], string>,
-    },
-  },
-);
-
-// 티켓 스텁 상단 띠 색. 라벨 옆 액센트 바와 같은 색 쌍을 재사용합니다.
+// 티켓 스텁 상단 띠 색(내한/원정).
 const ticketAccentGradient = {
   home: "from-ztmy-magenta to-ztmy-pink",
   away: "from-ztmy-sky to-ztmy-sun",
 } satisfies Record<Event["accent"], string>;
+
+// event.accent(home: 내한 / away: 원정)를 라벨 앞 작은 색 점으로 구분 — 막대
+// 장식 대신 점 하나로 간결하게(docs/CONVENTIONS.md 디자인 방향).
+const accentDotStyles = cva("h-2 w-2 shrink-0 rounded-full", {
+  variants: {
+    accent: {
+      home: "bg-ztmy-magenta",
+      away: "bg-ztmy-sky",
+    } satisfies Record<Event["accent"], string>,
+  },
+});
 
 /**
  * 포스터 클릭 시 이동 위치 — 내한/원정 둘 다 외부 투어 링크 대신 사이트
@@ -112,7 +108,7 @@ function NextEventCardComponent({
             "tablet:h-auto tablet:bg-transparent tablet:justify-start tablet:text-sm tablet:hover:bg-transparent tablet:font-semibold",
           )}
         >
-          <span className={accentBarStyles({ accent: event.accent })} />
+          <span className={accentDotStyles({ accent: event.accent })} />
           {event.label}
           <ChevronDownIcon
             className={cn(
@@ -180,7 +176,7 @@ function NextEventCardComponent({
                     </Link>
 
                     <div>
-                      <p className="font-mono text-[10px] tracking-[0.2em] text-white/55 uppercase">
+                      <p className="font-mono text-xs tracking-[0.2em] text-white/55 uppercase">
                         Date
                       </p>
                       <p
@@ -195,7 +191,7 @@ function NextEventCardComponent({
                         )}
                       </p>
                       {activePerformance && (
-                        <p className="font-mono text-[11px] font-medium text-white/70">
+                        <p className="font-mono text-xs font-medium text-white/70">
                           {activePerformance.datesLabel}{" "}
                           {activePerformance.time}
                         </p>
@@ -203,7 +199,7 @@ function NextEventCardComponent({
                     </div>
 
                     <div>
-                      <p className="font-mono text-[10px] tracking-[0.2em] text-white/55 uppercase">
+                      <p className="font-mono text-xs tracking-[0.2em] text-white/55 uppercase">
                         Venue
                       </p>
                       <span className="text-xs text-white">
@@ -253,17 +249,16 @@ function NextEventCardComponent({
 
                   {/* 콘서트 티켓 스텁을 참고한 레이아웃 — DATE/VENUE 두 반쪽을
                   점선 절취선으로 나누고, 절취선과 상단 띠 둘 다 accent 색을
-                  씁니다. */}
-                  <div className="relative flex w-full overflow-hidden rounded-md border border-white/10 bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]">
+                  씁니다. 모서리는 각지게(rounded 없음). */}
+                  <div className="relative flex w-full overflow-hidden border border-white/10 bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]">
                     <div
                       className={cn(
                         "absolute inset-x-0 top-0 h-0.5 bg-linear-to-r",
                         ticketAccentGradient[event.accent],
                       )}
                     />
-
                     <div className="flex-1 p-3">
-                      <p className="font-mono text-[10px] tracking-[0.25em] text-white/55 uppercase">
+                      <p className="font-mono text-xs tracking-[0.25em] text-white/55 uppercase">
                         Date
                       </p>
                       <p
@@ -290,7 +285,7 @@ function NextEventCardComponent({
                     />
 
                     <div className="flex-1 p-3">
-                      <p className="font-mono text-[10px] tracking-[0.25em] text-white/55 uppercase">
+                      <p className="font-mono text-xs tracking-[0.25em] text-white/55 uppercase">
                         Venue
                       </p>
                       <p

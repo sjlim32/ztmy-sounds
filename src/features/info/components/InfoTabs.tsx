@@ -3,6 +3,11 @@
 import { useRef } from "react";
 import type { KeyboardEvent } from "react";
 import { cn } from "@/lib/utils";
+import {
+  ACTIVE_TAB_CLASS,
+  TAB_CLASS,
+  TAB_LIST_CLASS,
+} from "@/components/button-styles";
 import { INFO_SCROLL_CONTAINER_ID, INFO_TABS } from "@/features/info/info";
 import type { InfoTabId } from "@/features/info/info";
 import { useInfoTab } from "./InfoTabContext";
@@ -65,7 +70,11 @@ export function InfoTabs() {
       ref={tablistRef}
       role="tablist"
       aria-label="정보 카테고리"
-      className={cn("my-3 flex flex-wrap justify-center gap-2", "tablet:my-6")}
+      className={cn(
+        TAB_LIST_CLASS,
+        "mx-auto my-3 flex w-fit justify-center",
+        "tablet:my-6",
+      )}
     >
       {INFO_TABS.map(({ id, label }, index) => {
         const isActive = id === activeTab;
@@ -81,10 +90,7 @@ export function InfoTabs() {
             tabIndex={isActive ? 0 : -1}
             onClick={() => activate(id)}
             onKeyDown={(event) => handleKeyDown(event, index)}
-            className={cn(
-              "hover:border-ztmy-magenta/60 rounded-full border border-white/15 bg-black/40 px-4 py-1.5 text-sm font-medium text-white/80 backdrop-blur-sm transition-colors hover:text-white",
-              isActive && "border-ztmy-magenta/60 text-white",
-            )}
+            className={cn(TAB_CLASS, isActive && ACTIVE_TAB_CLASS)}
           >
             {label}
           </button>

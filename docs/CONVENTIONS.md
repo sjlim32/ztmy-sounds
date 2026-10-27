@@ -109,7 +109,7 @@ src/
                              # 투어 공연일 세트리스트는 투어 공통 곡
                              # (setlists.tour_id) + 그 공연일 곡(setlists.live_id)을
                              # track_number로 합치고, 공연일에만 있는 곡은
-                             # "선택곡"(ztmy-sky 띠·태그, 앙코르는 ztmy-sun)으로
+                             # "선택곡"(ztmy-sky 행 배경·태그, 앙코르는 ztmy-sun)으로
                              # 강조한다. 일차(day_number)가 있는 곡은 "첫째날",
                              # "둘째날" 태그(ztmy-pink)로 일차를 표시한다.
                              # lives/tours.metadata.visited("first"/"second"…)가
@@ -241,6 +241,29 @@ src/
   프레임 읽고 그 사이를 추정해 맞춥니다.
 
 ## Tailwind
+
+- 글자 크기: 읽거나 누르는 글자(버튼, 칩, 라벨, 설명, 배지)는 `text-sm`(14px)부터.
+  `text-xs`(12px)는 개수·시각 같은 보조 정보에만, `text-[10px]`은 쓰지 않습니다.
+  예외: 푸터의 건의·출처 버튼은 푸터를 컴팩트하게 유지하려고 `text-xs`를 씁니다.
+- 디자인 방향은 모던·심플: 버튼은 모서리가 살짝 둥근 사각형(`rounded-lg`), 상태는 단색
+  면과 테두리로만 구분합니다. **알약 모양, 그라데이션 채움, 한쪽 면만 강조하는 막대
+  (왼쪽 띠·밑줄 띠 등)는 쓰지 않습니다** — 선택 상태도 칸 전체의 면으로 표시합니다.
+  예외: 홈 NEXT VISIT/NEXT STAGE의 날짜·장소 티켓 카드는 콘서트 티켓 모양을 살리려고
+  위쪽 그라데이션 띠(내한/원정 색)를 유지합니다.
+- 버튼은 성격에 따라 `src/components/button-styles.ts`의 공용 스타일을 씁니다
+  (크기·위치는 호출부에서 `cn`으로 얹기):
+  - 이동(뒤로가기·메인으로·가이드 곡 이동, PC 설치·공유, 푸터 건의·출처):
+    `NAV_BUTTON_CLASS` — 어두운 면 + 2px 테두리
+  - 고르기(공연 정보 탭, 즛토피아 곡/앨범, 가이드 곡 목록 필터): `TAB_LIST_CLASS` 안에
+    `TAB_CLASS`, 고른 칸은 `ACTIVE_TAB_CLASS`(흰 면으로 반전)
+  - 링크(다른 페이지·구역으로 이동하는 글자 버튼): `LINK_BUTTON_CLASS` — 투명 면 + 2px
+    테두리, 필요하면 끝에 화살표 아이콘
+  - 동작(모바일 설치 배너의 "추가"처럼 눌러서 실행): `ACTION_BUTTON_CLASS` — 사이트
+    대표색(마젠타) 단색 면
+  - 닫기 같은 테두리 없는 아이콘 버튼: `GHOST_ICON_BUTTON_CLASS`
+  - 목록의 한 줄(가이드 곡 목록·곡 목록 드로어): `LIST_ITEM_CLASS`, 고른 줄은
+    `ACTIVE_LIST_ITEM_CLASS`(줄 전체를 옅게 칠함)
+  - 포커스 표시는 `FOCUS_RING`을 씁니다(위 상수들에는 이미 들어 있음).
 
 - 커스텀 브레이크포인트: `tablet`(50rem/800px) / `pc`(67.5rem/1280px) / `wide`(90rem/1440px).
   전부 min-width 기준이며 `src/app/globals.css`의 `@theme`에서 정의합니다. 뷰포트
