@@ -21,6 +21,14 @@ src/
       sw.ts                 # 서비스워커 엔트리
   features/                 # 기능 단위 모듈. 각 폴더는 보통 components/lib(/data) 구성
     guide/                  # 곡 가이드(영상+가사+응원법). *-context.tsx로 플레이어/모드 상태 보유
+                             # 상세 화면 tablet 이상: 영상 위 GuideDetailToolbar
+                             # (곡 목록 드로어 SongListDrawer / 뒤로가기=항상 목록으로 /
+                             # 이전·다음 곡), 영상 아래 CallLegend(응원 표시
+                             # 안내) + 스윙 GIF 또는(없으면) SongDescriptionPanel
+                             # (Song.description, 없으면 lib/song-description.ts의
+                             # 예시 목데이터를 "예시" 표시와 함께). 이 세로 열의
+                             # 폭은 lib/player-layout.ts 한 곳에서 정한다.
+                             # 응원 색·이름·설명은 lib/call-tag-style.ts.
       data/
         songs/              # 정식 공개곡 — 곡 하나당 파일 하나, index.ts가 취합
         not-yet/            # 아직 가이드 미공개곡 데이터

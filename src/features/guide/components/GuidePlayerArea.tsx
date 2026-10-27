@@ -1,14 +1,25 @@
 "use client";
 
+import { useCallback, useState } from "react";
 import { useSelectedLayoutSegment } from "next/navigation";
 import { cva } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 import { YouTubePlayer } from "@/features/guide/components/YouTubePlayer";
 import {
   PlayerPrevButton,
   PlayerNextButton,
-  PlayerSongListLink,
 } from "@/features/guide/components/PlayerControls";
-import { SwingGuideGif } from "@/features/guide/components/SwingGuideGif";
+import {
+  SwingGuideGif,
+  showsSwingGif,
+} from "@/features/guide/components/SwingGuideGif";
+import { GuideDetailToolbar } from "@/features/guide/components/GuideDetailToolbar";
+import { SongListDrawer } from "@/features/guide/components/SongListDrawer";
+import { CallLegend } from "@/features/guide/components/CallLegend";
+import { SongDescriptionPanel } from "@/features/guide/components/SongDescriptionPanel";
+import { useGuideMode } from "@/features/guide/guide-mode-context";
+import { getSong } from "@/features/guide/data/songs";
+import { PLAYER_COLUMN_CLASS } from "@/features/guide/lib/player-layout";
 
 const playerAreaStyles = cva(
   [
@@ -17,7 +28,9 @@ const playerAreaStyles = cva(
     // 줄(영상/컨트롤) 사이 여백을 다르게 계산해 영상과 컨트롤 사이가 크게
     // 벌어질 수 있어 명시적으로 고정. center로 둬서 영상+컨트롤 묶음 전체가
     // 화면 세로 중앙에 오도록 함.
-    "tablet:flex-wrap tablet:content-center",
+    // tablet 이상은 세로 스택: 곡 이동 버튼 줄(order-0) → 영상(1) → 응원
+    // 안내·곡 정보(3) → 스윙 GIF(4). 모바일 전용 ◀▶/목록 버튼은 tablet:hidden.
+    "tablet:flex-wrap tablet:content-center tablet:gap-y-3",
     // tablet 이상에서도 w-full 유지 — YouTubePlayer 내부의 퍼센트 기반 폭
     // (min(90%, ...))이 이 요소를 기준으로 계산되므로, 여기서 폭을
     // content-fit(w-auto)으로 줄이면 그 퍼센트 계산 기준이 사라져 영상이
@@ -61,6 +74,22 @@ const playerAreaStyles = cva(
 export function GuidePlayerArea() {
   const segment = useSelectedLayoutSegment();
   const isSongSelected = segment !== null;
+  const song = segment ? getSong(segment) : null;
+  const { visibleTags } = useGuideMode();
+  // 영상 아래 자리: 스윙 예시 GIF가 있으면 GIF, 없으면 곡 설명
+  const showDescription = !!song && !showsSwingGif(song, visibleTags);
+  // 곡 목록 드로어는 "어느 곡 화면에서 열었는지"로 기억한다 — 뒤로가기 등으로
+  // 곡(또는 목록 화면)이 바뀌면 따로 닫지 않아도 자연히 닫힌 상태가 된다.
+  const [listOpenedAt, setListOpenedAt] = useState<string | null>(null);
+  // 곡이 바뀌면 열림 기록 자체를 지운다(앞으로가기로 돌아와도 다시 안 열리게).
+  const [lastSegment, setLastSegment] = useState(segment);
+  if (segment !== lastSegment) {
+    setLastSegment(segment);
+    setListOpenedAt(null);
+  }
+  const isListOpen = segment !== null && listOpenedAt === segment;
+  const openList = useCallback(() => setListOpenedAt(segment), [segment]);
+  const closeList = useCallback(() => setListOpenedAt(null), []);
 
   return (
     <div
@@ -69,13 +98,28 @@ export function GuidePlayerArea() {
         state: isSongSelected ? "open" : "closed",
       })}
     >
+      <GuideDetailToolbar onOpenList={openList} />
       <PlayerPrevButton />
       <div className="tablet:order-1 tablet:basis-full flex w-2/3 justify-center">
-        <YouTubePlayer />
+        <div className={cn(PLAYER_COLUMN_CLASS, "flex justify-center")}>
+          <YouTubePlayer />
+        </div>
       </div>
-      <PlayerSongListLink />
       <PlayerNextButton />
+      {song && (
+        <div className="tablet:order-3 tablet:flex tablet:basis-full hidden justify-center">
+          <div className={cn(PLAYER_COLUMN_CLASS, "flex flex-col gap-3")}>
+            <CallLegend />
+            {showDescription && <SongDescriptionPanel song={song} />}
+          </div>
+        </div>
+      )}
       <SwingGuideGif />
+      <SongListDrawer
+        open={isListOpen}
+        onClose={closeList}
+        currentSongId={segment}
+      />
     </div>
   );
 }

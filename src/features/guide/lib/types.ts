@@ -36,5 +36,14 @@ export interface Song {
   swingGif?: string;
   /** 지정하면 swingGif를 이 크기(px)의 정사각형에 맞춰 가운데만 보이게 표시 (파일은 그대로) */
   swingGifSize?: number;
+  /** 영상 아래 곡 설명(스윙 GIF가 없는 곡에 표시). 없으면 임시 예시 문구를 보여준다. */
+  description?: SongDescription;
   lyrics: LyricLine[];
+}
+
+export interface SongDescription {
+  /** 곡 소개 한두 문장 */
+  summary: string;
+  /** 처음 온 사람이 알아두면 좋은 응원 포인트 */
+  points?: string[];
 }

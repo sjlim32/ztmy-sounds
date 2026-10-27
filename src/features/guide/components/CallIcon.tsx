@@ -1,13 +1,7 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { CallTag } from "@/features/guide/lib/types";
-
-const ICON_LABEL: Record<CallTag, string> = {
-  swing: "샤모지 흔들기",
-  clap: "샤모지 박수",
-  call: "떼창",
-  slam: "슬램",
-};
+import { CALL_TAG_LABEL } from "@/features/guide/lib/call-tag-style";
 
 const ICON_SRC: Record<CallTag, string> = {
   swing: "/assets/song/swing-notext.webp",
@@ -28,8 +22,8 @@ export function CallIcon({
   return (
     <Image
       src={ICON_SRC[name]}
-      alt={ICON_LABEL[name]}
-      title={ICON_LABEL[name]}
+      alt={CALL_TAG_LABEL[name]}
+      title={CALL_TAG_LABEL[name]}
       data-call-icon={name}
       width={size}
       height={size}

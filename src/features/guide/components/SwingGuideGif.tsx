@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelectedLayoutSegment } from "next/navigation";
 import { cn } from "@/lib/utils";
-import type { LyricLine } from "@/features/guide/lib/types";
+import type { CallTag, LyricLine, Song } from "@/features/guide/lib/types";
 import { getSong } from "@/features/guide/data/songs";
 import { usePlayer } from "@/features/guide/player-context";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
@@ -36,6 +36,18 @@ function getSwingRunStart(lyrics: LyricLine[], index: number): number | null {
  * GIF는 동작이 노래 박자와 맞아야 해서, swingGif 구간에 들어갈 때마다(그리고
  * 그 구간에서 재생을 멈췄다 다시 틀 때마다) playId를 올려 처음부터 재생한다.
  */
+/**
+ * 이 곡 화면에서 스윙 예시 GIF가 보이는지 — 응원 가이드(스윙을 보여주는
+ * 모드)이고 곡에 swingGif가 있을 때. 영상 아래 설명 영역은 GIF가 없을 때만
+ * 그 자리를 쓴다(GuidePlayerArea).
+ */
+export function showsSwingGif(
+  song: Song | null,
+  visibleTags: readonly CallTag[],
+): boolean {
+  return visibleTags.includes("swing") && !!song?.swingGif;
+}
+
 function useSwingGif(): SwingGif | null {
   const segment = useSelectedLayoutSegment();
   const { visibleTags } = useGuideMode();
@@ -59,9 +71,8 @@ function useSwingGif(): SwingGif | null {
     setPlay({ runKey, id: runKey === null ? play.id : play.id + 1 });
   }
 
-  if (!segment || !visibleTags.includes("swing")) return null;
-  const song = getSong(segment);
-  if (!song?.swingGif) return null;
+  const song = segment ? getSong(segment) : null;
+  if (!song?.swingGif || !showsSwingGif(song, visibleTags)) return null;
 
   return {
     src: song.swingGif,
@@ -80,7 +91,7 @@ export function SwingGuideGif() {
     <div
       className={cn(
         "hidden",
-        "tablet:order-5 tablet:flex tablet:basis-full tablet:justify-center",
+        "tablet:order-4 tablet:flex tablet:basis-full tablet:justify-center",
       )}
     >
       <SwingImage {...gif} />

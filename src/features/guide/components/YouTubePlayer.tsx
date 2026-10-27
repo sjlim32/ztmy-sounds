@@ -176,7 +176,7 @@ export function YouTubePlayer() {
   return (
     <div
       ref={containerRef}
-      className="tablet:w-[min(90%,calc((100dvh-4rem)*16/9))] aspect-video w-full [&>iframe]:h-full [&>iframe]:w-full"
+      className="aspect-video w-full [&>iframe]:h-full [&>iframe]:w-full"
     />
   );
 }
