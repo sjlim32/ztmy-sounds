@@ -20,7 +20,7 @@ export function isStandaloneDisplay(): boolean {
 
 /**
  * beforeinstallprompt/appinstalled 구독 + 실제 설치 트리거를 한 곳에 모은다
- * — PC 코너 바(InstallShareBar)와 모바일 배너(InstallPromptBanner)가 UI는
+ * — PC 푸터의 설치 버튼(InstallButton)과 모바일 배너(InstallPromptBanner)가 UI는
  * 완전히 다르지만 이 브라우저 이벤트 배관 자체는 동일해서 중복을 없앴다.
  * 이미 standalone으로 실행 중이면 애초에 구독하지 않는다(설치할 이유가
  * 없음) — 두 호출부 모두 이 훅과 별개로 standalone 여부에 따라 자기

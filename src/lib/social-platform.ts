@@ -17,7 +17,7 @@ export type SocialPlatform = (typeof SOCIAL_PLATFORMS)[number];
 
 /**
  * 소셜 플랫폼 키 → 아이콘 매핑. info 안내(INFORMATION) 등이 같은 키로 이 매핑을
- * 공유합니다(푸터는 FOOTER_SOCIAL_LINKS의 이미지 아이콘을 따로 씀).
+ * 공유합니다(홈 공식 링크 묶음은 OFFICIAL_ICON_LINKS의 이미지 아이콘을 따로 씀).
  */
 export const SOCIAL_PLATFORM_ICON: Record<
   SocialPlatform,

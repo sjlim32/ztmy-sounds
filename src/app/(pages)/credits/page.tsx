@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { HomeLink } from "@/components/HomeLink";
 import { PageScrollBody } from "@/components/PageScrollBody";
 import { SiteLink } from "@/components/SiteLink";
+import { COPYRIGHT_NOTICE } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "출처",
@@ -95,6 +96,11 @@ export default function CreditsPage() {
             </li>
           ))}
         </ul>
+
+        {/* 모바일 푸터는 줄인 문구만 보여줘서 전문을 여기 둔다. */}
+        <p className="mt-6 text-sm break-keep text-white/50">
+          {COPYRIGHT_NOTICE}
+        </p>
       </PageScrollBody>
     </main>
   );

@@ -40,7 +40,7 @@ function isIos(): boolean {
  * 모바일 전용 "홈 화면에 추가" 배너 — MobileHeader 바로 아래 일반 흐름으로
  * 붙는다(플랫폼별 설치 방법이 근본적으로 달라서 안드로이드/iOS를 나눈다).
  *
- * - 안드로이드 계열(beforeinstallprompt 지원): PC의 InstallShareBar와 같은
+ * - 안드로이드 계열(beforeinstallprompt 지원): PC의 InstallButton과 같은
  *   네이티브 설치 프롬프트를 그대로 띄우는 버튼을 보여준다.
  * - iOS Safari: beforeinstallprompt 자체가 없어 프로그래밍적으로 설치를
  *   띄울 방법이 없다 — "공유 버튼 → 홈 화면에 추가"를 안내하는 텍스트만

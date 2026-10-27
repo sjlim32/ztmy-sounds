@@ -11,7 +11,6 @@ import { GuideDimOverlay } from "@/components/GuideDimOverlay";
 import { InstallPromptBanner } from "@/components/InstallPromptBanner";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
 import { Footer } from "@/components/Footer";
-import { InstallShareBar } from "@/components/InstallShareBar";
 import { ARTIST } from "@/data/artist";
 import { SITE_URL, SITE_NAME, SITE_BRAND, SITE_DESCRIPTION } from "@/lib/seo";
 import { buildSiteJsonLdGraph } from "@/lib/structured-data";
@@ -162,7 +161,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </div>
             <Footer />
           </div>
-          <InstallShareBar />
         </SerwistProvider>
       </body>
     </html>
