@@ -9,6 +9,7 @@ export interface Event {
   tourName: string;
   tourImg: string;
   tourUrl: string;
+  tourType?: string;
   place: string;
   placeDesc?: string;
   placeUrl: string;
@@ -19,18 +20,13 @@ export interface Event {
   performances?: TourPerformanceItem[];
 }
 
-// event.accent(home: 내한 / away: 원정)에 따른 상단 테두리 색.
-export const accentBorder = {
-  home: "border-ztmy-magenta/40",
-  away: "border-ztmy-sky/40",
-} satisfies Record<Event["accent"], string>;
-
 export const visitEvent: Event = {
   label: "NEXT VISIT",
   accent: "home",
   tourName: "사운드 플래닛 페스티널 2026",
   tourImg: "",
   tourUrl: "https://soundplanetfestival.co.kr/",
+  tourType: "FESTIVAL",
   place: "PARADISE CITY",
   placeUrl: "https://maps.app.goo.gl/TXhUQEc1cXpRPY1b8",
   date: "2026.09.06",
@@ -69,6 +65,7 @@ export const originEvent: Event = {
   tourName: "아피쿠라 전기 「アピクラ電機」",
   tourImg: "/assets/info/apicula-denki_kv.webp",
   tourUrl: "https://zutomayo.net/apicula/",
+  tourType: "HALL TOUR",
   place: "전국 홀 투어",
   placeDesc: "23개 도시",
   placeUrl: "https://maps.app.goo.gl/6JdViGdHH1Vwn6hX9",

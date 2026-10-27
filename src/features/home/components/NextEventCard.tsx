@@ -4,14 +4,27 @@ import { memo, useId, type ReactNode } from "react";
 import Link from "next/link";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { formatEventDate, accentBorder, type Event } from "@/data/event";
+import { formatEventDate, type Event } from "@/data/event";
 import type { TourPerformanceItem } from "@/data/tour-performances";
 import type { Remaining } from "@/features/home/lib/countdown";
-import { ExternalLinkIcon } from "@/components/icons/ExternalLinkIcon";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { Countdown } from "@/features/home/components/Countdown";
 
 // 티켓 스텁 상단 띠 색(내한/원정).
+// 티켓 절취선·항목 이름 색, 바탕에 옅게 비치는 색(내한/원정).
+const accentPerforation = {
+  home: "border-ztmy-magenta/45",
+  away: "border-ztmy-sky/45",
+} satisfies Record<Event["accent"], string>;
+const accentLabel = {
+  home: "text-ztmy-pink/80",
+  away: "text-ztmy-sky/80",
+} satisfies Record<Event["accent"], string>;
+const accentTint = {
+  home: "from-ztmy-magenta/15",
+  away: "from-ztmy-sky/12",
+} satisfies Record<Event["accent"], string>;
+
 const ticketAccentGradient = {
   home: "from-ztmy-magenta to-ztmy-pink",
   away: "from-ztmy-sky to-ztmy-sun",
@@ -93,7 +106,7 @@ function NextEventCardComponent({
   return (
     <div
       data-role="next-event-card"
-      className="tablet:max-w-72 pc:max-w-80 wide:max-w-96"
+      className="tablet:max-w-80 pc:max-w-96 wide:max-w-104"
     >
       <div className={cn("flex flex-col gap-2", !isOpen && "gap-0")}>
         <button
@@ -138,180 +151,12 @@ function NextEventCardComponent({
             새어나와 "닫혀도 열린 것처럼" 보입니다). MoonPhase의 밤안개는 이
             박스 밖(아래 Countdown)에 따로 그려서 이 클리핑에 걸리지 않게 합니다. */}
             <div className="overflow-hidden">
-              <div
-                className={cn(
-                  "space-y-1.5 pt-1.5",
-                  "tablet:space-y-4 tablet:pt-0",
-                )}
-              >
-                {/* 모바일 - 가로 레이아웃 */}
-                <div className={cn("flex gap-3 px-2 pb-1", "tablet:hidden")}>
-                  <PosterLink className="relative block shrink-0 overflow-hidden rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.6)]">
-                    {event.tourImg !== "" ? (
-                      <>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={event.tourImg}
-                          alt={event.tourName}
-                          loading="lazy"
-                          className="h-full w-[24dvw] object-cover transition-opacity hover:opacity-80"
-                        />
-                        {/* 이미지 하단이 카드 배경으로 자연스럽게 이어지도록 스크림 처리 */}
-                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-t from-black/70 to-transparent" />
-                      </>
-                    ) : (
-                      <div className="h-full w-[24dvw] bg-white/5" />
-                    )}
-                  </PosterLink>
-
-                  <div className="flex min-w-0 flex-col justify-center gap-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
-                    <Link href="/info" className="group block">
-                      <p
-                        data-role="title"
-                        className="hover:text-ztmy-pink text-xs font-semibold break-keep text-white transition-colors"
-                      >
-                        {event.tourName}
-                        <ExternalLinkIcon className="ml-1 inline h-2.5 w-2.5 opacity-70" />
-                      </p>
-                    </Link>
-
-                    <div>
-                      <p className="font-mono text-xs tracking-[0.2em] text-white/55 uppercase">
-                        Date
-                      </p>
-                      <p
-                        data-role="date"
-                        className="font-mono text-xs font-bold text-white"
-                      >
-                        {formatEventDate(event)}
-                        {!activePerformance && (
-                          <span className="ml-1.5 text-xs font-normal text-white/70">
-                            {event.time}
-                          </span>
-                        )}
-                      </p>
-                      {activePerformance && (
-                        <p className="font-mono text-xs font-medium text-white/70">
-                          {activePerformance.datesLabel}{" "}
-                          {activePerformance.time}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <p className="font-mono text-xs tracking-[0.2em] text-white/55 uppercase">
-                        Venue
-                      </p>
-                      <span className="text-xs text-white">
-                        {activePerformance
-                          ? activePerformance.venue
-                          : event.place}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 태블릿 이상 - 세로 레이아웃 */}
-                <div
-                  className={cn("hidden", "tablet:flex flex-col items-center")}
-                >
-                  <PosterLink className="relative flex w-fit overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.6)]">
-                    {event.tourImg !== "" ? (
-                      <>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={event.tourImg}
-                          alt={event.tourName}
-                          loading="lazy"
-                          // 포스터만 화면 높이를 따라 줄어든다 — 37rem은 Header(top-44)와
-                          // 포스터를 뺀 카드 나머지(토글·제목·티켓·카운트다운), 하단
-                          // 여백을 합친 높이라, 화면이 낮아져도 카드가 화면 안에 남는다.
-                          className="max-h-[min(30dvh,calc(100dvh-37rem))] rounded-lg object-cover transition-opacity hover:opacity-80"
-                        />
-                        {/* 이미지 하단이 아래 텍스트 영역으로 자연스럽게 이어지도록 스크림 처리 */}
-                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/60 to-transparent" />
-                      </>
-                    ) : (
-                      <div className="aspect-3/4 w-full rounded-lg bg-white/5" />
-                    )}
-                  </PosterLink>
-
-                  <Link
-                    data-role="title"
-                    href="/info"
-                    className={cn(
-                      "hover:text-ztmy-pink my-2 font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] transition-colors",
-                      "tablet:text-sm pc:text-base wide:text-lg",
-                    )}
-                  >
-                    {event.tourName}
-                  </Link>
-
-                  {/* 콘서트 티켓 스텁을 참고한 레이아웃 — DATE/VENUE 두 반쪽을
-                  점선 절취선으로 나누고, 절취선과 상단 띠 둘 다 accent 색을
-                  씁니다. 모서리는 각지게(rounded 없음). */}
-                  <div className="relative flex w-full overflow-hidden border border-white/10 bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]">
-                    <div
-                      className={cn(
-                        "absolute inset-x-0 top-0 h-0.5 bg-linear-to-r",
-                        ticketAccentGradient[event.accent],
-                      )}
-                    />
-                    <div className="flex-1 p-3">
-                      <p className="font-mono text-xs tracking-[0.25em] text-white/55 uppercase">
-                        Date
-                      </p>
-                      <p
-                        data-role="date"
-                        className={cn(
-                          "mt-1 font-mono text-lg text-white",
-                          "pc:text-base tablet:text-sm",
-                        )}
-                      >
-                        {formatEventDate(event)}
-                      </p>
-                      <p className="font-mono text-xs font-bold text-white/50">
-                        {activePerformance
-                          ? `${activePerformance.datesLabel} ${activePerformance.time}`
-                          : event.time}
-                      </p>
-                    </div>
-
-                    <div
-                      className={cn(
-                        "w-0 border-l border-dashed",
-                        accentBorder[event.accent],
-                      )}
-                    />
-
-                    <div className="flex-1 p-3">
-                      <p className="font-mono text-xs tracking-[0.25em] text-white/55 uppercase">
-                        Venue
-                      </p>
-                      <p
-                        className={cn(
-                          "mt-1 text-lg break-keep text-white",
-                          "pc:text-base tablet:text-sm",
-                        )}
-                      >
-                        {activePerformance
-                          ? activePerformance.venue
-                          : event.place}
-                      </p>
-                      {activePerformance ? (
-                        <p className="text-xs font-bold text-white/50">
-                          {activePerformance.pref} · 전국 23개 도시
-                        </p>
-                      ) : (
-                        event.placeDesc && (
-                          <p className="text-xs font-bold text-white/50">
-                            {event.placeDesc}
-                          </p>
-                        )
-                      )}
-                    </div>
-                  </div>
-                </div>
+              <div className={cn("pt-1.5", "tablet:pt-0")}>
+                <BoardingTicket
+                  event={event}
+                  activePerformance={activePerformance}
+                  className={cn("mx-2 mb-2", "tablet:mx-0 tablet:mb-0")}
+                />
               </div>
             </div>
           </div>
@@ -341,3 +186,133 @@ function NextEventCardComponent({
 }
 
 export const NextEventCard = memo(NextEventCardComponent);
+
+/**
+ * NEXT VISIT / NEXT STAGE의 보딩 티켓 — 맨 위에 공연명, 그 아래 줄에 포스터와
+ * DATE ┆ VENUE(점선 절취선으로 나눔). 위쪽에 내한/원정 색 띠를 두고 모서리는
+ * 각지게(콘서트 티켓 모양을 살리는 예외 — docs/CONVENTIONS.md). 모바일·태블릿
+ * 이상 공용으로 크기만 다르다.
+ */
+function BoardingTicket({
+  event,
+  activePerformance,
+  className,
+}: {
+  event: Event;
+  activePerformance?: TourPerformanceItem;
+  className?: string;
+}) {
+  const time = activePerformance
+    ? `${activePerformance.datesLabel} ${activePerformance.time}`
+    : event.time;
+  const venue = activePerformance ? activePerformance.venue : event.place;
+  const venueDetail = activePerformance
+    ? `${activePerformance.pref} · 전국 23개 도시`
+    : event.placeDesc;
+
+  return (
+    <div
+      className={cn(
+        // 위는 각지게(색 띠가 붙는 쪽), 아래만 둥글게.
+        "relative flex flex-col gap-2.5 overflow-hidden rounded-b-lg border border-white/10 bg-black/45 bg-linear-to-br to-transparent p-3 shadow-[0_4px_16px_rgba(0,0,0,0.45)] backdrop-blur-sm",
+        accentTint[event.accent],
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          "absolute inset-x-0 top-0 h-0.5 bg-linear-to-r",
+          ticketAccentGradient[event.accent],
+        )}
+      />
+
+      <div className="flex items-start justify-between gap-3">
+        <Link
+          data-role="title"
+          href="/info"
+          className={cn(
+            "hover:text-ztmy-pink text-sm leading-snug font-semibold break-keep text-white transition-colors",
+            "pc:text-base",
+          )}
+        >
+          {event.tourName}
+        </Link>
+        <span
+          aria-hidden
+          className={cn(
+            "mt-0.5 shrink-0 font-mono text-xs tracking-[0.25em] uppercase",
+            accentLabel[event.accent],
+          )}
+        >
+          {event.tourType ?? "CONCERT"}
+        </span>
+      </div>
+
+      {/* 제목과 본문 사이 가로 점선 — 티켓 상단 조각처럼 */}
+      <div
+        aria-hidden
+        className="-mx-3 border-t border-dashed border-white/15"
+      />
+
+      <div className="flex gap-3">
+        <PosterLink className="block shrink-0 self-start">
+          {event.tourImg !== "" ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={event.tourImg}
+              alt={event.tourName}
+              loading="lazy"
+              className={cn(
+                "aspect-3/4 w-20 object-cover shadow-[0_2px_10px_rgba(0,0,0,0.55)] ring-1 ring-white/15 transition-opacity hover:opacity-80",
+                "pc:w-24",
+              )}
+            />
+          ) : (
+            <div className={cn("aspect-3/4 w-20 bg-white/5", "pc:w-24")} />
+          )}
+        </PosterLink>
+
+        {/* DATE ┆ VENUE — 콘서트 티켓처럼 점선 절취선으로 나눈다 */}
+        <dl className="flex min-w-0 flex-1 text-sm leading-snug">
+          <div className="min-w-0 flex-1 pr-3">
+            <dt
+              className={cn(
+                "font-mono text-xs tracking-[0.25em] uppercase",
+                accentLabel[event.accent],
+              )}
+            >
+              Date
+            </dt>
+            <dd data-role="date" className="mt-1 break-keep text-white">
+              {formatEventDate(event)}
+            </dd>
+            <dd className="mt-0.5 font-mono text-xs text-white/55">{time}</dd>
+          </div>
+          <div
+            aria-hidden
+            className={cn(
+              "w-0 border-l-2 border-dashed",
+              accentPerforation[event.accent],
+            )}
+          />
+          <div className="min-w-0 flex-1 pl-3">
+            <dt
+              className={cn(
+                "font-mono text-xs tracking-[0.25em] uppercase",
+                accentLabel[event.accent],
+              )}
+            >
+              Venue
+            </dt>
+            <dd className="mt-1 break-keep text-white">{venue}</dd>
+            {venueDetail && (
+              <dd className="mt-0.5 text-xs break-keep text-white/55">
+                {venueDetail}
+              </dd>
+            )}
+          </div>
+        </dl>
+      </div>
+    </div>
+  );
+}
