@@ -1,21 +1,20 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { usePlayer } from "@/features/guide/player-context";
 import { CALL_TAG_COLOR } from "@/features/guide/lib/call-tag-style";
 
-const CLAP = "✋";
+export const CLAP = "✋";
 const CLAP_COLOR = CALL_TAG_COLOR.clap;
 
 /**
  * ✋와 ✋ 사이 간격 표기 — 데이터에 적은 문자를 화면에선 빈 간격으로 바꿔 그린다.
- * 띄어쓰기는 짧은 쉼(0.3em), 슬래시(/)는 긴 쉼(0.6em). 붙여 쓴 ✋✋는 간격 없음.
+ * 띄어쓰기는 짧은 쉼(0.4em), 슬래시(/)는 긴 쉼(1em). 붙여 쓴 ✋✋는 간격 없음.
  */
 function getClapGapClass(between: string): string | null {
   if (!/^[\s/]+$/.test(between)) return null; // ✋ 사이에 다른 글자가 있으면 그대로 표시
-  return between.includes("/") ? "w-[0.6em]" : "w-[0.3em]";
+  return between.includes("/") ? "w-[1em]" : "w-[0.4em]";
 }
 
 /**
@@ -92,7 +91,7 @@ function useClapCount(
 }
 
 /**
- * 가사 원문 속 ✋를 박수 타이밍(line.claps)에 맞춰 하나씩 "짝" 치는
+ * 발음 줄 속 ✋를 박수 타이밍(line.claps)에 맞춰 하나씩 "짝" 치는
  * 애니메이션으로 보여준다. 재생 중인 줄일 때만 동작하고, 그 외에는 평범한
  * 텍스트처럼 보인다.
  * - 아직 칠 차례가 아닌 ✋: 흐리게
@@ -141,12 +140,21 @@ export function ClapText({
                 data-clap={state}
                 className={cn(
                   "relative inline-block transition-[opacity,filter] duration-150",
+                  // 박수 묶음이 앞 글자(このまま 등)에 붙어 보이지 않게 첫 ✋ 앞을 띄운다.
+                  index === 0 && "ml-[0.5em]",
+                  // 재생 중인 줄의 ✋는 처음부터 끝까지 같은 합성 레이어에서
+                  // 그린다 — 튀어 오르는 애니메이션(transform)·흑백 필터가
+                  // 붙었다 떨어질 때마다 브라우저가 이모지를 다른 방식으로 다시
+                  // 그려서, 애니메이션이 끝난 직후 크기가 미세하게 바뀌어
+                  // 흔들려 보였다. 필터도 같은 이유로 늘 걸어 두고 값만 바꾼다.
+                  isActive &&
+                    "grayscale-0 will-change-[transform,opacity,filter]",
                   state === "pending" && "opacity-35 grayscale",
-                  // 상태가 hit으로 바뀌는 순간 애니메이션이 새로 붙어 처음부터 재생된다.
+                  // 상태가 hit으로 바뀌는 순간 애니메이션이 새로 붙어 처음부터
+                  // 재생된다 — ✋가 튀어 오르고, 같은 ✋ 잔상이 커지며 사라진다.
                   state === "hit" &&
-                    "after:pointer-events-none after:absolute after:inset-0 after:rounded-full after:border-2 after:border-(--clap-color) after:opacity-0 motion-safe:animate-[clap-pop_380ms_ease-out] motion-safe:after:animate-[clap-ring_480ms_ease-out]",
+                    "after:pointer-events-none after:absolute after:inset-0 after:flex after:items-center after:justify-center after:opacity-0 after:content-['✋'] motion-safe:animate-[clap-pop_380ms_ease-out] motion-safe:after:animate-[clap-ghost_520ms_ease-out]",
                 )}
-                style={{ "--clap-color": CLAP_COLOR } as CSSProperties}
               >
                 {CLAP}
               </span>

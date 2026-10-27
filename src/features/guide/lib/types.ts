@@ -1,4 +1,4 @@
-export const CALL_TAGS = ["swing", "clap", "call", "slam"] as const;
+export const CALL_TAGS = ["swing", "clap", "call", "dance", "slam"] as const;
 export type CallTag = (typeof CALL_TAGS)[number];
 
 export interface LyricSegment {
@@ -18,11 +18,11 @@ export interface LyricLine {
   slam?: string;
   interlude?: boolean;
   /**
-   * 박수 타이밍 — 이 줄의 time으로부터 몇 초 뒤인지. original 안의 ✋를 앞에서부터
+   * 박수 타이밍 — 이 줄의 time으로부터 몇 초 뒤인지. pronunciation 안의 ✋를 앞에서부터
    * 순서대로 하나씩 대응합니다(개수가 모자라면 남는 ✋는 애니메이션 없이 표시).
    */
   claps?: number[];
-  /** 모바일에서 이 줄이 재생 중일 때 곡의 swingGif를 띄움 */
+  /** 이 줄이 재생 중일 때 곡의 swingGif를 띄움(모바일 화면 우측, 태블릿 이상 가사 영역 우측) */
   swingGif?: boolean;
 }
 
@@ -40,10 +40,11 @@ export interface Song {
   /** 곡 목록 중요도 필터용 — "essential"(필수 숙지) / "recommended"(예습 중요) */
   importance?: SongImportance;
   /** 스윙 동작 예시 애니메이션 경로 (`/assets/guide/<song-id>.webp`, 원본 크기로 표시) */
-  swingGif?: string;
+  /** 여러 개면 하나가 한 바퀴 끝날 때마다 다음 것으로 번갈아 재생한다 */
+  swingGif?: string | readonly string[];
   /** 지정하면 swingGif를 이 크기(px)의 정사각형에 맞춰 가운데만 보이게 표시 (파일은 그대로) */
   swingGifSize?: number;
-  /** 영상 아래 곡 설명(스윙 GIF가 없는 곡에 표시). 없으면 임시 예시 문구를 보여준다. */
+  /** 태블릿 이상 영상 아래 곡 설명. 없으면 임시 예시 문구를 보여준다. */
   description?: SongDescription;
   lyrics: LyricLine[];
 }

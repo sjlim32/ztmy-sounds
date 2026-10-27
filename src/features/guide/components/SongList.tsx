@@ -29,20 +29,18 @@ interface SongListProps {
 const wrapperStyles = cva(
   [
     "contents",
-    "tablet:relative tablet:flex tablet:flex-col tablet:overflow-hidden tablet:rounded-lg pl-3",
+    "tablet:relative tablet:flex tablet:flex-col tablet:overflow-hidden",
     "tablet:bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.7)_0%,rgba(0,0,0,0.5)_55%,rgba(0,0,0,0.18)_100%)] tablet:backdrop-blur-xs",
   ],
   {
     variants: {
-      // 좌우 여백은 래퍼가 아니라 Link 자체의 padding(tablet:px-7)으로
-      // 통일 — 래퍼에 padding을 주면 li/overflow-hidden 조상이 그 바깥
-      // 영역에서 Link의 호버 배경을 잘라내서(레이아웃 크기는 맞아도
-      // 실제로는 안 칠해짐) 곡 선택 시 패딩 영역이 안 채워지는 문제가
-      // 있었음. 위아래는 곡이 선택되면 제목 한 줄만 남으므로 여백 없이
-      // 배경이 딱 맞게 밀착되도록.
+      // 좌우 여백은 래퍼에 두지 않는다 — 곡 항목의 hover·선택 면이 패널
+      // 좌우 끝까지 꽉 차도록(글자 여백은 Link의 px-4). 위아래는 곡이
+      // 선택되면 제목 한 줄만 남으므로 여백 없이 배경이 딱 맞게 밀착되도록.
+      // 목록 패널만 모서리를 둥글게 — 곡 상세의 제목 칸은 각지게.
       compact: {
         true: "mb-3",
-        false: "tablet:flex-[0_1_auto] tablet:py-3",
+        false: "tablet:flex-[0_1_auto] tablet:rounded-lg tablet:py-3",
       },
     },
   },
@@ -71,7 +69,8 @@ const titleStyles = cva(
 // display 자체도 transition-discrete로 함께 애니메이션시켜 접힘이 끝나면
 // 진짜 display:none이 되도록.
 //
-// state: browsing(선택 없음, gap 대신 margin으로 간격) / active(내가 선택된
+// state: browsing(선택 없음 — 위아래 같은 여백으로 hover·선택 면이 위아래
+// 구분선에서 똑같이 떨어지게) / active(내가 선택된
 // 항목) / collapsed(선택되지 않아 접힌 항목). divide-y는
 // --tw-divide-y-reverse 기본값(0)에서 border-top이 아니라 border-bottom에
 // 적용됨 — 곡이 선택되면 선택된 항목 아래에 어울리지 않는 구분선이 계속
@@ -82,7 +81,7 @@ const itemWrapperStyles = cva(
   {
     variants: {
       state: {
-        browsing: "mt-1",
+        browsing: "py-1",
         active: "border-b-0!",
         collapsed: "hidden border-b-0!",
       },
@@ -171,7 +170,11 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
             // 올렸을 때만 반투명하게 드러남(파이어폭스/웹킷 둘 다 대응).
             "tablet:scrollbar-thin tablet:[scrollbar-color:transparent_transparent] tablet:hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
             "tablet:[&::-webkit-scrollbar]:w-1.5 tablet:[&::-webkit-scrollbar-thumb]:rounded-full tablet:[&::-webkit-scrollbar-thumb]:bg-transparent tablet:hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
-            !selectedSongId && "tablet:flex-1",
+            // 목록 화면: 오른쪽 스크롤바 자리만큼 왼쪽에도 같은 폭을 비워 좌우
+            // 여백을 맞춘다. 곡 상세(제목 한 칸)엔 스크롤이 없어서 비우지 않는다 —
+            // 비우면 제목 칸이 아래 가사 영역보다 좁아진다.
+            !selectedSongId &&
+              "tablet:flex-1 tablet:[scrollbar-gutter:stable_both-edges]",
             visible ? "opacity-100" : "opacity-0",
           )}
         >
@@ -198,12 +201,14 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                   <div className="overflow-hidden">
                     <Link
                       href={isSelected ? basePath : `${basePath}/${item.id}`}
-                      // 선택·hover는 한쪽 막대 대신 칸 전체의 옅은 면으로 표시
+                      // 선택·hover는 한쪽 막대 대신 칸 전체의 옅은 면으로 표시(모서리 없이)
                       className={cn(
                         LIST_ITEM_CLASS,
-                        "group relative block px-4",
+                        "group relative block rounded-none px-4",
                         "tablet:py-2",
-                        isSelected && cn(ACTIVE_LIST_ITEM_CLASS, "py-1"),
+                        // 곡 상세의 제목 칸: 위아래를 살짝 더 띄운다.
+                        isSelected &&
+                          cn(ACTIVE_LIST_ITEM_CLASS, "py-2", "tablet:py-3"),
                       )}
                     >
                       <div className="flex items-center justify-between gap-2">
@@ -220,7 +225,10 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                             {item.importance && (
                               <span
                                 className={cn(
-                                  "rounded px-1.5 py-px text-xs font-bold",
+                                  // 글꼴의 글자가 아래로 치우쳐 보여서, 높이를
+                                  // 19px로 고정하고 아래만 1px 띄워 글자를
+                                  // 배지 세로 가운데에 맞춘다(실측 차이 0.5px 이내).
+                                  "inline-flex h-4.75 items-center rounded px-1.5 pb-px text-xs leading-none font-bold",
                                   item.importance === "essential"
                                     ? "bg-ztmy-magenta/30 text-ztmy-pink"
                                     : "bg-white/10 text-white/70",

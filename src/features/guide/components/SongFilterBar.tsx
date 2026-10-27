@@ -10,7 +10,7 @@ import {
   SONG_IMPORTANCE_LABEL,
   type SongFilter,
 } from "@/features/guide/lib/song-filter";
-import { CALL_TAG_LABEL } from "@/features/guide/lib/call-tag-style";
+import { CALL_TAG_SHORT_LABEL } from "@/features/guide/lib/call-tag-style";
 import { ACTIVE_TAB_CLASS, TAB_CLASS } from "@/components/button-styles";
 
 /**
@@ -43,7 +43,7 @@ export function SongFilterBar({
     <div
       role="group"
       aria-label="곡 목록 필터"
-      className={cn("flex flex-col gap-2 px-4 py-2.5", className)}
+      className={cn("flex flex-col gap-1.5 px-4 py-2", className)}
     >
       <FilterRow label="중요도">
         <Chip
@@ -72,8 +72,8 @@ export function SongFilterBar({
             active={filter.callTag === tag}
             onClick={() => setCallTag(tag)}
           >
-            <CallIcon name={tag} size={20} className="mr-0" />
-            {CALL_TAG_LABEL[tag]}
+            <CallIcon name={tag} size={18} className="mr-0" />
+            {CALL_TAG_SHORT_LABEL[tag]}
           </Chip>
         ))}
       </FilterRow>
@@ -90,7 +90,7 @@ function FilterRow({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="w-12 shrink-0 text-sm font-medium text-white/60">
+      <span className="w-11 shrink-0 text-sm font-medium text-white/60">
         {label}
       </span>
       <div className="flex flex-wrap gap-1.5">{children}</div>
@@ -115,7 +115,7 @@ function Chip({
       // 탭과 같은 "여러 개 중 고르기" 스타일(button-styles.ts) — 고른 칸은 흰 면
       className={cn(
         TAB_CLASS,
-        "inline-flex items-center gap-1.5 px-3 py-1.5",
+        "inline-flex items-center gap-1 px-2.5 py-1",
         active && ACTIVE_TAB_CLASS,
       )}
     >

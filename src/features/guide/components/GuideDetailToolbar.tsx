@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ListIcon } from "@/components/icons/ListIcon";
 import { BackLink } from "@/components/BackLink";
+import { ShareButton } from "@/components/ShareButton";
 import { NAV_BUTTON_CLASS } from "@/components/button-styles";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
 import { getNeighborIds } from "@/features/guide/components/PlayerControls";
@@ -16,7 +17,8 @@ const buttonClass = cn(
 );
 
 /**
- * tablet 이상: 영상 위 곡 이동 버튼 줄 — [곡 목록] … [뒤로가기] [이전 곡] [다음 곡].
+ * tablet 이상: 영상 위 곡 이동 버튼 줄 — [곡 목록] … [공유] [뒤로가기] [이전 곡] [다음 곡].
+ * 공유는 지금 곡 주소를 보낸다.
  * 곡 목록은 화면을 떠나지 않고 드로어(SongListDrawer)로 연다.
  * 모바일은 기존 영상 양옆 ◀▶ 버튼(PlayerControls)을 그대로 쓴다.
  */
@@ -50,6 +52,10 @@ export function GuideDetailToolbar({ onOpenList }: { onOpenList: () => void }) {
         </button>
 
         <div className="flex items-center gap-2">
+          <ShareButton
+            className="h-10 w-10"
+            tooltipClassName="top-full bottom-auto mt-2 mb-0"
+          />
           {/* 브라우저 히스토리가 아니라 항상 곡 목록(/guide, /slam)으로 —
               곡 사이를 여러 번 오가거나 링크로 바로 들어와도 같은 곳으로 간다. */}
           <BackLink href={basePath} />

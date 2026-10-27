@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { useAutoScrollPreference } from "@/features/guide/lib/auto-scroll";
 import { AutoScrollStatusIcon } from "@/features/guide/components/AutoScrollStatusIcon";
 
-export function AutoScrollToggle() {
+export function AutoScrollToggle({ className }: { className?: string }) {
   const [autoScroll, setAutoScroll] = useAutoScrollPreference();
 
   return (
@@ -13,7 +13,10 @@ export function AutoScrollToggle() {
       onClick={() => setAutoScroll(!autoScroll)}
       aria-pressed={autoScroll}
       title="자동 스크롤"
-      className="absolute right-0 bottom-1 flex items-center gap-2 rounded-full bg-black/40 py-1.5 pr-1.5 pl-3 backdrop-blur-sm transition-colors hover:bg-black/60 focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
+      className={cn(
+        "flex items-center gap-2 rounded-full bg-black/40 py-1.5 pr-1.5 pl-3 backdrop-blur-sm transition-colors hover:bg-black/60 focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+        className,
+      )}
     >
       <span className="text-[11px] font-semibold tracking-wider text-white/80">
         AUTO SCROLL

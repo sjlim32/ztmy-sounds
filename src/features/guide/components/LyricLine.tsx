@@ -12,7 +12,7 @@ import {
   parseIconTokens,
 } from "@/features/guide/lib/icon-tokens";
 import { CallIcon } from "@/features/guide/components/CallIcon";
-import { ClapText } from "@/features/guide/components/ClapText";
+import { CLAP, ClapText } from "@/features/guide/components/ClapText";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
 import {
   getVisibleLineTag,
@@ -20,7 +20,7 @@ import {
 } from "@/features/guide/lib/line-tag";
 import {
   CALL_TAG_COLOR,
-  CALL_TAG_LABEL,
+  CALL_TAG_SHORT_LABEL,
   withAlpha,
 } from "@/features/guide/lib/call-tag-style";
 
@@ -35,7 +35,7 @@ function InlineCallIcon({ name }: { name: CallTag }) {
 
 /**
  * pronunciation 등에 쓰는 ** / * / *** 강조 마커 중 지금 이 줄에서 실제로
- * "켜져 있는" 강조 범위. lineTag가 swing/clap/call이면 cheer, "slam"이면
+ * "켜져 있는" 강조 범위. lineTag가 swing/clap/call/dance면 cheer, "slam"이면
  * slam, 태그가 없으면 어느 쪽도 강조하지 않습니다.
  */
 type EmphasisScope = "cheer" | "slam";
@@ -64,11 +64,32 @@ interface lyricLineProps {
 
 const NO_CLAPS: readonly number[] = [];
 
-// 응원 단어(또는 강조 단어가 없는 응원 줄 전체)에 칠하는 형광펜
-const HIGHLIGHT_CLASS = "rounded-sm box-decoration-clone px-0.5 text-white";
-function highlightColor(color: string) {
-  return `${color}55`;
+/** 발음 줄 속 ✋를 박수 타이밍(line.claps) 애니메이션으로 그릴 때 쓰는 값. */
+interface ClapTiming {
+  lineStart: number;
+  times: readonly number[];
+  isActive: boolean;
 }
+
+function countClaps(text: string): number {
+  return text.split(CLAP).length - 1;
+}
+
+// 응원 단어(또는 강조 단어가 없는 응원 줄 전체) 표시 — 발음 줄은 따라
+// 부를 기준이라 응원 색 형광펜, 나머지(원문·번역·응원 설명)는 장식 없이
+// 응원 색 글자로만.
+const HIGHLIGHT_CLASS = "rounded-sm box-decoration-clone px-0.5 text-white";
+const EMPHASIS_CLASS = "font-bold";
+
+function emphasisProps(color: string, highlight: boolean) {
+  return highlight
+    ? { className: HIGHLIGHT_CLASS, style: { backgroundColor: `${color}55` } }
+    : { className: EMPHASIS_CLASS, style: { color } };
+}
+
+// 재생 중인 응원 줄 배경의 알파값 — 응원 색 글자(응원 단어)가 묻히지 않게
+// 옅게 깐다.
+const ACTIVE_LINE_ALPHA = "2e";
 
 function LyricLineComponent({
   line,
@@ -108,26 +129,18 @@ function LyricLineComponent({
         </p>
       )}
       <CheerText text={cheerText} tag={lineTag} showIcon={!!line.interlude} />
-      <OriginalText
-        text={line.original}
-        tag={lineTag}
-        scope={emphasisScope}
-        clap={
-          // ✋가 있는 줄은 타이밍(claps)이 없어도 ClapText로 그린다 — ✋ 사이
-          // 간격 표기(공백 / 슬래시)를 항상 같은 규칙으로 보여주기 위함.
-          line.original.includes("✋")
-            ? {
-                lineStart: parseTimestamp(line.time),
-                times: line.claps ?? NO_CLAPS,
-                isActive,
-              }
-            : undefined
-        }
-      />
+      <OriginalText text={line.original} tag={lineTag} scope={emphasisScope} />
       <PronunciationText
         text={line.pronunciation}
         tag={lineTag}
         scope={emphasisScope}
+        // 박수(✋)는 따라 부르는 발음 줄에 적는다. 타이밍(claps)이 없어도
+        // ClapText로 그려서 ✋ 사이 간격 표기(공백 / 슬래시)를 같은 규칙으로 보여준다.
+        clap={{
+          lineStart: parseTimestamp(line.time),
+          times: line.claps ?? NO_CLAPS,
+          isActive,
+        }}
       />
       <TranslationText
         text={line.translation}
@@ -138,14 +151,20 @@ function LyricLineComponent({
   );
 
   // 응원 줄도 줄 전체 배경은 칠하지 않는다 — 응원 설명은 배지로, 실제로
-  // 응원하는 단어만 형광펜으로 표시(CheerText / renderTextParts 참고).
+  // 응원하는 단어만 응원 색 글자로 표시(CheerText / renderTextParts 참고).
   // 간주가 아닌 줄은 [아이콘 칸 | 본문] 두 칸 그리드 — 아이콘 칸은 비어
   // 있어도 자리를 차지해서 가사 시작 위치가 모든 줄에서 같고, 아이콘(재생
   // 점)은 본문 첫 줄(배지든 원문이든) 높이의 세로 가운데에 자동으로 맞는다.
   const body = line.interlude ? (
     content
   ) : (
-    <div className="grid grid-cols-[2rem_minmax(0,1fr)] gap-x-2 [&>*]:col-start-2">
+    <div
+      className={cn(
+        "grid grid-cols-[1.375rem_minmax(0,1fr)] gap-x-2 [&>*]:col-start-2",
+        // 태블릿 이상은 아이콘(28px) 둘레에 여백을 둬서 본문과 더 띄운다.
+        "tablet:grid-cols-[2.25rem_minmax(0,1fr)] tablet:gap-x-3",
+      )}
+    >
       <span
         aria-hidden
         // 높이 0인 칸의 세로 가운데에 표시만 넘쳐 보이게 — 아이콘이 줄
@@ -165,7 +184,7 @@ function LyricLineComponent({
   );
 
   // 응원 줄도 줄 전체 배경은 칠하지 않는다 — 응원 설명은 배지로, 실제로
-  // 응원하는 단어만 형광펜으로 표시(CheerText / renderTextParts 참고).
+  // 응원하는 단어만 응원 색 글자로 표시(CheerText / renderTextParts 참고).
   return (
     <li
       data-active={isActive || undefined}
@@ -175,22 +194,34 @@ function LyricLineComponent({
         "group relative transition-colors hover:bg-white/10",
         lineClick && "cursor-pointer",
         line.interlude
-          ? cn("px-3 text-center", isMusicBreak ? "my-2 py-3" : "my-4 py-6")
-          : "py-3 pr-3 pl-2 text-left",
-        // 재생 중인 줄: 테두리 없이 밝은 보라 배경 + 흰 글자. 재생 중이
-        // 아닌 줄은 LyricsView가 글자를 흐리게 해서 차이를 키운다.
-        isActive && "bg-ztmy-purple/25 font-semibold text-white",
+          ? cn("px-5 text-center", isMusicBreak ? "my-2 py-3" : "my-4 py-6")
+          : "py-3 pr-5 pl-4 text-left",
+        // 재생 중인 줄: 테두리 없이 옅은 배경 + 흰 글자. 응원 줄은 그 응원
+        // 색, 아니면 보라. 재생 중이 아닌 줄은 LyricsView가 글자를 흐리게
+        // 해서 차이를 키운다. 글자 굵기는 바꾸지 않는다 — 굵어지면 글자 폭이
+        // 넓어져 줄이 바뀔 때마다 가사가 옆으로 흔들려 보인다.
+        isActive && "text-white",
+        isActive && !lineTag && "bg-ztmy-purple/25",
       )}
+      style={
+        isActive && lineTag
+          ? { backgroundColor: withAlpha(lineTag, ACTIVE_LINE_ALPHA) }
+          : undefined
+      }
     >
       {!line.interlude && lineTag && runPosition && (
-        <RunLine tag={lineTag} position={runPosition} />
+        <RunLine tag={lineTag} position={runPosition} isActive={isActive} />
       )}
       {lineClick ? (
         <button
           type="button"
           onClick={lineClick}
           className={cn(
-            "w-full group-hover:cursor-pointer",
+            // block: 버튼은 기본이 inline-block이라 안쪽 그리드 첫 칸(아이콘 칸)의
+            // 글자 기준선에 맞춰 줄에 놓인다 — 아이콘 칸이 비었을 때(구간 안 줄이
+            // 재생 중이 아닐 때)와 아이콘이 생겼을 때 기준선이 달라져, 재생될
+            // 때마다 줄 높이가 6~8px 줄었다 늘었다 하며 흔들려 보였다.
+            "block w-full group-hover:cursor-pointer",
             line.interlude ? "text-center" : "text-left",
           )}
         >
@@ -214,9 +245,11 @@ export const LyricLine = memo(LyricLineComponent);
 // ── ♫ ── 구분선. 재생 중이면 음표가 ♪♫♪ 셋으로 늘어나 박자 타듯 번갈아
 // 들썩이고, 양쪽 구분선이 분홍빛으로 밝아진다. 응원 태그가 있으면 음표 옆에
 // 아이콘(배지 설명은 그 아래).
-function MusicBreak({ tag, isActive }: { tag?: CallTag; isActive: boolean }) {
-  const notes = isActive ? ["♪", "♫", "♪"] : ["♫"];
+// 음표 셋을 늘 그려 두고 재생 중이 아닐 땐 양옆 ♪만 감춘다 — 개수가
+// 바뀌면 가운데 폭이 달라져 양옆 구분선이 늘었다 줄었다 흔들린다.
+const MUSIC_BREAK_NOTES = ["♪", "♫", "♪"];
 
+function MusicBreak({ tag, isActive }: { tag?: CallTag; isActive: boolean }) {
   return (
     <p
       role="img"
@@ -234,14 +267,15 @@ function MusicBreak({ tag, isActive }: { tag?: CallTag; isActive: boolean }) {
       />
       <span aria-hidden className="flex items-center gap-1.5">
         {tag && <CallIcon name={tag} size={20} className="mr-0" />}
-        {notes.map((note, index) => (
+        {MUSIC_BREAK_NOTES.map((note, index) => (
           <span
-            key={`${note}-${index}`}
+            key={index}
             className={cn(
               "inline-block text-lg leading-none",
               isActive
                 ? "text-ztmy-pink motion-safe:animate-[note-bob_0.9s_ease-in-out_infinite]"
                 : "text-white/50",
+              !isActive && index !== 1 && "invisible",
             )}
             style={
               isActive ? { animationDelay: `${index * 0.15}s` } : undefined
@@ -266,36 +300,66 @@ function MusicBreak({ tag, isActive }: { tag?: CallTag; isActive: boolean }) {
 
 /****** 왼쪽 아이콘 칸 ******/
 // 같은 태그가 이어지는 구간을 줄 높이 전체에 걸친 응원 색 세로선으로 잇는다.
-// 칸 위치(왼쪽 8px, 폭 32px)는 위 그리드의 아이콘 칸과 같아야 한다.
+// 칸 위치(왼쪽 16px = 줄의 pl-4, 폭 모바일 22px / 태블릿 이상 36px)는 위
+// 그리드의 아이콘 칸과 같아야 한다.
 function RunLine({
   tag,
   position,
+  isActive,
 }: {
   tag: CallTag;
   position: TagRunPosition;
+  isActive: boolean;
 }) {
   if (position === "single") return null;
+
+  // 구간 첫 줄은 아이콘 아래(top-10)부터. 이어지는 줄은 줄 높이 전체인데,
+  // 재생 중엔 그 줄에도 아이콘이 떠서 아이콘 자리(8px~40px)만 비운다.
+  const bottom = position === "end" ? "bottom-4" : "bottom-0";
+  const segments =
+    position === "start"
+      ? ["top-10 bottom-0"]
+      : isActive
+        ? ["top-0 h-2", `top-10 ${bottom}`]
+        : [`top-0 ${bottom}`];
 
   return (
     <span
       aria-hidden
-      className="pointer-events-none absolute inset-y-0 left-2 w-8"
+      className={cn(
+        "pointer-events-none absolute inset-y-0 left-4 w-5.5",
+        "tablet:w-9",
+      )}
     >
-      <span
-        className={cn(
-          "absolute left-1/2 w-0.5 -translate-x-1/2 rounded-full",
-          position === "start" && "top-10 bottom-0",
-          position === "middle" && "top-0 bottom-0",
-          position === "end" && "top-0 bottom-4",
-        )}
-        style={{ backgroundColor: withAlpha(tag, "99") }}
-      />
+      {segments.map((segment) => (
+        <span
+          key={segment}
+          className={cn(
+            "absolute left-1/2 w-0.5 -translate-x-1/2 rounded-full",
+            segment,
+          )}
+          style={{ backgroundColor: withAlpha(tag, "99") }}
+        />
+      ))}
     </span>
   );
 }
 
-// 구간 첫 줄(또는 홀로 있는 응원 줄)은 아이콘, 구간 안 이어지는 줄은 재생
-// 중일 때만 세로선 위 재생 점. 재생 중이면 응원 색 후광 + 퍼지는 고리로 강조.
+// 재생 중 아이콘 강조 — 동작마다 다르게. 흔들기는 샤모지가 좌우로 흔들리고,
+// 떼창은 소리치듯 커졌다 돌아오고, 댄스는 좌우로 통통 튀며 몸을 흔든다
+// (globals.css call-swing / call-shout / call-dance).
+// 박수·슬램은 아이콘은 그대로 두고 퍼지는 고리(PingRing)로.
+const ACTIVE_ICON_MOTION: Partial<Record<CallTag, string>> = {
+  swing:
+    "origin-bottom motion-safe:animate-[call-swing_0.7s_ease-in-out_infinite]",
+  call: "motion-safe:animate-[call-shout_0.8s_ease-in-out_infinite]",
+  dance: "motion-safe:animate-[call-dance_0.9s_ease-in-out_infinite]",
+};
+
+// 아이콘은 구간 첫 줄(또는 홀로 있는 응원 줄)에 늘 보이고, 구간 안 이어지는
+// 줄엔 재생 중일 때만 뜬다. 재생 중이면 배경 없이 동작별 애니메이션 + 응원
+// 색 빛으로 강조한다. 크기는 재생 여부와 상관없이 그대로(모바일 22px,
+// 태블릿 이상 28px).
 function GutterMarker({
   tag,
   position,
@@ -305,55 +369,48 @@ function GutterMarker({
   position: TagRunPosition;
   isActive: boolean;
 }) {
+  const isRunHead = position === "start" || position === "single";
+  if (!isRunHead && !isActive) return null;
+
   const color = CALL_TAG_COLOR[tag];
-
-  if (position === "start" || position === "single") {
-    return (
-      // 아이콘은 처음부터 강조 크기(32px)로 그리고 재생 중에도 크기는 그대로 —
-      // 강조는 후광 + 퍼지는 고리 + 빛으로만 한다.
-      <span className="relative flex h-8 w-8 shrink-0 items-center justify-center">
-        {isActive && <ActiveHalo color={color} size="h-11 w-11" />}
-        <span
-          className="relative flex"
-          style={
-            isActive ? { filter: `drop-shadow(0 0 4px ${color})` } : undefined
-          }
-        >
-          <CallIcon name={tag} size={32} className="mr-0" />
-        </span>
-      </span>
-    );
-  }
-
-  if (!isActive) return null;
+  const motion = ACTIVE_ICON_MOTION[tag];
 
   return (
-    <span className="relative flex h-2.5 w-8 shrink-0 items-center justify-center">
-      <ActiveHalo color={color} size="h-5 w-5" />
+    <span
+      className={cn(
+        "relative flex size-5.5 shrink-0 items-center justify-center",
+        "tablet:size-7",
+      )}
+    >
+      {isActive && !motion && (
+        <PingRing color={color} size={cn("size-8", "tablet:size-10")} />
+      )}
       <span
-        className="relative h-2.5 w-2.5 rounded-full"
-        style={{ backgroundColor: color, boxShadow: `0 0 8px 2px ${color}` }}
-      />
+        className={cn("relative flex", isActive && motion)}
+        style={
+          isActive ? { filter: `drop-shadow(0 0 4px ${color})` } : undefined
+        }
+      >
+        <CallIcon
+          name={tag}
+          size={28}
+          className={cn("mr-0", "max-tablet:size-5.5!")}
+        />
+      </span>
     </span>
   );
 }
 
-/** 재생 중 표시: 응원 색 원형 후광 + 바깥으로 계속 퍼져 나가는 고리. */
-function ActiveHalo({ color, size }: { color: string; size: string }) {
+/** 바깥으로 계속 퍼져 나가는 응원 색 고리(재생 중 강조 애니메이션). */
+function PingRing({ color, size }: { color: string; size: string }) {
   return (
-    <>
-      <span
-        className={cn("absolute rounded-full", size)}
-        style={{ backgroundColor: `${color}40` }}
-      />
-      <span
-        className={cn(
-          "absolute rounded-full border-2 motion-safe:animate-ping",
-          size,
-        )}
-        style={{ borderColor: `${color}aa` }}
-      />
-    </>
+    <span
+      className={cn(
+        "absolute rounded-full border-2 motion-safe:animate-ping",
+        size,
+      )}
+      style={{ borderColor: `${color}aa` }}
+    />
   );
 }
 
@@ -381,23 +438,16 @@ function CheerText({
     );
   }
 
-  // 응원 설명 배지: 아이콘 + 종류 이름 + 설명
+  // 응원 설명: 아이콘 + 종류 이름 + 설명을 응원 색 글자로만(배경 장식 없음)
   return (
-    <p data-role="cheer" className="mb-1.5">
+    <p data-role="cheer" className="mb-1">
       <span
-        className={cn(
-          "inline-flex max-w-full flex-wrap items-center gap-x-1.5 rounded-2xl border px-2.5 py-0.5 text-left",
-          "text-sm leading-relaxed font-bold",
-        )}
-        style={{
-          color: CALL_TAG_COLOR[tag],
-          backgroundColor: withAlpha(tag, "1f"),
-          borderColor: withAlpha(tag, "80"),
-        }}
+        className="inline-flex max-w-full flex-wrap items-center gap-x-1.5 text-left text-sm leading-relaxed font-bold"
+        style={{ color: CALL_TAG_COLOR[tag] }}
       >
         <span className="inline-flex shrink-0 items-center whitespace-nowrap">
           {showIcon && <CallIcon name={tag} size={18} />}
-          {CALL_TAG_LABEL[tag]}
+          {CALL_TAG_SHORT_LABEL[tag]}
         </span>
         <span aria-hidden>·</span>
         <span>{renderTextParts(text, "cheer")}</span>
@@ -411,30 +461,18 @@ function OriginalText({
   text,
   tag,
   scope,
-  clap,
 }: {
   text: string;
   tag?: CallTag;
   scope?: EmphasisScope;
-  /** line.claps가 있는 줄 — 원문 속 ✋를 박수 타이밍 애니메이션으로 그린다 */
-  clap?: { lineStart: number; times: readonly number[]; isActive: boolean };
 }) {
   if (!text && !tag) return null;
 
   const emphasisColor = tag ? CALL_TAG_COLOR[tag] : undefined;
 
   return (
-    <p data-role="original" className="wide:text-base pc:text-sm text-xs">
-      {clap ? (
-        <ClapText
-          text={text}
-          lineStart={clap.lineStart}
-          claps={clap.times}
-          isActive={clap.isActive}
-        />
-      ) : (
-        renderTextParts(text, "original", scope, emphasisColor)
-      )}
+    <p data-role="original" className="pc:text-base text-sm">
+      {renderTextParts(text, "original", scope, emphasisColor)}
     </p>
   );
 }
@@ -444,10 +482,12 @@ function PronunciationText({
   text,
   tag,
   scope,
+  clap,
 }: {
   text: LyricText;
   tag?: CallTag;
   scope?: EmphasisScope;
+  clap: ClapTiming;
 }) {
   if (!text) return null;
 
@@ -456,6 +496,8 @@ function PronunciationText({
     <LyricTextRenderer
       text={text}
       prefix="pron"
+      highlight
+      clap={clap}
       scope={scope}
       emphasisColor={emphasisColor}
     />
@@ -469,14 +511,9 @@ function PronunciationText({
     !!emphasisColor && !!scope && !hasEmphasis(plainText, scope);
 
   return (
-    <p data-role="pronunciation" className="wide:text-xl pc:text-base text-sm">
+    <p data-role="pronunciation" className="wide:text-xl pc:text-lg text-base">
       {highlightWholeLine ? (
-        <strong
-          className={HIGHLIGHT_CLASS}
-          style={{ backgroundColor: highlightColor(emphasisColor) }}
-        >
-          {content}
-        </strong>
+        <strong {...emphasisProps(emphasisColor, true)}>{content}</strong>
       ) : (
         content
       )}
@@ -499,7 +536,7 @@ function TranslationText({
   const emphasisColor = tag ? CALL_TAG_COLOR[tag] : undefined;
 
   return (
-    <p data-role="translation" className="wide:text-base pc:text-sm text-xs">
+    <p data-role="translation" className="pc:text-sm text-xs">
       {renderTextParts(text, "translation", scope, emphasisColor)}
     </p>
   );
@@ -511,16 +548,34 @@ function LyricTextRenderer({
   prefix,
   scope,
   emphasisColor,
+  highlight = false,
+  clap,
 }: {
   text: LyricText;
   prefix: string;
   scope?: EmphasisScope;
   emphasisColor?: string;
+  highlight?: boolean;
+  clap?: ClapTiming;
 }) {
   if (typeof text === "string") {
-    return <>{renderTextParts(text, prefix, scope, emphasisColor)}</>;
+    return (
+      <>
+        {renderTextParts(text, prefix, scope, emphasisColor, highlight, {
+          clap,
+          clapStart: 0,
+        })}
+      </>
+    );
   }
 
+  // 구간마다 따로 그리지만 ✋ 순서(claps 인덱스)는 줄 전체로 이어진다 —
+  // 각 구간이 몇 번째 ✋부터 시작하는지 미리 센다.
+  const clapStarts = text.map((_, index) =>
+    text
+      .slice(0, index)
+      .reduce((sum, segment) => sum + countClaps(segment.text), 0),
+  );
   return (
     <>
       {text.map((segment, index) => (
@@ -530,6 +585,8 @@ function LyricTextRenderer({
             `${prefix}-seg-${index}`,
             scope,
             emphasisColor,
+            highlight,
+            { clap, clapStart: clapStarts[index] },
           )}
         </span>
       ))}
@@ -542,7 +599,27 @@ function renderTextParts(
   key: string,
   scope?: EmphasisScope,
   emphasisColor?: string,
+  highlight = false,
+  claps?: { clap?: ClapTiming; clapStart: number },
 ) {
+  // ✋가 든 조각은 ClapText로 — claps 인덱스는 조각을 넘어 앞에서부터 이어진다.
+  let clapCursor = claps?.clapStart ?? 0;
+  const renderValue = (value: string, valueKey: string) => {
+    const clap = claps?.clap;
+    if (!clap || !value.includes(CLAP)) return value;
+    const start = clapCursor;
+    clapCursor += countClaps(value);
+    return (
+      <ClapText
+        key={valueKey}
+        text={value}
+        lineStart={clap.lineStart}
+        claps={clap.times.slice(start, clapCursor)}
+        isActive={clap.isActive}
+      />
+    );
+  };
+
   return parseIconTokens(text).map((part, index) => {
     if (part.type === "icon") {
       return <InlineCallIcon key={`${key}-${index}`} name={part.value} />;
@@ -554,7 +631,7 @@ function renderTextParts(
           if (seg.type !== "emphasis") {
             return (
               <Fragment key={`${key}-${index}-${segIndex}`}>
-                {seg.value}
+                {renderValue(seg.value, `${key}-${index}-${segIndex}-clap`)}
               </Fragment>
             );
           }
@@ -567,23 +644,18 @@ function renderTextParts(
           if (!applies) {
             return (
               <Fragment key={`${key}-${index}-${segIndex}`}>
-                {seg.value}
+                {renderValue(seg.value, `${key}-${index}-${segIndex}-clap`)}
               </Fragment>
             );
           }
 
           return (
-            // 실제로 응원하는 단어에만 응원 색 형광펜을 칠한다.
+            // 실제로 응원하는 단어만 응원 색으로(발음 줄은 형광펜).
             <strong
               key={`${key}-${index}-${segIndex}`}
-              className={cn(emphasisColor && HIGHLIGHT_CLASS)}
-              style={
-                emphasisColor
-                  ? { backgroundColor: highlightColor(emphasisColor) }
-                  : undefined
-              }
+              {...(emphasisColor && emphasisProps(emphasisColor, highlight))}
             >
-              {seg.value}
+              {renderValue(seg.value, `${key}-${index}-${segIndex}-clap`)}
             </strong>
           );
         })}

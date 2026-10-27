@@ -7,6 +7,7 @@ import type { Song } from "@/features/guide/lib/types";
 import { usePlayer } from "@/features/guide/player-context";
 import { getActiveLineIndex } from "@/features/guide/lib/lyric-sync";
 import { getSongForVersion } from "@/features/guide/lib/song-version";
+import { saveLastSongId } from "@/features/guide/lib/last-song";
 import { SongList } from "@/features/guide/components/SongList";
 import { LyricsView } from "@/features/guide/components/LyricsView";
 import { usePanelEntranceVisible } from "@/lib/use-entrance-visible";
@@ -27,6 +28,12 @@ export function SongPanel() {
   useEffect(() => {
     setActiveSongId(segment);
   }, [segment, setActiveSongId]);
+
+  // 홈의 "이어서 연습하기"용. 없는 곡 id(404)는 저장하지 않는다.
+  const songId = song?.id;
+  useEffect(() => {
+    if (songId) saveLastSongId(songId);
+  }, [songId]);
 
   // 곡이 바뀌면(또는 음원/라이브 버전이 바뀌면) 렌더 중에 즉시(트랜지션
   // 없이) 이전 내용을 감추고 내용을 교체합니다 — 사라질 때는 애니메이션
@@ -65,10 +72,11 @@ export function SongPanel() {
         // visible prop으로 자체 처리.
         // tablet 이상: guide/layout.tsx의 flex row에서 사이드바 역할 —
         // shrink-0으로 메인 영역(flex-1)에 폭을 뺏기지 않고, 세로 중앙
-        // 정렬은 그 flex row의 items-center가 대신 맡음. 1440px 미만은
-        // 고정폭(max-w-sm), 1440px 이상은 뷰포트의 30%(7:3 비율)로 확장 —
-        // max-w-sm이 30vw보다 좁아서 그대로 두면 잘리므로 max-w-none으로 해제.
-        "pc:w-[30vw] pc:max-w-none contents",
+        // 정렬은 그 flex row의 items-center가 대신 맡음. pc 미만은
+        // 고정폭(max-w-sm), pc 이상은 뷰포트의 36%로 확장해 가사를 넓게
+        // 본다(영상 쪽이 나머지를 씀) — max-w-sm이 36vw보다 좁아서 그대로
+        // 두면 잘리므로 max-w-none으로 해제.
+        "pc:w-[36vw] pc:max-w-none contents",
         "tablet:flex tablet:w-full tablet:max-w-sm tablet:shrink-0 tablet:flex-col",
         "tablet:transition-[height,opacity] tablet:duration-300",
         // 목록 화면도 상세 화면과 같은 높이(88vh) — 목록 ↔ 상세를 오갈 때

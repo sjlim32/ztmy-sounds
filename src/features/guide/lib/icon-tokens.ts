@@ -5,7 +5,7 @@ export type TextPart =
 
 const TOKEN_PATTERN = new RegExp(`\\[(${CALL_TAGS.join("|")})\\]`, "g");
 
-// 가사 문자열을 인라인 "[swing]" / "[clap]" / "[call]" 토큰 기준으로 나눠서, 해당 위치에 아이콘을 렌더링할 수 있게 합니다.
+// 가사 문자열을 인라인 "[swing]" / "[clap]" / "[call]" / "[dance]" 토큰 기준으로 나눠서, 해당 위치에 아이콘을 렌더링할 수 있게 합니다.
 export function parseIconTokens(text: string): TextPart[] {
   const parts: TextPart[] = [];
   let lastIndex = 0;

@@ -117,15 +117,57 @@ body {
   }
 }
 
-/* ClapText — 박수 순간 퍼지는 파동 */
-@keyframes clap-ring {
+/* ClapText — 박수 순간 같은 ✋ 잔상이 커지며 사라짐 */
+@keyframes clap-ghost {
   0% {
-    transform: scale(0.6);
-    opacity: 0.9;
+    transform: scale(1);
+    opacity: 0.7;
   }
   100% {
-    transform: scale(2.2);
+    transform: scale(2.4);
     opacity: 0;
+  }
+}
+
+/* 가이드 가사 아이콘 칸 — 재생 중 흔들기 줄: 샤모지가 좌우로 흔들흔들 */
+@keyframes call-swing {
+  0%,
+  100% {
+    transform: rotate(-14deg);
+  }
+  50% {
+    transform: rotate(14deg);
+  }
+}
+
+/* 가이드 가사 아이콘 칸 — 재생 중 떼창 줄: 소리치듯 커졌다 돌아옴 */
+@keyframes call-shout {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  30% {
+    transform: translateY(-2px) scale(1.2);
+  }
+  60% {
+    transform: scale(0.95);
+  }
+}
+
+/* 가이드 가사 아이콘 칸 — 재생 중 댄스 줄: 좌우로 통통 튀며 몸을 흔듦 */
+@keyframes call-dance {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-2px, -3px) rotate(-10deg);
+  }
+  50% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  75% {
+    transform: translate(2px, -3px) rotate(10deg);
   }
 }
 

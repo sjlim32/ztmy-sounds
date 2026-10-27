@@ -11,7 +11,8 @@ import { getActiveLineIndex } from "@/features/guide/lib/lyric-sync";
 import { getSongForVersion } from "@/features/guide/lib/song-version";
 
 interface SwingGif {
-  src: string;
+  /** 한 장이면 반복, 여러 장이면 한 바퀴씩 번갈아 재생 */
+  srcs: readonly string[];
   size?: number;
   /** 지금 재생 중인 가사 줄에 swingGif 플래그가 있는지 */
   isSwing: boolean;
@@ -36,12 +37,8 @@ function getSwingRunStart(lyrics: LyricLine[], index: number): number | null {
  * GIF는 동작이 노래 박자와 맞아야 해서, swingGif 구간에 들어갈 때마다(그리고
  * 그 구간에서 재생을 멈췄다 다시 틀 때마다) playId를 올려 처음부터 재생한다.
  */
-/**
- * 이 곡 화면에서 스윙 예시 GIF가 보이는지 — 응원 가이드(스윙을 보여주는
- * 모드)이고 곡에 swingGif가 있을 때. 영상 아래 설명 영역은 GIF가 없을 때만
- * 그 자리를 쓴다(GuidePlayerArea).
- */
-export function showsSwingGif(
+// 응원 가이드(스윙을 보여주는 모드)이고 곡에 swingGif가 있을 때만 띄운다.
+function showsSwingGif(
   song: Song | null,
   visibleTags: readonly CallTag[],
 ): boolean {
@@ -75,32 +72,24 @@ function useSwingGif(): SwingGif | null {
   if (!song?.swingGif || !showsSwingGif(song, visibleTags)) return null;
 
   return {
-    src: song.swingGif,
+    srcs: typeof song.swingGif === "string" ? [song.swingGif] : song.swingGif,
     size: song.swingGifSize,
     isSwing: runStart !== null,
     playId: play.id,
   };
 }
 
-/** tablet 이상: GuidePlayerArea 안에서 영상·컨트롤 아래 줄에 항상 표시. */
-export function SwingGuideGif() {
-  const gif = useSwingGif();
-  if (!gif) return null;
-
-  return (
-    <div
-      className={cn(
-        "hidden",
-        "tablet:order-4 tablet:flex tablet:basis-full tablet:justify-center",
-      )}
-    >
-      <SwingImage {...gif} />
-    </div>
-  );
-}
-
-/** 모바일: 현재 재생 중인 가사 줄에 swingGif 플래그가 있을 때만 화면 우측 중앙에 고정 표시. */
-export function SwingGuideGifOverlay() {
+/**
+ * 현재 재생 중인 가사 줄에 swingGif 플래그가 있을 때만 나타나는 스윙 예시.
+ * - screen(모바일): 화면 우측 중앙에 고정 — guide/layout.tsx에 둔다.
+ * - lyrics(태블릿 이상): 가사 영역(LyricsView) 우측 — 세로 위치는 LyricsView가
+ *   감싼 자리(재생 중인 줄의 윗줄 높이)를 따른다.
+ */
+export function SwingGuideGifOverlay({
+  placement = "screen",
+}: {
+  placement?: "screen" | "lyrics";
+}) {
   const gif = useSwingGif();
   if (!gif) return null;
 
@@ -109,9 +98,11 @@ export function SwingGuideGifOverlay() {
       aria-hidden={!gif.isSwing}
       className={cn(
         // 가사 줄 탭(seek)을 가리지 않도록 pointer-events-none
-        "pointer-events-none fixed top-1/2 right-2 z-40 -translate-y-1/2 transition-opacity duration-300",
+        "pointer-events-none z-40 -translate-y-1/2 transition-opacity duration-300",
         gif.isSwing ? "opacity-100" : "opacity-0",
-        "tablet:hidden",
+        placement === "screen"
+          ? cn("fixed top-1/2 right-2", "tablet:hidden")
+          : cn("hidden", "tablet:block"),
       )}
     >
       <SwingImage {...gif} />
@@ -119,47 +110,115 @@ export function SwingGuideGifOverlay() {
   );
 }
 
+// 애니메이션 WebP 한 바퀴 길이(ms) — 프레임(ANMF 청크)마다 적힌 재생 시간을
+// 더한다. WebP가 아니거나 움직이지 않으면 0.
+function getAnimatedWebpDuration(buffer: ArrayBuffer): number {
+  const view = new DataView(buffer);
+  const fourcc = (offset: number) =>
+    String.fromCharCode(
+      view.getUint8(offset),
+      view.getUint8(offset + 1),
+      view.getUint8(offset + 2),
+      view.getUint8(offset + 3),
+    );
+  if (buffer.byteLength < 12 || fourcc(0) !== "RIFF" || fourcc(8) !== "WEBP") {
+    return 0;
+  }
+
+  let total = 0;
+  let offset = 12;
+  while (offset + 8 <= buffer.byteLength) {
+    const size = view.getUint32(offset + 4, true);
+    // ANMF 본문: X(3) Y(3) 폭-1(3) 높이-1(3) 재생 시간(3, ms) 플래그(1)
+    if (fourcc(offset) === "ANMF" && offset + 8 + 15 <= buffer.byteLength) {
+      const at = offset + 8 + 12;
+      total +=
+        view.getUint8(at) |
+        (view.getUint8(at + 1) << 8) |
+        (view.getUint8(at + 2) << 16);
+    }
+    offset += 8 + size + (size % 2); // 청크는 짝수 바이트로 채워진다
+  }
+  return total;
+}
+
+interface LoadedGif {
+  blob: Blob;
+  duration: number;
+}
+
 function SwingImage({
-  src,
+  srcs,
   size,
   playId,
-}: Pick<SwingGif, "src" | "size" | "playId">) {
+}: Pick<SwingGif, "srcs" | "size" | "playId">) {
   const imgRef = useRef<HTMLImageElement>(null);
-  const [loaded, setLoaded] = useState<{ src: string; blob: Blob } | null>(
-    null,
-  );
+  const srcKey = srcs.join("|");
+  const [loaded, setLoaded] = useState<{
+    key: string;
+    gifs: LoadedGif[];
+  } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    fetch(src)
-      .then((response) => (response.ok ? response.blob() : null))
-      .then((blob) => {
-        if (blob && !cancelled) setLoaded({ src, blob });
+    Promise.all(
+      srcKey.split("|").map(async (src) => {
+        const response = await fetch(src);
+        if (!response.ok) throw new Error(`${src}: ${response.status}`);
+        const blob = await response.blob();
+        return {
+          blob,
+          duration: getAnimatedWebpDuration(await blob.arrayBuffer()),
+        };
+      }),
+    )
+      .then((gifs) => {
+        if (!cancelled) setLoaded({ key: srcKey, gifs });
       })
-      // 못 받아오면 원래 src로 그냥 반복 재생된다(다시 재생만 안 됨).
+      // 못 받아오면 첫 번째 src로 그냥 반복 재생된다(다시 재생·번갈아 재생만 안 됨).
       .catch(() => {});
     return () => {
       cancelled = true;
     };
-  }, [src]);
+  }, [srcKey]);
+
+  // 다시 재생할 때(playId가 바뀌면)는 항상 첫 번째 GIF부터.
+  const [turn, setTurn] = useState({ playId, index: 0 });
+  if (turn.playId !== playId) setTurn({ playId, index: 0 });
 
   // 애니메이션 이미지는 같은 주소로는 브라우저가 이어서 재생해 버려서(브라우저
   // 마다 동작도 다름), 받아둔 파일로 매번 새 주소(blob URL)를 만들어 갈아
   // 끼운다 — 새 주소의 이미지는 항상 첫 프레임부터 시작한다. 파일은 한 번만
-  // 받으므로 다시 재생할 때 네트워크를 쓰지 않는다.
+  // 받으므로 다시 재생할 때 네트워크를 쓰지 않는다. 여러 장이면 지금 장이 한
+  // 바퀴 끝나는 시점에 다음 장으로 넘긴다.
   useEffect(() => {
     const img = imgRef.current;
-    if (!img || loaded?.src !== src) return;
-    const url = URL.createObjectURL(loaded.blob);
+    if (!img || loaded?.key !== srcKey) return;
+    const gif = loaded.gifs[turn.index % loaded.gifs.length];
+    const url = URL.createObjectURL(gif.blob);
     img.src = url;
-    return () => URL.revokeObjectURL(url);
-  }, [loaded, src, playId]);
+    const timer =
+      loaded.gifs.length > 1 && gif.duration > 0
+        ? setTimeout(
+            () =>
+              setTurn((current) => ({
+                ...current,
+                index: (current.index + 1) % loaded.gifs.length,
+              })),
+            gif.duration,
+          )
+        : undefined;
+    return () => {
+      clearTimeout(timer);
+      URL.revokeObjectURL(url);
+    };
+  }, [loaded, srcKey, playId, turn.index]);
 
   return (
     // eslint-disable-next-line @next/next/no-img-element -- 곡마다 GIF 크기가 달라 이미지 자체 크기를 그대로 써야 해서 next/image의 필수 width/height 제약을 피함
     <img
       ref={imgRef}
-      src={src}
+      src={srcs[0]}
       alt="스윙 동작 예시"
       // size가 있으면 그 정사각형을 덮도록 축소해 가운데만 보이게(object-cover)
       style={size ? { width: size, height: size } : undefined}
