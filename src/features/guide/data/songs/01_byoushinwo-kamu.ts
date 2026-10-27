@@ -11,6 +11,13 @@ const song: Song = {
   title: byoushin,
   youtubeId: "2Ux6BA8Jlr4",
   importance: "essential",
+  description: {
+    summary: "조련 T I P",
+    points: [
+      "가이드에는 박수만 있지만 떼창도 자주 섞어서 하므로 현장에서의 지시에 따르면 됨",
+      "기본적으로 지시사항은 박수와 비슷하나, 떼창만 가능한 지시도 존재 (헨나 코에데[= 이상한 목소리로] 등)",
+    ],
+  },
   lyrics: [
     {
       time: "0:0",
@@ -80,7 +87,7 @@ const song: Song = {
       pronunciation: "하쿠츄-무노 나카데 **간간** 쿠다이타",
       translation: "백일몽 속에서 땅땅 부쉈어",
       cheer: {
-        text: "'간간' 부분만 리듬에 맞춰서",
+        text: "",
         tag: "swing",
       },
     },
@@ -208,7 +215,7 @@ const song: Song = {
       pronunciation: "하쿠츄-무노 나카데 **간간** 쿠다이타",
       translation: "백일몽 속에서 땅땅 부쉈어",
       cheer: {
-        text: "'간간' 부분만 리듬에 맞춰서",
+        text: "",
         tag: "swing",
       },
     },
@@ -336,64 +343,69 @@ const song: Song = {
     //################ Shamoji ################//
     {
       time: "3:40.7",
-      original: "このまま ✋ ✋✋/✋ ✋✋/✋ ✋ ✋",
-      pronunciation: "코노 마마",
+      original: "このまま",
+      pronunciation: "코노 마마 **✋ ✋✋/✋ ✋✋/✋ ✋ ✋**",
       translation: "",
       cheer: {
         text: "민나데 (다같이)",
         tag: "clap",
       },
-      claps: [1.0, 1.2, 1.4, 1.6, 2.0],
+      claps: [3.0, 3.3, 3.55, 4.0, 4.3, 4.55, 5.0, 5.4, 5.8],
     },
     {
       time: "3:48",
-      original: "このまま ✋ ✋✋/✋ ✋✋/✋ ✋ ✋",
-      pronunciation: "코노 마마",
+      original: "このまま",
+      pronunciation: "코노 마마 **✋ ✋✋/✋ ✋✋/✋ ✋ ✋**",
       translation: "",
       cheer: {
         text: "못토 못토 못토 (크게)",
         tag: "clap",
       },
+      claps: [3.0, 3.3, 3.55, 4.0, 4.3, 4.55, 5.0, 5.4, 5.8],
     },
     {
       time: "3:55.6",
-      original: "このまま ✋ ✋✋/✋ ✋✋/✋ ✋ ✋",
-      pronunciation: "코노 마마",
+      original: "このまま",
+      pronunciation: "코노 마마 **✋ ✋✋/✋ ✋✋/✋ ✋ ✋**",
       translation: "",
       cheer: {
-        text: "단단 오키쿠 (작게 치다가 점점 크게)",
+        text: "단단 오키쿠 (점점 크게)",
         tag: "clap",
       },
+      claps: [3.0, 3.3, 3.55, 4.0, 4.3, 4.55, 5.0, 5.4, 5.8],
     },
     {
       time: "4:03.1",
-      original: "このまま ✋ ✋✋/✋ ✋✋/✋ ✋ ✋",
-      pronunciation: "코노 마마",
+      original: "このまま",
+      pronunciation: "코노 마마 **✋ ✋✋/✋ ✋✋/✋ ✋ ✋**",
       translation: "",
       cheer: {
-        text: "마에카라 우시로 (앞에서부터 뒤로 파도타기)",
+        text: "마에카라 우시로 (앞에서부터 뒤로)",
         tag: "clap",
       },
+      claps: [3.0, 3.3, 3.55, 4.0, 4.3, 4.55, 5.0, 5.4, 5.8],
     },
     {
       time: "4:10.6",
-      original: "このまま ✋ ✋✋/✋ ✋✋/✋ ✋ ✋",
-      pronunciation: "코노 마마",
+      original: "このまま",
+      pronunciation: "코노 마마 **✋ ✋✋/✋ ✋✋/✋ ✋ ✋**",
       translation: "",
       cheer: {
-        text: "우시로카라 마에 (뒤에서부터 앞으로 파도타기)",
+        text: "우시로카라 마에 (뒤에서부터 앞으로)",
         tag: "clap",
       },
+      claps: [2.8, 3.1, 3.35, 3.8, 4.1, 4.35, 4.7, 5.1, 5.5],
     },
     {
       time: "4:17",
-      original: "このまま ✋ ✋✋/✋ ✋✋/✋ ✋ ✋",
-      pronunciation: "코노 마마",
+      original: "このまま",
+      pronunciation: "코노 마마 **✋ ✋✋/✋ ✋✋/✋ ✋ ✋**",
       translation: "",
       cheer: {
         text: "민나데 타노시쿠 (다같이 즐겁게)",
         tag: "clap",
       },
+      claps: [3.7, 4.0, 4.25, 4.7, 5.0, 5.25, 5.7, 6.1, 6.5],
     },
     //################ END ################//
     {

@@ -198,7 +198,7 @@ const song: Song = {
       pronunciation: "**^아이마이지다이^** 다이죠부니 나루타메노",
       translation: "애매한 시대 괜찮아지기 위한",
       cheer: {
-        text: '"아이마이지다이"떼창',
+        text: "",
         tag: "call",
       },
       slam: "떼창",

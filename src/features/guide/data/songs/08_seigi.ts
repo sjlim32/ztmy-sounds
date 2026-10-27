@@ -57,7 +57,7 @@ const song: Song = {
       pronunciation: "아카이 히토미가 보야케루 오토  **『꽥 꽥』**",
       translation: "붉은 눈동자가 희미해지는 소리 『꽥 꽥』",
       cheer: {
-        text: "'꽥꽥' 박자에 맞춰",
+        text: "",
         tag: "swing",
       },
     },
@@ -73,7 +73,7 @@ const song: Song = {
       pronunciation: "후카이 히루네노 온도니 나레테쿠노 **『꽥 꽥』**",
       translation: "깊은 낮잠의 온도에 익숙해져 가는 거야? 『꽥 꽥』",
       cheer: {
-        text: "'꽥꽥' 박자에 맞춰",
+        text: "",
         tag: "swing",
       },
     },
@@ -248,7 +248,7 @@ const song: Song = {
       pronunciation: "와루이 코토 시테나쿠테모 **『꽥 꽥』**",
       translation: "나쁜 짓 하지 않아도 『꽥 꽥』",
       cheer: {
-        text: "'꽥꽥' 박자에 맞춰",
+        text: "",
         tag: "swing",
       },
     },
@@ -264,7 +264,7 @@ const song: Song = {
       pronunciation: "아오이 후세이카쿠레이 오시콘데 **『꽥 꽥』**",
       translation: "푸른 풍성학려에 밀어넣어 『꽥 꽥』",
       cheer: {
-        text: "'꽥꽥' 박자에 맞춰",
+        text: "",
         tag: "swing",
       },
     },
