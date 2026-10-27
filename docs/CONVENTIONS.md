@@ -24,7 +24,9 @@ src/
                              # 상세 화면 tablet 이상: 영상 위 GuideDetailToolbar
                              # (곡 목록 드로어 SongListDrawer / 뒤로가기=항상 목록으로 /
                              # 이전·다음 곡), 영상 아래 CallLegend(응원 표시
-                             # 안내) + 스윙 GIF 또는(없으면) SongDescriptionPanel
+                             # 안내) | GuideToolsCard(자동 스크롤 + 곡별 오류
+                             # 제보 — 모바일은 둘 다 가사 영역 안) 한 줄, 그 아래
+                             # SongDescriptionPanel
                              # (Song.description, 없으면 lib/song-description.ts의
                              # 예시 목데이터를 "예시" 표시와 함께). 이 세로 열의
                              # 폭은 lib/player-layout.ts 한 곳에서 정한다.
@@ -32,9 +34,14 @@ src/
                              # 응원 아이콘은 public/assets/guide/shamoji/의 샤모지
                              # 세트(그림만 256px `<이름>.webp`, 한자·영문 포함
                              # 512px `<이름>-label.webp`) — 스윙=swing, 클랩=clap,
-                             # 떼창=sing. 응원 색은 이 아이콘 색에서 뽑았으므로
-                             # 아이콘을 바꾸면 색도 함께 바꾼다. 슬램은 기존
-                             # slam.svg(노랑). 가사 아이콘 칸은 32px, 응원 표시
+                             # 떼창=sing, 댄스=dance. 응원 색은 이 아이콘 색에서 뽑았으므로
+                             # 아이콘을 바꾸면 색도 함께 바꾼다. 슬램은
+                             # public/assets/guide/slam.svg(노랑). 예전 응원
+                             # 아이콘(옛 public/assets/song/)은 쓰지 않고
+                             # shamoji/legacy/default/에 보관만 한다. 공지
+                             # "응원법 구분 방법"도 샤모지 라벨 버전을 쓴다.
+                             # 가사 아이콘은 모바일 22px /
+                             # 태블릿 이상 28px(칸은 36px로 둘레 여백), 응원 표시
                              # 안내는 라벨 포함 버전 48px(CallIcon withLabel).
                              # 곡 목록(/guide) 필터: SongFilterBar(중요도 /
                              # 응원법 두 줄, AND) + lib/song-filter.ts. 중요도는
@@ -42,12 +49,13 @@ src/
                              # "recommended" 예습 중요)를 곡 파일에 직접 적는다.
                              # 필터 상태는 레이아웃이 유지하는 동안 남고, 곡이
                              # 선택된 동안엔 적용하지 않는다(접힘 애니메이션용).
-                             # 응원 가사 줄은 줄 배경 없이 설명 배지 + 응원
-                             # 단어(**…**/^…^) 형광펜으로만 표시한다. 응원
-                             # 태그가 있는데 발음 줄에 그 모드의 강조 표시가
-                             # 없으면 발음 줄 전체에 형광펜을 칠한다.
+                             # 응원 단어(**…**/^…^)는 발음 줄에서만 응원 색
+                             # 형광펜, 원문·번역·응원 설명은 배경·테두리 없이
+                             # 응원 색 굵은 글자로만 표시한다. 응원 태그가
+                             # 있는데 발음 줄에 그 모드의 강조 표시가 없으면
+                             # 발음 줄 전체에 형광펜을 칠한다.
                              # 가사 줄은 [아이콘 칸 | 본문] 두 칸 그리드라 아이콘이
-                             # 본문 첫 줄(배지/원문) 세로 가운데에 맞고, 응원
+                             # 본문 첫 줄(응원 설명/원문) 세로 가운데에 맞고, 응원
                              # 태그가 이어지는 구간은 첫 줄에 아이콘 + 아래로
                              # 응원 색 세로선(lib/line-tag.ts getTagRunPositions,
                              # LyricLine RunLine/GutterMarker). ♫만 있는 간주 줄은
@@ -55,19 +63,40 @@ src/
                              # 옆), 재생 중엔 ♪♫♪가 박자 타듯 들썩이고 구분선이
                              # 분홍빛으로 밝아진다. 글자가 있는 간주(밴드 소개
                              # 등)는 기존 가운데 정렬 그대로.
-                             # 재생 중인 줄은 테두리·둥근 모서리 없이 밝은 보라
-                             # 배경(나머지 줄 글자는 흐리게, LyricsView의 :has
-                             # 선택자)으로 표시하고, 가사 영역(LyricsView)은 배경
-                             # 흐림 + 살짝 어둡게 해서 그 보라가 사이트 배경과
-                             # 섞이지 않게 한다. 재생 중인 응원 줄은 아이콘 칸도
-                             # 강조 — 아이콘 줄은(아이콘은 늘 32px, 크기 변화 없음) 응원 색 후광 +
-                             # 퍼지는 고리(ActiveHalo), 구간 안 줄은 세로선 위
-                             # 재생 점 + 같은 후광.
+                             # 재생 중인 줄은 테두리·둥근 모서리 없이 옅은 배경
+                             # — 응원 줄은 그 응원 색, 아니면 보라(나머지 줄
+                             # 글자는 흐리게, LyricsView의 :has 선택자)으로
+                             # 표시하고, 가사 영역(LyricsView)은 배경 흐림 +
+                             # 살짝 어둡게 해서 그 색이 사이트 배경과 섞이지
+                             # 않게 한다. 가사 글자 크기는 발음 > 원문 > 번역.
+                             # 재생 중인 응원 줄은 아이콘 칸도 강조 — 아이콘은
+                             # 배경 없이 퍼지는 고리(PingRing) + 응원 색 빛, 구간
+                             # 안 줄은 세로선 위 재생 점 + 후광·고리(ActiveHalo).
+                             # 재생 중이 되어도 크기가 바뀌는 스타일(글자 굵기,
+                             # 요소 개수 등)은 쓰지 않는다 — 줄이 바뀔 때마다
+                             # 가사가 흔들려 보인다.
       data/
         songs/              # 정식 공개곡 — 곡 하나당 파일 하나, index.ts가 취합
         not-yet/            # 아직 가이드 미공개곡 데이터
         origin/             # 원본(수정 전) 가사/정보 백업
-    home/                   # 홈 화면 (Header, Countdown, MoonPhase 등)
+    home/                   # 홈 화면. 라우트(app/(pages)/page.tsx)는 서버
+                             # 컴포넌트로 곡 제목만 뽑아 HomeScreen(클라이언트)에
+                             # 넘긴다 — 곡 데이터를 홈에서 직접 import하면 가사
+                             # 전체가 홈 번들에 실린다.
+                             # PC: 왼쪽 위 로고(h1)+소개 문구(Header), 오른쪽 위
+                             # 공식 링크(OfficialLinks), 왼쪽 공연 카드
+                             # (NextEventCard) + 원정 카드 아래 공연 안내 버튼
+                             # (ConcertQuickPanel, 패널은 오른쪽으로 열림), 오른쪽
+                             # 메뉴(MainNavLink, 응원 가이드가 primary) + 곡
+                             # 바로가기(PracticeShortcuts: 이어서 연습 = guide/
+                             # lib/last-song.ts + 필수 숙지 곡).
+                             # PC 화면 가장자리 여백은 네 귀퉁이·푸터 모두 40px로
+                             # 맞춘다(메뉴는 버튼 안쪽 여백 때문에 right-6).
+                             # 모바일: 상단 바 [공식 링크 시트 | 로고 | 공유] →
+                             # 소개 문구 → 메뉴 → 곡 바로가기 → 공연 카드 →
+                             # 공연 안내 → 푸터. 360×640에서도
+                             # 넘치지 않게 맞춰 두었으니 세로로 뭔가 더하면
+                             # 그 크기에서 확인한다.
     info/                   # /info 페이지 콘텐츠 (info.mdx + 렌더 컴포넌트).
                              # 탭(공연/축제/콜라보/팝업) 소속은 info.tsx의
                              # INFO_TABS/INFO_TAB_SECTIONS 하나로만 관리하고
@@ -77,7 +106,7 @@ src/
                              # 열린 탭은 주소 해시(/info#popup)에 두어 새로고침·
                              # 링크 공유에도 유지된다(탭 id = 해시).
                              # 공연 당일 시간표는 schedule.ts 한 곳에만 둔다 —
-                             # /info의 일정표(ScheduleTimeline)와 홈의 당일 안내
+                             # /info의 일정표(ScheduleTimeline)와 홈의 공연 안내
                              # (features/home ConcertQuickPanel)가 같이 읽고,
                              # 당일엔 지금 시간대 줄을 강조한다(lib/schedule-
                              # status.ts, 현지 일본 시각 기준). 공연 관련 링크
@@ -189,11 +218,15 @@ src/
   서브셋 항목).
 - 스윙 동작 예시 애니메이션이 있는 곡은 `public/assets/guide/<song-id>.webp`를
   두고(원본 크기 그대로 표시, GIF는 용량이 커서 애니메이션 WebP로 변환해서 넣음) `Song.swingGif`에 경로를 적습니다. 응원 가이드(/guide)에서만 표시되며
-  (`SwingGuideGif.tsx`) tablet 이상은 영상 하단에 상시, 모바일은 현재 가사 줄에
-  `swingGif: true`(`LyricLine` 플래그)가 있을 때만 화면 우측 중앙에 고정으로
-  뜹니다. GIF 경로는 음원 버전에서도 정식(live) 데이터의 값을 씁니다.
+  (`SwingGuideGif.tsx`) 현재 가사 줄에 `swingGif: true`(`LyricLine` 플래그)가 있을
+  때만 뜹니다 — 모바일은 화면 우측 중앙에 고정, tablet 이상은 가사 영역 우측에서
+  재생 중인 줄의 바로 윗줄 세로 가운데(가사 스크롤을 따라 움직임, `LyricsView`). GIF 경로는 음원 버전에서도 정식(live) 데이터의 값을 씁니다.
   `swingGif: true` 줄이 연달아 붙은 구간에 들어갈 때마다 애니메이션을 첫 프레임부터
   다시 재생합니다(노래 박자와 맞추기 위함).
+  `swingGif`에 경로를 배열로 여러 개 적으면 하나가 한 바퀴 끝날 때마다 다음 것으로
+  번갈아 재생합니다(한 바퀴 길이는 애니메이션 WebP의 프레임 시간을 읽어서 계산하므로
+  WebP로 넣어야 함. 예: 해마성장통). 화면엔 작게(보통 100~120px) 뜨므로 원본을
+  그대로 넣지 말고 표시 크기의 2배 정도로 줄이고, 프레임이 많으면 솎아 냅니다.
   원본 비율이 정사각형이 아니면 `Song.swingGifSize`(px)를 지정해 파일은 그대로 두고
   화면에서만 그 크기 정사각형에 맞춰 가운데 부분만 보이게 할 수 있습니다
   (예: 400x200 → `swingGifSize: 100`이면 가운데 200x200이 100x100으로 표시).
@@ -225,17 +258,21 @@ src/
 - `pronunciation`은 문자열 또는 `{ text, tag }[]`(`LyricSegment[]`)로 구간별 응원
   타입(색상)을 지정할 수 있습니다. `cheer`는 그 줄 전체에 대한 응원 문구로, 문자열 또는
   단일 `{ text, tag }`를 받습니다.
-- `tag`(`CallTag`)는 `"swing" | "clap" | "call"` 중 하나입니다.
+- `tag`(`CallTag`)는 `"swing" | "clap" | "call" | "dance"` 중 하나입니다. 응원 설명
+  없이 태그만 달려면 `cheer: { text: "", tag: "dance" }`처럼 `text`를 비웁니다
+  (예: 곡 전체를 춤추며 즐기는 해마성장통).
 - 가사 텍스트(`original`/`pronunciation`) 안에 `[swing]` `[clap]` `[call]` 토큰을 그대로
   적으면 해당 위치에 아이콘이 렌더링됩니다 (`src/lib/guide/icon-tokens.ts`).
-- `claps`(선택)는 `original` 속 ✋의 박수 타이밍입니다. **그 줄 `time`으로부터 몇 초
+- `claps`(선택)는 `pronunciation` 속 ✋의 박수 타이밍입니다(✋는 따라 부르는 발음 줄에
+  적고, 응원 단어처럼 `**…**`로 감싸면 형광펜도 함께 칠해집니다). **그 줄 `time`으로부터 몇 초
   뒤인지**를 숫자 배열로 적고, ✋를 앞에서부터 순서대로 하나씩 대응합니다
   (예: `time: "3:40.7"`, `claps: [1.4, 2.2, 2.4]` → 3:42.1, 3:42.9, 3:43.1).
   재생 중인 줄에서만 동작하며, 칠 차례가 아닌 ✋는 흐리게, 타이밍이 된 ✋는 튀어
-  오르며 파동이 퍼지고, 그때마다 가사 줄 배경이 박수 색으로 울립니다
+  오르며 같은 ✋ 잔상이 커지며 사라지고, 그때마다 가사 줄 배경이 박수 색으로 울립니다
   (`ClapText.tsx`의 `pulseLine`, Web Animations API로 줄 요소에 직접 재생). 개수가 모자라면 남는 ✋는 그냥 표시됩니다.
-  ✋ 사이 간격은 표기로 정합니다: 붙여 쓰면(`✋✋`) 간격 없음, 띄어쓰기는 0.3em,
-  슬래시(`/`)는 0.6em(슬래시 문자는 화면에 안 보임). 예: `✋ ✋✋/✋ ✋✋`.
+  ✋ 사이 간격은 표기로 정합니다: 붙여 쓰면(`✋✋`) 간격 없음, 띄어쓰기는 0.4em,
+  슬래시(`/`)는 1em(슬래시 문자는 화면에 안 보임). 예: `✋ ✋✋/✋ ✋✋`. 첫 ✋
+  앞은 0.5em 더 띄웁니다.
   이 규칙은 `claps`가 없는 줄의 ✋에도 똑같이 적용됩니다.
   재생 위치는 250ms 간격 `currentTime`이 아니라 `usePlayer().getCurrentTime()`을 매
   프레임 읽고 그 사이를 추정해 맞춥니다.
@@ -252,7 +289,7 @@ src/
   위쪽 그라데이션 띠(내한/원정 색)를 유지합니다.
 - 버튼은 성격에 따라 `src/components/button-styles.ts`의 공용 스타일을 씁니다
   (크기·위치는 호출부에서 `cn`으로 얹기):
-  - 이동(뒤로가기·메인으로·가이드 곡 이동, PC 설치·공유, 푸터 건의·출처):
+  - 이동(뒤로가기·메인으로·가이드 곡 이동, 설치·공유, 푸터 건의·출처):
     `NAV_BUTTON_CLASS` — 어두운 면 + 2px 테두리
   - 고르기(공연 정보 탭, 즛토피아 곡/앨범, 가이드 곡 목록 필터): `TAB_LIST_CLASS` 안에
     `TAB_CLASS`, 고른 칸은 `ACTIVE_TAB_CLASS`(흰 면으로 반전)
@@ -306,23 +343,28 @@ src/
   `/zutopia`)는 안쪽 레이아웃을 직접 짜지 말고 `src/components/PageScrollBody.tsx`를
   씁니다 — 콘텐츠가 짧으면 Footer가 화면 하단에 고정되고 길어지면 밀려나는
   동작을 한 곳에서 관리합니다.
-- `PageScrollBody`는 내부적으로 `<Footer inline />`을 렌더링합니다. 이 방식을
-  새로 쓰는 페이지를 추가하면 `src/components/Footer.tsx`의
-  `SELF_MANAGED_FOOTER_PREFIXES`에도 그 경로 prefix를 반드시 추가하세요 —
-  안 그러면 루트 레이아웃의 전역 Footer와 이중으로 렌더링됩니다.
-- 푸터(`src/components/Footer.tsx`)는 위쪽 경계선 + 어두운 배경 띠로 콘텐츠와 구분하고,
-  컴팩트하게 왼쪽 정렬로 공식 링크 아이콘 줄(`data/social-links.ts`의
-  `FOOTER_SOCIAL_LINKS` — zutomayocalendar.net 푸터와 같은 유튜브, X 메인·스태프,
-  인스타그램 메인·스태프·mart, 아이콘도 같은 이미지를 `public/assets/footer/`에 두고
-  그대로 씀) → 저작권 문구("본 사이트는 비공식 팬 페이지로서, 사이트 내의 모든
-  음원·영상·이미지의 저작권은 아티스트에게 있습니다. © 2026 ずっと真夜中でいいのに。" —
-  운영자가 정한 문구 그대로, PC에선 한 줄 고정)을 두고, 건의·출처 버튼은 오른쪽
-  구석(모바일은 아래)에 둡니다.
-  PC(tablet 이상)에서는 메인 화면(/)에서만 보이고, 모바일은 가이드 상세를 뺀 모든
-  화면에 보입니다. 그래서 PC에서 `/info` 등 다른 페이지의 높이 계산은 푸터 몫을
-  빼지 않습니다(예: 가이드 패널 88vh).
-- PC 설치·공유 버튼(`InstallShareBar`)은 화면 왼쪽 아래에 떠 있고, 푸터가 보일 때는
-  Footer가 알려주는 `--footer-height` CSS 변수만큼 올라가 푸터 바로 위에 뜹니다.
+- `PageScrollBody`는 내부적으로 `<Footer inline />`을 렌더링합니다. 루트 레이아웃의
+  Footer는 메인 화면(/)에서만 그리므로, 새 스크롤 페이지가 이걸 쓰기 시작해도 따로
+  등록할 곳은 없습니다. 가이드·슬램 화면엔 푸터가 없습니다(목록·가사가 화면 높이를
+  다 씀).
+- 푸터(`src/components/Footer.tsx`)는 배경 띠·경계선 없이 글자 그림자만 준 한 줄입니다.
+  - 태블릿 이상(메인 화면에서만 보임): 왼쪽에 운영자가 정한 저작권 문구 그대로
+    (`lib/seo.ts`의 `COPYRIGHT_NOTICE`), 오른쪽에 사이트 기능 버튼 묶음
+    [설치][공유] | [건의][출처]. 설치(`InstallButton`)는 설치 가능할 때만 보입니다.
+  - 모바일: 줄인 문구("비공식 팬 페이지 · © ZUTOMAYO · 출처" — 출처는 글자 링크) +
+    건의 버튼. 저작권 전문은 출처 페이지(/credits)에도 있습니다.
+- 공유(`ShareButton`, `lib/use-share.ts`)는 지금 보고 있는 페이지 주소를 보냅니다.
+  자리: PC 메인 푸터, 가이드·슬램 곡 상세의 PC 상단 막대(`GuideDetailToolbar`),
+  모바일 상단 바(메인과 곡 상세).
+- 공식 링크 아이콘(`data/social-links.ts`의 `OFFICIAL_ICON_LINKS` — zutomayocalendar.net
+  푸터와 같은 유튜브, X 메인·스태프, 인스타그램 메인·스태프·mart, 아이콘도 같은
+  이미지를 `public/assets/footer/`에 두고 그대로 씀)은 PC 메인 오른쪽 위
+  (`features/home OfficialLinks`), 모바일은 메인 상단 바 왼쪽 버튼이 여는 시트
+  (`components/mobile/OfficialLinksSheet`, 아이콘만으론 계정 구분이 안 돼서 이름 포함)에
+  있습니다.
+- 건의 폼(Tally) 주소는 `lib/feedback.ts`의 `getFeedbackUrl()`로 만듭니다. 곡 가사
+  맨 끝의 "이 곡 싱크·가사 오류 제보"는 `title`(곡 한국어 제목)·`mode`(cheer/slam)를 넘기는데,
+  Tally 폼에 같은 이름의 숨김 필드(Hidden fields)가 있어야 값이 채워집니다.
 
 - 메인에서 들어올 때 내용이 서서히 나타나게 하려면 `src/components/EntranceFade.tsx`로
   감쌉니다(/info, /zutopia). /guide의 패널과 같은 훅(`src/lib/use-entrance-visible.ts`)을
@@ -332,7 +374,7 @@ src/
 ## PWA 설치 프롬프트
 
 - `beforeinstallprompt`/`appinstalled` 구독 로직은 `src/lib/use-install-prompt.ts`의
-  `useInstallPrompt()` 하나로 관리합니다. PC 코너 바(`InstallShareBar`)와
+  `useInstallPrompt()` 하나로 관리합니다. PC 푸터 설치 버튼(`InstallButton`)과
   모바일 배너(`InstallPromptBanner`)는 UI만 다르고 이 배관은 공유합니다 —
   새로 설치 유도 UI를 추가해도 이 이벤트 구독을 다시 만들지 말고 훅을
   재사용하세요.
