@@ -1,5 +1,6 @@
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { useSelectedLayoutSegment } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -28,10 +29,24 @@ export function GuideListScroll({ children }: { children: ReactNode }) {
   const segment = useSelectedLayoutSegment();
   const isListMode = segment === null;
   const scrollRef = useScrollFadeMask<HTMLDivElement>();
+  // 모바일 목록 화면에서 마지막으로 보던 스크롤 위치. 곡 상세로 가면 목록이
+  // 숨으면서(곡 줄이 전부 접힘) 이 박스의 스크롤이 0으로 밀리므로, 목록으로
+  // 돌아오면 저장해 둔 위치로 바로 되돌린다(전환 애니메이션이 없어서 바로 보인다).
+  const listScrollTopRef = useRef(0);
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !isListMode) return;
+    el.scrollTop = listScrollTopRef.current;
+  }, [isListMode, scrollRef]);
 
   return (
     <div
       ref={scrollRef}
+      onScroll={(event) => {
+        if (isListMode)
+          listScrollTopRef.current = event.currentTarget.scrollTop;
+      }}
       className={cn(
         "flex min-h-0 flex-1 flex-col",
         isListMode ? "overflow-y-auto" : "overflow-hidden",

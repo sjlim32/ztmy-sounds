@@ -4,19 +4,23 @@ import { useCallback, useId, useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ARTIST } from "@/data/artist";
 import { BackLink } from "@/components/BackLink";
 import { HomeLink } from "@/components/HomeLink";
-import { MOBILE_HEADER_ROUTES } from "@/components/mobile/mobile-header.constants";
 import { OfficialLinksSheet } from "@/components/mobile/OfficialLinksSheet";
 import { ShareButton } from "@/components/ShareButton";
 import { GlobeIcon } from "@/components/icons/GlobeIcon";
 import { NAV_BUTTON_CLASS } from "@/components/button-styles";
 import { LOGO } from "@/lib/seo";
+import { findSitePage } from "@/components/site-pages";
+import { HEADER_TITLE_TRANSITION } from "@/components/mobile/header-title-transition";
 
 /**
- * 모바일 전용 전역 상단 헤더. 메인(/)에서는 가운데 로고 + 좌측 공식 링크
- * (OfficialLinksSheet) + 우측 공유, 그 외 페이지에서는 페이지 이름 + 좌측
+ * 모바일 전용 전역 상단 헤더. 가운데는 메인(/)에선 로고, 하위 페이지에선
+ * 페이지 이름(site-pages.ts — PC 헤더와 같은 이름, 즛토피아는 ZUTOPIA).
+ * 가이드·슬램 곡 상세에서만 비워 두고, 그 자리에 가이드 화면이 곡 제목
+ * (MobileSongTitle)을 겹쳐 그린다(곡 데이터는 가사까지 들어 있어 이 전역
+ * 헤더에서 불러오지 않는다). 메인(/)에서는
+ * 좌측 공식 링크(OfficialLinksSheet) + 우측 공유, 그 외 페이지에서는 좌측
  * 뒤로가기(브라우저 히스토리 back) + 우측 메인 바로가기 버튼을 보여줍니다.
  * 곡 상세(가이드·슬램)에선 그 곡 주소를 공유할 수 있게 우측에 공유를 더합니다.
  */
@@ -24,14 +28,10 @@ export function MobileHeader() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const isSongDetail = /^\/(guide|slam)\/[^/]+/.test(pathname);
+  const pageLabel = isHome ? null : findSitePage(pathname)?.label;
   const [isOfficialOpen, setOfficialOpen] = useState(false);
   const closeOfficial = useCallback(() => setOfficialOpen(false), []);
   const officialSheetId = useId();
-
-  const matchedRoute = MOBILE_HEADER_ROUTES.find((route) =>
-    pathname.startsWith(route.path),
-  );
-  const title = matchedRoute?.title ?? ARTIST.name.en;
 
   return (
     // 루트 레이아웃에서 body/상위 컨테이너가 전부 스크롤되지 않는 구조라
@@ -73,8 +73,23 @@ export function MobileHeader() {
           />
         )}
 
-        {isHome ? (
-          // 제목(h1)은 메인 페이지의 Header가 이미 갖고 있어서 여기선 장식용.
+        {/* 페이지 제목(h1)은 각 페이지 본문이 갖고 있어서 여기 로고·이름은 장식용. */}
+        {pageLabel ? (
+          // 곡 상세에선 지우지 않고 투명하게만 둬서, 그 자리에 뜨는 곡 제목
+          // (MobileSongTitle)과 서로 엇갈려 사라지고 나타난다. key로 이름이
+          // 바뀔 때마다 새로 그려 살짝 올라오며 나타나게(@starting-style).
+          <div
+            key={pageLabel}
+            aria-hidden={isSongDetail || undefined}
+            className={cn(
+              "truncate px-24 text-lg font-bold tracking-tight",
+              HEADER_TITLE_TRANSITION,
+              isSongDetail && "opacity-0",
+            )}
+          >
+            {pageLabel}
+          </div>
+        ) : (
           <Image
             src={LOGO.src}
             alt=""
@@ -83,8 +98,6 @@ export function MobileHeader() {
             height={LOGO.height}
             className="h-10 w-auto [filter:drop-shadow(0.5px_0_0_#fff)_drop-shadow(-0.5px_0_0_#fff)_drop-shadow(0_0.5px_0_#fff)_drop-shadow(0_-0.5px_0_#fff)]"
           />
-        ) : (
-          <div className="text-lg font-bold tracking-tight">{title}</div>
         )}
 
         <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1.5">

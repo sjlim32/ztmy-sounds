@@ -22,13 +22,27 @@ src/
   features/                 # 기능 단위 모듈. 각 폴더는 보통 components/lib(/data) 구성
     guide/                  # 곡 가이드(영상+가사+응원법). *-context.tsx로 플레이어/모드 상태 보유
                              # 상세 화면 tablet 이상: 영상 위 GuideDetailToolbar
-                             # (곡 목록 드로어 SongListDrawer / 뒤로가기=항상 목록으로 /
-                             # 이전·다음 곡), 영상 아래 CallLegend(응원 표시
-                             # 안내) | GuideToolsCard(자동 스크롤 + 곡별 오류
-                             # 제보 — 모바일은 둘 다 가사 영역 안) 한 줄, 그 아래
-                             # SongDescriptionPanel
-                             # (Song.description, 없으면 lib/song-description.ts의
-                             # 예시 목데이터를 "예시" 표시와 함께). 이 세로 열의
+                             # (면·테두리 없는 GHOST_BUTTON_CLASS — 곡 목록 드로어
+                             # SongListDrawer / 공유 / 이전 곡 │ 다음 <곡 제목>.
+                             # 목록으로 돌아가기는 헤더 ‹), 영상 아래 CallLegend
+                             # (응원 표시 안내 — 누르는 기능이 없어 아이콘+이름만,
+                             # 박스 없음), 그 아래 SongDescriptionPanel
+                             # (Song.description, 없거나 비면 칸을 숨김).
+                             # 자동 스크롤 토글은 가사 영역 오른쪽 아래. 곡별
+                             # 싱크·가사 오류 제보(SongReportLink)는 PC는 가사
+                             # 영역 왼쪽 아래 어두운 면 버튼(floating), 모바일은
+                             # 영상 아래 줄 오른쪽 작은 글자 링크(inline).
+                             # 모바일 곡 상세: 상단 바 가운데에 곡 제목
+                             # (MobileSongTitle — 전역 MobileHeader가 곡 데이터를
+                             # 안 불러오도록 가이드 layout이 겹쳐 그리고, 헤더는
+                             # 로고를 비움), 본문의 선택된 곡 줄은 숨김. 영상
+                             # 아래 한 줄에 작은 응원 표시 안내(CallLegend
+                             # compact) + 오류 제보. 모바일은 목록 ↔ 곡 상세 전환
+                             # 애니메이션(곡 줄 접힘·영상 펼침)이 없고 가사
+                             # fade만 남긴다. 목록으로 돌아오면 보던 스크롤 위치로
+                             # 복원(GuideListScroll).
+                             # 곡 목록 필터(SongFilterBar)는 필터 칩 전용 스타일,
+                             # 모바일은 줄마다 한 줄 가로 스크롤. 이 세로 열의
                              # 폭은 lib/player-layout.ts 한 곳에서 정한다.
                              # 응원 색·이름·설명은 lib/call-tag-style.ts.
                              # 응원 아이콘은 public/assets/guide/shamoji/의 샤모지
@@ -329,7 +343,7 @@ src/
   위쪽 그라데이션 띠(내한/원정 색)를 유지합니다.
 - 버튼은 성격에 따라 `src/components/button-styles.ts`의 공용 스타일을 씁니다
   (크기·위치는 호출부에서 `cn`으로 얹기):
-  - 이동(뒤로가기·메인으로·가이드 곡 이동, 설치·공유, 푸터 건의·출처):
+  - 이동(뒤로가기·메인으로, 설치·공유, 푸터 건의·출처):
     `NAV_BUTTON_CLASS` — 어두운 면 + 2px 테두리
   - 고르기(공연 정보 탭, 즛토피아 곡/앨범, 가이드 곡 목록 필터): `TAB_LIST_CLASS` 안에
     `TAB_CLASS`, 고른 칸은 `ACTIVE_TAB_CLASS`(흰 면으로 반전)
@@ -337,7 +351,9 @@ src/
     테두리, 필요하면 끝에 화살표 아이콘
   - 동작(모바일 설치 배너의 "추가"처럼 눌러서 실행): `ACTION_BUTTON_CLASS` — 사이트
     대표색(마젠타) 단색 면
-  - 닫기 같은 테두리 없는 아이콘 버튼: `GHOST_ICON_BUTTON_CLASS`
+  - 닫기·헤더 뒤로가기 같은 테두리 없는 아이콘 버튼: `GHOST_ICON_BUTTON_CLASS`
+  - 콘텐츠 옆에서 눈에 덜 띄어야 하는 글자 버튼(가이드 상세 영상 위 버튼 줄):
+    `GHOST_BUTTON_CLASS` — 면·테두리 없이 흐린 글자, 마우스를 올리면 옅은 면
   - 목록의 한 줄(가이드 곡 목록·곡 목록 드로어): `LIST_ITEM_CLASS`, 고른 줄은
     `ACTIVE_LIST_ITEM_CLASS`(줄 전체를 옅게 칠함)
   - 포커스 표시는 `FOCUS_RING`을 씁니다(위 상수들에는 이미 들어 있음).

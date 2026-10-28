@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { HomeLink } from "@/components/HomeLink";
 import { CallIcon } from "@/features/guide/components/CallIcon";
 import { getCachedSongCallTags } from "@/features/guide/lib/song-call-tags";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
@@ -77,12 +76,15 @@ const titleStyles = cva(
 // 남아있으므로(접힌 항목은 display:none이라 안 보이지만 선택된 항목은 계속
 // 보임) active/collapsed 둘 다 제거.
 const itemWrapperStyles = cva(
-  "min-h-0 shrink-0 overflow-hidden transition-[display] transition-discrete duration-600",
+  // 모바일은 접힘/펼침 애니메이션 없이 바로(GuidePlayerArea와 같은 이유).
+  "max-tablet:transition-none min-h-0 shrink-0 overflow-hidden transition-[display] transition-discrete duration-600",
   {
     variants: {
       state: {
         browsing: "py-1",
-        active: "border-b-0!",
+        // 모바일 곡 상세에선 선택된 곡 줄도 숨긴다 — 곡 제목은 상단 바에
+        // 있다(MobileSongTitle). 태블릿 이상은 가사 위 제목 칸으로 남긴다.
+        active: "max-tablet:hidden border-b-0!",
         collapsed: "hidden border-b-0!",
       },
     },
@@ -96,6 +98,7 @@ const itemWrapperStyles = cva(
 const itemInnerStyles = cva(
   [
     "transition-[grid-template-rows,opacity,display] transition-discrete duration-600 ease-out",
+    "max-tablet:transition-none",
     "tablet:px-0 px-2",
   ],
   {
@@ -255,13 +258,6 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
           })}
         </ul>
       </div>
-
-      {!selectedSongId && (
-        <HomeLink
-          label="메인으로"
-          className={cn("mx-auto my-2 hidden", "tablet:inline-flex")}
-        />
-      )}
     </>
   );
 }

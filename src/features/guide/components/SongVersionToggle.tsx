@@ -19,7 +19,7 @@ export function SongVersionToggle() {
   if (!activeSongId || !hasOriginVersion(activeSongId)) return null;
 
   return (
-    <div className="absolute right-0 bottom-11 flex items-center gap-0.5 rounded-full bg-black/40 p-1 backdrop-blur-sm">
+    <div className="tablet:right-3 absolute right-0 bottom-11 flex items-center gap-0.5 rounded-full bg-black/40 p-1 backdrop-blur-sm">
       {VERSION_OPTIONS.map(({ value, label }) => (
         <button
           key={value}

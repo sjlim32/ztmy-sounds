@@ -4,6 +4,7 @@ import { GuidePlayerArea } from "@/features/guide/components/GuidePlayerArea";
 import { GuideListScroll } from "@/features/guide/components/GuideListScroll";
 import { GuideMainScrollArea } from "@/features/guide/components/GuideMainScrollArea";
 import { SongPanel } from "@/features/guide/components/SongPanel";
+import { MobileSongTitle } from "@/features/guide/components/MobileSongTitle";
 import { SwingGuideGifOverlay } from "@/features/guide/components/SwingGuideGif";
 import { NoticePanel } from "@/features/notice/components/NoticePanel";
 import { cn } from "@/lib/utils";
@@ -33,6 +34,8 @@ export default function GuideLayout({ children }: LayoutProps<"/guide">) {
         </GuideListScroll>
         {/* GuideListScroll 바깥에 둬야 그 스크롤 페이드 마스크에 안 잘림 */}
         <SwingGuideGifOverlay />
+        {/* 모바일 곡 상세: 상단 바 가운데에 곡 제목 */}
+        <MobileSongTitle />
         {children}
       </PlayerProvider>
     </GuideModeProvider>

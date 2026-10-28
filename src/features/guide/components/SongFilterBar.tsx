@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { CallIcon } from "@/features/guide/components/CallIcon";
 import {
@@ -11,7 +10,10 @@ import {
   type SongFilter,
 } from "@/features/guide/lib/song-filter";
 import { CALL_TAG_SHORT_LABEL } from "@/features/guide/lib/call-tag-style";
-import { ACTIVE_TAB_CLASS, TAB_CLASS } from "@/components/button-styles";
+import { FilterChip, FilterRow } from "@/components/FilterChips";
+
+// 모바일: 칩 묶음이 패널 오른쪽 끝(바깥 px-4)까지 넘어가게 그만큼 넓힌다.
+const CHIPS_BLEED_CLASS = "-mr-4 pr-4 tablet:mr-0 tablet:pr-0";
 
 /**
  * 곡 목록 위 필터 두 줄 — 중요도 / 응원법. 각 줄에서 하나를 고르고, 이미
@@ -45,81 +47,41 @@ export function SongFilterBar({
       aria-label="곡 목록 필터"
       className={cn("flex flex-col gap-1.5 px-4 py-2", className)}
     >
-      <FilterRow label="중요도">
-        <Chip
+      <FilterRow label="중요도" chipsClassName={CHIPS_BLEED_CLASS}>
+        <FilterChip
           active={filter.importance === null}
           onClick={() => setImportance(null)}
         >
           전체
-        </Chip>
+        </FilterChip>
         {SONG_IMPORTANCES.map((importance) => (
-          <Chip
+          <FilterChip
             key={importance}
             active={filter.importance === importance}
             onClick={() => setImportance(importance)}
           >
             {SONG_IMPORTANCE_LABEL[importance]}
-          </Chip>
+          </FilterChip>
         ))}
       </FilterRow>
-      <FilterRow label="응원법">
-        <Chip active={filter.callTag === null} onClick={() => setCallTag(null)}>
+      <FilterRow label="응원법" chipsClassName={CHIPS_BLEED_CLASS}>
+        <FilterChip
+          active={filter.callTag === null}
+          onClick={() => setCallTag(null)}
+        >
           전체
-        </Chip>
+        </FilterChip>
         {callTags.map((tag) => (
-          <Chip
+          <FilterChip
             key={tag}
             active={filter.callTag === tag}
             onClick={() => setCallTag(tag)}
           >
             <CallIcon name={tag} size={18} className="mr-0" />
             {CALL_TAG_SHORT_LABEL[tag]}
-          </Chip>
+          </FilterChip>
         ))}
       </FilterRow>
     </div>
-  );
-}
-
-function FilterRow({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="w-11 shrink-0 text-sm font-medium text-white/60">
-        {label}
-      </span>
-      <div className="flex flex-wrap gap-1.5">{children}</div>
-    </div>
-  );
-}
-
-function Chip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      // 탭과 같은 "여러 개 중 고르기" 스타일(button-styles.ts) — 고른 칸은 흰 면
-      className={cn(
-        TAB_CLASS,
-        "inline-flex items-center gap-1 px-2.5 py-1",
-        active && ACTIVE_TAB_CLASS,
-      )}
-    >
-      {children}
-    </button>
   );
 }

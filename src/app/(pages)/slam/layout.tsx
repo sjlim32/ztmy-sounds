@@ -4,6 +4,7 @@ import { GuidePlayerArea } from "@/features/guide/components/GuidePlayerArea";
 import { GuideListScroll } from "@/features/guide/components/GuideListScroll";
 import { GuideMainScrollArea } from "@/features/guide/components/GuideMainScrollArea";
 import { SongPanel } from "@/features/guide/components/SongPanel";
+import { MobileSongTitle } from "@/features/guide/components/MobileSongTitle";
 import { NoticePanel } from "@/features/notice/components/NoticePanel";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +32,8 @@ export default function SlamLayout({ children }: LayoutProps<"/slam">) {
             <SongPanel />
           </div>
         </GuideListScroll>
+        {/* 모바일 곡 상세: 상단 바 가운데에 곡 제목 */}
+        <MobileSongTitle />
         {children}
       </PlayerProvider>
     </GuideModeProvider>

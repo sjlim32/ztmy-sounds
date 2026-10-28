@@ -105,12 +105,12 @@ export function NoticeAccordionItem({
             <Content />
 
             {onDismissChange && (
-              <label className="flex items-center gap-1.5 text-xs text-white/50">
+              <label className="flex w-fit cursor-pointer items-center gap-2 py-1 text-sm text-white/60 select-none">
                 <input
                   type="checkbox"
                   checked={isDismissed}
                   onChange={(event) => onDismissChange(event.target.checked)}
-                  className="accent-ztmy-purple h-3 w-3"
+                  className="accent-ztmy-purple h-4 w-4"
                 />
                 다시 열지 않기
               </label>

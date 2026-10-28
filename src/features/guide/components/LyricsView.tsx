@@ -235,13 +235,6 @@ export function LyricsView({
           />
         ))}
 
-        {/* 모바일: 가사 맨 끝에 곡별 제보(태블릿 이상은 영상 아래 GuideToolsCard) */}
-        <li
-          className={cn("flex justify-center px-4 pt-8 pb-2", "tablet:hidden")}
-        >
-          <SongReportLink song={song} />
-        </li>
-
         <li ref={bottomSentinelRef} aria-hidden className="h-px" />
       </ol>
 
@@ -265,9 +258,19 @@ export function LyricsView({
 
       {/* 가사 fade 전환(곡 변경, 버전 토글)과 무관하게 항상 화면에 유지 */}
       <SongVersionToggle />
-      {/* 태블릿 이상은 영상 아래 GuideToolsCard에 같은 토글이 있다 */}
+      {/* 가사 영역 오른쪽 아래(태블릿 이상은 스크롤 화살표 줄 오른쪽 끝) */}
+      {/* 태블릿 이상: 곡별 오류 제보 — 가사 영역 왼쪽 아래에 늘 떠 있게(오른쪽
+      아래 자동 스크롤과 마주 보는 자리). 모바일은 영상 바로 아래(GuidePlayerArea). */}
+      <SongReportLink
+        song={song}
+        variant="floating"
+        className="tablet:inline-flex absolute bottom-2 left-3 hidden"
+      />
       <AutoScrollToggle
-        className={cn("absolute right-0 bottom-1", "tablet:hidden")}
+        className={cn(
+          "absolute right-0 bottom-1",
+          "tablet:right-3 tablet:bottom-2",
+        )}
       />
     </div>
   );

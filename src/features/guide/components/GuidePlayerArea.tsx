@@ -12,14 +12,19 @@ import {
 import { GuideDetailToolbar } from "@/features/guide/components/GuideDetailToolbar";
 import { SongListDrawer } from "@/features/guide/components/SongListDrawer";
 import { CallLegend } from "@/features/guide/components/CallLegend";
-import { GuideToolsCard } from "@/features/guide/components/GuideToolsCard";
+import { SongReportLink } from "@/features/guide/components/SongReportLink";
 import { SongDescriptionPanel } from "@/features/guide/components/SongDescriptionPanel";
 import { getSong } from "@/features/guide/data/songs";
 import { PLAYER_COLUMN_CLASS } from "@/features/guide/lib/player-layout";
 
 const playerAreaStyles = cva(
   [
-    "order-2 flex w-full shrink-0 flex-row flex-nowrap items-center justify-center gap-2 overflow-hidden px-2 py-2 transition-[max-height,opacity] duration-500",
+    "order-2 flex w-full shrink-0 flex-row flex-wrap items-center justify-center gap-x-2 gap-y-1 overflow-hidden px-2 py-2 transition-[max-height,opacity] duration-500",
+    // 모바일은 첫 줄 [◀ 영상 ▶], 둘째 줄(basis-full) 응원 표시 안내 + 오류 제보.
+    // 모바일은 열고 닫을 때 애니메이션 없이 바로 — 목록 ↔ 곡 상세가 다른
+    // 화면처럼 바로 바뀐다(곡 제목이 상단 바로 옮겨 가서 "목록이 고른 곡으로
+    // 줄어드는" 흐름이 더는 보이지 않음). 태블릿 이상은 그대로 펼침 애니메이션.
+    "max-tablet:transition-none",
     // content-center를 명시하지 않으면 브라우저마다(특히 Safari) 줄바꿈된 두
     // 줄(영상/컨트롤) 사이 여백을 다르게 계산해 영상과 컨트롤 사이가 크게
     // 벌어질 수 있어 명시적으로 고정. center로 둬서 영상+컨트롤 묶음 전체가
@@ -46,7 +51,11 @@ const playerAreaStyles = cva(
         // 공유하는 NoticePanel의 중앙 정렬을 밀어내지 않음 — 이 max-height
         // 트릭 자체가 YouTube iframe을 언마운트하지 않고 유지하기 위한 것이라
         // tablet 이상에서도 그대로 적용.
-        open: "tablet:bg-transparent max-h-dvh bg-black/50 opacity-100",
+        // tablet 이상은 상한을 넉넉히(200dvh) 둔다 — max-h-dvh면 낮은 화면에서
+        // 내용이 화면보다 길 때 이 박스가 잘리고(content-center라 위아래가 같이
+        // 잘림) 위쪽 곡 이동 버튼 줄이 보이지도, 스크롤로 닿지도 않는다. 넘치는
+        // 만큼은 바깥 GuideMainScrollArea가 스크롤한다.
+        open: "tablet:bg-transparent tablet:max-h-[200dvh] max-h-dvh bg-black/50 opacity-100",
         closed: "pointer-events-none max-h-0 opacity-0",
       },
     },
@@ -100,13 +109,20 @@ export function GuidePlayerArea() {
         </div>
       </div>
       <PlayerNextButton />
+      {/* 모바일: 영상 바로 아래 한 줄 — 왼쪽 응원 표시 안내(작게), 오른쪽 곡별
+      오류 제보. 태블릿 이상은 응원 안내가 영상 아래 카드, 오류 제보는 가사
+      영역 왼쪽 아래(LyricsView). */}
+      {song && (
+        <div className="tablet:hidden flex basis-full items-center justify-between gap-2 px-1">
+          <CallLegend variant="compact" />
+          <SongReportLink song={song} variant="inline" className="shrink-0" />
+        </div>
+      )}
       {song && (
         <div className="tablet:order-3 tablet:flex tablet:basis-full hidden justify-center">
           <div className={cn(PLAYER_COLUMN_CLASS, "flex flex-col gap-3")}>
-            <div className="flex gap-3">
-              <CallLegend className="min-w-0 flex-1" />
-              <GuideToolsCard song={song} />
-            </div>
+            {/* 자동 스크롤·오류 제보는 가사를 다루는 기능이라 가사 영역(LyricsView)에 있다. */}
+            <CallLegend />
             <SongDescriptionPanel song={song} />
           </div>
         </div>
