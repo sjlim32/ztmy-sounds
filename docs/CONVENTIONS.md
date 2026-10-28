@@ -27,7 +27,12 @@ src/
                              # 목록으로 돌아가기는 헤더 ‹), 영상 아래 CallLegend
                              # (응원 표시 안내 — 누르는 기능이 없어 아이콘+이름만,
                              # 박스 없음), 그 아래 SongDescriptionPanel
-                             # (Song.description, 없거나 비면 칸을 숨김).
+                             # (Song.description, 없거나 비면 칸을 숨김 — 모바일은
+                             # 가사 목록 맨 위 카드로 보여 주고, 재생 중인 줄
+                             # 순번은 그 카드만큼 보정한다(LyricsView)), 둘의
+                             # 오른쪽에 동작 예시 GIF 칸(SwingGuideGifSlot).
+                             # 곡 상세에선 영상 영역이 위쪽 정렬(목록 화면의
+                             # 공지는 가운데 정렬 그대로 — GuideMainScrollArea).
                              # 자동 스크롤 토글은 가사 영역 오른쪽 아래. 곡별
                              # 싱크·가사 오류 제보(SongReportLink)는 PC는 가사
                              # 영역 왼쪽 아래 어두운 면 버튼(floating), 모바일은
@@ -68,6 +73,8 @@ src/
                              # 응원 색 굵은 글자로만 표시한다. 응원 태그가
                              # 있는데 발음 줄에 그 모드의 강조 표시가 없으면
                              # 발음 줄 전체에 형광펜을 칠한다.
+                             # 응원 설명 앞엔 응원 종류 이름("흔들기" 등)을 붙이지
+                             # 않는다(왼쪽 아이콘·글자 색이 이미 알려줌).
                              # 가사 줄은 [아이콘 칸 | 본문] 두 칸 그리드라 아이콘이
                              # 본문 첫 줄(응원 설명/원문) 세로 가운데에 맞고, 응원
                              # 태그가 이어지는 구간은 첫 줄에 아이콘 + 아래로
@@ -97,8 +104,7 @@ src/
                              # 컴포넌트로 곡 제목만 뽑아 HomeScreen(클라이언트)에
                              # 넘긴다 — 곡 데이터를 홈에서 직접 import하면 가사
                              # 전체가 홈 번들에 실린다.
-                             # PC: 왼쪽 위 로고(h1)+소개 문구(Header), 오른쪽 위
-                             # 공식 링크(OfficialLinks), 왼쪽 공연 카드
+                             # PC: 왼쪽 위 로고(h1)+소개 문구(Header), 왼쪽 공연 카드
                              # (NextEventCard) + 원정 카드 아래 공연 안내 버튼
                              # (ConcertQuickPanel, 패널은 오른쪽으로 열림), 오른쪽
                              # 메뉴(MainNavLink) + 곡
@@ -112,7 +118,7 @@ src/
                              # 못 만든다 — 세로로 뭔가 더하면 1440×650에서 확인).
                              # PC 화면 가장자리 여백은 네 귀퉁이·푸터 모두 40px로
                              # 맞춘다(메뉴는 버튼 안쪽 여백 때문에 right-6).
-                             # 모바일: 상단 바 [공식 링크 시트 | 로고 | 공유] →
+                             # 모바일: 상단 바 [로고 | 공유] →
                              # 소개 문구 → 메뉴 → 곡 바로가기 → 공연 카드 →
                              # 공연 안내 → 푸터. 360×640에서도
                              # 넘치지 않게 맞춰 두었으니 세로로 뭔가 더하면
@@ -128,12 +134,21 @@ src/
                              # (INFO_TAB_ANCHOR_ID)으로 스크롤한다.
                              # 열린 탭은 주소 해시(/info#popup)에 두어 새로고침·
                              # 링크 공유에도 유지된다(탭 id = 해시).
-                             # 공연 당일 시간표는 schedule.ts 한 곳에만 둔다 —
-                             # /info의 일정표(ScheduleTimeline)와 홈의 공연 안내
-                             # (features/home ConcertQuickPanel)가 같이 읽고,
-                             # 당일엔 지금 시간대 줄을 강조한다(lib/schedule-
-                             # status.ts, 현지 일본 시각 기준). 공연 관련 링크
-                             # 모음은 links.ts. 공연이 바뀌면 둘 다 교체한다.
+                             # 공연 목록(SCHEDULE_SHOWS)과 공연별 당일 시간표
+                             # (getShowSchedule — 개장 = 개연 1시간 전)는
+                             # schedule.ts 한 곳에 둔다. lib/schedule-status.ts가
+                             # 다음(또는 오늘) 공연과 당일 진행 상태를 현지 일본
+                             # 시각으로 계산한다. 공연 관련 링크 모음은 links.ts.
+                             # 투어 전체 일정(data/tour-schedule.ts)은
+                             # TourScheduleTable 표(날짜 / 도시 / 장소 / 인원수,
+                             # 월 구분 줄) 하나로 /info 일정 탭과 홈 공연 안내
+                             # 패널이 같이 쓴다. 홈 패널은 시기별로 바뀐다:
+                             # 다음 공연 3일 이내(당일 포함)면 그 공연 시간표
+                             # (ScheduleTimeline, 당일엔 지금 일정 강조), 티켓
+                             # 접수가 아직 진행 중이면(입금 기간까지) 접수 일정
+                             # (TicketRoundList, 접수 중·입금 중 회차 강조) +
+                             # 접힌 투어 일정표, 접수가 끝나면 투어 일정표를
+                             # 항상 펼치고 다음 공연 줄 강조·지난 공연은 접음.
                              # DetailField/DetailList(라벨: 값 카드)는
                              # 티켓/굿즈 안내처럼 반복되는 목록에 재사용한다.
                              # ImageGallery는 이미지 묶음을 태블릿 이상에선
@@ -295,8 +310,10 @@ src/
 - 스윙 동작 예시 애니메이션이 있는 곡은 `public/assets/guide/<song-id>.webp`를
   두고(원본 크기 그대로 표시, GIF는 용량이 커서 애니메이션 WebP로 변환해서 넣음) `Song.swingGif`에 경로를 적습니다. 응원 가이드(/guide)에서만 표시되며
   (`SwingGuideGif.tsx`) 현재 가사 줄에 `swingGif: true`(`LyricLine` 플래그)가 있을
-  때만 뜹니다 — 모바일은 화면 우측 중앙에 고정, tablet 이상은 가사 영역 우측에서
-  재생 중인 줄의 바로 윗줄 세로 가운데(가사 스크롤을 따라 움직임, `LyricsView`). GIF 경로는 음원 버전에서도 정식(live) 데이터의 값을 씁니다.
+  때만 뜹니다(구간이 끝나도 0.5초 더 남았다가 사라짐) — 모바일은 화면 우측 중앙에
+  고정, tablet 이상은 영상 아래 응원 표시 안내·곡 설명 오른쪽의 "동작 예시" 칸
+  (`SwingGuideGifSlot`, 자리는 늘 있고 GIF가 없는 곡은 점선 테두리에 "GIF 없음",
+  슬램 가이드엔 칸 없음). 가사는 가리지 않습니다. GIF 경로는 음원 버전에서도 정식(live) 데이터의 값을 씁니다.
   `swingGif: true` 줄이 연달아 붙은 구간에 들어갈 때마다 애니메이션을 첫 프레임부터
   다시 재생합니다(노래 박자와 맞추기 위함).
   `swingGif`에 경로를 배열로 여러 개 적으면 하나가 한 바퀴 끝날 때마다 다음 것으로
@@ -306,6 +323,9 @@ src/
   원본 비율이 정사각형이 아니면 `Song.swingGifSize`(px)를 지정해 파일은 그대로 두고
   화면에서만 그 크기 정사각형에 맞춰 가운데 부분만 보이게 할 수 있습니다
   (예: 400x200 → `swingGifSize: 100`이면 가운데 200x200이 100x100으로 표시).
+  자르지 않고 원본 비율 그대로 보이려면 `swingGifSize` 대신 `Song.swingGifWidth`(모바일
+  표시 폭, px)를 적습니다 — 태블릿 이상 "동작 예시" 칸은 칸 폭에 맞추고 높이가 비율을
+  따릅니다(예: 타이다다 16:9, `swingGifWidth: 200`).
 - `data/not-yet/`은 아직 가이드가 준비되지 않은 곡, `data/origin/`은 수정 전
   원본 가사/정보 백업 — 둘 다 `songList`에는 포함되지 않습니다.
 
@@ -433,22 +453,22 @@ src/
   Footer는 메인 화면(/)에서만 그리므로, 새 스크롤 페이지가 이걸 쓰기 시작해도 따로
   등록할 곳은 없습니다. 가이드·슬램 화면엔 푸터가 없습니다(목록·가사가 화면 높이를
   다 씀).
-- 푸터(`src/components/Footer.tsx`)는 배경 띠·경계선 없이 글자 그림자만 준 한 줄입니다.
-  - 태블릿 이상(메인 화면에서만 보임): 왼쪽에 운영자가 정한 저작권 문구 그대로
-    (`lib/seo.ts`의 `COPYRIGHT_NOTICE`), 오른쪽에 사이트 기능 버튼 묶음
+- 푸터(`src/components/Footer.tsx`)는 배경 띠·경계선 없이 글자 그림자만 줍니다.
+  - 태블릿 이상(메인 화면에서만 보임, 한 줄): 왼쪽에 운영자가 정한 저작권 문구 그대로
+    (`lib/seo.ts`의 `COPYRIGHT_NOTICE`) + 공식 링크 아이콘, 오른쪽에 사이트 기능 버튼 묶음
     [설치][공유] | [건의][출처]. 설치(`InstallButton`)는 설치 가능할 때만 보입니다.
     화면 높이가 700px 이하면 홈 카드들과 겹쳐서 숨깁니다(`tablet:xlow:hidden`).
-  - 모바일: 줄인 문구("비공식 팬 페이지 · © ZUTOMAYO · 출처" — 출처는 글자 링크) +
+  - 모바일(두 줄): 공식 링크 아이콘 줄, 그 아래 줄인 문구("비공식 팬 페이지 · © ZUTOMAYO ·
+    출처" — 출처는 글자 링크) +
     건의 버튼. 저작권 전문은 출처 페이지(/credits)에도 있습니다.
 - 공유(`ShareButton`, `lib/use-share.ts`)는 지금 보고 있는 페이지 주소를 보냅니다.
   자리: PC 메인 푸터, 가이드·슬램 곡 상세의 PC 상단 막대(`GuideDetailToolbar`),
   모바일 상단 바(메인과 곡 상세).
 - 공식 링크 아이콘(`data/social-links.ts`의 `OFFICIAL_ICON_LINKS` — zutomayocalendar.net
   푸터와 같은 유튜브, X 메인·스태프, 인스타그램 메인·스태프·mart, 아이콘도 같은
-  이미지를 `public/assets/footer/`에 두고 그대로 씀)은 PC 메인 오른쪽 위
-  (`features/home OfficialLinks`), 모바일은 메인 상단 바 왼쪽 버튼이 여는 시트
-  (`components/mobile/OfficialLinksSheet`, 아이콘만으론 계정 구분이 안 돼서 이름 포함)에
-  있습니다.
+  이미지를 `public/assets/footer/`에 두고 그대로 씀)은 푸터에 있습니다
+  (`components/OfficialLinks`) — PC는 저작권 문구 바로 옆(한 줄), 모바일은 저작권
+  줄 위의 아이콘 줄. 계정 구분은 대체 텍스트·마우스 설명(title)의 계정 이름으로.
 - 건의 폼(Tally) 주소는 `lib/feedback.ts`의 `getFeedbackUrl()`로 만듭니다. 곡 가사
   맨 끝의 "이 곡 싱크·가사 오류 제보"는 `title`(곡 한국어 제목)·`mode`(cheer/slam)를 넘기는데,
   Tally 폼에 같은 이름의 숨김 필드(Hidden fields)가 있어야 값이 채워집니다.
