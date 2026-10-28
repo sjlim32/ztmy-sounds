@@ -4,7 +4,7 @@ import { ARTIST } from "@/data/artist";
 export const metadata: Metadata = {
   title: `${ARTIST.name.kr} 응원 가이드`,
   description:
-    "노래를 선택해서 샤모지 응원법과 떼창을 미리 공부할 수 있습니다.",
+    "노래를 선택해서 샤모지 응원법과 호응법, 떼창 타이밍을 미리 공부할 수 있습니다.",
 };
 
 // 실제 UI는 SongPanel(guide/layout.tsx에 상주)이 라우트 세그먼트를 보고 그립니다.
