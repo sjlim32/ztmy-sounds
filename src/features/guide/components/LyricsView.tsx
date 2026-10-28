@@ -6,19 +6,19 @@ import type { Song } from "@/features/guide/lib/types";
 import { LyricLine } from "@/features/guide/components/LyricLine";
 import { AutoScrollToggle } from "@/features/guide/components/AutoScrollToggle";
 import { SongVersionToggle } from "@/features/guide/components/SongVersionToggle";
-import { SwingGuideGifOverlay } from "@/features/guide/components/SwingGuideGif";
 import { useAutoScrollPreference } from "@/features/guide/lib/auto-scroll";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
+import {
+  SongDescriptionPanel,
+  hasSongDescription,
+} from "@/features/guide/components/SongDescriptionPanel";
+import { getSong } from "@/features/guide/data/songs";
 import { SongReportLink } from "@/features/guide/components/SongReportLink";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
 import { getTagRunPositions } from "@/features/guide/lib/line-tag";
 
-// 스윙 예시 GIF 아래끝과 재생 중인 줄 위끝 사이 간격(px).
-const GIF_GAP = 8;
-
-// 자동 스크롤 한 번의 길이와 곡선 — GIF도 같은 값으로 따라 움직인다.
+// 자동 스크롤 한 번의 길이(easeInOutCubic 곡선).
 const SCROLL_MS = 450;
-const SCROLL_EASING_CSS = "cubic-bezier(0.65, 0, 0.35, 1)";
 function easeInOutCubic(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
 }
@@ -36,11 +36,17 @@ export function LyricsView({
 }) {
   const listRef = useRef<HTMLOListElement>(null);
   const bottomSentinelRef = useRef<HTMLLIElement>(null);
-  const gifAnchorRef = useRef<HTMLDivElement>(null);
   // 목록 맨 아래 sentinel이 아직 안 보이면(교차 안 함) 더 스크롤할 게 남은 것.
   const [canScrollDown, setCanScrollDown] = useState(false);
   const [autoScroll] = useAutoScrollPreference();
   const { visibleTags } = useGuideMode();
+  // 모바일 가사 맨 위 곡 설명 카드. 설명은 정식(live) 데이터에만 있을 수 있어
+  // 음원 버전이어도 정식 데이터에서 읽는다. 카드가 목록의 첫 항목이라 가사 줄의
+  // 목록 순번은 그만큼 밀린다(lineOffset).
+  const descriptionSong = song ? (getSong(song.id) ?? song) : null;
+  const showDescription =
+    !!descriptionSong && hasSongDescription(descriptionSong);
+  const lineOffset = showDescription ? 1 : 0;
   // 곡·모드가 바뀔 때만 계산 — 재생 중 매 tick 다시 만들면 각 줄의 memo가 깨진다.
   const runPositions = useMemo(
     () => (song ? getTagRunPositions(song.lyrics, visibleTags) : []),
@@ -85,7 +91,8 @@ export function LyricsView({
     if (!autoScroll) return;
 
     const list = listRef.current;
-    const activeEl = list?.children[activeLineIndex] as HTMLElement | undefined;
+    const activeEl = list?.children[activeLineIndex + lineOffset] as
+      HTMLElement | undefined;
     if (!list || !activeEl) return;
 
     // 목록 중앙에 오도록 스크롤. 브라우저 기본 부드러운 스크롤(behavior:
@@ -139,53 +146,7 @@ export function LyricsView({
       list.removeEventListener("wheel", stop);
       list.removeEventListener("touchstart", stop);
     };
-  }, [song, activeLineIndex, autoScroll]);
-
-  // 태블릿 이상: 스윙 예시 GIF를 재생 중인 줄 바로 위에, 그 줄 위쪽 끝에서
-  // GIF_GAP만큼 띄워 둔다 — 재생 중인 줄은 가리지 않는다. 영역 밖으로는 안
-  // 나간다(맨 위 줄이면 영역 위끝에 붙음). 매 프레임 바뀔 수 있어서 상태 대신
-  // 요소 style을 직접 바꾼다.
-  //
-  // 자동 스크롤 중엔 실제 스크롤 위치가 아니라 스크롤이 끝났을 때의 위치(위
-  // effect가 재생 중인 줄을 가운데로 맞추는 목표 위치)로 계산해 그 자리로 한 번에
-  // 미끄러지게 한다 — 실제 위치를 따라가면 줄이 바뀌는 순간 GIF가 한 줄
-  // 내려갔다가 스크롤을 따라 다시 올라와 흔들려 보인다. 자동 스크롤이 꺼져
-  // 있으면 손으로 스크롤하는 위치를 그대로 따라간다.
-  useEffect(() => {
-    const list = listRef.current;
-    const anchor = gifAnchorRef.current;
-    if (!list || !anchor || activeLineIndex < 0) return;
-
-    const active = list.children[activeLineIndex] as HTMLElement | undefined;
-    if (!active) return;
-
-    const place = (scrollTop: number, animate: boolean) => {
-      const half = anchor.offsetHeight / 2;
-      const center = active.offsetTop - scrollTop - GIF_GAP - half;
-      const top = Math.min(Math.max(center, half), list.clientHeight - half);
-      anchor.style.transition = animate
-        ? `top ${SCROLL_MS}ms ${SCROLL_EASING_CSS}`
-        : "none";
-      anchor.style.top = `${top}px`;
-    };
-
-    if (autoScroll) {
-      const maxScroll = list.scrollHeight - list.clientHeight;
-      const target =
-        active.offsetTop - list.clientHeight / 2 + active.clientHeight / 2;
-      place(Math.min(Math.max(target, 0), maxScroll), true);
-      return;
-    }
-
-    place(list.scrollTop, true);
-    const follow = () => place(list.scrollTop, false);
-    list.addEventListener("scroll", follow, { passive: true });
-    window.addEventListener("resize", follow);
-    return () => {
-      list.removeEventListener("scroll", follow);
-      window.removeEventListener("resize", follow);
-    };
-  }, [song, activeLineIndex, autoScroll]);
+  }, [song, activeLineIndex, autoScroll, lineOffset]);
 
   if (!song) return null;
 
@@ -208,7 +169,7 @@ export function LyricsView({
         data-playing={activeLineIndex >= 0 || undefined}
         className={cn(
           // bottom-12 = 스크롤 화살표 영역 확보
-          "absolute inset-x-0 top-0 bottom-0 scrollbar-none overflow-x-hidden overflow-y-auto py-10 [&::-webkit-scrollbar]:hidden",
+          "absolute inset-x-0 top-0 bottom-0 scrollbar-none overflow-x-hidden overflow-y-auto pt-6 pb-10 [&::-webkit-scrollbar]:hidden",
           // 스크롤 영역을 처음부터 별도 합성 레이어로 — 안 그러면 브라우저(특히
           // 1배율 모니터)가 자동 스크롤 중 매 프레임 글자를 다시 그리며 픽셀
           // 격자에 맞춰 재생 중이던 줄 글자가 떨려 보인다.
@@ -218,13 +179,20 @@ export function LyricsView({
           // (:has 대신 data-playing — :has는 줄이 바뀔 때마다 모든 줄의
           // 스타일을 다시 계산해서, 마침 시작되는 자동 스크롤의 프레임을 빼먹게 한다)
           "[&[data-playing]>li:not([data-active])]:text-white/55",
-          "tablet:bottom-12 tablet:py-7",
+          "tablet:bottom-12 tablet:pt-5 tablet:pb-7",
           // 사라질 땐 트랜지션 없이 즉시, 나타날 때만 fade-in — 그래야 곡이
           // 빠르게 연달아 바뀌어도 이미 교체된 다음 곡 내용이 fade-out
           // 되는 것처럼 보이는 깜빡임이 생기지 않습니다.
           visible ? "opacity-100 transition-opacity duration-500" : "opacity-0",
         )}
       >
+        {/* 모바일: 재생 전에 읽고, 재생하면 자동 스크롤로 지나가는 곡 설명
+            (태블릿 이상은 영상 아래에 따로 있다) */}
+        {showDescription && descriptionSong && (
+          <li className={cn("px-3 pb-3", "tablet:hidden")}>
+            <SongDescriptionPanel song={descriptionSong} />
+          </li>
+        )}
         {song.lyrics.map((line, index) => (
           <LyricLine
             key={line.time}
@@ -246,15 +214,6 @@ export function LyricsView({
           <ChevronDownIcon className="h-4 w-4 text-white" />
         </div>
       )}
-
-      {/* 태블릿 이상: 스윙 구간 가사가 재생될 때만 가사 영역 우측, 재생 중인
-          줄의 윗줄 높이에 예시 GIF(세로 위치는 위 effect가 정한다) */}
-      <div
-        ref={gifAnchorRef}
-        className="pointer-events-none absolute top-1/2 right-3 z-40"
-      >
-        <SwingGuideGifOverlay placement="lyrics" />
-      </div>
 
       {/* 가사 fade 전환(곡 변경, 버전 토글)과 무관하게 항상 화면에 유지 */}
       <SongVersionToggle />

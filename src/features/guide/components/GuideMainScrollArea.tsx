@@ -23,11 +23,17 @@ export function GuideMainScrollArea({ children }: { children: ReactNode }) {
       className={cn(
         "contents",
         "tablet:flex tablet:min-w-0 tablet:flex-1 tablet:flex-col tablet:items-center tablet:justify-center-safe tablet:overflow-y-auto",
+        // 곡 상세(영상이 열림)는 위쪽 정렬 — 가운데 정렬이면 영상 위가 휑하게 비고
+        // 오른쪽 가사 패널 위끝과도 어긋난다. 목록 화면(공지)은 가운데 그대로.
+        "tablet:has-[>[data-open]]:justify-start",
         "tablet:scrollbar-thin tablet:[scrollbar-color:transparent_transparent] tablet:hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
         "tablet:[&::-webkit-scrollbar]:w-1.5 tablet:[&::-webkit-scrollbar-thumb]:rounded-full tablet:[&::-webkit-scrollbar-thumb]:bg-transparent tablet:hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
         // SongPanel과 같은 높이(목록 화면도 상세와 같은 높이). 4rem은 헤더
         // 높이(SiteHeader).
         "tablet:h-[calc(94vh-4rem)]",
+        // 크기 컨테이너 — 영상 열 폭과 GIF 칸 크기를 이 영역 크기(cqh/cqw)로
+        // 계산한다(lib/player-layout.ts).
+        "tablet:[container-type:size]",
       )}
     >
       {children}

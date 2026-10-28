@@ -44,6 +44,11 @@ export interface Song {
   swingGif?: string | readonly string[];
   /** 지정하면 swingGif를 이 크기(px)의 정사각형에 맞춰 가운데만 보이게 표시 (파일은 그대로) */
   swingGifSize?: number;
+  /**
+   * 정사각형으로 자르지 않고 원본 비율 그대로 보일 GIF의 모바일 표시 폭(px).
+   * 태블릿 이상 "동작 예시" 칸은 칸 폭에 맞춘다. swingGifSize와 같이 쓰지 않는다.
+   */
+  swingGifWidth?: number;
   /** 태블릿 이상 영상 아래 곡 설명. 없으면 임시 예시 문구를 보여준다. */
   description?: SongDescription;
   lyrics: LyricLine[];

@@ -12,6 +12,7 @@ import {
 import { GuideDetailToolbar } from "@/features/guide/components/GuideDetailToolbar";
 import { SongListDrawer } from "@/features/guide/components/SongListDrawer";
 import { CallLegend } from "@/features/guide/components/CallLegend";
+import { SwingGuideGifSlot } from "@/features/guide/components/SwingGuideGif";
 import { SongReportLink } from "@/features/guide/components/SongReportLink";
 import { SongDescriptionPanel } from "@/features/guide/components/SongDescriptionPanel";
 import { getSong } from "@/features/guide/data/songs";
@@ -97,6 +98,8 @@ export function GuidePlayerArea() {
   return (
     <div
       data-role="guide-player-area"
+      // 곡이 열려 있으면 바깥 스크롤 영역(GuideMainScrollArea)이 위쪽 정렬로 바뀐다.
+      data-open={isSongSelected || undefined}
       className={playerAreaStyles({
         state: isSongSelected ? "open" : "closed",
       })}
@@ -120,10 +123,14 @@ export function GuidePlayerArea() {
       )}
       {song && (
         <div className="tablet:order-3 tablet:flex tablet:basis-full hidden justify-center">
-          <div className={cn(PLAYER_COLUMN_CLASS, "flex flex-col gap-3")}>
-            {/* 자동 스크롤·오류 제보는 가사를 다루는 기능이라 가사 영역(LyricsView)에 있다. */}
-            <CallLegend />
-            <SongDescriptionPanel song={song} />
+          {/* [응원 표시 안내 + 곡 설명 | 동작 예시 GIF 칸]. 자동 스크롤·오류
+              제보는 가사를 다루는 기능이라 가사 영역(LyricsView)에 있다. */}
+          <div className={cn(PLAYER_COLUMN_CLASS, "flex items-start gap-3")}>
+            <div className="flex min-w-0 flex-1 flex-col gap-3">
+              <CallLegend />
+              <SongDescriptionPanel song={song} />
+            </div>
+            <SwingGuideGifSlot />
           </div>
         </div>
       )}

@@ -18,11 +18,7 @@ import {
   getVisibleLineTag,
   type TagRunPosition,
 } from "@/features/guide/lib/line-tag";
-import {
-  CALL_TAG_COLOR,
-  CALL_TAG_SHORT_LABEL,
-  withAlpha,
-} from "@/features/guide/lib/call-tag-style";
+import { CALL_TAG_COLOR, withAlpha } from "@/features/guide/lib/call-tag-style";
 
 // CallIcon은 align-middle(=부모 baseline + x-height의 절반)로 정렬되는데,
 // 이 폰트에서는 그 기준점이 실제 글자의 시각적 중심보다 살짝 아래라서
@@ -438,18 +434,16 @@ function CheerText({
     );
   }
 
-  // 응원 설명: 아이콘 + 종류 이름 + 설명을 응원 색 글자로만(배경 장식 없음)
+  // 응원 설명: 설명만 응원 색 글자로(배경 장식 없음). 응원 종류는 왼쪽 아이콘과
+  // 글자 색이 이미 알려줘서 이름("흔들기" 등)은 앞에 붙이지 않는다. 간주 줄은
+  // 아이콘 칸이 없어 설명 앞에 아이콘만 넣는다.
   return (
     <p data-role="cheer" className="mb-1">
       <span
-        className="inline-flex max-w-full flex-wrap items-center gap-x-1.5 text-left text-sm leading-relaxed font-bold"
+        className="inline-flex max-w-full items-center gap-x-1.5 text-left text-sm leading-relaxed font-bold"
         style={{ color: CALL_TAG_COLOR[tag] }}
       >
-        <span className="inline-flex shrink-0 items-center whitespace-nowrap">
-          {showIcon && <CallIcon name={tag} size={18} />}
-          {CALL_TAG_SHORT_LABEL[tag]}
-        </span>
-        <span aria-hidden>·</span>
+        {showIcon && <CallIcon name={tag} size={18} className="mr-0" />}
         <span>{renderTextParts(text, "cheer")}</span>
       </span>
     </p>
