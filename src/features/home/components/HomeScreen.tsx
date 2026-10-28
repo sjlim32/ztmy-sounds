@@ -8,7 +8,6 @@ import { Header } from "@/features/home/components/Header";
 import { NextEventCard } from "@/features/home/components/NextEventCard";
 import { MainNavLink } from "@/features/home/components/MainNavLink";
 import { ConcertQuickPanel } from "@/features/home/components/ConcertQuickPanel";
-import { OfficialLinks } from "@/features/home/components/OfficialLinks";
 import {
   PracticeShortcuts,
   type PracticeSong,
@@ -194,13 +193,6 @@ export function HomeScreen({
           </div>
         </div>
         {/* MOBILE END */}
-
-        <OfficialLinks
-          className={cn(
-            "hidden",
-            "tablet:absolute tablet:top-8 tablet:right-10 tablet:flex",
-          )}
-        />
 
         <section
           id="main-left"

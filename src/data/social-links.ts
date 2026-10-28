@@ -34,7 +34,7 @@ export type OfficialIconLink = {
 };
 
 /**
- * 홈의 공식 링크 묶음(OfficialLinks) — zutomayocalendar.net 푸터와 같은
+ * 푸터의 공식 링크 줄(components/OfficialLinks) — zutomayocalendar.net 푸터와 같은
  * 구성·아이콘 이미지(유튜브, X 메인·스태프, 인스타그램 메인·스태프·mart).
  * 위 SOCIAL_LINKS는 검색엔진용 구조화 데이터(sameAs)에도 쓰여서 따로 둔다.
  */
