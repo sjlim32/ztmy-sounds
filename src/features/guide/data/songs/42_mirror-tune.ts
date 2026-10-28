@@ -12,6 +12,10 @@ const song: Song = {
   youtubeId: "jd9tEPZVuy8",
   importance: "recommended",
   swingGif: "/assets/guide/milabo.webp",
+  description: {
+    summary: "",
+    points: [],
+  },
   lyrics: [
     {
       time: "0:0",
@@ -172,7 +176,7 @@ const song: Song = {
       pronunciation: "모치롱 몬다이와 야마즈미 데스가 **yey**",
       translation: "당연히 문제는 산더미지만요 yey",
       cheer: {
-        text: '"yey"만',
+        text: "",
         tag: "swing",
       },
     },
@@ -200,7 +204,7 @@ const song: Song = {
       pronunciation: "심피테키나 미라츈 **yey**",
       translation: "신비한 미러튠 yey",
       cheer: {
-        text: '"yey"만',
+        text: "",
         tag: "swing",
       },
     },
@@ -349,7 +353,7 @@ const song: Song = {
       pronunciation: "모치롱 히키사가리와 시나이데스가 **yey**",
       translation: "물론 물러서지는 않겠지만 yey",
       cheer: {
-        text: '"yey"만',
+        text: "",
         tag: "swing",
       },
     },
@@ -365,7 +369,7 @@ const song: Song = {
       pronunciation: "코코로이키 얀챠데 아부낫카시이케도 **yey**",
       translation: "마음만 넘쳐서 위태롭지만서도 yey",
       cheer: {
-        text: '"yey"만',
+        text: "",
         tag: "swing",
       },
     },

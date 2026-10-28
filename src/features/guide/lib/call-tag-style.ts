@@ -17,7 +17,7 @@ export const CALL_TAG_COLOR: Record<CallTag, string> = {
 export const CALL_TAG_LABEL: Record<CallTag, string> = {
   swing: "샤모지 흔들기",
   clap: "샤모지 박수",
-  call: "떼창",
+  call: "노래",
   dance: "샤모지 댄스",
   slam: "슬램",
 };
@@ -30,7 +30,7 @@ export const CALL_TAG_LABEL: Record<CallTag, string> = {
 export const CALL_TAG_SHORT_LABEL: Record<CallTag, string> = {
   swing: "흔들기",
   clap: "박수",
-  call: "떼창",
+  call: "노래",
   dance: "댄스",
   slam: "슬램",
 };

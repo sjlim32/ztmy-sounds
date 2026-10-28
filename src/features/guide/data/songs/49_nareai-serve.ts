@@ -113,7 +113,7 @@ const song: Song = {
       pronunciation: "**아이 아이**",
       translation: "",
       cheer: {
-        text: "떼창 + 박자에 맞게 샤모지 흔들기",
+        text: "",
         tag: "call",
       },
       slam: "떼창",
@@ -149,7 +149,7 @@ const song: Song = {
       pronunciation: "**아이 아이**",
       translation: "",
       cheer: {
-        text: "떼창 + 박자에 맞게 샤모지 흔들기",
+        text: "",
         tag: "call",
       },
       slam: "떼창",
@@ -250,7 +250,7 @@ const song: Song = {
       pronunciation: "**아이 아이**",
       translation: "",
       cheer: {
-        text: "떼창 + 박자에 맞게 샤모지 흔들기",
+        text: "",
         tag: "call",
       },
       slam: "떼창",
@@ -285,7 +285,7 @@ const song: Song = {
       pronunciation: "**아이 아이**",
       translation: "",
       cheer: {
-        text: "떼창 + 박자에 맞게 샤모지 흔들기",
+        text: "",
         tag: "call",
       },
       slam: "떼창",

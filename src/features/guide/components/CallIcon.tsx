@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import type { CallTag } from "@/features/guide/lib/types";
 import { CALL_TAG_LABEL } from "@/features/guide/lib/call-tag-style";
 
-// 스윙/클랩/떼창/댄스는 샤모지 아이콘 세트(그림만 있는 256px 정사각형 버전).
+// 스윙/클랩/노래/댄스는 샤모지 아이콘 세트(그림만 있는 256px 정사각형 버전).
 // 같은 이름의 *-label.webp는 한자·영문이 들어간 큰 자리용 버전.
 const ICON_SRC: Record<CallTag, string> = {
   swing: "/assets/guide/shamoji/swing.webp",

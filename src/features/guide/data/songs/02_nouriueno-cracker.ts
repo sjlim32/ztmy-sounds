@@ -234,7 +234,7 @@ const song: Song = {
         text: "",
         tag: "call",
       },
-      slam: "떼창 (이에나캇타)",
+      slam: "",
     },
     {
       time: "2:00",

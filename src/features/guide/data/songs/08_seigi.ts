@@ -516,7 +516,7 @@ const song: Song = {
       translation: "다가오고 멀어지며 살폈던 거야",
       swingGif: true,
       cheer: {
-        text: "스윙하며 아카네의 지시에 따라 떼창",
+        text: "",
         tag: "swing",
       },
     },
@@ -527,7 +527,7 @@ const song: Song = {
       translation: "다가오고 멀어지며 알아봤던 거야",
       swingGif: true,
       cheer: {
-        text: "스윙하며 아카네의 지시에 따라 떼창",
+        text: "",
         tag: "swing",
       },
     },
@@ -538,7 +538,7 @@ const song: Song = {
       translation: "지하에 닿아 질문을 풀며 웃어보인 거야",
       swingGif: true,
       cheer: {
-        text: "스윙하며 아카네의 지시에 따라 떼창",
+        text: "",
         tag: "call",
       },
     },
@@ -549,7 +549,7 @@ const song: Song = {
       translation: "다가오고 멀어지며 만나게 된 거야",
       swingGif: true,
       cheer: {
-        text: "스윙하며 아카네의 지시에 따라 떼창",
+        text: "",
         tag: "swing",
       },
     },
@@ -560,7 +560,7 @@ const song: Song = {
       translation: "다가오고 멀어지며 살폈던 거야",
       swingGif: true,
       cheer: {
-        text: "스윙하며 아카네의 지시에 따라 떼창",
+        text: "",
         tag: "call",
       },
     },
@@ -571,7 +571,7 @@ const song: Song = {
       translation: "다가오고 멀어지며 알아봤던 거야",
       swingGif: true,
       cheer: {
-        text: "스윙하며 아카네의 지시에 따라 떼창",
+        text: "",
         tag: "swing",
       },
     },
@@ -582,7 +582,7 @@ const song: Song = {
       translation: "다가오고 멀어지며 웃어보인 거야",
       swingGif: true,
       cheer: {
-        text: "스윙하며 아카네의 지시에 따라 떼창",
+        text: "",
         tag: "call",
       },
     },
@@ -593,7 +593,7 @@ const song: Song = {
       translation: "다가오다 열 번 물러서며 만나게 된 거야",
       swingGif: true,
       cheer: {
-        text: "스윙하며 아카네의 지시에 따라 떼창",
+        text: "",
         tag: "swing",
       },
     },

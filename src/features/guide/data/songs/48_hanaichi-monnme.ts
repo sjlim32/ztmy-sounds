@@ -442,7 +442,7 @@ const song: Song = {
       pronunciation: "**하나이치몬메**",
       translation: "하나이치몬메",
       cheer: {
-        text: "떼창",
+        text: "",
         tag: "call",
       },
     },
@@ -459,7 +459,7 @@ const song: Song = {
       pronunciation: "**하나이치몬메**",
       translation: "하나이치몬메",
       cheer: {
-        text: "떼창",
+        text: "",
         tag: "call",
       },
     },

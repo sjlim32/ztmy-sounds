@@ -16,6 +16,10 @@ const song: Song = {
     "/assets/guide/hippocampal_02.webp",
   ],
   swingGifSize: 120,
+  description: {
+    summary: "해마 댄스",
+    points: ["노래 끝까지 마음대로 샤모지 흔들며 호응"],
+  },
   lyrics: [
     {
       time: "0:0",
@@ -24,7 +28,7 @@ const song: Song = {
       translation: "",
       interlude: true,
       cheer: {
-        text: "노래 끝까지 마음대로 샤모지 흔들며 호응",
+        text: "",
         tag: "dance",
       },
       swingGif: true,
@@ -443,6 +447,7 @@ const song: Song = {
       original: "♫",
       pronunciation: "",
       translation: "",
+      cheer: { text: "", tag: "dance" },
       interlude: true,
       swingGif: true,
     },

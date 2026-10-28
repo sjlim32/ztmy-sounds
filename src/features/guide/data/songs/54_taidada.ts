@@ -11,6 +11,16 @@ const song: Song = {
   title: taidada,
   youtubeId: "rdKOnKhK8GU",
   importance: "essential",
+  swingGif: "/assets/guide/taidada.webp",
+  // 가로로 긴 장면이라 자르지 않고 원본 비율(16:9) 그대로
+  swingGifWidth: 200,
+  description: {
+    summary: "T I P",
+    points: [
+      '"진루이난다시~ / 츠게루 모노데쇼"까지 4줄은 팔을 앞으로 뻗어주세요. (GIF 참고)',
+      "그 외의 부분은 박자에 맞춰 흔들어주세요.",
+    ],
+  },
   lyrics: [
     {
       time: "0:0",
@@ -95,12 +105,13 @@ const song: Song = {
     {
       time: "0:41",
       original: "人類なんだしー 自由自在のはずが",
-      pronunciation: "진루이난다시- 지유-지자이노 하즈가",
+      pronunciation: "진루이난다시ー 지유ー지자이노 하즈가",
       translation: "인류니까 자유자재여야 하는데",
       cheer: {
         text: "",
         tag: "swing",
       },
+      swingGif: true,
     },
     {
       time: "0:44.5",
@@ -111,6 +122,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      swingGif: true,
     },
     {
       time: "0:47.5",
@@ -121,6 +133,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      swingGif: true,
     },
     {
       time: "0:51",
@@ -131,6 +144,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      swingGif: true,
     },
     {
       time: "0:57.5",
@@ -168,7 +182,7 @@ const song: Song = {
       pronunciation: "챤토**세이**",
       translation: "제대로 해",
       cheer: {
-        text: '"세이"에 점프',
+        text: "JUMP !",
         tag: "swing",
       },
     },
@@ -178,7 +192,7 @@ const song: Song = {
       pronunciation: "What’s your **pain**?",
       translation: " What’s your pain?",
       cheer: {
-        text: '"pain"에 점프',
+        text: "JUMP !",
         tag: "swing",
       },
     },
@@ -188,7 +202,7 @@ const song: Song = {
       pronunciation: "칸죠ー**센오** 키미토 넷테이키타인다요",
       translation: "감정선의 작전 너와 맞춰가고 싶어",
       cheer: {
-        text: '"센"에 점프',
+        text: "JUMP !",
         tag: "swing",
       },
     },
@@ -343,12 +357,13 @@ const song: Song = {
     {
       time: "1:59.3",
       original: "人類なんだしー 自由自在のはずが",
-      pronunciation: "진루이난다시- 지유-지자이노 하즈가",
+      pronunciation: "진루이난다시ー 지유ー지자이노 하즈가",
       translation: "인류니까 자유자재여야 하는데",
       cheer: {
         text: "",
         tag: "swing",
       },
+      swingGif: true,
     },
     {
       time: "2:02.6",
@@ -359,6 +374,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      swingGif: true,
     },
     {
       time: "2:06",
@@ -369,6 +385,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      swingGif: true,
     },
     {
       time: "2:09.3",
@@ -379,6 +396,7 @@ const song: Song = {
         text: "",
         tag: "swing",
       },
+      swingGif: true,
     },
     {
       time: "2:15.8",
@@ -416,7 +434,7 @@ const song: Song = {
       pronunciation: "챤토**세이**",
       translation: "제대로 해",
       cheer: {
-        text: '"세이"에 점프',
+        text: "JUMP !",
         tag: "swing",
       },
     },
@@ -426,7 +444,7 @@ const song: Song = {
       pronunciation: "What’s your **pain**?",
       translation: " What’s your pain?",
       cheer: {
-        text: '"pain"에 점프',
+        text: "JUMP !",
         tag: "swing",
       },
     },
@@ -436,7 +454,7 @@ const song: Song = {
       pronunciation: "칸주**세ー오** 키미토 넷테이키타인다요",
       translation: "감수성을 너와 맞춰가고 싶어",
       cheer: {
-        text: '"세"에 점프',
+        text: "JUMP !",
         tag: "swing",
       },
     },
@@ -544,7 +562,7 @@ const song: Song = {
       pronunciation: "챤토**세이**",
       translation: "제대로 해",
       cheer: {
-        text: '"세이"에 점프',
+        text: "JUMP !",
         tag: "swing",
       },
     },
@@ -554,7 +572,7 @@ const song: Song = {
       pronunciation: "What’s your **pain**?",
       translation: " What’s your pain?",
       cheer: {
-        text: '"pain"에 점프',
+        text: "JUMP !",
         tag: "swing",
       },
     },
@@ -564,7 +582,7 @@ const song: Song = {
       pronunciation: "칸조**오**나이 토키코소 토이타다슨다요",
       translation: "감정이 없을 때일수록 따지는 거야",
       cheer: {
-        text: '"오"에 점프',
+        text: "JUMP !",
         tag: "swing",
       },
     },

@@ -11,6 +11,12 @@ const song: Song = {
   title: medi,
   youtubeId: "sBpITQ7oXxM",
   importance: "recommended",
+  description: {
+    summary: "떼창 T I P",
+    points: [
+      "노래 표시된 부분의 떼창 타이밍은 스크린에 표시되니 스크린을 꼭 봐주세요.",
+    ],
+  },
   lyrics: [
     {
       time: "0:00",
@@ -389,7 +395,7 @@ const song: Song = {
       translation: "방해하는 그들은 절대 용서 못 해요",
       cheer: {
         tag: "call",
-        text: "떼창 표시 나올 때",
+        text: "스크린에 표시되는 타이밍에만",
       },
       slam: "기차놀이",
     },
@@ -400,7 +406,7 @@ const song: Song = {
       translation: "눈을 떠도 감아도 Santa Compaña",
       cheer: {
         tag: "call",
-        text: "떼창 표시 나올 때",
+        text: "스크린에 표시되는 타이밍에만",
       },
       slam: "기차놀이",
     },

@@ -22,12 +22,13 @@ const song: Song = {
       // # 1
       time: "0:2.4",
       original: "C R **E A M**",
-      pronunciation: "",
+      pronunciation: "C R **✋/✋/✋**",
       translation: "",
       cheer: {
-        text: '\"E A M\" 박자에 맞춰',
+        text: "",
         tag: "clap",
       },
+      claps: [1.1, 1.3, 1.55],
     },
     {
       time: "0:04.8",
@@ -39,12 +40,13 @@ const song: Song = {
       // # 2
       time: "0:9.8",
       original: "C R **E A M**",
-      pronunciation: "",
+      pronunciation: "C R **✋/✋/✋**",
       translation: "",
       cheer: {
-        text: '\"E A M\" 박자에 맞춰',
+        text: "",
         tag: "clap",
       },
+      claps: [1.1, 1.3, 1.55],
     },
     {
       time: "0:12.4",
@@ -56,12 +58,13 @@ const song: Song = {
       // # 3
       time: "0:17.5",
       original: "C R **E A M**",
-      pronunciation: "",
+      pronunciation: "C R **✋/✋/✋**",
       translation: "",
       cheer: {
-        text: '\"E A M\" 박자에 맞춰',
+        text: "",
         tag: "clap",
       },
+      claps: [1.1, 1.3, 1.55],
     },
     {
       time: "0:19.8",
@@ -73,12 +76,13 @@ const song: Song = {
       // # 4
       time: "0:25",
       original: "C R **E A M**",
-      pronunciation: "",
+      pronunciation: "C R **✋/✋/✋**",
       translation: "",
       cheer: {
-        text: '\"E A M\" 박자에 맞춰',
+        text: "",
         tag: "clap",
       },
+      claps: [1.1, 1.3, 1.55],
     },
     {
       time: "0:27.5",
@@ -90,13 +94,13 @@ const song: Song = {
       // # 5
       time: "0:32.4",
       original: "C R **E A M**",
-      pronunciation: "",
+      pronunciation: "C R **✋/✋/✋**",
       translation: "",
-
       cheer: {
-        text: '\"E A M\" 박자에 맞춰',
+        text: "",
         tag: "clap",
       },
+      claps: [1.1, 1.3, 1.55],
     },
     {
       time: "0:34.9",
@@ -108,12 +112,13 @@ const song: Song = {
       // # 6
       time: "0:39.8",
       original: "C R **E A M**",
-      pronunciation: "",
+      pronunciation: "C R **✋/✋/✋**",
       translation: "",
       cheer: {
-        text: '\"E A M\" 박자에 맞춰',
+        text: "",
         tag: "clap",
       },
+      claps: [1.1, 1.3, 1.55],
     },
     {
       time: "0:42.6",
@@ -395,12 +400,13 @@ const song: Song = {
       // # 4
       time: "2:54.9",
       original: "C R **E A M**",
-      pronunciation: "",
+      pronunciation: "C R **✋/✋/✋**",
       translation: "",
       cheer: {
-        text: '\"E A M\" 박자에 맞춰',
+        text: "",
         tag: "clap",
       },
+      claps: [1.1, 1.3, 1.55],
     },
     {
       time: "2:56.6",
@@ -620,12 +626,13 @@ const song: Song = {
     {
       time: "4:17.3",
       original: "C R **E A M**",
-      pronunciation: "",
+      pronunciation: "C R **✋/✋/✋**",
       translation: "",
       cheer: {
-        text: '\"E A M\" 박자에 맞춰',
+        text: "",
         tag: "clap",
       },
+      claps: [1.1, 1.3, 1.55],
     },
     {
       time: "4:20",

@@ -13,6 +13,13 @@ const song: Song = {
   importance: "essential",
   swingGif: "/assets/guide/dousoukai.webp",
   swingGifSize: 100,
+  description: {
+    summary: "점프 T I P",
+    points: [
+      "마지막 글자에 점프하되, 영상처럼 샤모지를 흔들면서 내려가다가 스프링처럼 JUMP!",
+    ],
+  },
+
   lyrics: [
     //================ 1절 ================//
     {
@@ -143,7 +150,7 @@ const song: Song = {
       translation: "Shy한 헛소동",
       swingGif: true,
       cheer: {
-        text: "스프링처럼 몸을 낮추다 마지막에 Jump",
+        text: "JUMP !",
         tag: "swing",
       },
       slam: '"기"에 Jump',
@@ -185,7 +192,7 @@ const song: Song = {
       translation: "제멋대로인 나로 좋아",
       swingGif: true,
       cheer: {
-        text: "스프링처럼 몸을 낮추다 마지막에 Jump",
+        text: "JUMP !",
         tag: "swing",
       },
     },
@@ -226,7 +233,7 @@ const song: Song = {
       translation: "Shy한 헛소동",
       swingGif: true,
       cheer: {
-        text: "스프링처럼 몸을 낮추다 마지막에 Jump",
+        text: "JUMP !",
         tag: "swing",
       },
     },
@@ -267,7 +274,7 @@ const song: Song = {
       translation: "제멋대로인 나로 좋아",
       swingGif: true,
       cheer: {
-        text: "스프링처럼 몸을 낮추다 마지막에 Jump",
+        text: "JUMP !",
         tag: "swing",
       },
       slam: '"이"에 Jump',
@@ -400,7 +407,7 @@ const song: Song = {
       translation: "Shy한 헛소동",
       swingGif: true,
       cheer: {
-        text: "스프링처럼 몸을 낮추다 마지막에 Jump",
+        text: "JUMP !",
         tag: "swing",
       },
       slam: '"기"에 Jump',
@@ -442,7 +449,7 @@ const song: Song = {
       translation: "제멋대로인 나로 좋아",
       swingGif: true,
       cheer: {
-        text: "스프링처럼 몸을 낮추다 마지막에 Jump",
+        text: "JUMP !",
         tag: "swing",
       },
       slam: '"이"에 Jump',
@@ -484,7 +491,7 @@ const song: Song = {
       translation: "Shy한 헛소동",
       swingGif: true,
       cheer: {
-        text: "스프링처럼 몸을 낮추다 마지막에 Jump",
+        text: "JUMP !",
         tag: "swing",
       },
       slam: '"기"에 Jump',
@@ -526,7 +533,7 @@ const song: Song = {
       translation: "제멋대로인 나로 좋아",
       swingGif: true,
       cheer: {
-        text: "스프링처럼 몸을 낮추다 마지막에 Jump",
+        text: "JUMP !",
         tag: "swing",
       },
       slam: '"이"에 Jump',
@@ -669,7 +676,7 @@ const song: Song = {
       translation: "Shy한 헛소동",
       swingGif: true,
       cheer: {
-        text: "스프링처럼 몸을 낮추다 마지막에 Jump",
+        text: "JUMP !",
         tag: "swing",
       },
       slam: '"기"에 Jump',
@@ -711,7 +718,7 @@ const song: Song = {
       translation: "제멋대로인 나로 좋아",
       swingGif: true,
       cheer: {
-        text: "스프링처럼 몸을 낮추다 마지막에 Jump",
+        text: "JUMP !",
         tag: "swing",
       },
       slam: '"이"에 Jump',
@@ -753,7 +760,7 @@ const song: Song = {
       translation: "Shy한 헛소동",
       swingGif: true,
       cheer: {
-        text: "스프링처럼 몸을 낮추다 마지막에 Jump",
+        text: "JUMP !",
         tag: "swing",
       },
       slam: '"기"에 Jump',
@@ -795,7 +802,7 @@ const song: Song = {
       translation: "제멋대로인 나로 좋아",
       swingGif: true,
       cheer: {
-        text: "스프링처럼 몸을 낮추다 마지막에 Jump",
+        text: "JUMP !",
         tag: "swing",
       },
       slam: '"이"에 Jump',
