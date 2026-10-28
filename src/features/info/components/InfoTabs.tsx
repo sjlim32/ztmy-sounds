@@ -4,16 +4,19 @@ import { useRef } from "react";
 import type { KeyboardEvent } from "react";
 import { cn } from "@/lib/utils";
 import {
-  ACTIVE_TAB_CLASS,
-  TAB_CLASS,
-  TAB_LIST_CLASS,
+  ACTIVE_HEADER_TAB_CLASS,
+  HEADER_TAB_CLASS,
 } from "@/components/button-styles";
-import { INFO_SCROLL_CONTAINER_ID, INFO_TABS } from "@/features/info/info";
+import {
+  INFO_SCROLL_CONTAINER_ID,
+  INFO_TAB_ANCHOR_ID,
+  INFO_TABS,
+} from "@/features/info/info";
 import type { InfoTabId } from "@/features/info/info";
-import { useInfoTab } from "./InfoTabContext";
+import { useInfoTab } from "@/features/info/lib/use-info-tab";
 
-// 탭 바를 컨테이너 최상단에 딱 붙이지 않고 살짝 띄우는 여백(px).
-const TABLIST_SCROLL_GAP = 8;
+// 탭 내용 시작점을 컨테이너 최상단에 딱 붙이지 않고 살짝 띄우는 여백(px).
+const CONTENT_SCROLL_GAP = 16;
 
 /**
  * 앵커로 점프하는 목차 대신, 카테고리별로 화면 자체를 갈아끼우는 탭 바.
@@ -26,26 +29,29 @@ const TABLIST_SCROLL_GAP = 8;
  * 탭을 바꾸면 새로 보이는 콘텐츠가 이전 스크롤 위치보다 짧을 수 있어(탭마다
  * 섹션 개수가 다름) 스크롤을 되돌린다 — 안 그러면 빈 공간이나 Footer만
  * 보이는 채로 남아 "고장난 것처럼" 보인다. 다만 페이지 맨 위(0)가 아니라
- * 탭 바가 컨테이너 최상단에 오는 위치로 맞춘다 — 탭 바 위에 공연 개요·일정
- * 카드가 있어서 맨 위로 가면 탭 바와 방금 연 탭 내용이 화면 밖으로 밀려난다.
+ * 탭 내용 시작점(INFO_TAB_ANCHOR_ID)이 컨테이너 최상단에 오는 위치로 맞춘다 —
+ * 그 위에 공연 개요·일정 카드가 있어서 맨 위로 가면 방금 연 탭 내용이 화면
+ * 밖으로 밀려난다.
+ *
+ * 탭 바는 본문이 아니라 헤더(SiteHeader)에 있다 — 태블릿 이상은 로고 오른쪽,
+ * 모바일은 상단 바 아래 한 줄. 자리·크기는 호출부가 className으로 정한다.
  */
-export function InfoTabs() {
+export function InfoTabs({ className }: { className?: string }) {
   const { activeTab, setActiveTab } = useInfoTab();
   const tabRefs = useRef<Partial<Record<InfoTabId, HTMLButtonElement>>>({});
-  const tablistRef = useRef<HTMLDivElement>(null);
 
   const activate = (id: InfoTabId) => {
     setActiveTab(id);
     // 새 탭 콘텐츠가 커밋된 뒤(스크롤 가능한 높이가 바뀐 뒤) 위치를 잡는다.
     requestAnimationFrame(() => {
       const container = document.getElementById(INFO_SCROLL_CONTAINER_ID);
-      const tablist = tablistRef.current;
-      if (!container || !tablist) return;
+      const anchor = document.getElementById(INFO_TAB_ANCHOR_ID);
+      if (!container || !anchor) return;
       const top =
-        tablist.getBoundingClientRect().top -
+        anchor.getBoundingClientRect().top -
         container.getBoundingClientRect().top +
         container.scrollTop -
-        TABLIST_SCROLL_GAP;
+        CONTENT_SCROLL_GAP;
       container.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
     });
   };
@@ -67,14 +73,9 @@ export function InfoTabs() {
 
   return (
     <div
-      ref={tablistRef}
       role="tablist"
       aria-label="정보 카테고리"
-      className={cn(
-        TAB_LIST_CLASS,
-        "mx-auto my-3 flex w-fit justify-center",
-        "tablet:my-6",
-      )}
+      className={cn("flex h-full items-stretch gap-6", className)}
     >
       {INFO_TABS.map(({ id, label }, index) => {
         const isActive = id === activeTab;
@@ -90,7 +91,10 @@ export function InfoTabs() {
             tabIndex={isActive ? 0 : -1}
             onClick={() => activate(id)}
             onKeyDown={(event) => handleKeyDown(event, index)}
-            className={cn(TAB_CLASS, isActive && ACTIVE_TAB_CLASS)}
+            className={cn(
+              HEADER_TAB_CLASS,
+              isActive && ACTIVE_HEADER_TAB_CLASS,
+            )}
           >
             {label}
           </button>

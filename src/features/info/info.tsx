@@ -5,8 +5,15 @@ import { InfoEvent } from "@/features/info/lib/types";
 // 두 곳에서 같은 문자열을 따로 적으면 어긋날 수 있어 여기 하나로 둔다.
 export const INFO_SCROLL_CONTAINER_ID = "info-scroll-container";
 
-/** 정보 페이지 상단 탭 4종. */
+// 본문에서 탭 내용이 시작하는 지점의 id — 탭 바는 헤더(SiteHeader)에 있어서,
+// 탭을 바꾸면 이 지점이 화면 맨 위에 오도록 스크롤한다(InfoTabs).
+export const INFO_TAB_ANCHOR_ID = "info-tab-content";
+
+/** 정보 페이지 탭 4종(탭 바는 헤더에 있다). */
 export type InfoTabId = "schedule" | "map" | "ticket" | "prologue";
+
+/** 주소에 해시가 없을 때 열리는 탭. */
+export const DEFAULT_INFO_TAB: InfoTabId = "schedule";
 
 export const INFO_TABS: { id: InfoTabId; label: string }[] = [
   { id: "schedule", label: "투어 일정" },

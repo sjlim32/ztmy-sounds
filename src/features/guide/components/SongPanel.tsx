@@ -79,10 +79,10 @@ export function SongPanel() {
         "pc:w-[36vw] pc:max-w-none contents",
         "tablet:flex tablet:w-full tablet:max-w-sm tablet:shrink-0 tablet:flex-col",
         "tablet:transition-[height,opacity] tablet:duration-300",
-        // 목록 화면도 상세 화면과 같은 높이(88vh) — 목록 ↔ 상세를 오갈 때
+        // 목록 화면도 상세 화면과 같은 높이 — 목록 ↔ 상세를 오갈 때
         // 패널 크기가 바뀌지 않도록. (PC에선 Footer가 메인 화면에만 떠서
-        // 여기선 Footer 몫을 뺄 필요가 없다.)
-        "tablet:h-[88vh]",
+        // 여기선 Footer 몫을 뺄 필요가 없다. 4rem은 헤더 높이 — SiteHeader.)
+        "tablet:h-[calc(94vh-4rem)]",
         isPanelVisible ? "tablet:opacity-100" : "tablet:opacity-0",
       )}
     >

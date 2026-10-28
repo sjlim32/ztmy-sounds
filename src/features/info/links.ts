@@ -28,7 +28,7 @@ export const TICKET_LINKS: ConcertLink[] = (INFORMATION.url.ticket ?? []).map(
   }),
 );
 
-/** /info의 탭 바로가기 — 해시가 탭 id다(InfoTabContext). */
+/** /info의 탭 바로가기 — 해시가 탭 id다(lib/use-info-tab.ts). */
 export const INFO_TAB_LINKS: ConcertLink[] = [
   { label: "공연 정보 전체", href: "/info" },
   ...INFO_TABS.map((tab) => ({ label: tab.label, href: `/info#${tab.id}` })),

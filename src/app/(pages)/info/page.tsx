@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { buildMusicEventJsonLd } from "@/lib/structured-data";
 import { INFO_SCROLL_CONTAINER_ID } from "@/features/info/info";
 import { EntranceFade } from "@/components/EntranceFade";
-import { HomeLink } from "@/components/HomeLink";
 import { PageScrollBody } from "@/components/PageScrollBody";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 
@@ -54,15 +53,12 @@ export default function InfoPage() {
       <PageScrollBody
         innerClassName={cn(
           "mx-auto w-full px-3 pt-6 pb-10",
-          "tablet:max-w-4xl tablet:px-6 tablet:py-16",
+          "tablet:max-w-4xl tablet:px-6 tablet:pt-10 tablet:pb-16",
         )}
       >
+        {/* 메인으로 가는 길은 헤더 로고(SiteHeader)가 맡는다. */}
         <EntranceFade>
-          <HomeLink label="홈으로" className="tablet:inline-flex hidden" />
-
-          <div className="mt-6">
-            <InfoContent />
-          </div>
+          <InfoContent />
         </EntranceFade>
       </PageScrollBody>
     </main>

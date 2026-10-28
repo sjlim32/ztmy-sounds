@@ -7,11 +7,10 @@ import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { NAV_BUTTON_CLASS } from "@/components/button-styles";
 
 interface BackLinkProps {
-  // 지정하면 그 경로로 고정 이동(Link) — 예: zutopia는 브라우저 history가
-  // 아니라 URL 뎁스를 한 단계 뗀 상위 경로로 가야 해서(ZutopiaTopNav 참고,
-  // 외부 링크로 바로 들어왔거나 여러 단계를 건너뛴 경우 history back은
-  // 엉뚱한 곳으로 감) 호출부가 그 경로를 계산해 넘긴다. 생략하면 기존
-  // 동작 그대로 router.back()으로 브라우저 히스토리를 한 단계 되돌린다.
+  // 지정하면 그 경로로 고정 이동(Link) — 예: 가이드 상세의 뒤로가기는
+  // 브라우저 history가 아니라 항상 곡 목록으로 가야 해서(GuideDetailToolbar)
+  // 호출부가 그 경로를 넘긴다. 생략하면 router.back()으로 브라우저
+  // 히스토리를 한 단계 되돌린다.
   href?: string;
   label?: string;
   // false면 아이콘만 보이고 label은 aria-label로만 쓰인다(모바일 헤더처럼

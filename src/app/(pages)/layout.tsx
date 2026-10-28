@@ -10,6 +10,7 @@ import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { GuideDimOverlay } from "@/components/GuideDimOverlay";
 import { InstallPromptBanner } from "@/components/InstallPromptBanner";
 import { MobileHeader } from "@/components/mobile/MobileHeader";
+import { SiteHeader } from "@/components/SiteHeader";
 import { Footer } from "@/components/Footer";
 import { ARTIST } from "@/data/artist";
 import { SITE_URL, SITE_NAME, SITE_BRAND, SITE_DESCRIPTION } from "@/lib/seo";
@@ -156,6 +157,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           >
             <MobileHeader />
             <InstallPromptBanner />
+            <SiteHeader />
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               {children}
             </div>

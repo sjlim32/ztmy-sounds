@@ -5,13 +5,11 @@ import {
   EventDetails,
   ImageLabel,
 } from "@/features/info/components/EventDetails";
-import { InfoTabProvider } from "@/features/info/components/InfoTabContext";
-import { InfoTabs } from "@/features/info/components/InfoTabs";
 import { TabSection } from "@/features/info/components/TabSection";
 import { TourSchedule } from "@/features/info/components/TourSchedule";
 import { TicketSchedule } from "@/features/info/components/TicketSchedule";
 import { groupImagesBySection } from "@/features/info/lib/group-images";
-import { INFORMATION } from "@/features/info/info";
+import { INFORMATION, INFO_TAB_ANCHOR_ID } from "@/features/info/info";
 import { SiteLink } from "@/components/SiteLink";
 
 export const sections = groupImagesBySection(
@@ -38,10 +36,9 @@ export const sections = groupImagesBySection(
 
 <EventDetails event={INFORMATION} />
 
-<InfoTabProvider defaultTab="schedule">
-  <InfoTabs />
+{/* 탭 바는 헤더(SiteHeader)에 있다. 탭을 바꾸면 이 지점으로 스크롤한다. */}
 
-  <div className="flex flex-col gap-3">
+<div id={INFO_TAB_ANCHOR_ID} className="tablet:mt-6 mt-3 flex scroll-mt-4 flex-col gap-3">
     <TabSection id="schedule">
       <ImageLabel id="schedule" label="투어 일정" />
 
@@ -239,5 +236,4 @@ export const sections = groupImagesBySection(
       </div>
     </TabSection>
 
-  </div>
-</InfoTabProvider>
+</div>

@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { INFO_TAB_SECTIONS } from "@/features/info/info";
-import { useInfoTab } from "./InfoTabContext";
+import { useInfoTab } from "@/features/info/lib/use-info-tab";
 
 /**
  * ImageLabel + 그 아래 콘텐츠 한 덩어리를 감싼다. INFO_TAB_SECTIONS에서
