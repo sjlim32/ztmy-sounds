@@ -10,6 +10,7 @@ import { useGuideMode } from "@/features/guide/guide-mode-context";
 import { getActiveLineIndex } from "@/features/guide/lib/lyric-sync";
 import { getSongForVersion } from "@/features/guide/lib/song-version";
 import { GIF_SQUARE_CLASS } from "@/features/guide/lib/player-layout";
+import { ImageOffIcon } from "@/components/icons/ImageOffIcon";
 
 interface SwingGif {
   /** 한 장이면 반복, 여러 장이면 한 바퀴씩 번갈아 재생 */
@@ -158,12 +159,21 @@ export function SwingGuideGifSlot({ className }: { className?: string }) {
     <section
       aria-label="동작 예시 GIF"
       className={cn(
-        "flex shrink-0 flex-col gap-2 rounded-lg border bg-black/40 p-3 backdrop-blur-sm",
-        gif ? "border-white/10" : "border-dashed border-white/25",
+        "flex shrink-0 flex-col gap-2 rounded-lg border p-3 backdrop-blur-sm",
+        // GIF가 없으면 칸 전체를 비활성처럼 — 옅은 면·점선 테두리·흐린 라벨로
+        // "아직 재생 전"(실선, 진한 면)과 확실히 구분한다.
+        gif
+          ? "border-white/10 bg-black/40"
+          : "border-dashed border-white/20 bg-black/20",
         className,
       )}
     >
-      <h3 className="text-sm font-bold tracking-wide text-white/70">
+      <h3
+        className={cn(
+          "text-sm font-bold tracking-wide",
+          gif ? "text-white/70" : "text-white/40",
+        )}
+      >
         동작 예시
       </h3>
       {/* 폭은 화면 폭·영상 아래 남는 높이에 맞춘다(스크롤이 생기지 않게).
@@ -171,7 +181,8 @@ export function SwingGuideGifSlot({ className }: { className?: string }) {
           정사각형보다 낮아서 넘치지 않는다 — 아니면 정사각형. */}
       <div
         className={cn(
-          "relative flex items-center justify-center overflow-hidden rounded-md bg-white/5",
+          "relative flex items-center justify-center overflow-hidden rounded-md",
+          gif && "bg-white/5",
           GIF_SQUARE_CLASS,
           !gif?.width && "aspect-square",
         )}
@@ -199,7 +210,14 @@ export function SwingGuideGifSlot({ className }: { className?: string }) {
             </div>
           </>
         ) : (
-          <span className="text-sm text-white/45">GIF 없음</span>
+          // 빈 자리 — 빗금 무늬 + 점선 테두리 + 이미지 없음 아이콘
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-md border border-dashed border-white/15 bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.05)_0_6px,transparent_6px_12px)] px-2 text-center">
+            <ImageOffIcon className="h-6 w-6 text-white/30" />
+            <span className="text-sm font-medium text-white/45">GIF 없음</span>
+            <span className="text-xs break-keep text-white/30">
+              이 곡은 동작 예시가 없어요
+            </span>
+          </div>
         )}
       </div>
     </section>
