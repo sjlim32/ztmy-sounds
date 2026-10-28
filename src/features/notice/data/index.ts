@@ -1,4 +1,5 @@
 import type { Notice } from "@/features/notice/lib/types";
+import type { GuideMode } from "@/features/guide/guide-mode-context";
 import fanPageDisclaimer from "./fan-page-disclaimer";
 import fightTheShamoji from "./fight-the-shamoji";
 import festival from "./festival";
@@ -15,13 +16,33 @@ export const noticeList: Notice[] = [
   slamGuide,
 ];
 
+/**
+ * 가이드 화면별로 보여줄 공지 — 슬램 가이드(/slam)는 isSlamVisible인 공지만,
+ * 응원 가이드(/guide)는 그 외(false/미지정)만. 숨긴(visible: false) 공지는 뺀다.
+ */
+export function getNoticesForMode(mode: GuideMode): Notice[] {
+  return noticeList.filter(
+    (notice) =>
+      notice.visible &&
+      (mode === "slam" ? !!notice.isSlamVisible : !notice.isSlamVisible),
+  );
+}
+
+// isAlwaysOpen은 화면마다 하나씩 — 응원 가이드에 하나, 슬램 가이드에 하나까지
+// 둘 수 있다(NoticeList는 화면별 목록에서 첫 번째 것만 펼친다).
 if (process.env.NODE_ENV !== "production") {
-  const alwaysOpenCount = noticeList.filter(
-    (notice) => notice.isAlwaysOpen,
-  ).length;
-  if (alwaysOpenCount > 1) {
-    console.warn(
-      `[notice] isAlwaysOpen은 공지 하나에만 지정해야 합니다 (현재 ${alwaysOpenCount}개).`,
+  const MODE_LABEL: Record<GuideMode, string> = {
+    cheer: "응원 가이드",
+    slam: "슬램 가이드",
+  };
+  for (const mode of ["cheer", "slam"] as const) {
+    const alwaysOpen = getNoticesForMode(mode).filter(
+      (notice) => notice.isAlwaysOpen,
     );
+    if (alwaysOpen.length > 1) {
+      console.warn(
+        `[notice] isAlwaysOpen은 ${MODE_LABEL[mode]} 공지 중 하나에만 지정해야 합니다 (현재 ${alwaysOpen.length}개: ${alwaysOpen.map((notice) => notice.id).join(", ")}).`,
+      );
+    }
   }
 }

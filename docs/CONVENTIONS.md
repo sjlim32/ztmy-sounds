@@ -124,6 +124,10 @@ src/
                              # (swipe, 장수가 많을 때)으로 보여주고 어느 걸 눌러도
                              # 같은 확대 뷰에서 묶음 전체를 넘겨 본다.
     notice/                 # 공지사항 (MDX 콘텐츠 + 데이터 + 노출/해제 로직)
+                             # 화면별 목록은 data/index.ts의 getNoticesForMode
+                             # (슬램 가이드 = isSlamVisible, 응원 가이드 = 그 외).
+                             # isAlwaysOpen(처음에 펼쳐 둘 공지)은 화면마다
+                             # 하나씩 — 같은 화면에 둘 이상이면 개발 중 경고.
       content/              # 공지 MDX 프로즈
     zutopia/                 # 즛토피아 허브: 카테고리→항목 2단 구조(registry.ts) +
                              # 곡/앨범 DB(song-db/) + 지난 공연 DB(lives/) — 전부

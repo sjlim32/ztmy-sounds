@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { noticeList } from "@/features/notice/data";
+import { getNoticesForMode } from "@/features/notice/data";
 import { NoticeAccordionItem } from "@/features/notice/components/NoticeAccordionItem";
 import { useNoticeDismissal } from "@/features/notice/lib/dismissal";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
@@ -21,12 +21,8 @@ interface NoticeListProps {
 export function NoticeList({ visible }: NoticeListProps) {
   const { mode } = useGuideMode();
   // 슬램 가이드(/slam)에서는 isSlamVisible인 공지만, 응원 가이드(/guide)에서는
-  // 그 외(false/미지정) 공지만 보여줍니다.
-  const filteredNotice = noticeList.filter(
-    (notice) =>
-      notice.visible &&
-      (mode === "slam" ? !!notice.isSlamVisible : !notice.isSlamVisible),
-  );
+  // 그 외(false/미지정) 공지만 보여줍니다(getNoticesForMode).
+  const filteredNotice = getNoticesForMode(mode);
   const alwaysOpenNotice =
     filteredNotice.find((notice) => notice.isAlwaysOpen) ?? null;
   const [isDismissed, setDismissed] = useNoticeDismissal(
