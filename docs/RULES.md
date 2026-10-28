@@ -1,6 +1,7 @@
 # 프로젝트 규칙
 
-- **ずっと真夜中でいいのに。(ZUTOMAYO)** 전용 콜가이드 사이트입니다.
+- **ずっと真夜中でいいのに。(ZUTOMAYO)** 전용 응원 가이드(CALL GUIDE) 사이트입니다. 사이트 안에서 이 기능은
+  한국어 "응원 가이드", 영어 "CALL GUIDE"로만 부릅니다(콜 가이드·호응 가이드 등 쓰지 않음).
 
 ## 알려진 주의사항
 
@@ -92,3 +93,10 @@
     `next build`를 직접 실행하면 이 검사를 건너뛰니 배포는 `pnpm pages:deploy`로
     하세요.
   - Thin(100) 굵기는 로드하지 않습니다 — `font-thin`은 Regular로 보입니다.
+- LINE Seed KR은 세로 높이 값이 폰트 안의 표마다 달라서(hhea 1050/274 vs typo 750/250 +
+  줄 간격 324, typo 우선 표시 켜짐) Mac은 hhea를, Windows는 typo를 씁니다 — 그대로 두면
+  Windows에서만 한글이 줄 안에서 약 0.14em 위로 떠서 배지·버튼 글자가 위로 치우칩니다.
+  `layout.tsx`의 `localFont` `declarations`로 Mac 값(ascent 105% / descent 27.4% / gap
+  0%)에 고정해 두었으니 지우지 마세요. 폰트 파일을 바꾸면 이 값도 새 파일의 hhea로
+  다시 맞춥니다. (LINE Seed JP·IBM Plex Mono·RocknRoll One·851MkPOP은 두 OS가 같은 값을
+  써서 해당 없음.)

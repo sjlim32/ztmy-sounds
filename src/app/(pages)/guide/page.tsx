@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ARTIST } from "@/data/artist";
 
 export const metadata: Metadata = {
-  title: `${ARTIST.name.kr} 곡 목록`,
+  title: `${ARTIST.name.kr} 응원 가이드`,
   description:
     "노래를 선택해서 샤모지 응원법과 떼창을 미리 공부할 수 있습니다.",
 };

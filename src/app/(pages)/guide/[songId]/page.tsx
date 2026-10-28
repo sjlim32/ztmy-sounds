@@ -15,7 +15,7 @@ export async function generateMetadata(
   if (!song) return {};
 
   const title = `${song.title.jp} (${song.title.kr})`;
-  const description = `${song.title.kr} (${song.title.en}) 샤모지 콜가이드`;
+  const description = `${song.title.kr} (${song.title.en}) 샤모지 응원 가이드`;
   const thumbnail = `https://img.youtube.com/vi/${song.youtubeId}/maxresdefault.jpg`;
 
   return {

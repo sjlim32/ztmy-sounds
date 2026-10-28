@@ -21,7 +21,7 @@ const MODE_CONFIG: Record<
   cheer: {
     basePath: "/guide",
     visibleTags: ["swing", "clap", "call", "dance"],
-    label: { eyebrow: "Guide", title: "응원 가이드" },
+    label: { eyebrow: "Call Guide", title: "응원 가이드" },
   },
   slam: {
     basePath: "/slam",

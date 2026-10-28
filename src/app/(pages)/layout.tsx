@@ -49,6 +49,15 @@ const lineSeedKR = localFont({
   ],
   variable: "--font-line-seed-kr",
   display: "swap",
+  // 이 폰트는 세로 높이 값이 표마다 달라서(hhea 1050/274, typo 750/250 + 줄
+  // 간격 324, typo 우선 표시 켜짐) Mac은 hhea를, Windows는 typo를 써서 같은
+  // 줄 안에서 Windows 글자만 약 0.14em 위로 떴다(배지·버튼 글자가 위로 치우침).
+  // Mac 값으로 고정해 두 OS가 같게 그린다.
+  declarations: [
+    { prop: "ascent-override", value: "105%" },
+    { prop: "descent-override", value: "27.4%" },
+    { prop: "line-gap-override", value: "0%" },
+  ],
 });
 
 const plexMono = IBM_Plex_Mono({
@@ -91,6 +100,9 @@ export const metadata: Metadata = {
     "내한",
     "JPOP",
     "제이팝",
+    "응원 가이드",
+    "CALL GUIDE",
+    // 화면에선 "응원 가이드"로 통일했지만, 이 표현으로 검색하는 사람을 위해 키워드엔 남긴다.
     "콜 가이드",
     "떼창",
     "응원법",

@@ -20,7 +20,7 @@ interface Credit {
 
 const CREDITS: Credit[] = [
   {
-    role: "콜가이드",
+    role: "응원 가이드",
     name: "즛토마요 갤러리 - ♿ 내한 대비 샤모지 호응 가이드",
     nameUrl:
       "https://gall.dcinside.com/mgallery/board/view/?id=zuttomayo&no=231225&page=1",

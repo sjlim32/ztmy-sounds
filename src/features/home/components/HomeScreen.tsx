@@ -29,7 +29,7 @@ import {
 const NAV_LINKS = [
   {
     href: "/guide",
-    eyebrow: "Guide",
+    eyebrow: "Call Guide",
     label: "응원 가이드",
     icon: MicIcon,
     accent: "purple",

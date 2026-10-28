@@ -133,7 +133,7 @@ export function SongDetailPanel({
             )}
           >
             <MicIcon className="h-4 w-4" />
-            샤모지 호응 가이드 이동
+            응원 가이드 이동
           </a>
         )}
 

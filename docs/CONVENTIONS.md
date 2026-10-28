@@ -101,7 +101,7 @@ src/
                              # 공식 링크(OfficialLinks), 왼쪽 공연 카드
                              # (NextEventCard) + 원정 카드 아래 공연 안내 버튼
                              # (ConcertQuickPanel, 패널은 오른쪽으로 열림), 오른쪽
-                             # 메뉴(MainNavLink, 응원 가이드가 primary) + 곡
+                             # 메뉴(MainNavLink) + 곡
                              # 바로가기(PracticeShortcuts: 이어서 연습 = guide/
                              # lib/last-song.ts + 필수 숙지 곡).
                              # 메뉴와 곡 카드는 화면 높이와 상관없이 세로 1열,

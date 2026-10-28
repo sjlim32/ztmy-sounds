@@ -206,7 +206,7 @@ export function AlbumDetailPanel({
                     <IconLinkButton
                       href={song.guideHref}
                       icon={MicIcon}
-                      label="샤모지 호응 가이드 이동"
+                      label="응원 가이드 이동"
                       tone="guide"
                     />
                   )}

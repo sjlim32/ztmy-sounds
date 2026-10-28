@@ -114,7 +114,7 @@ export function SongLink({
         <IconLinkButton
           href={href}
           icon={MicIcon}
-          label="샤모지 호응 가이드 이동"
+          label="응원 가이드 이동"
           tone="guide"
         />
       )}
