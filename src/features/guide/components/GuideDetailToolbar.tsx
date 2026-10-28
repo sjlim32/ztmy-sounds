@@ -4,13 +4,14 @@ import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ListIcon } from "@/components/icons/ListIcon";
 import { ShareButton } from "@/components/ShareButton";
+import { SongVersionToggle } from "@/features/guide/components/SongVersionToggle";
 import { GHOST_BUTTON_CLASS } from "@/components/button-styles";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
 import { getNeighborIds } from "@/features/guide/components/PlayerControls";
 import { PLAYER_COLUMN_CLASS } from "@/features/guide/lib/player-layout";
 
 /**
- * tablet 이상: 영상 위 버튼 줄 — [☰ 곡 목록] … [공유] [‹ 이전 <제목> │ 다음 <제목> ›].
+ * tablet 이상: 영상 위 버튼 줄 — [☰ 곡 목록] [음원 │ 라이브] … [공유] [‹ 이전 <제목> │ 다음 <제목> ›].
  * 영상이 주인공이라 버튼은 면·테두리 없이(GHOST_BUTTON_CLASS) 가볍게 둔다.
  * 곡 목록은 화면을 떠나지 않고 드로어(SongListDrawer)로 열고, 공유는 지금 곡
  * 주소를 보낸다. 목록으로 돌아가기는 헤더(SiteHeader)의 ‹ / 페이지 이름이 맡는다.
@@ -37,14 +38,18 @@ export function GuideDetailToolbar({ onOpenList }: { onOpenList: () => void }) {
           "@container flex items-center justify-between gap-2",
         )}
       >
-        <button
-          type="button"
-          onClick={onOpenList}
-          aria-haspopup="dialog"
-          className={GHOST_BUTTON_CLASS}
-        >
-          <ListIcon className="h-4 w-4" />곡 목록
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={onOpenList}
+            aria-haspopup="dialog"
+            className={GHOST_BUTTON_CLASS}
+          >
+            <ListIcon className="h-4 w-4" />곡 목록
+          </button>
+          {/* 음원/라이브 — 영상을 바꾸는 기능이라 영상 바로 위에(음원 버전이 있는 곡만) */}
+          <SongVersionToggle />
+        </div>
 
         {/* 버튼 양끝을 영상 열 안쪽에 둔다 — 음수 여백으로 바깥에 붙이면 영상
             영역(overflow-hidden)에 잘려 보였다. */}

@@ -14,6 +14,7 @@ import { SongListDrawer } from "@/features/guide/components/SongListDrawer";
 import { CallLegend } from "@/features/guide/components/CallLegend";
 import { SwingGuideGifSlot } from "@/features/guide/components/SwingGuideGif";
 import { SongReportLink } from "@/features/guide/components/SongReportLink";
+import { SongVersionToggle } from "@/features/guide/components/SongVersionToggle";
 import { SongDescriptionPanel } from "@/features/guide/components/SongDescriptionPanel";
 import { getSong } from "@/features/guide/data/songs";
 import { PLAYER_COLUMN_CLASS } from "@/features/guide/lib/player-layout";
@@ -118,7 +119,11 @@ export function GuidePlayerArea() {
       {song && (
         <div className="tablet:hidden flex basis-full items-center justify-between gap-2 px-1">
           <CallLegend variant="compact" />
-          <SongReportLink song={song} variant="inline" className="shrink-0" />
+          <div className="flex shrink-0 items-center gap-1">
+            {/* 음원/라이브 — 영상을 바꾸는 기능이라 영상 바로 아래(음원 버전이 있는 곡만) */}
+            <SongVersionToggle />
+            <SongReportLink song={song} variant="inline" />
+          </div>
         </div>
       )}
       {song && (

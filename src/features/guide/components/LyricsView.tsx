@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import type { Song } from "@/features/guide/lib/types";
 import { LyricLine } from "@/features/guide/components/LyricLine";
 import { AutoScrollToggle } from "@/features/guide/components/AutoScrollToggle";
-import { SongVersionToggle } from "@/features/guide/components/SongVersionToggle";
 import { useAutoScrollPreference } from "@/features/guide/lib/auto-scroll";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import {
@@ -216,7 +215,6 @@ export function LyricsView({
       )}
 
       {/* 가사 fade 전환(곡 변경, 버전 토글)과 무관하게 항상 화면에 유지 */}
-      <SongVersionToggle />
       {/* 가사 영역 오른쪽 아래(태블릿 이상은 스크롤 화살표 줄 오른쪽 끝) */}
       {/* 태블릿 이상: 곡별 오류 제보 — 가사 영역 왼쪽 아래에 늘 떠 있게(오른쪽
       아래 자동 스크롤과 마주 보는 자리). 모바일은 영상 바로 아래(GuidePlayerArea). */}
