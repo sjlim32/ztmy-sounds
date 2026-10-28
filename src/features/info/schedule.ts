@@ -17,29 +17,39 @@ export const SCHEDULE_KIND_LABEL: Record<ScheduleKind, string> = {
   concert: "공연",
 };
 
-/**
- * 투어 첫 공연(히로시마 HBG홀) 당일 일정 안내.
- */
-export const SCHEDULE: ScheduleItem[] = [
-  { start: "17:00", label: "개장 (OPEN)", kind: "concert" },
-  { start: "18:00", label: "개연 (START)", kind: "concert" },
-];
+/** 공연 하나 — 날짜("YYYY-MM-DD")와 개연 시각("HH:mm", 현지). */
+export interface ScheduleShow {
+  date: string;
+  time: string;
+  venue?: string;
+  /** "1/15(금)" 같은 표시용 날짜 */
+  datesLabel?: string;
+}
+
+// 개장은 모든 공연이 개연 1시간 전(투어 각주 — 오카야마 4/11도 17:00 개연·16:00 개장).
+const OPEN_BEFORE_MINUTES = 60;
+
+function shiftTime(time: string, minutes: number): string {
+  const [hour, minute] = time.split(":").map(Number);
+  const total = hour * 60 + minute + minutes;
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
+
+/** 그 공연의 당일 시간표 — 개장(OPEN) → 개연(START). */
+export function getShowSchedule(time: string): ScheduleItem[] {
+  return [
+    {
+      start: shiftTime(time, -OPEN_BEFORE_MINUTES),
+      label: "개장 (OPEN)",
+      kind: "concert",
+    },
+    { start: time, label: "개연 (START)", kind: "concert" },
+  ];
+}
 
 export const SCHEDULE_NOTES = [
-  "※ 공연별 개장/개연 시각은 투어 일정표를 확인해 주세요.",
+  "※ 개장은 개연 1시간 전 기준입니다.",
   "※ 미취학 아동 입장 불가",
-];
-
-/** 일정표 펼침 시 보여줄 투어 스케줄 및 지도 이미지. */
-export const GATHER_MAP_IMAGES = [
-  {
-    src: "/assets/info/apicula-denki_tour-maps.webp",
-    alt: "일본 전국 공연 지도 및 좌석 규모",
-  },
-  {
-    src: "/assets/info/apicula-denki_schedule-kr.webp",
-    alt: "아피쿠라 전기 2027 전국 투어 홀별 정원수 번역본",
-  },
 ];
 
 // "2027.01.15" ~ "2027.01.15" → ["2027-01-15"]
@@ -56,9 +66,14 @@ function listDays(start: string, end: string): string[] {
 }
 
 // /info가 안내하는 공연은 originEvent와 같은 공연이다(info.tsx 주석 참고).
-export const SCHEDULE_DAYS = originEvent.performances
-  ? originEvent.performances.map((p) => p.date)
-  : listDays(getEventStartDate(originEvent), getEventEndDate(originEvent));
+// 투어면 공연 목록 그대로, 단일·다일 공연이면 날마다 같은 시각으로.
+export const SCHEDULE_SHOWS: ScheduleShow[] = originEvent.performances
+  ? originEvent.performances
+  : listDays(getEventStartDate(originEvent), getEventEndDate(originEvent)).map(
+      (date) => ({ date, time: originEvent.time }),
+    );
+
+export const SCHEDULE_DAYS = SCHEDULE_SHOWS.map((show) => show.date);
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 

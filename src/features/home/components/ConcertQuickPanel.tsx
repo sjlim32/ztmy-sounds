@@ -1,16 +1,27 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import {
-  SCHEDULE,
   SCHEDULE_DAYS,
   SCHEDULE_DAYS_LABEL,
   SCHEDULE_KIND_LABEL,
+  SCHEDULE_NOTES,
+  SCHEDULE_SHOWS,
   type ScheduleItem,
 } from "@/features/info/schedule";
-import type { ScheduleStatus } from "@/features/info/lib/schedule-status";
+import {
+  getVenueNow,
+  type ScheduleStatus,
+} from "@/features/info/lib/schedule-status";
 import { ScheduleTimeline } from "@/features/info/components/ScheduleTimeline";
+import { TourScheduleTable } from "@/features/info/components/TourScheduleTable";
+import {
+  TicketRoundList,
+  getApplyingRound,
+  isTicketScheduleOngoing,
+} from "@/features/info/components/TicketRoundList";
+import { INFORMATION } from "@/features/info/info";
 import { ConcertLinks } from "@/features/info/components/ConcertLinks";
 import {
   FOCUS_RING,
@@ -33,6 +44,9 @@ const BUILT_BEFORE_SCHEDULE_END =
 // 버튼 높이 — 지금 시각을 알기 전의 빈 자리도 같은 높이로 잡는다.
 const TRIGGER_HEIGHT = "min-h-11";
 
+// 다음 공연까지 이 날수 이내면 그 공연의 당일 시간표를 맨 위에 보여준다.
+const SHOW_TIMETABLE_WITHIN_DAYS = 3;
+
 // 집합 일정은 라벨이 구역 이름뿐이라("일반 Area …") 요약에선 종류를 앞에 붙인다.
 function summaryLabel(item: ScheduleItem): string {
   return item.kind === "gather"
@@ -45,9 +59,9 @@ function getTodaySummary(status: Extract<ScheduleStatus, { phase: "today" }>): {
   sub?: string;
 } {
   // 같은 시각에 겹친 일정(축제 종료·개연)은 뒤에 적힌 쪽을 대표로 보여준다.
-  const nowItem = SCHEDULE[status.states.lastIndexOf("now")];
+  const nowItem = status.items[status.states.lastIndexOf("now")];
   const nextItem =
-    status.nextIndex === null ? undefined : SCHEDULE[status.nextIndex];
+    status.nextIndex === null ? undefined : status.items[status.nextIndex];
   const next = nextItem && `다음 ${nextItem.start} ${summaryLabel(nextItem)}`;
 
   if (!nowItem) return { main: next ?? "오늘 일정이 끝났습니다" };
@@ -96,6 +110,19 @@ export function ConcertQuickPanel({
 
   const today = status.phase === "today" ? getTodaySummary(status) : null;
   const isToday = today !== null;
+  const nextShow = SCHEDULE_SHOWS[status.showIndex];
+  const daysUntil = status.phase === "before" ? status.daysUntil : 0;
+  const isTimetableSoon = daysUntil <= SHOW_TIMETABLE_WITHIN_DAYS;
+  const ticketOngoing = isTicketScheduleOngoing(status.nowMs);
+  const applyingRound = getApplyingRound(status.nowMs);
+  // 버튼 둘째 줄 — 당일이면 지금/다음 일정, 임박하면 D-day, 접수 중이면 그 회차.
+  const triggerSub = today
+    ? today.sub
+    : isTimetableSoon
+      ? `D-${daysUntil} · ${nextShow.datesLabel ?? nextShow.date} ${nextShow.venue ?? ""}`.trim()
+      : applyingRound
+        ? `${applyingRound.name} 접수 중`
+        : undefined;
 
   return (
     <div className={cn("relative", className)}>
@@ -134,7 +161,11 @@ export function ConcertQuickPanel({
             </div>
 
             <div className="flex min-h-0 flex-col gap-4 overflow-y-auto px-3 py-3">
-              <ScheduleTimeline status={status} narrow />
+              <PanelBody
+                status={status}
+                isTimetableSoon={isTimetableSoon}
+                ticketOngoing={ticketOngoing}
+              />
               <div className="border-t border-white/10 px-1 pt-3">
                 <ConcertLinks />
               </div>
@@ -168,10 +199,10 @@ export function ConcertQuickPanel({
         )}
         <span className="flex min-w-0 flex-1 flex-col">
           <span className="truncate text-sm font-semibold text-white">
-            {today ? today.main : "공연 정보 간단 요약"}
+            {today ? today.main : `${INFORMATION.name} 간단 요약`}
           </span>
-          {today?.sub && (
-            <span className="truncate text-xs text-white/70">{today.sub}</span>
+          {triggerSub && (
+            <span className="truncate text-xs text-white/70">{triggerSub}</span>
           )}
         </span>
         <ChevronDownIcon
@@ -184,5 +215,115 @@ export function ConcertQuickPanel({
         />
       </button>
     </div>
+  );
+}
+
+/**
+ * 패널 본문 — 시기에 따라 보여주는 것이 바뀐다.
+ * - 다음 공연이 SHOW_TIMETABLE_WITHIN_DAYS일 이내(당일 포함): 그 공연의 당일
+ *   시간표를 맨 위에(당일이면 지금 진행 중인 일정 강조).
+ * - 티켓 접수가 아직 진행 중(입금 기간까지): 티켓 접수 일정(진행 중 회차 강조),
+ *   투어 일정표는 접어 둔다.
+ * - 접수가 모두 끝나면: 투어 일정표를 항상 펼쳐 두고 다음 공연 줄을 강조.
+ */
+function PanelBody({
+  status,
+  isTimetableSoon,
+  ticketOngoing,
+}: {
+  status: Extract<ScheduleStatus, { phase: "before" | "today" }>;
+  isTimetableSoon: boolean;
+  ticketOngoing: boolean;
+}) {
+  const tableId = useId();
+  const [isTableOpen, setTableOpen] = useState(false);
+  const nextShow = SCHEDULE_SHOWS[status.showIndex];
+  const venueToday = getVenueNow(status.nowMs).date;
+  const table = (
+    <TourScheduleTable
+      today={venueToday}
+      nextDate={nextShow.date}
+      collapsePast
+    />
+  );
+
+  return (
+    <>
+      {isTimetableSoon && (
+        <PanelSection
+          title={
+            status.phase === "today" ? "오늘 공연 시간표" : "다음 공연 시간표"
+          }
+          meta={`${status.phase === "today" ? "D-DAY" : `D-${status.daysUntil}`} · ${nextShow.datesLabel ?? nextShow.date} ${nextShow.venue ?? ""}`}
+        >
+          <ScheduleTimeline status={status} />
+          <ul className="flex flex-col gap-0.5 px-1 text-xs text-white/60">
+            {SCHEDULE_NOTES.map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+          </ul>
+        </PanelSection>
+      )}
+
+      {ticketOngoing && !isTimetableSoon && (
+        <PanelSection title="티켓 접수 일정">
+          <TicketRoundList nowMs={status.nowMs} />
+        </PanelSection>
+      )}
+
+      {ticketOngoing && !isTimetableSoon ? (
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            aria-expanded={isTableOpen}
+            aria-controls={tableId}
+            onClick={() => setTableOpen((open) => !open)}
+            className={cn(
+              "text-ztmy-pink flex items-center justify-center gap-1 rounded-md border border-white/15 px-3 py-1.5 text-sm font-bold transition-colors hover:border-white/40",
+              FOCUS_RING,
+            )}
+          >
+            투어 일정표 {isTableOpen ? "접기" : "보기"}
+            <ChevronDownIcon
+              className={cn(
+                "h-3 w-3 transition-transform",
+                isTableOpen && "rotate-180",
+              )}
+            />
+          </button>
+          {isTableOpen && (
+            <div id={tableId} className="px-1">
+              {table}
+            </div>
+          )}
+        </div>
+      ) : (
+        <PanelSection title="투어 일정">
+          <div className="px-1">{table}</div>
+        </PanelSection>
+      )}
+    </>
+  );
+}
+
+function PanelSection({
+  title,
+  meta,
+  children,
+}: {
+  title: string;
+  meta?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="flex flex-col gap-2">
+      <h3 className="flex flex-wrap items-baseline gap-x-2 px-1 text-sm font-bold text-white">
+        {title}
+        {meta && (
+          <span className="text-xs font-normal text-white/60">{meta}</span>
+        )}
+      </h3>
+      {children}
+    </section>
   );
 }
