@@ -35,7 +35,15 @@ export function Footer({ inline = false }: { inline?: boolean } = {}) {
   if (!inline && !isHome) return null;
 
   return (
-    <footer className={cn("shrink-0", !isHome && "tablet:hidden")}>
+    <footer
+      className={cn(
+        "shrink-0",
+        !isHome && "tablet:hidden",
+        // 화면이 700px 이하로 낮으면 홈 PC 화면의 공연 카드·곡 카드와 겹쳐서
+        // 숨긴다(모바일은 푸터가 흐름 안에 있어 겹치지 않는다).
+        "tablet:xlow:hidden",
+      )}
+    >
       <div
         className={cn(
           "flex items-center justify-between gap-3 px-4 py-2",

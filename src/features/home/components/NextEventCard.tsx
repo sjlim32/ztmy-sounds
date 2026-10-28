@@ -265,10 +265,17 @@ function BoardingTicket({
               className={cn(
                 "aspect-3/4 w-20 object-cover shadow-[0_2px_10px_rgba(0,0,0,0.55)] ring-1 ring-white/15 transition-opacity hover:opacity-80",
                 "pc:w-24",
+                // 낮은 화면(700px 이하)에선 홈 왼쪽 열이 넘치지 않게 작게.
+                "tablet:xlow:w-16 pc:xlow:w-20",
               )}
             />
           ) : (
-            <div className={cn("aspect-3/4 w-20 bg-white/5", "pc:w-24")} />
+            <div
+              className={cn(
+                "aspect-3/4 w-20 bg-white/5",
+                "pc:w-24 tablet:xlow:w-16 pc:xlow:w-20",
+              )}
+            />
           )}
         </PosterLink>
 

@@ -25,8 +25,10 @@ export function Header({ artist }: { artist: artist }) {
           preload
           className={cn(
             "h-auto",
-            // 화면이 낮으면(880px 이하) 아래 공연 카드 자리를 위해 한 단계 작게.
+            // 화면이 낮으면(880px 이하) 아래 공연 카드 자리를 위해 한 단계 작게,
+            // 700px 이하면 한 단계 더.
             "tablet:w-64 pc:w-80 pc:short:w-72",
+            "tablet:xlow:w-52 pc:xlow:w-60",
             "[filter:drop-shadow(1px_0_0_#fff)_drop-shadow(-1px_0_0_#fff)_drop-shadow(0_1px_0_#fff)_drop-shadow(0_-1px_0_#fff)_drop-shadow(0_4px_16px_rgba(0,0,0,0.6))]",
           )}
         />

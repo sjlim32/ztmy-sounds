@@ -55,7 +55,7 @@ export function MoonPhase({
   const fireGradientId = `moon-fire-gradient-${uid}`;
 
   return (
-    <div className="tablet:h-24 tablet:w-24 relative h-16 w-16 shrink-0 overflow-visible drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
+    <div className="tablet:h-24 tablet:w-24 tablet:xlow:h-20 tablet:xlow:w-20 relative h-16 w-16 shrink-0 overflow-visible drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
       <svg
         viewBox="0 0 100 100"
         className="relative h-full w-full overflow-visible"

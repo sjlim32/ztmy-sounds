@@ -35,9 +35,17 @@ export function Countdown({
     return (
       <div
         aria-hidden
-        className={cn("invisible flex w-full border py-1", "tablet:p-4")}
+        className={cn(
+          "invisible flex w-full border py-1",
+          "tablet:p-4 tablet:xlow:py-2",
+        )}
       >
-        <div className={cn("h-16 w-16", "tablet:h-24 tablet:w-24")} />
+        <div
+          className={cn(
+            "h-16 w-16",
+            "tablet:h-24 tablet:w-24 tablet:xlow:h-20 tablet:xlow:w-20",
+          )}
+        />
       </div>
     );
   }
@@ -48,6 +56,8 @@ export function Countdown({
       className={cn(
         "flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-black/30 py-1 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
         "tablet:gap-4 tablet:p-4",
+        // 낮은 화면(700px 이하)에선 홈 왼쪽 열이 넘치지 않게 위아래를 줄인다.
+        "tablet:xlow:py-2",
       )}
     >
       {/* 위쪽 날짜/장소 티켓 스텁과 같은 chrome(둥근 어두운 박스)을 써서 한
@@ -186,7 +196,7 @@ function WaterBalloon({
   const fireGradientId = `fire-gradient-${uid}`;
 
   return (
-    <div className="tablet:h-24 tablet:w-24 relative h-16 w-16 shrink-0 overflow-visible drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
+    <div className="tablet:h-24 tablet:w-24 tablet:xlow:h-20 tablet:xlow:w-20 relative h-16 w-16 shrink-0 overflow-visible drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
       <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible">
         <defs>
           <clipPath id={balloonClipId}>

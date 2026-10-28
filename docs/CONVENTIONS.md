@@ -90,6 +90,12 @@ src/
                              # 메뉴(MainNavLink, 응원 가이드가 primary) + 곡
                              # 바로가기(PracticeShortcuts: 이어서 연습 = guide/
                              # lib/last-song.ts + 필수 숙지 곡).
+                             # 메뉴와 곡 카드는 화면 높이와 상관없이 세로 1열,
+                             # 높이가 모자라면 카드 안 전체가 스크롤.
+                             # 화면 높이 700px 이하(xlow)는 푸터를 숨기고 왼쪽
+                             # 열의 로고·포스터·카운트다운을 줄인다(왼쪽 열은
+                             # 공연 안내 패널이 오른쪽으로 열려 스크롤 박스로
+                             # 못 만든다 — 세로로 뭔가 더하면 1440×650에서 확인).
                              # PC 화면 가장자리 여백은 네 귀퉁이·푸터 모두 40px로
                              # 맞춘다(메뉴는 버튼 안쪽 여백 때문에 right-6).
                              # 모바일: 상단 바 [공식 링크 시트 | 로고 | 공유] →
@@ -304,7 +310,9 @@ src/
 
 - 커스텀 브레이크포인트: `tablet`(50rem/800px) / `pc`(67.5rem/1280px) / `wide`(90rem/1440px).
   전부 min-width 기준이며 `src/app/globals.css`의 `@theme`에서 정의합니다. 뷰포트
-  **높이**가 낮은 경우를 위한 `short`(max-height: 680px) 커스텀 variant도 있습니다.
+  **높이**가 낮은 경우를 위한 커스텀 variant `short`(max-height: 880px) / `low`(800px) /
+  `xlow`(700px)도 있습니다(겹치면 뒤에 선언된 쪽이 이기도록 이 순서로 선언).
+  모바일 화면에 영향을 주지 않으려면 `tablet:xlow:`처럼 너비 variant와 함께 씁니다.
 - 사이트 전용 색상은 `ztmy-dark` / `ztmy-purple` / `ztmy-magenta` / `ztmy-pink` 토큰을
   씁니다 (`globals.css`에 정의). 하드코딩된 hex(`bg-[#8d3cd4]` 등)를 새로 추가하지
   마세요 — 이미 있는 값이라면 토큰이 없는지 먼저 확인합니다.
@@ -351,6 +359,7 @@ src/
   - 태블릿 이상(메인 화면에서만 보임): 왼쪽에 운영자가 정한 저작권 문구 그대로
     (`lib/seo.ts`의 `COPYRIGHT_NOTICE`), 오른쪽에 사이트 기능 버튼 묶음
     [설치][공유] | [건의][출처]. 설치(`InstallButton`)는 설치 가능할 때만 보입니다.
+    화면 높이가 700px 이하면 홈 카드들과 겹쳐서 숨깁니다(`tablet:xlow:hidden`).
   - 모바일: 줄인 문구("비공식 팬 페이지 · © ZUTOMAYO · 출처" — 출처는 글자 링크) +
     건의 버튼. 저작권 전문은 출처 페이지(/credits)에도 있습니다.
 - 공유(`ShareButton`, `lib/use-share.ts`)는 지금 보고 있는 페이지 주소를 보냅니다.

@@ -209,16 +209,23 @@ export function HomeScreen({
           // 겹친다. 위아래를 Header 높이만큼 똑같이 비운 영역에 가둬서, 여유가
           // 있으면 예전처럼 화면 가운데에 오고 모자라면 Header 바로 아래에서
           // 시작해 아래로만 넘치게 한다(my-auto는 넘칠 때 0이 된다).
+          // 낮은 화면(880px 이하)은 가운데 정렬할 여유가 없어서 Header 바로
+          // 아래에 붙이고, 아래는 푸터 자리만 비운다. 700px 이하는 푸터를
+          // 숨기므로(Footer) 화면 가장자리 여백만 둔다. 이 열은 공연 안내 패널이
+          // 오른쪽으로 열려서 스크롤 박스로 만들 수 없다 — 대신 700px 이하에서
+          // 로고·포스터·카운트다운을 줄여 넘치지 않게 한다.
           className={cn(
             "fixed top-44 bottom-44 left-10 hidden flex-col",
             // pc는 로고가 더 커서(w-80, 낮은 화면은 w-72) 그만큼 아래에서 시작한다.
             "tablet:flex pc:top-56 pc:short:top-52",
+            "short:bottom-20 xlow:bottom-10",
+            "tablet:xlow:top-40 pc:xlow:top-44",
           )}
         >
-          <div className="my-auto flex flex-col gap-3">
+          <div className="short:mt-0 xlow:gap-2 my-auto flex flex-col gap-3">
             <div
               className={cn(
-                "flex flex-col gap-3",
+                "xlow:gap-2 flex flex-col gap-3",
                 !isCountdownReady && "invisible",
               )}
             >
@@ -261,22 +268,29 @@ export function HomeScreen({
           className={cn(
             // 메뉴 버튼이 안쪽 여백(px-4)을 갖고 있어서, 글자 끝이 다른 요소들과
             // 같은 화면 가장자리 40px에 오도록 right-6 + 카드 mr-4로 맞춘다.
-            "fixed top-1/2 right-6 hidden -translate-y-1/2 flex-col items-end gap-6",
-            // 화면 높이가 낮으면(880px 이하) 메뉴 아래에 쌓을 자리가 없어서
-            // 곡 카드를 메뉴 왼쪽으로 나란히 둔다.
-            "tablet:flex short:flex-row-reverse short:items-center short:gap-6",
+            // 위는 공식 링크, 아래는 푸터를 피한 영역에 가둔다 — 여유가 있으면
+            // 화면 가운데, 모자라면 곡 카드가 줄어들며 카드 안이 스크롤된다.
+            // 높이가 낮아도 메뉴와 곡 카드는 항상 세로 1열을 유지한다.
+            // 700px 이하는 푸터를 숨기므로(Footer) 아래는 가장자리 여백만 둔다.
+            "fixed top-24 right-6 bottom-24 hidden flex-col",
+            "tablet:flex xlow:bottom-10",
           )}
         >
-          <nav data-role="site-nav" className="flex flex-col items-end gap-3">
-            {NAV_LINKS.map((link) => (
-              <MainNavLink key={link.href} {...link} />
-            ))}
-          </nav>
-          <PracticeShortcuts
-            songs={practiceSongs}
-            layout="list"
-            className={cn("mr-4", "short:mr-0")}
-          />
+          <div className="short:gap-4 my-auto flex min-h-0 flex-col items-end gap-6">
+            <nav
+              data-role="site-nav"
+              className="short:gap-1 flex shrink-0 flex-col items-end gap-3"
+            >
+              {NAV_LINKS.map((link) => (
+                <MainNavLink key={link.href} {...link} />
+              ))}
+            </nav>
+            <PracticeShortcuts
+              songs={practiceSongs}
+              layout="list"
+              className="mr-4 min-h-0"
+            />
+          </div>
         </div>
       </main>
     </>
