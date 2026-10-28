@@ -1,9 +1,9 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { usePlayer } from "@/features/guide/player-context";
 import { CALL_TAG_COLOR } from "@/features/guide/lib/call-tag-style";
+import { pulseLine, useAccentCount } from "@/features/guide/lib/accent-pulse";
 
 export const CLAP = "✋";
 const CLAP_COLOR = CALL_TAG_COLOR.clap;
@@ -18,80 +18,7 @@ function getClapGapClass(between: string): string | null {
 }
 
 /**
- * 박수가 터지는 순간 그 가사 줄(<li>) 배경이 "둥" 하고 울리게 한다 — 박수
- * 색으로 번쩍였다가 원래 배경으로 빠지고, 테두리 안쪽 빛이 사그라든다.
- * 줄의 원래 배경(재생 중 보라색)은 클래스로 칠해져 있어서, 그 위에 잠깐만
- * 덮어썼다 돌아오도록 Web Animations API로 줄 요소에 직접 재생한다(리렌더 없음).
- */
-function pulseLine(line: HTMLElement) {
-  const reduceMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
-
-  line.animate(
-    reduceMotion
-      ? [{ backgroundColor: `${CLAP_COLOR}40` }, {}]
-      : [
-          // 줄 크기·위치는 건드리지 않는다(transform scale 등을 쓰면 줄 전체
-          // 글자가 좌우로 밀려 보이고 목록에 가로 넘침이 생김) — 색과 안쪽
-          // 그림자만 바꿔서 레이아웃 변화 없이 "울림"만 표현한다.
-          {
-            backgroundColor: `${CLAP_COLOR}55`,
-            boxShadow: `inset 0 0 0 2px ${CLAP_COLOR}cc, inset 0 0 18px ${CLAP_COLOR}66`,
-          },
-          {
-            boxShadow: `inset 0 0 0 0 ${CLAP_COLOR}00, inset 0 0 0 ${CLAP_COLOR}00`,
-          },
-        ],
-    { duration: reduceMotion ? 250 : 420, easing: "ease-out" },
-  );
-}
-
-/**
- * 유튜브 iframe의 getCurrentTime()은 매 프레임 바뀌지 않고 띄엄띄엄 갱신된다.
- * 박수처럼 짧은 간격에 맞추려면 그대로 쓰면 늦게 터지므로, 마지막으로 값이
- * 바뀐 순간을 기준점으로 잡고 재생 중이면 흐른 시간만큼 앞으로 추정한다.
- */
-function useClapCount(
-  lineStart: number,
-  claps: readonly number[],
-  enabled: boolean,
-): number {
-  const { getCurrentTime, isPlaying } = usePlayer();
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!enabled) return;
-
-    let frameId = 0;
-    let lastRaw: number | undefined;
-    let anchor = { time: 0, at: 0 };
-
-    const tick = () => {
-      const now = performance.now();
-      const raw = getCurrentTime();
-      if (raw !== undefined && raw !== lastRaw) {
-        lastRaw = raw;
-        anchor = { time: raw, at: now };
-      }
-      const time = isPlaying
-        ? anchor.time + (now - anchor.at) / 1000
-        : anchor.time;
-      // 앞뒤로 seek해도 맞도록 매번 "지금까지 지나간 박수 수"를 새로 센다.
-      const passed = claps.filter((offset) => lineStart + offset <= time);
-      setCount(passed.length);
-      frameId = requestAnimationFrame(tick);
-    };
-
-    frameId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frameId);
-  }, [enabled, getCurrentTime, isPlaying, lineStart, claps]);
-
-  return enabled ? count : 0;
-}
-
-/**
- * 발음 줄 속 ✋를 박수 타이밍(line.claps)에 맞춰 하나씩 "짝" 치는
+ * 발음 줄 속 ✋를 강조 타이밍(line.accents)에 맞춰 하나씩 "짝" 치는
  * 애니메이션으로 보여준다. 재생 중인 줄일 때만 동작하고, 그 외에는 평범한
  * 텍스트처럼 보인다.
  * - 아직 칠 차례가 아닌 ✋: 흐리게
@@ -109,7 +36,7 @@ export function ClapText({
   claps: readonly number[];
   isActive: boolean;
 }) {
-  const count = useClapCount(lineStart, claps, isActive && claps.length > 0);
+  const count = useAccentCount(lineStart, claps, isActive && claps.length > 0);
   const pieces = text.split(CLAP);
   const anchorRef = useRef<HTMLSpanElement>(null);
   const lastCountRef = useRef(0);
@@ -119,7 +46,7 @@ export function ClapText({
   useEffect(() => {
     if (count > lastCountRef.current) {
       const line = anchorRef.current?.closest("li");
-      if (line) pulseLine(line);
+      if (line) pulseLine(line, CLAP_COLOR, { ring: true });
     }
     lastCountRef.current = count;
   }, [count]);

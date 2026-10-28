@@ -28,7 +28,7 @@ const song: Song = {
         text: "",
         tag: "clap",
       },
-      claps: [1.1, 1.3, 1.55],
+      accents: [1.1, 1.3, 1.55],
     },
     {
       time: "0:04.8",
@@ -46,7 +46,7 @@ const song: Song = {
         text: "",
         tag: "clap",
       },
-      claps: [1.1, 1.3, 1.55],
+      accents: [1.1, 1.3, 1.55],
     },
     {
       time: "0:12.4",
@@ -64,7 +64,7 @@ const song: Song = {
         text: "",
         tag: "clap",
       },
-      claps: [1.1, 1.3, 1.55],
+      accents: [1.1, 1.3, 1.55],
     },
     {
       time: "0:19.8",
@@ -82,7 +82,7 @@ const song: Song = {
         text: "",
         tag: "clap",
       },
-      claps: [1.1, 1.3, 1.55],
+      accents: [1.1, 1.3, 1.55],
     },
     {
       time: "0:27.5",
@@ -100,7 +100,7 @@ const song: Song = {
         text: "",
         tag: "clap",
       },
-      claps: [1.1, 1.3, 1.55],
+      accents: [1.1, 1.3, 1.55],
     },
     {
       time: "0:34.9",
@@ -118,7 +118,7 @@ const song: Song = {
         text: "",
         tag: "clap",
       },
-      claps: [1.1, 1.3, 1.55],
+      accents: [1.1, 1.3, 1.55],
     },
     {
       time: "0:42.6",
@@ -406,7 +406,7 @@ const song: Song = {
         text: "",
         tag: "clap",
       },
-      claps: [1.1, 1.3, 1.55],
+      accents: [1.1, 1.3, 1.55],
     },
     {
       time: "2:56.6",
@@ -632,7 +632,7 @@ const song: Song = {
         text: "",
         tag: "clap",
       },
-      claps: [1.1, 1.3, 1.55],
+      accents: [1.1, 1.3, 1.55],
     },
     {
       time: "4:20",

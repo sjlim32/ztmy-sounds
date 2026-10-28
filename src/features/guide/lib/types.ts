@@ -18,10 +18,12 @@ export interface LyricLine {
   slam?: string;
   interlude?: boolean;
   /**
-   * 박수 타이밍 — 이 줄의 time으로부터 몇 초 뒤인지. pronunciation 안의 ✋를 앞에서부터
-   * 순서대로 하나씩 대응합니다(개수가 모자라면 남는 ✋는 애니메이션 없이 표시).
+   * 강조 타이밍 — 이 줄의 time으로부터 몇 초 뒤인지. 발음 줄에 ✋가 있으면(박수)
+   * ✋를 앞에서부터 하나씩 대응해 이모지가 튀고 줄 배경이 울린다(개수가 모자라면
+   * 남는 ✋는 애니메이션 없이 표시). ✋가 없는 응원 줄(흔들기 등)은 타이밍마다
+   * 줄 배경만 응원 색으로 번쩍인다.
    */
-  claps?: number[];
+  accents?: number[];
   /** 이 줄이 재생 중일 때 곡의 swingGif를 띄움(모바일 화면 우측, 태블릿 이상 가사 영역 우측) */
   swingGif?: boolean;
 }

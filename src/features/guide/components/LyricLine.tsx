@@ -13,6 +13,8 @@ import {
 } from "@/features/guide/lib/icon-tokens";
 import { CallIcon } from "@/features/guide/components/CallIcon";
 import { CLAP, ClapText } from "@/features/guide/components/ClapText";
+import { AccentPulse } from "@/features/guide/components/AccentPulse";
+import { useAccentCount } from "@/features/guide/lib/accent-pulse";
 import { useGuideMode } from "@/features/guide/guide-mode-context";
 import {
   getVisibleLineTag,
@@ -60,15 +62,61 @@ interface lyricLineProps {
 
 const NO_CLAPS: readonly number[] = [];
 
-/** 발음 줄 속 ✋를 박수 타이밍(line.claps) 애니메이션으로 그릴 때 쓰는 값. */
+/** 발음 줄 속 ✋를 강조 타이밍(line.accents) 애니메이션으로 그릴 때 쓰는 값. */
 interface ClapTiming {
   lineStart: number;
   times: readonly number[];
   isActive: boolean;
 }
 
+/** ✋가 없는 응원 줄의 강조 타이밍(line.accents) — 강조 단어를 차례로 켠다. */
+interface AccentTiming {
+  lineStart: number;
+  accents: readonly number[];
+  isActive: boolean;
+  tag: CallTag;
+}
+
+/** 강조 단어 표시 상태 — count개까지 켜짐, total개 너머는 타이밍 없음. */
+interface AccentMarks {
+  count: number;
+  isActive: boolean;
+  total: number;
+}
+
+// 강조 단어가 타이밍(line.accents)에 대응될 때: 아직이면 흐리게, 되면 켜지며
+// 살짝 튀어 오른다. 튀어 오르려면 inline-block이어야 해서 이때만 붙인다.
+function accentMarkClass(index: number, marks: AccentMarks): string {
+  if (!marks.isActive || index >= marks.total) return "";
+  return cn(
+    // 박수 ✋와 같은 이유로 처음부터 같은 합성 레이어에서 그린다(튀어 오른 뒤
+    // 크기가 미세하게 흔들려 보이지 않게).
+    "inline-block transition-opacity duration-150 will-change-[transform,opacity]",
+    index < marks.count
+      ? "motion-safe:animate-[accent-pop_380ms_ease-out]"
+      : "opacity-45",
+  );
+}
+
+/** 이 글자 안에서 지금 모드에 적용되는 강조 단어(**…** / ^…^) 수. */
+function countAppliedEmphasis(text: string, scope?: EmphasisScope): number {
+  return parseIconTokens(text)
+    .flatMap((part) => (part.type === "text" ? parseEmphasis(part.value) : []))
+    .filter(
+      (seg) =>
+        seg.type === "emphasis" &&
+        (scope === "cheer" ? seg.cheer : scope === "slam" ? seg.slam : false),
+    ).length;
+}
+
 function countClaps(text: string): number {
   return text.split(CLAP).length - 1;
+}
+
+function hasClap(text: LyricText): boolean {
+  return (
+    typeof text === "string" ? text : text.map((seg) => seg.text).join("")
+  ).includes(CLAP);
 }
 
 // 응원 단어(또는 강조 단어가 없는 응원 줄 전체) 표시 — 발음 줄은 따라
@@ -130,14 +178,26 @@ function LyricLineComponent({
         text={line.pronunciation}
         tag={lineTag}
         scope={emphasisScope}
-        // 박수(✋)는 따라 부르는 발음 줄에 적는다. 타이밍(claps)이 없어도
+        // 박수(✋)는 따라 부르는 발음 줄에 적는다. 타이밍(accents)이 없어도
         // ClapText로 그려서 ✋ 사이 간격 표기(공백 / 슬래시)를 같은 규칙으로 보여준다.
         clap={{
           lineStart: parseTimestamp(line.time),
-          times: line.claps ?? NO_CLAPS,
+          times: line.accents ?? NO_CLAPS,
           isActive,
         }}
+        // ✋가 없는 응원 줄(흔들기 등)의 강조 타이밍 — 박자 아이콘 줄 + 아이콘 동작
+        accent={
+          lineTag && line.accents && !hasClap(line.pronunciation)
+            ? {
+                lineStart: parseTimestamp(line.time),
+                accents: line.accents,
+                isActive,
+                tag: lineTag,
+              }
+            : undefined
+        }
       />
+
       <TranslationText
         text={line.translation}
         tag={lineTag}
@@ -262,7 +322,7 @@ function MusicBreak({ tag, isActive }: { tag?: CallTag; isActive: boolean }) {
         )}
       />
       <span aria-hidden className="flex items-center gap-1.5">
-        {tag && <CallIcon name={tag} size={20} className="mr-0" />}
+        {tag && <MusicBreakIcon tag={tag} isActive={isActive} />}
         {MUSIC_BREAK_NOTES.map((note, index) => (
           <span
             key={index}
@@ -382,6 +442,8 @@ function GutterMarker({
         <PingRing color={color} size={cn("size-8", "tablet:size-10")} />
       )}
       <span
+        // data-gutter-icon: 강조 타이밍마다 AccentPulse가 안쪽 이미지를 움직인다.
+        data-gutter-icon
         className={cn("relative flex", isActive && motion)}
         style={
           isActive ? { filter: `drop-shadow(0 0 4px ${color})` } : undefined
@@ -407,6 +469,36 @@ function PingRing({ color, size }: { color: string; size: string }) {
       )}
       style={{ borderColor: `${color}aa` }}
     />
+  );
+}
+
+/**
+ * 간주(♫) 줄의 응원 아이콘 — 음표가 들썩이는 동안(재생 중) 줄 왼쪽 아이콘
+ * (GutterMarker)과 같은 응원별 애니메이션을 한다: 흔들기·노래·댄스는 아이콘
+ * 자체가 움직이고, 박수·슬램은 퍼지는 고리. 크기는 재생 여부와 상관없이 그대로.
+ */
+function MusicBreakIcon({
+  tag,
+  isActive,
+}: {
+  tag: CallTag;
+  isActive: boolean;
+}) {
+  const color = CALL_TAG_COLOR[tag];
+  const motion = ACTIVE_ICON_MOTION[tag];
+
+  return (
+    <span className="relative flex size-5 items-center justify-center">
+      {isActive && !motion && <PingRing color={color} size="size-7" />}
+      <span
+        className={cn("relative flex", isActive && motion)}
+        style={
+          isActive ? { filter: `drop-shadow(0 0 4px ${color})` } : undefined
+        }
+      >
+        <CallIcon name={tag} size={20} className="mr-0" />
+      </span>
+    </span>
   );
 }
 
@@ -477,12 +569,21 @@ function PronunciationText({
   tag,
   scope,
   clap,
+  accent,
 }: {
   text: LyricText;
   tag?: CallTag;
   scope?: EmphasisScope;
   clap: ClapTiming;
+  accent?: AccentTiming;
 }) {
+  // ✋가 없는 응원 줄의 강조 타이밍 — 지금까지 지난 수만큼 강조 단어(**…**)를
+  // 앞에서부터 켜고, 늘 때마다 AccentPulse가 아이콘 동작·배경을 울린다.
+  const count = useAccentCount(
+    accent?.lineStart ?? 0,
+    accent?.accents ?? NO_CLAPS,
+    !!accent && accent.isActive && accent.accents.length > 0,
+  );
   if (!text) return null;
 
   const emphasisColor = tag ? CALL_TAG_COLOR[tag] : undefined;
@@ -494,6 +595,11 @@ function PronunciationText({
       clap={clap}
       scope={scope}
       emphasisColor={emphasisColor}
+      accentMarks={
+        accent
+          ? { count, isActive: accent.isActive, total: accent.accents.length }
+          : undefined
+      }
     />
   );
 
@@ -511,6 +617,7 @@ function PronunciationText({
       ) : (
         content
       )}
+      {accent && <AccentPulse count={count} tag={accent.tag} />}
     </p>
   );
 }
@@ -544,6 +651,7 @@ function LyricTextRenderer({
   emphasisColor,
   highlight = false,
   clap,
+  accentMarks,
 }: {
   text: LyricText;
   prefix: string;
@@ -551,6 +659,7 @@ function LyricTextRenderer({
   emphasisColor?: string;
   highlight?: boolean;
   clap?: ClapTiming;
+  accentMarks?: AccentMarks;
 }) {
   if (typeof text === "string") {
     return (
@@ -558,17 +667,28 @@ function LyricTextRenderer({
         {renderTextParts(text, prefix, scope, emphasisColor, highlight, {
           clap,
           clapStart: 0,
+          accentMarks,
+          emphasisStart: 0,
         })}
       </>
     );
   }
 
-  // 구간마다 따로 그리지만 ✋ 순서(claps 인덱스)는 줄 전체로 이어진다 —
+  // 구간마다 따로 그리지만 ✋ 순서(accents 인덱스)는 줄 전체로 이어진다 —
   // 각 구간이 몇 번째 ✋부터 시작하는지 미리 센다.
   const clapStarts = text.map((_, index) =>
     text
       .slice(0, index)
       .reduce((sum, segment) => sum + countClaps(segment.text), 0),
+  );
+  // 강조 단어 순서(accents 인덱스)도 같은 방식으로 줄 전체에 이어 센다.
+  const emphasisStarts = text.map((_, index) =>
+    text
+      .slice(0, index)
+      .reduce(
+        (sum, segment) => sum + countAppliedEmphasis(segment.text, scope),
+        0,
+      ),
   );
   return (
     <>
@@ -580,7 +700,12 @@ function LyricTextRenderer({
             scope,
             emphasisColor,
             highlight,
-            { clap, clapStart: clapStarts[index] },
+            {
+              clap,
+              clapStart: clapStarts[index],
+              accentMarks,
+              emphasisStart: emphasisStarts[index],
+            },
           )}
         </span>
       ))}
@@ -594,10 +719,17 @@ function renderTextParts(
   scope?: EmphasisScope,
   emphasisColor?: string,
   highlight = false,
-  claps?: { clap?: ClapTiming; clapStart: number },
+  claps?: {
+    clap?: ClapTiming;
+    clapStart: number;
+    accentMarks?: AccentMarks;
+    emphasisStart: number;
+  },
 ) {
-  // ✋가 든 조각은 ClapText로 — claps 인덱스는 조각을 넘어 앞에서부터 이어진다.
+  // ✋가 든 조각은 ClapText로 — accents 인덱스는 조각을 넘어 앞에서부터 이어진다.
   let clapCursor = claps?.clapStart ?? 0;
+  // 강조 단어도 accents 인덱스에 앞에서부터 하나씩 대응한다(✋가 없는 응원 줄).
+  let emphasisCursor = claps?.emphasisStart ?? 0;
   const renderValue = (value: string, valueKey: string) => {
     const clap = claps?.clap;
     if (!clap || !value.includes(CLAP)) return value;
@@ -643,11 +775,19 @@ function renderTextParts(
             );
           }
 
+          const emphasisIndex = emphasisCursor++;
+          const style = emphasisColor
+            ? emphasisProps(emphasisColor, highlight)
+            : undefined;
+          const accentClass = claps?.accentMarks
+            ? accentMarkClass(emphasisIndex, claps.accentMarks)
+            : "";
           return (
             // 실제로 응원하는 단어만 응원 색으로(발음 줄은 형광펜).
             <strong
               key={`${key}-${index}-${segIndex}`}
-              {...(emphasisColor && emphasisProps(emphasisColor, highlight))}
+              className={cn(style?.className, accentClass) || undefined}
+              style={style?.style}
             >
               {renderValue(seg.value, `${key}-${index}-${segIndex}-clap`)}
             </strong>

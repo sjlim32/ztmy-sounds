@@ -174,6 +174,19 @@ body {
   }
 }
 
+/* 가이드 가사 강조 단어 — 강조 타이밍(accents)이 되면 살짝 튀어 오름 */
+@keyframes accent-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.22);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 /* 가이드 가사 음표 간주(MusicBreak) — 재생 중 음표가 박자 타듯 들썩임 */
 @keyframes note-bob {
   0%,
