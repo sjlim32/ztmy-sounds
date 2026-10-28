@@ -1,6 +1,8 @@
 "use client";
 
+import { useLayoutEffect } from "react";
 import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { EntranceFade } from "@/components/EntranceFade";
 import { PageScrollBody } from "@/components/PageScrollBody";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
@@ -18,6 +20,17 @@ const ZUTOPIA_SCROLL_CONTAINER_ID = "zutopia-scroll-container";
 
 export function ZutopiaScrollArea({ children }: { children: ReactNode }) {
   const scrollRef = useScrollFadeMask<HTMLElement>();
+  const pathname = usePathname();
+
+  // 이 스크롤 박스는 ZUTOPIA 안의 모든 페이지(첫 화면·곡·앨범·공연·상세)가
+  // 같이 써서, 페이지를 옮겨도 이전 스크롤 위치가 남는다 — 경로가 바뀔 때마다
+  // 맨 위로 되돌린다(주소의 ?song= 같은 쿼리만 바뀌는 드로어 열고 닫기는 제외).
+  // 예외: 공연 목록은 상세에서 돌아오면 보던 위치로 복원한다 — LiveListView가
+  // 이 layout effect 뒤(passive effect)에 다시 스크롤한다.
+  // <main>의 scroll-smooth 때문에 instant를 명시한다.
+  useLayoutEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0, behavior: "instant" });
+  }, [pathname, scrollRef]);
 
   return (
     <>
@@ -38,7 +51,7 @@ export function ZutopiaScrollArea({ children }: { children: ReactNode }) {
         <PageScrollBody
           innerClassName={cn(
             "mx-auto w-full px-3 pt-6 pb-10",
-            "tablet:max-w-4xl tablet:px-6 tablet:py-16",
+            "tablet:max-w-4xl tablet:px-6 tablet:pt-10 tablet:pb-16",
           )}
         >
           <EntranceFade>{children}</EntranceFade>

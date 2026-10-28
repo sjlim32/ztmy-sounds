@@ -4,7 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { SortFilterBar } from "@/features/zutopia/components/SortFilterBar";
+import {
+  SORT_FILTER_CARD_CLASS,
+  SortFilterBar,
+} from "@/features/zutopia/components/SortFilterBar";
 import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
 import type { ZutopiaEntry, ZutopiaEntryType } from "@/features/zutopia/types";
 
@@ -48,14 +51,16 @@ function entryYear(entry: ZutopiaEntry): string | null {
 }
 
 /**
- * 상세로 들어갔다가 목록으로 돌아왔을 때 복원할 상태. /zutopia는 window가
- * 아니라 ZutopiaScrollArea의 <main>이 스크롤되는 구조라(docs/RULES.md) 브라우저
- * 기본 스크롤 복원이 동작하지 않고, 필터도 로컬 state라 언마운트되면
- * 사라진다 — 그래서 항목 클릭 시점에 직접 저장해 둔다.
+ * 상세로 들어갔다가 목록으로 돌아왔을 때 복원할 상태(필터 + 스크롤 위치).
+ * /zutopia는 window가 아니라 ZutopiaScrollArea의 <main>이 스크롤되는 구조라
+ * (docs/RULES.md) 브라우저 기본 스크롤 복원이 동작하지 않고, 필터도 로컬
+ * state라 언마운트되면 사라진다 — 그래서 항목 클릭 시점에 직접 저장해 둔다.
+ * ZUTOPIA는 경로가 바뀌면 맨 위로 되돌리지만(ZutopiaScrollArea, layout
+ * effect), 이 복원은 그 뒤(passive effect)에 돌아서 공연 목록만 예외가 된다.
  *
  * 복귀 경로가 둘이라 popstate 감지가 아니라 "저장 → 다음 마운트에서 한 번
  * 소비" 방식을 쓴다: MO 헤더 뒤로가기는 router.back()(popstate)이지만 PC
- * ZutopiaTopNav 뒤로가기는 상위 경로로 가는 일반 Link(push)라서다.
+ * 헤더의 "공연" 탭(ZutopiaHeaderNav)은 목록으로 가는 일반 Link(push)라서다.
  */
 interface ListSnapshot {
   sortBy: SortBy;
@@ -135,10 +140,11 @@ export function LiveListView({
   const [yearFilter, setYearFilter] = useState(
     initialSnapshot?.yearFilter ?? ALL_YEAR,
   );
+
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // passive effect라 Next Link의 "페이지 상단으로 scrollIntoView"(layout
-  // 단계)보다 늦게 돌아 덮어쓰이지 않는다. <main>의 scroll-smooth 때문에
+  // passive effect라 ZutopiaScrollArea의 "경로가 바뀌면 맨 위로"(layout
+  // effect)보다 늦게 돌아 덮어쓰이지 않는다. <main>의 scroll-smooth 때문에
   // instant를 명시한다.
   useEffect(() => {
     hasMountedOnClient = true;
@@ -171,7 +177,8 @@ export function LiveListView({
       { value: ALL_YEAR, label: "전체" },
       ...[...years]
         .sort((a, b) => b.localeCompare(a))
-        .map((year) => ({ value: year, label: `${year}년` })),
+        // "년"을 빼 칩을 줄여 최대한 한 줄에 들어가게(줄 이름이 이미 "연도").
+        .map((year) => ({ value: year, label: year })),
     ];
   }, [entries]);
 
@@ -221,7 +228,7 @@ export function LiveListView({
       강제하지 않음) — 여기서는 세 필터가 항상 세로로 쌓이므로 각 줄을
       w-full로 감싸, 선택값이 바뀌어도(버튼 텍스트 길이가 달라도) 카드
       폭이 흔들리지 않게 고정한다. */}
-      <div className="tablet:px-4 tablet:py-3 flex w-full flex-col gap-2 rounded-lg border border-white/10 bg-white/5 px-2 py-1">
+      <div className={cn(SORT_FILTER_CARD_CLASS, "w-full")}>
         <div className="w-full">
           <SortFilterBar
             options={SORT_OPTIONS}
@@ -244,6 +251,7 @@ export function LiveListView({
             value={yearFilter}
             onChange={setYearFilter}
             label="연도"
+            compact
           />
         </div>
       </div>

@@ -6,6 +6,7 @@ import {
   getZutopiaCategory,
 } from "@/features/zutopia/registry";
 import { LiveListView } from "@/features/zutopia/lives/components/LiveListView";
+import type { ZutopiaCategory } from "@/features/zutopia/types";
 
 export function generateStaticParams() {
   return ZUTOPIA_CATEGORIES.map((category) => ({ category: category.slug }));
@@ -17,7 +18,16 @@ export default async function ZutopiaCategoryPage(
   const { category: slug } = await props.params;
   const category = getZutopiaCategory(slug);
   if (!category) notFound();
+  return (
+    <>
+      {/* 페이지 이름·구역은 헤더(SiteHeader)가 보여줘서 제목은 화면 읽기·검색 노출용. */}
+      <h1 className="sr-only">{`즛토피아 ${category.label} 목록`}</h1>
+      <CategoryContent category={category} />
+    </>
+  );
+}
 
+async function CategoryContent({ category }: { category: ZutopiaCategory }) {
   const entries = await category.getEntries();
 
   if (entries.length === 0) {

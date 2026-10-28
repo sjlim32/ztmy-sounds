@@ -8,7 +8,10 @@ import { groupAlbums } from "@/features/zutopia/song-db/song-album-grouping";
 import { DIRECTION_OPTIONS } from "@/features/zutopia/song-db/sort";
 import { AlbumDetailPanel } from "@/features/zutopia/song-db/components/AlbumDetailPanel";
 import { SongDbDrawer } from "@/features/zutopia/song-db/components/SongDbDrawer";
-import { SortFilterBar } from "@/features/zutopia/components/SortFilterBar";
+import {
+  SORT_FILTER_CARD_CLASS,
+  SortFilterBar,
+} from "@/features/zutopia/components/SortFilterBar";
 import type {
   AlbumGroupBy,
   AlbumWithSongs,
@@ -17,6 +20,8 @@ import type {
 
 interface AlbumListViewProps {
   albums: AlbumWithSongs[];
+  /** 정렬 카드 오른쪽 위에 작게 보여줄 개수 문구(예: "전체 9개"). */
+  summary?: string;
 }
 
 type AlbumCoverVersion = "regular" | "first-press";
@@ -55,7 +60,7 @@ function getAlbumCoverSrc(
   return album.cover_image_url;
 }
 
-export function AlbumListView({ albums }: AlbumListViewProps) {
+export function AlbumListView({ albums, summary }: AlbumListViewProps) {
   const [groupBy, setGroupBy] = useState<AlbumGroupBy>("type");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [coverVersion, setCoverVersion] =
@@ -102,7 +107,12 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+      <div className={cn(SORT_FILTER_CARD_CLASS, "relative")}>
+        {summary && (
+          <p className="tablet:absolute tablet:top-3 tablet:right-4 text-sm text-white/50">
+            {summary}
+          </p>
+        )}
         <SortFilterBar
           options={SORT_OPTIONS}
           value={groupBy}

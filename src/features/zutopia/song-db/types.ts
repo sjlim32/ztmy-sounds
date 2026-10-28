@@ -35,7 +35,7 @@ export type AlbumGroupBy = "type" | "year";
 export type SongGroupBy = "album" | "year";
 export type SortDirection = "asc" | "desc";
 
-// 공개곡/미공개곡(metadata.unrelease) 개수 — 허브 카드와 SongDbNav 표시용.
+// 공개곡/미공개곡(metadata.unrelease) 개수 — 즛토피아 첫 화면 카드 표시용.
 export interface SongCounts {
   released: number;
   unreleased: number;

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getZutopiaCategory } from "@/features/zutopia/registry";
-import { ZutopiaSectionHeader } from "@/features/zutopia/components/ZutopiaSectionHeader";
 
 export async function generateMetadata(
   props: LayoutProps<"/zutopia/[category]">,
@@ -26,6 +25,10 @@ export async function generateMetadata(
  * 늘어날수록 탭도 계속 늘어나는 구조라 확장성이 없었음), lives 목록에
  * 투어까지 합쳐지며 항목 수가 계속 늘어날 예정이라 제거했습니다 — 항목
  * 탐색은 이제 목록 페이지 자체의 필터(예: LiveListView)가 맡습니다.
+ *
+ * 카테고리 제목·설명도 화면에 두지 않는다 — 페이지 이름과 구역(공연)은
+ * 헤더(SiteHeader)가 보여주고, 상세 페이지는 자기 제목(h1)을 갖는다. 목록
+ * 페이지의 제목(h1)은 [category]/page.tsx가 화면에 안 보이게 둔다.
  */
 export default async function ZutopiaCategoryLayout(
   props: LayoutProps<"/zutopia/[category]">,
@@ -34,14 +37,5 @@ export default async function ZutopiaCategoryLayout(
   const category = getZutopiaCategory(slug);
   if (!category) notFound();
 
-  return (
-    <div>
-      <ZutopiaSectionHeader
-        title={category.label}
-        description={category.description}
-      />
-
-      <div className="mt-8">{props.children}</div>
-    </div>
-  );
+  return props.children;
 }

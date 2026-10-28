@@ -176,6 +176,28 @@ src/
                              # content.mdx를 만들어 [slug]/page.tsx의
                              # CONTENT_BY_KEY에 등록한다(선택 사항).
       song-db/              # 곡/앨범 DB 조회·정렬·표시 로직 (Supabase 소스)
+                             # 곡·앨범·공연 목록 위 정렬/필터 카드는 모두
+                             # components/SortFilterBar.tsx의 SORT_FILTER_CARD_CLASS
+                             # (안쪽 여백 통일). 줄 모양은 공용 FilterRow/FilterChip.
+      search/               # 첫 화면(/zutopia) 통합 검색. data.ts가 빌드 때 곡·
+                             # 앨범·공연 + 곡별 세트리스트 연결(공연일은 투어로
+                             # 묶음)로 인덱스를 만들고, search.ts가 브라우저에서
+                             # 찾는다 — 곡이 걸리면 그 곡이 실린 앨범과 그 곡을
+                             # 부른 공연도 "관련" 결과로 함께 보여준다(더 보기
+                             # 없이 전부, 공연은 시작 연도별로 묶어 최신부터). 결과는 태블릿 이상은 검색창 바로
+                             # 아래 드롭다운(배경막 없음, 바깥 클릭·Esc로
+                             # 닫힘), 모바일은 카드 자리에 그대로. 검색어는
+                             # 주소 ?q=에 둔다(뒤로가기·공유 유지).
+      (스크롤)              # ZUTOPIA는 모든 페이지가 스크롤 박스 하나
+                             # (ZutopiaScrollArea)를 같이 써서, 경로가 바뀌면
+                             # 항상 맨 위로 되돌린다(쿼리만 바뀌는 드로어는 제외).
+                             # 예외로 공연 목록은 상세에서 돌아오면(뒤로가기·
+                             # 헤더 공연 탭) 필터와 스크롤 위치를 복원한다
+                             # (LiveListView — 초기화 뒤에 돌아서 덮어씀).
+      nav.ts                # 헤더의 즛토피아 구역 이동(곡·앨범·공연) 항목.
+                             # 헤더가 클라이언트라 registry.ts를 못 써서 따로
+                             # 둔다 — 카테고리를 더하면 여기도 더한다. 곡·앨범
+                             # 페이지 본문엔 따로 탭을 두지 않는다(헤더와 중복).
   components/               # 여러 기능이 공유하는 전역 컴포넌트
     mobile/                 # 모바일 전용 전역 컴포넌트
     icons/                  # 커스텀 SVG 아이콘 (외부 아이콘 라이브러리 미사용)
@@ -345,8 +367,14 @@ src/
   (크기·위치는 호출부에서 `cn`으로 얹기):
   - 이동(뒤로가기·메인으로, 설치·공유, 푸터 건의·출처):
     `NAV_BUTTON_CLASS` — 어두운 면 + 2px 테두리
-  - 고르기(공연 정보 탭, 즛토피아 곡/앨범, 가이드 곡 목록 필터): `TAB_LIST_CLASS` 안에
-    `TAB_CLASS`, 고른 칸은 `ACTIVE_TAB_CLASS`(흰 면으로 반전)
+  - 필터(가이드 곡 목록, ZUTOPIA 곡·앨범·공연 정렬/필터 전부):
+    `src/components/FilterChips.tsx`의 `FilterRow`(왼쪽 이름 + 칩들) +
+    `FilterChip`을 씁니다. 칩 모양은 `FILTER_CHIP_CLASS`, 고른 칸은 `ACTIVE_FILTER_CHIP_CLASS` — 작은 칸 +
+    1px 테두리, 고르면 마젠타로 옅게 칠함. 모바일은 칩이 넘치면 그 줄만 가로
+    스크롤, `wrap`(SortFilterBar는 `compact`)이면 작은 칩 + 줄바꿈(공연 연도).
+    켜고 끄는 옵션(미공개곡 제외)도 체크박스 대신 같은 칩.
+  - 헤더 탭(공연 정보 탭, 즛토피아 곡·앨범·공연): `HEADER_TAB_CLASS`, 고른 칸은
+    `ACTIVE_HEADER_TAB_CLASS` — 면 없이 글자 색 + 마젠타 밑줄, 헤더 높이를 꽉 채움
   - 링크(다른 페이지·구역으로 이동하는 글자 버튼): `LINK_BUTTON_CLASS` — 투명 면 + 2px
     테두리, 필요하면 끝에 화살표 아이콘
   - 동작(모바일 설치 배너의 "추가"처럼 눌러서 실행): `ACTION_BUTTON_CLASS` — 사이트

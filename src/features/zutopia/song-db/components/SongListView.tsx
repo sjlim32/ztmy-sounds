@@ -16,7 +16,11 @@ import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 import { SongDbDrawer } from "@/features/zutopia/song-db/components/SongDbDrawer";
 import { SongDetailPanel } from "@/features/zutopia/song-db/components/SongDetailPanel";
 import { UnreleasedBadge } from "@/features/zutopia/song-db/components/UnreleasedBadge";
-import { SortFilterBar } from "@/features/zutopia/components/SortFilterBar";
+import {
+  SORT_FILTER_CARD_CLASS,
+  SortFilterBar,
+} from "@/features/zutopia/components/SortFilterBar";
+import { FilterChip, FilterRow } from "@/components/FilterChips";
 import type {
   SongGroupBy,
   SongWithAlbums,
@@ -25,6 +29,8 @@ import type {
 
 interface SongListViewProps {
   songs: SongWithAlbums[];
+  /** 정렬 카드 오른쪽 위에 작게 보여줄 개수 문구(예: "전체 75곡 · 미공개 5곡"). */
+  summary?: string;
 }
 
 /**
@@ -49,7 +55,7 @@ const SORT_OPTIONS: { value: SongGroupBy; label: string }[] = [
   { value: "year", label: "발매일" },
 ];
 
-export function SongListView({ songs }: SongListViewProps) {
+export function SongListView({ songs, summary }: SongListViewProps) {
   const [groupBy, setGroupBy] = useState<SongGroupBy>("album");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [hideUnreleased, setHideUnreleased] = useState(false);
@@ -90,12 +96,12 @@ export function SongListView({ songs }: SongListViewProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div
-        className={cn(
-          "flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 px-2 py-1",
-          "tablet:px-4 tablet:py-3",
+      <div className={cn(SORT_FILTER_CARD_CLASS, "relative")}>
+        {summary && (
+          <p className="tablet:absolute tablet:top-3 tablet:right-4 text-sm text-white/50">
+            {summary}
+          </p>
         )}
-      >
         <SortFilterBar
           options={SORT_OPTIONS}
           value={groupBy}
@@ -108,23 +114,15 @@ export function SongListView({ songs }: SongListViewProps) {
           onChange={setSortDirection}
         />
         {hasUnreleased && (
-          <label
-            className={cn(
-              "flex w-fit cursor-pointer items-center gap-2 py-1 text-sm font-medium text-white/70 select-none",
-              "tablet:text-base",
-            )}
-          >
-            <input
-              type="checkbox"
-              checked={hideUnreleased}
-              onChange={(event) => setHideUnreleased(event.target.checked)}
-              className={cn(
-                "accent-ztmy-purple h-3.5 w-3.5",
-                "tablet:h-4 tablet:w-4",
-              )}
-            />
-            미공개곡 제외
-          </label>
+          // 다른 줄과 같은 필터 칩 — 누를 때마다 켜고 끈다.
+          <FilterRow label="보기">
+            <FilterChip
+              active={hideUnreleased}
+              onClick={() => setHideUnreleased(!hideUnreleased)}
+            >
+              미공개곡 제외
+            </FilterChip>
+          </FilterRow>
         )}
       </div>
 

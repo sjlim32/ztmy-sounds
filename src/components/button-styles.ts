@@ -12,15 +12,6 @@ export const FOCUS_RING =
 export const NAV_BUTTON_CLASS = `inline-flex items-center justify-center gap-1.5 rounded-lg border-2 border-white/15 bg-black/50 font-medium text-white/85 backdrop-blur-sm transition-colors hover:border-white/35 hover:bg-white/10 hover:text-white ${FOCUS_RING}`;
 
 /**
- * 탭·필터처럼 "여러 개 중 고르기": 칸마다 따로 떨어진 버튼, 고른 칸은 흰 면으로
- * 꽉 채워 반전시킨다(막대·밑줄 없이 면 전체로 선택 상태를 보여줌).
- */
-export const TAB_LIST_CLASS = "flex flex-wrap gap-2";
-export const TAB_CLASS = `rounded-lg border-2 border-white/10 bg-black/40 px-4 py-2 text-sm font-medium text-white/70 backdrop-blur-sm transition-colors hover:border-white/30 hover:text-white ${FOCUS_RING}`;
-export const ACTIVE_TAB_CLASS =
-  "border-white bg-white text-ztmy-dark hover:border-white hover:text-ztmy-dark";
-
-/**
  * 필터 칩(가이드 곡 목록의 중요도·응원법): 작은 칸 + 1px 테두리, 고른 칸은
  * 사이트 대표색(마젠타)으로 옅게 칠하고 테두리를 마젠타로. 이동 버튼(2px
  * 테두리)·헤더 탭(밑줄)과 한눈에 구분되게 필터만의 모양을 쓴다.

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { ZutopiaScrollArea } from "@/features/zutopia/components/ZutopiaScrollArea";
-import { ZutopiaTopNav } from "@/features/zutopia/components/ZutopiaTopNav";
 
 export const metadata: Metadata = {
   title: "즛토피아",
@@ -23,11 +22,5 @@ export default function ZutopiaLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <ZutopiaScrollArea>
-      <ZutopiaTopNav />
-
-      <div className="tablet:mt-8">{children}</div>
-    </ZutopiaScrollArea>
-  );
+  return <ZutopiaScrollArea>{children}</ZutopiaScrollArea>;
 }

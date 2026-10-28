@@ -85,12 +85,10 @@ function resolveDisplaySong<T extends Song>(
   };
 }
 
-// 곡 페이지는 앨범 개수를, 앨범 페이지는 곡 개수를 SongDbNav 배지에 표시하기
-// 위해서만 상대 데이터셋이 필요하다 — get*WithAlbums/get*WithSongs 전체를
-// (모든 앨범/곡 정보를 다대다로 조인해서) 다시 불러오는 건 개수 하나 얻자고
-// 이 기능에서 가장 비싼 쿼리를 페이지마다 불필요하게 한 번씩 더 실행하는
-// 것과 같다. count-only 쿼리(head: true라 실제 행 데이터는 아예 안 옴)로
-// 대체한다.
+// 즛토피아 첫 화면 카드에 개수만 보여줄 때 쓴다 — get*WithAlbums/get*WithSongs
+// 전체를(모든 앨범/곡 정보를 다대다로 조인해서) 불러오는 건 개수 하나 얻자고
+// 이 기능에서 가장 비싼 쿼리를 한 번 더 실행하는 것과 같아서, count-only
+// 쿼리(head: true라 실제 행 데이터는 아예 안 옴)로 대체한다.
 // 미공개곡(metadata.unrelease)은 공개곡 수에서 빼고 따로 센다 —
 // song-metadata.ts의 parseSongMetadata와 같은 기준("true" 문자열/불리언,
 // ->>로 꺼내면 둘 다 텍스트 "true"가 된다).
