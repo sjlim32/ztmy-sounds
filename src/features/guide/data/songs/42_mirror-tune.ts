@@ -13,8 +13,10 @@ const song: Song = {
   importance: "recommended",
   swingGif: "/assets/guide/milabo.webp",
   description: {
-    summary: "",
-    points: [],
+    summary: "T I P",
+    points: [
+      "후렴 부분이 아닌 yey에는 손을 앞으로 뻗은 뒤 아래로 천천히 내려주세요.",
+    ],
   },
   lyrics: [
     {
@@ -503,23 +505,25 @@ const song: Song = {
     },
     {
       time: "4:19",
-      original: "ye ye ye yey",
-      pronunciation: "**ye ye ye yey**",
-      translation: "ye ye ye yey",
+      original: "ye ye ye yey~ level up",
+      pronunciation: "**ye** **ye** **ye** **yey~** level up**",
+      translation: "",
       cheer: {
         text: "박자에 맞춰",
         tag: "swing",
       },
+      accents: [0.0, 0.4, 0.65, 0.95],
     },
     {
       time: "4:24.4",
-      original: "ye ye ye yey",
-      pronunciation: "**ye ye ye yey**",
-      translation: "ye ye ye yey",
+      original: "ye ye ye yey~ level up",
+      pronunciation: "**ye** **ye** **ye** **yey~** level up**",
+      translation: "",
       cheer: {
         text: "박자에 맞춰",
         tag: "swing",
       },
+      accents: [0.25, 0.65, 0.9, 1.2],
     },
     {
       time: "4:25.9",

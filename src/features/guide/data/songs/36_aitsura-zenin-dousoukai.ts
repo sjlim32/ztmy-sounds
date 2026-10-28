@@ -84,12 +84,13 @@ const song: Song = {
     {
       time: "0:30.7",
       original: "もうダンスダンスダンス 誰も気づいてない",
-      pronunciation: "모오 **단스단스단스** 다레모 키즈이테나이",
+      pronunciation: "모오 **단스** **단스** **단스** 다레모 키즈이테나이",
       translation: "이제 댄스 댄스 댄스 누구도 알지 못해",
       cheer: {
-        text: "'단스 단스 단스' 박자에 맞춰",
+        text: "박자에 맞춰",
         tag: "swing",
       },
+      accents: [0.8, 1.2, 1.6],
     },
     {
       time: "0:34.2",
@@ -100,12 +101,13 @@ const song: Song = {
     {
       time: "0:38",
       original: "もうステイステイ捨てる 下積み正義",
-      pronunciation: "모오 **스테이 스테이 스테루** 시타즈미 세이기",
+      pronunciation: "모오 **스테이** **스테이** **스테루** 시타즈미 세이기",
       translation: "이제 스테이 스테이 버리는 밑바닥 정의",
       cheer: {
-        text: "'스테이 스테이 스테루' 박자에 맞춰",
+        text: "박자에 맞춰",
         tag: "swing",
       },
+      accents: [0.8, 1.2, 1.6],
     },
     {
       time: "0:41.7",
@@ -153,6 +155,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [1.7],
       slam: '"기"에 Jump',
     },
     {
@@ -195,6 +198,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [1.7],
     },
     {
       time: "1:04.2",
@@ -236,6 +240,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [1.7],
     },
     {
       time: "1:11.5",
@@ -277,6 +282,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [1.7],
       slam: '"이"에 Jump',
     },
     {
@@ -410,6 +416,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [1.7],
       slam: '"기"에 Jump',
     },
     {
@@ -452,6 +459,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [1.7],
       slam: '"이"에 Jump',
     },
     {
@@ -494,6 +502,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [1.7],
       slam: '"기"에 Jump',
     },
     {
@@ -536,6 +545,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [1.7],
       slam: '"이"에 Jump',
     },
     //================ R A P ================//
@@ -545,7 +555,7 @@ const song: Song = {
       pronunciation: "다레카오 케나시테 지분와 맛토오",
       translation: "누군가를 깎아내리고 자신은 정당",
       cheer: {
-        text: "=== Rap Part ===",
+        text: "=== R A P ===",
         tag: "swing",
       },
     },
@@ -679,6 +689,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [1.7],
       slam: '"기"에 Jump',
     },
     {
@@ -721,6 +732,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [1.7],
       slam: '"이"에 Jump',
     },
     {
@@ -763,6 +775,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [1.7],
       slam: '"기"에 Jump',
     },
     {
@@ -805,6 +818,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [1.7],
       slam: '"이"에 Jump',
     },
     //================ R A P ================//
@@ -814,7 +828,7 @@ const song: Song = {
       pronunciation: "오츠카레사마데스 카제기미데스",
       translation: "고생하셨습니다 감기기운 있어요",
       cheer: {
-        text: "=== Rap Part ===",
+        text: "=== R A P ===",
         tag: "swing",
       },
       slam: "핏 러닝",
