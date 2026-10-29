@@ -121,13 +121,17 @@ export function SongLink({
           Encore
         </span>
       )}
-      {href && (
+      {/* 응원 가이드가 없는 줄도 버튼 폭(28px)만큼 비워 둔다 — 그래야 선택곡·
+      일차·ENCORE 배지가 줄마다 같은 자리에 선다. */}
+      {href ? (
         <IconLinkButton
           href={href}
           icon={MicIcon}
           label="응원 가이드 이동"
           tone="guide"
         />
+      ) : (
+        <span aria-hidden className="h-7 w-7 shrink-0" />
       )}
     </div>
   );

@@ -4,10 +4,15 @@ import { cn } from "@/lib/utils";
 type Tone = "youtube" | "guide" | "spotify" | "appleMusic";
 type Variant = "pill" | "solid";
 
+// variant="pill"(기본, 곡 행 옆 작은 버튼): 면 없이 아이콘에만 그 링크의
+// 색을 남기고, 마우스를 올리면 옅은 면 — 사이트의 다른 테두리 없는 버튼
+// (헤더 뒤로가기, 가이드 상세 버튼 줄)과 같은 결. 꽉 찬 색 면은 목록에서
+// 줄마다 반복돼 너무 튄다.
 const PILL_TONE_STYLES: Record<Tone, string> = {
-  youtube: "bg-red-600 text-white hover:bg-red-500 focus-visible:bg-red-500",
+  youtube:
+    "text-red-500 hover:bg-white/10 hover:text-red-400 focus-visible:bg-white/10",
   guide:
-    "bg-ztmy-magenta hover:bg-ztmy-magenta/85 focus-visible:bg-ztmy-magenta/85 text-white",
+    "text-ztmy-pink hover:bg-white/10 hover:text-white focus-visible:bg-white/10",
   spotify:
     "text-white/60 hover:bg-green-500/15 hover:text-green-400 focus-visible:bg-green-500/15 focus-visible:text-green-400",
   appleMusic:
@@ -23,7 +28,8 @@ const SOLID_TONE_STYLES: Partial<Record<Tone, string>> = {
 };
 
 const SIZE_STYLES = {
-  sm: { square: "h-6 w-6", icon: "h-3 w-3" },
+  // 면이 없어서 아이콘 자체로 보여야 해 16px(누르는 영역 28px).
+  sm: { square: "h-7 w-7", icon: "h-4 w-4" },
   md: { square: "h-7 w-7", icon: "h-4 w-4" },
   // md의 1.5배(세트리스트 스트리밍 버튼처럼 더 눈에 띄어야 할 때).
   lg: { square: "h-11 w-11", icon: "h-6 w-6" },
@@ -45,9 +51,9 @@ interface IconLinkButtonProps {
 }
 
 /**
- * 곡 행/공연 정보에 붙는 외부 링크 아이콘(유튜브/응원 가이드/음원 사이트)
- * 공용 버튼. 그냥 아이콘이 아니라 누를 수 있는 버튼임이 드러나도록
- * 확대/색상 전환을 주고, 브라우저 기본 title 대신 커스텀 툴팁을 붙인다
+ * 곡 행/공연 정보에 붙는 링크 아이콘(유튜브/응원 가이드/음원 사이트) 공용
+ * 버튼. 그냥 아이콘이 아니라 누를 수 있는 버튼임이 드러나도록 마우스를 올리면
+ * 옅은 면이 생기고(solid는 확대), 브라우저 기본 title 대신 커스텀 툴팁을 붙인다
  * (AlbumListView 커버 호버 라벨과 동일한 opacity/translate 트랜지션
  * 재사용). 터치(group-active) / 마우스(tablet:group-hover) /
  * 키보드(group-focus-within) 세 가지 입력 방식 모두에서 뜬다.
@@ -64,8 +70,16 @@ export function IconLinkButton({
   const sizing = SIZE_STYLES[size];
   const isSolid = variant === "solid";
   const colorClass = isSolid
-    ? cn("shadow-md", SOLID_TONE_STYLES[tone])
-    : cn("bg-white/5", PILL_TONE_STYLES[tone]);
+    ? cn("shadow-md hover:scale-110 active:scale-95", SOLID_TONE_STYLES[tone])
+    : PILL_TONE_STYLES[tone];
+  const linkClass = cn(
+    "inline-flex items-center justify-center transition-all duration-200",
+    "focus-visible:outline-ztmy-magenta focus-visible:outline-2 focus-visible:outline-offset-2",
+    "rounded-md",
+    sizing.square,
+    colorClass,
+  );
+  const icon = <Icon className={sizing.icon} />;
 
   return (
     <span className={cn("group/tip relative inline-flex shrink-0", className)}>
@@ -74,16 +88,9 @@ export function IconLinkButton({
         target="_blank"
         rel="noopener noreferrer"
         aria-label={label}
-        className={cn(
-          "inline-flex items-center justify-center transition-all duration-200",
-          "hover:scale-110 active:scale-95",
-          "focus-visible:outline-ztmy-magenta focus-visible:outline-2 focus-visible:outline-offset-2",
-          "rounded-md",
-          sizing.square,
-          colorClass,
-        )}
+        className={linkClass}
       >
-        <Icon className={sizing.icon} />
+        {icon}
       </a>
 
       <span
