@@ -223,17 +223,25 @@ function toSetlist(
  * 투어 공연일 세트리스트 = 투어 공통 곡(setlists.tour_id) + 그 공연일에만
  * 있는 곡(setlists.live_id)을 track_number로 합친 것. 공연일 쪽에만 있는
  * 곡은 "선택곡"으로 표시한다 — 투어 공통 세트리스트의 빈 번호 자리를
- * 공연일마다 다른 곡으로 채우는 구성이다. 같은 곡이 양쪽에 다 있으면
- * 한 번만(공통 곡으로) 보여준다.
+ * 공연일마다 다른 곡으로 채우는 구성이다.
+ *
+ * 같은 곡이 양쪽에 다 있으면 한 번만, 공통 곡으로 보여주되 번호(·앙코르·
+ * 일차)는 공연일 쪽을 따른다 — 공연일 세트리스트가 그날의 실제 순서라서다.
+ * 투어 공통에선 15번인 곡이 어느 공연일엔 14번이면(예: INTENSE 홍콩의 잔기),
+ * 투어 번호를 남기면 그 공연일의 15번 곡과 번호가 겹치고 14번이 빈다.
  */
 function mergeTourSetlist(
   tourRows: SetlistRow[],
   liveRows: SetlistRow[],
 ): LiveSetlistEntry[] {
   const tourSongIds = new Set(tourRows.map((row) => row.songs.id));
-  const liveOnly = liveRows.filter((row) => !tourSongIds.has(row.songs.id));
-  const selected = new Set(liveOnly);
-  return toSetlist([...tourRows, ...liveOnly], (row) => selected.has(row));
+  const liveSongIds = new Set(liveRows.map((row) => row.songs.id));
+  // 공연일에도 있는 공통 곡은 공연일 행으로 대신한다(번호를 공연일 기준으로).
+  const tourOnly = tourRows.filter((row) => !liveSongIds.has(row.songs.id));
+  const selected = new Set(
+    liveRows.filter((row) => !tourSongIds.has(row.songs.id)),
+  );
+  return toSetlist([...tourOnly, ...liveRows], (row) => selected.has(row));
 }
 
 /**
@@ -341,6 +349,8 @@ export const getTourBySlug = cache(
       };
     });
 
-    return { ...tour, dates };
+    // 투어 공통 세트리스트(공연일마다 바뀌는 선택곡 제외) — 상세에서 한 번만
+    // 보여주고, 공연일 행엔 그날의 선택곡만 미리 보여준다(TourDateList).
+    return { ...tour, setlist: toSetlist(tourSetlist), dates };
   },
 );

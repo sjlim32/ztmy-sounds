@@ -3,16 +3,21 @@ import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { formatLiveDate } from "@/features/zutopia/lives/data";
 import { LiveTicket } from "@/features/zutopia/lives/LiveTicket";
 import { LiveTypeBadge } from "@/features/zutopia/lives/LiveTypeBadge";
-import { TourDateList } from "@/features/zutopia/lives/TourDateList";
+import {
+  TourCommonSetlist,
+  TourDateList,
+} from "@/features/zutopia/lives/TourDateList";
 import type { TourDetail } from "@/features/zutopia/lives/types";
 import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
+import { LIVE_SECTION_TITLE_SHADOW } from "@/features/zutopia/lives/surface";
 import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
 
 /**
  * 투어(콘서트) 상세 페이지 — DefaultLiveContent와 같은 시각 언어(포스터
  * + 뱃지, 로고 서체 제목, 티켓 스텁)를 쓴다. 티켓(기간·variation·음원
  * 링크)은 tours 행의 컬럼으로 그리고, 투어에 묶인 개별 공연일(dates)은
- * 자기 페이지 없이 아래 일정 목록에서 펼쳐 세트리스트를 보여준다. 아직
+ * 자기 페이지 없이 아래 일정 목록에서 펼쳐 세트리스트를 보여준다(공통 곡은
+ * 그 위 투어 공통 세트리스트에 한 번만, 공연일 행엔 그날의 선택곡만). 아직
  * 공연일 데이터가 없는 투어(dates가 빈 배열)는 안내 문구만 보여준다 —
  * DB에는 투어만 먼저 등록하고 개별 공연일은 나중에 채우는 흐름이다.
  */
@@ -88,11 +93,15 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
         metadata={tour.metadata}
       />
 
+      <TourCommonSetlist entries={tour.setlist} dates={tour.dates} />
+
       <section className="w-full">
+        {/* 카드 밖 제목이라 배경 그림 위에서도 읽히게 글자 그림자 */}
         <div
           className={cn(
-            "flex items-baseline justify-between border-b border-white/10 pb-2",
+            "flex items-baseline justify-between border-b border-white/15 pb-2",
             "tablet:pb-3",
+            LIVE_SECTION_TITLE_SHADOW,
           )}
         >
           <p
@@ -104,7 +113,7 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
             공연 일정
           </p>
           <p
-            className={cn("font-mono text-xs text-white/40", "tablet:text-sm")}
+            className={cn("font-mono text-xs text-white/60", "tablet:text-sm")}
           >
             {tour.dates.length} dates
           </p>

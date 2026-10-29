@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { LIVE_SURFACE_CLASS } from "@/features/zutopia/lives/surface";
 import { AppleMusicIcon } from "@/components/icons/AppleMusicIcon";
 import { SpotifyIcon } from "@/components/icons/SpotifyIcon";
 import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
@@ -21,10 +22,8 @@ const TICKET_DIVIDER_CLASS = cn(
   "tablet:w-0 tablet:border-t-0 tablet:border-l",
 );
 
-const TICKET_LABEL_CLASS = cn(
-  "font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase",
-  "tablet:text-xs",
-);
+const TICKET_LABEL_CLASS =
+  "font-mono text-xs tracking-[0.25em] text-white/60 uppercase";
 
 /**
  * "본문 (부연설명)" 형태로 끝에 괄호가 붙어 있으면 분리한다 —
@@ -59,7 +58,7 @@ export function LiveTicket({
   const hasStreamingLinks = spotify || youtubeMusic || appleMusic;
 
   return (
-    <div className="relative w-full overflow-hidden bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]">
+    <div className={cn(LIVE_SURFACE_CLASS, "relative w-full overflow-hidden")}>
       <div className="from-ztmy-magenta to-ztmy-purple absolute inset-x-0 top-0 h-0.5 bg-linear-to-r" />
 
       <div className={cn("flex flex-col", "tablet:flex-row")}>

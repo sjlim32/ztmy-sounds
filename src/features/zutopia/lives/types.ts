@@ -45,6 +45,8 @@ export interface TourDateEntry {
 }
 
 export interface TourDetail extends Tour {
+  // 투어 공통 세트리스트(setlists.tour_id) — 공연일마다 바뀌는 선택곡은 빠진다.
+  setlist: LiveSetlistEntry[];
   // 이 투어에 묶인 개별 공연일(lives.tour_id로 연결) — 아직 없을 수 있다.
   dates: TourDateEntry[];
 }

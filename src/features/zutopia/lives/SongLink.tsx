@@ -3,7 +3,10 @@ import { cn } from "@/lib/utils";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 
-const indexBadgeClass = "w-6 shrink-0 font-mono text-xs tabular-nums";
+// "15-1"(투어 공통 세트리스트의 선택곡 자리)까지 한 줄에 들어가는 폭으로 고정 —
+// 모든 줄이 같은 폭이라 제목 시작 위치도 맞는다.
+const indexBadgeClass =
+  "w-8 shrink-0 font-mono text-xs whitespace-nowrap tabular-nums";
 
 const rowClass = cn(
   "flex w-full items-center gap-3 px-4 py-2.5",
@@ -37,24 +40,30 @@ export function SongLink({
   arrange,
   encore = false,
   selected = false,
+  wrapTitle = false,
+  indexLabel,
   children,
 }: {
   href?: string | null;
   index: number;
+  /** 번호 칸에 숫자 대신 보여줄 글자(투어 공통 세트리스트의 "15-1" 같은 자리). */
+  indexLabel?: string;
   dayNumber?: number | null;
   arrange?: string | null;
   encore?: boolean;
   selected?: boolean;
+  /** 제목을 한 줄로 자르지 않고 여러 줄로(투어 공통 세트리스트의 선택곡 후보 목록). */
+  wrapTitle?: boolean;
   children: ReactNode;
 }) {
-  const number = String(index).padStart(2, "0");
+  const number = indexLabel ?? String(index).padStart(2, "0");
   const dayLabel = dayNumber != null ? formatDayNumber(dayNumber) : null;
 
   return (
     <div
       className={cn(
         rowClass,
-        encore || selected ? "text-white" : "text-white/80",
+        encore || selected ? "text-white" : "text-white/90",
         encore && "bg-ztmy-sun/5",
         // 선택된 곡은 한쪽 막대 대신 행 전체를 옅게 칠한다
         selected && "bg-ztmy-sky/15",
@@ -65,13 +74,15 @@ export function SongLink({
           indexBadgeClass,
           encore && "text-ztmy-sun font-bold",
           selected && !encore && "text-ztmy-sky font-bold",
-          !encore && !selected && "text-white/30",
+          !encore && !selected && "text-white/45",
         )}
       >
         {number}
       </span>
       <div className="flex min-w-0 flex-1 flex-col justify-center">
-        <span className="truncate">{children}</span>
+        <span className={wrapTitle ? "break-keep" : "truncate"}>
+          {children}
+        </span>
         {arrange && (
           <span
             className={cn("truncate text-xs text-white/50", "tablet:text-sm")}
