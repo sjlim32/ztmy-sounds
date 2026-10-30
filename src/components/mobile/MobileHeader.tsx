@@ -73,7 +73,7 @@ export function MobileHeader() {
             aria-hidden
             width={LOGO.width}
             height={LOGO.height}
-            className="h-10 w-auto [filter:drop-shadow(0.5px_0_0_#fff)_drop-shadow(-0.5px_0_0_#fff)_drop-shadow(0_0.5px_0_#fff)_drop-shadow(0_-0.5px_0_#fff)]"
+            className="h-10 w-auto [filter:drop-shadow(1px_0_0_#fff)_drop-shadow(-1px_0_0_#fff)_drop-shadow(0_1px_0_#fff)_drop-shadow(0_-1px_0_#fff)]"
           />
         )}
 
