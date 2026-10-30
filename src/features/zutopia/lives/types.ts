@@ -39,6 +39,8 @@ export interface TourDateEntry {
   cityOriginal: string | null;
   region: string;
   venue: string;
+  // 목록 행 썸네일(없으면 포스터로 대신) + 펼침 영역 작은 이미지 목록 맨 앞.
+  iconImageUrl: string | null;
   posterImageUrl: string | null;
   additionalImageUrls: string[];
   setlist: LiveSetlistEntry[];

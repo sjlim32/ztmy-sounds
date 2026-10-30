@@ -363,7 +363,7 @@ export const getTourBySlug = cache(
     const { data: lives, error: livesError } = await supabase
       .from("lives")
       .select(
-        `id, start_date, end_date, country, region, live_venue, poster_image_url, additional_image_urls, ${SETLIST_SELECT}`,
+        `id, start_date, end_date, country, region, live_venue, icon_image_url, poster_image_url, additional_image_urls, ${SETLIST_SELECT}`,
       )
       .or(tourDateFilter(tour))
       .eq("status", "ACTIVE")
@@ -388,6 +388,7 @@ export const getTourBySlug = cache(
         cityOriginal: original,
         region: live.region,
         venue: live.live_venue,
+        iconImageUrl: live.icon_image_url,
         posterImageUrl: live.poster_image_url,
         additionalImageUrls: live.additional_image_urls ?? [],
         setlist: mergeTourSetlist(tourSetlist, live.setlists),

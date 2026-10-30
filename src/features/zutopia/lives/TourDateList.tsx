@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
-import { ParenText } from "@/features/zutopia/lives/ParenText";
 import { Setlist, type SetlistSlot } from "@/features/zutopia/lives/Setlist";
 import {
   LIVE_SURFACE_CLASS,
@@ -223,11 +222,24 @@ function collectSelectedSlots(
   return [...slots.values()];
 }
 
-/** 공연일 행 바로 아래 펼침 — 포스터·추가 이미지(작은 썸네일) + 그날 전체 세트리스트. */
+/**
+ * 공연일 행 바로 아래 펼침 — 공연 상세 페이지와 같은 노출 방식: 포스터는 크게,
+ * 아이콘(포스터와 다를 때)·추가 이미지는 작은 이미지 목록, 그 아래 그날 전체
+ * 세트리스트.
+ */
 function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
+  const showIcon =
+    !!date.iconImageUrl &&
+    date.iconImageUrl !== date.posterImageUrl &&
+    !date.additionalImageUrls.includes(date.iconImageUrl);
   const images = [
-    ...(date.posterImageUrl
-      ? [{ src: date.posterImageUrl, alt: `${date.date} ${date.venue} 포스터` }]
+    ...(showIcon && date.iconImageUrl
+      ? [
+          {
+            src: date.iconImageUrl,
+            alt: `${date.date} ${date.venue} 아이콘 이미지`,
+          },
+        ]
       : []),
     ...date.additionalImageUrls.map((url, i) => ({
       src: url,
@@ -244,8 +256,17 @@ function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
         "tablet:ml-6",
       )}
     >
+      {date.posterImageUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={date.posterImageUrl}
+          alt={`${date.date} ${date.venue} 포스터`}
+          loading="lazy"
+          className="max-h-[50vh] max-w-full self-center rounded-lg object-contain"
+        />
+      )}
       {images.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           <ZoomableImageGroup
             images={images}
             thumbnailWidth={72}
@@ -265,9 +286,10 @@ function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
 }
 
 /**
- * 공연 일정 한 줄 — 왼쪽 날짜 칸(MM.DD + 요일)과 오른쪽 도시/장소를 크기·
- * 굵기로 확실히 나눠, 세로로 훑을 때 날짜와 도시가 각각 한 열로 읽히게
- * 한다. 한국 공연은 마젠타 "내한" 태그로 강조한다.
+ * 공연 일정 한 줄 — 썸네일이 주인공. 왼쪽에 공연일 그림(아이콘, 없으면 포스터)을
+ * 세로 3:4로 크게 두고, 날짜는 그림 아래쪽에 얹는다. 그림이 없는 공연일은 같은
+ * 자리에 날짜 칸만(같은 폭이라 목록 정렬이 흐트러지지 않는다). 오른쪽은 도시·
+ * 장소·그날의 선택곡. 한국 공연은 마젠타 "내한" 태그로 강조한다.
  */
 function TourDateRow({
   date,
@@ -282,6 +304,7 @@ function TourDateRow({
   panelId: string;
   onClick: () => void;
 }) {
+  const thumbnail = date.iconImageUrl ?? date.posterImageUrl;
   // 그날에만 있는 곡(투어 공통 세트리스트에 없는 선택곡) — 펼치지 않아도 보인다.
   const selectedSongs = date.setlist.filter((entry) => entry.isSelected);
   const start = parseIsoDate(date.startDate);
@@ -292,6 +315,13 @@ function TourDateRow({
   const isKorea = date.country === "한국";
   const dateLabel = formatTourDateLabel(start, end);
 
+  const yearLabel = showYear
+    ? end && start.year !== end.year
+      ? `${start.year}–${end.year}`
+      : start.year
+    : null;
+  const weekdayLabel = end ? `${start.weekday}–${end.weekday}` : start.weekday;
+
   return (
     <button
       type="button"
@@ -299,7 +329,7 @@ function TourDateRow({
       aria-expanded={isOpen}
       aria-controls={panelId}
       className={cn(
-        "group flex w-full items-stretch overflow-hidden rounded-md border text-left transition-colors",
+        "group flex w-full items-stretch overflow-hidden rounded-lg border text-left transition-colors",
         // 배경 그림 위에서도 읽히게 어두운 면 + 흐림(LIVE_SURFACE_CLASS).
         LIVE_SURFACE_CLASS,
         isOpen
@@ -307,52 +337,57 @@ function TourDateRow({
           : "hover:border-white/25 hover:bg-black/65",
       )}
     >
+      {/* 왼쪽 썸네일 칸 — 그림이 있으면 3:4로 크게 + 아래에 날짜, 없으면 날짜 칸. */}
       <span
         className={cn(
-          "flex w-24 shrink-0 flex-col items-center justify-center border-r border-dashed border-white/15 px-1 py-2.5",
-          "tablet:w-28 tablet:py-3",
+          "relative flex w-24 shrink-0 flex-col items-center justify-center overflow-hidden border-r border-white/10",
+          "tablet:w-32",
+          thumbnail ? "aspect-[3/4] self-start" : "min-h-24 bg-white/[0.03]",
         )}
       >
-        {showYear && (
-          <span className="font-mono text-[10px] text-white/40">
-            {end && start.year !== end.year
-              ? `${start.year}–${end.year}`
-              : start.year}
+        {thumbnail ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={thumbnail}
+              alt=""
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            {/* 그림 위 날짜가 읽히게 아래에서 위로 어두워지는 막 */}
+            <span className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/85 to-transparent" />
+            <span className="absolute inset-x-0 bottom-0 flex flex-col items-center px-1 pb-1.5">
+              <DateText
+                label={dateLabel}
+                weekday={weekdayLabel}
+                year={yearLabel}
+                long={!!end && start.month !== end.month}
+              />
+            </span>
+          </>
+        ) : (
+          <span className="flex flex-col items-center px-1 py-3">
+            <DateText
+              label={dateLabel}
+              weekday={weekdayLabel}
+              year={yearLabel}
+              long={!!end && start.month !== end.month}
+            />
           </span>
         )}
-        <span
-          className={cn(
-            "text-center font-mono font-bold tracking-tight whitespace-nowrap text-white tabular-nums",
-            end
-              ? start.month === end.month
-                ? "tablet:text-base text-[13px]"
-                : "tablet:text-sm text-[11px]"
-              : "tablet:text-lg text-base",
-          )}
-        >
-          {dateLabel}
-        </span>
-        <span
-          className={cn(
-            "font-mono text-[10px] font-medium tracking-[0.15em] text-white/40",
-            "tablet:text-xs",
-          )}
-        >
-          {end ? `${start.weekday}–${end.weekday}` : start.weekday}
-        </span>
       </span>
 
       <span
         className={cn(
-          "flex min-w-0 flex-1 flex-col justify-center gap-0.5 px-3 py-2.5",
-          "tablet:px-4 tablet:py-3",
+          "flex min-w-0 flex-1 flex-col justify-center gap-1 px-3 py-3",
+          "tablet:px-5",
         )}
       >
-        <span className="flex items-baseline gap-1.5">
+        <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
           <span
             className={cn(
               "text-base font-semibold transition-colors",
-              "tablet:text-lg",
+              "tablet:text-xl",
               isOpen
                 ? "text-ztmy-pink"
                 : "group-hover:text-ztmy-pink text-white",
@@ -366,17 +401,15 @@ function TourDateRow({
             </span>
           )}
           {isKorea && (
-            <span
-              className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.visit, "self-center")}
-            >
+            <span className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.visit)}>
               내한
             </span>
           )}
         </span>
         <span
-          className={cn("truncate text-xs text-white/75", "tablet:text-sm")}
+          className={cn("truncate text-sm text-white/75", "tablet:text-base")}
         >
-          <ParenText text={date.venue} />
+          <VenueText venue={date.venue} />
         </span>
         {selectedSongs.length > 0 && (
           <span
@@ -391,10 +424,13 @@ function TourDateRow({
             {selectedSongs.map((entry, index) => (
               <span
                 key={`${entry.songId}-${entry.dayNumber ?? "all"}`}
-                className="text-white/80"
+                className="whitespace-nowrap text-white/80"
               >
-                {index > 0 && <span className="mr-1.5 text-white/30">·</span>}
                 {entry.titleKo}
+                {/* 구분점은 앞 곡 끝에 붙여 줄바꿈돼도 새 줄 맨 앞에 오지 않게. */}
+                {index < selectedSongs.length - 1 && (
+                  <span className="ml-1.5 text-white/30">·</span>
+                )}
               </span>
             ))}
           </span>
@@ -410,5 +446,52 @@ function TourDateRow({
         />
       </span>
     </button>
+  );
+}
+
+/** 썸네일 칸의 날짜(MM.DD + 요일, 해를 넘기는 투어면 연도). */
+function DateText({
+  label,
+  weekday,
+  year,
+  long,
+}: {
+  label: string;
+  weekday: string;
+  year: string | null;
+  /** 달을 넘기는 기간("03.28–04.02")처럼 긴 날짜는 한 단계 작게. */
+  long: boolean;
+}) {
+  return (
+    <>
+      {year && <span className="font-mono text-xs text-white/60">{year}</span>}
+      <span
+        className={cn(
+          "text-center font-mono font-bold tracking-tight whitespace-nowrap text-white tabular-nums drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]",
+          long ? "tablet:text-sm text-xs" : "tablet:text-base text-sm",
+        )}
+      >
+        {label}
+      </span>
+      <span className="font-mono text-xs font-medium tracking-[0.15em] text-white/70">
+        {weekday}
+      </span>
+    </>
+  );
+}
+
+/**
+ * 장소 이름 — 도시 이름과 같은 방식으로 한글명(괄호 안)을 먼저 크게, 원어를 뒤에
+ * 작고 흐리게. live_venue는 "日本武道館 (일본무도관)"처럼 원어 뒤 괄호에 한글명이
+ * 붙는다. 괄호가 없으면 그대로 한 덩어리.
+ */
+function VenueText({ venue }: { venue: string }) {
+  const match = venue.match(/^(.*\S)\s*\(([^()]*)\)\s*$/);
+  if (!match) return <>{venue}</>;
+  return (
+    <>
+      {match[2]}
+      <span className="ml-1.5 text-[0.85em] opacity-60">{match[1]}</span>
+    </>
   );
 }
