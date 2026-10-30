@@ -117,7 +117,7 @@ export function ZutopiaSearch({
             }}
             enterKeyHint="search"
             aria-label="곡·앨범·공연 검색"
-            placeholder="곡·앨범·공연 이름으로 검색 (예: 초침)"
+            placeholder="ZUTOPIA 통합 검색 (곡·별명·앨범·공연 이름)"
             className={cn(
               // 모바일 Safari는 16px 미만 입력란에 포커스하면 화면을 확대해서 text-base.
               "h-12 w-full rounded-lg border-2 border-white/15 bg-black/50 pr-12 pl-11 text-base text-white backdrop-blur-sm transition-colors placeholder:text-white/40 hover:border-white/30 focus:border-white/60 focus:outline-none",
