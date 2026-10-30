@@ -6,7 +6,11 @@ import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { ParenText } from "@/features/zutopia/lives/ParenText";
 import { Setlist, type SetlistSlot } from "@/features/zutopia/lives/Setlist";
-import { LIVE_SURFACE_CLASS } from "@/features/zutopia/lives/surface";
+import {
+  LIVE_SURFACE_CLASS,
+  LIVE_TAG_CLASS,
+  LIVE_TAG_TONE,
+} from "@/features/zutopia/lives/surface";
 import { formatDayNumber } from "@/features/zutopia/lives/SongLink";
 import type {
   LiveSetlistEntry,
@@ -144,16 +148,23 @@ function collectSelectedSlots(
   const commonNumbers = [...new Set(common.map((e) => e.trackNumber))].sort(
     (a, b) => a - b,
   );
-  // anchor(앞 공통 곡 번호, 맨 앞이면 0) 뒤 n번째 자리의 정렬 위치·표시 번호.
-  const positionOf = (anchor: number, nth: number) => {
+  // anchor(앞 공통 곡 번호, 맨 앞이면 0) 뒤 자리의 정렬 위치·표시 번호.
+  // 그 곡의 공연일 번호가 anchor와 다음 공통 곡 사이의 빈 번호이고 아직 안
+  // 쓰였으면 그 번호(서울 둘째날 Ham 9번 → 9번), 아니면 남은 빈 번호 중 첫 번째,
+  // 빈 번호가 다 차면 "15-1"처럼 anchor에 순번을 붙인다.
+  const positionOf = (anchor: number, own: number, used: Set<number>) => {
     const next = commonNumbers.find((n) => n > anchor) ?? Infinity;
     const gaps: number[] = [];
-    for (let n = anchor + 1; n < next && gaps.length < nth; n++) gaps.push(n);
-    if (nth <= gaps.length) {
-      const number = gaps[nth - 1];
+    for (let n = anchor + 1; n < next && n <= anchor + 50; n++) gaps.push(n);
+    const free = gaps.filter((n) => !used.has(n));
+    const number = free.includes(own) ? own : free[0];
+    if (number != null) {
+      used.add(number);
       return { trackNumber: number, label: String(number).padStart(2, "0") };
     }
-    const extra = nth - gaps.length;
+    let extra = 1;
+    while (used.has(anchor + extra / 100)) extra += 1;
+    used.add(anchor + extra / 100);
     return {
       trackNumber: anchor + extra / 100,
       label: `${String(anchor).padStart(2, "0")}-${extra}`,
@@ -173,18 +184,22 @@ function collectSelectedSlots(
             a.trackNumber - b.trackNumber,
         );
       let anchor = 0;
-      let nth = 0;
+      const used = new Set<number>();
       for (const entry of ordered) {
         const commonNumber = commonNumberBySong.get(entry.songId);
         if (!entry.isSelected && commonNumber != null) {
           anchor = commonNumber;
-          nth = 0;
           continue;
         }
         if (!entry.isSelected) continue;
-        if (day === "all" && entry.dayNumber != null) continue;
-        nth += 1;
-        const { trackNumber, label } = positionOf(anchor, nth);
+        // 날마다 같은 선택곡(일차 없음)은 "all"에서 한 번만, 날짜별 선택곡은 그날에서.
+        if (day === "all" ? entry.dayNumber != null : entry.dayNumber == null)
+          continue;
+        const { trackNumber, label } = positionOf(
+          anchor,
+          entry.trackNumber,
+          used,
+        );
         const slot = slots.get(label) ?? {
           trackNumber,
           label,
@@ -252,7 +267,7 @@ function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
 /**
  * 공연 일정 한 줄 — 왼쪽 날짜 칸(MM.DD + 요일)과 오른쪽 도시/장소를 크기·
  * 굵기로 확실히 나눠, 세로로 훑을 때 날짜와 도시가 각각 한 열로 읽히게
- * 한다. 한국 공연은 ztmy-sun "내한" 태그로 강조한다.
+ * 한다. 한국 공연은 마젠타 "내한" 태그로 강조한다.
  */
 function TourDateRow({
   date,
@@ -352,10 +367,7 @@ function TourDateRow({
           )}
           {isKorea && (
             <span
-              className={cn(
-                "bg-ztmy-sun self-center rounded-full px-1.5 py-0.5 text-[10px] leading-none font-bold text-black",
-                "tablet:text-xs",
-              )}
+              className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.visit, "self-center")}
             >
               내한
             </span>
@@ -369,11 +381,13 @@ function TourDateRow({
         {selectedSongs.length > 0 && (
           <span
             className={cn(
-              "mt-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 text-xs",
+              "mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs",
               "tablet:text-sm",
             )}
           >
-            <span className="text-ztmy-sky shrink-0 font-semibold">선택곡</span>
+            <span className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.selected)}>
+              선택곡
+            </span>
             {selectedSongs.map((entry, index) => (
               <span
                 key={`${entry.songId}-${entry.dayNumber ?? "all"}`}

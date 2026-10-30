@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import {
+  LIVE_TAG_CLASS,
+  LIVE_TAG_TONE,
+} from "@/features/zutopia/lives/surface";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 
@@ -15,11 +19,7 @@ const rowClass = cn(
 );
 
 export function formatDayNumber(dayNumber: number): string {
-  if (dayNumber === 1) return "첫째날";
-  if (dayNumber === 2) return "둘째날";
-  if (dayNumber === 3) return "셋째날";
-  if (dayNumber === 4) return "넷째날";
-  return `${dayNumber}일차`;
+  return `DAY ${dayNumber}`;
 }
 
 /**
@@ -30,7 +30,8 @@ export function formatDayNumber(dayNumber: number): string {
  * 앙코르 곡은 번호 흐름은 그대로 두고 ztmy-sun 톤 + ENCORE 태그로만 강조한다.
  * 선택곡(투어 공연일에만 있는 곡)은 앙코르와 겹쳐도 구분되도록 배경 대신
  * ztmy-sky 왼쪽 띠 + "선택곡" 태그로 강조한다.
- * 일차(dayNumber)가 지정된 곡은 ztmy-pink "첫째날", "둘째날" 태그로 강조한다.
+ * 일차(dayNumber)가 지정된 곡은 "DAY 1"(분홍)·"DAY 2"(보라) 태그로 강조한다
+ * (태그 모양은 surface.ts의 LIVE_TAG_CLASS — 가이드 중요도 배지와 같은 결).
  * 편곡 정보(arrange)가 있으면 곡 제목 아래에 흐리고 작은 글씨로 표시한다.
  */
 export function SongLink({
@@ -94,31 +95,25 @@ export function SongLink({
       {dayLabel && (
         <span
           className={cn(
-            "border-ztmy-pink/60 text-ztmy-pink shrink-0 rounded-full border px-1.5 py-0.5 text-xs font-bold",
-            "tablet:text-xs",
+            LIVE_TAG_CLASS,
+            LIVE_TAG_TONE.day[
+              ((dayNumber ?? 1) - 1) % LIVE_TAG_TONE.day.length
+            ],
           )}
         >
           {dayLabel}
         </span>
       )}
       {selected && (
-        <span
-          className={cn(
-            "border-ztmy-sky/60 text-ztmy-sky shrink-0 rounded-full border px-1.5 py-0.5 text-xs font-bold",
-            "tablet:text-xs",
-          )}
-        >
+        <span className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.selected)}>
           선택곡
         </span>
       )}
       {encore && (
         <span
-          className={cn(
-            "text-ztmy-sun shrink-0 font-mono text-xs tracking-[0.2em] uppercase",
-            "tablet:text-xs",
-          )}
+          className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.encore, "tracking-wide")}
         >
-          Encore
+          ENCORE
         </span>
       )}
       {/* 응원 가이드가 없는 줄도 버튼 폭(28px)만큼 비워 둔다 — 그래야 선택곡·

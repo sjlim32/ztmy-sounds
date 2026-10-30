@@ -232,9 +232,10 @@ function toSetlist(
  */
 function mergeTourSetlist(
   tourRows: SetlistRow[],
-  liveRows: SetlistRow[],
+  rawLiveRows: SetlistRow[],
 ): LiveSetlistEntry[] {
   const tourSongIds = new Set(tourRows.map((row) => row.songs.id));
+  const liveRows = collapseRepeatedDays(rawLiveRows, tourSongIds);
   const liveSongIds = new Set(liveRows.map((row) => row.songs.id));
   // 공연일에도 있는 공통 곡은 공연일 행으로 대신한다(번호를 공연일 기준으로).
   const tourOnly = tourRows.filter((row) => !liveSongIds.has(row.songs.id));
@@ -242,6 +243,50 @@ function mergeTourSetlist(
     liveRows.filter((row) => !tourSongIds.has(row.songs.id)),
   );
   return toSetlist([...tourOnly, ...liveRows], (row) => selected.has(row));
+}
+
+/**
+ * 이틀 이상 공연(day_number가 있는 공연일)에서 날마다 세트리스트 전체를 따로
+ * 등록한 경우, 같은 곡이 날마다 한 줄씩 반복되지 않게 한 줄로 합친다.
+ * - 투어 공통 곡: 날짜와 상관없이 한 줄(일차 없음). 번호는 여러 날 중 가장
+ *   많이 쓰인 번호(같으면 앞 날) — 어느 날 데이터에 같은 곡이 두 번 들어간
+ *   경우(예: INTENSE 서울 둘째날의 어둡게 검게 8·10번)에도 제자리를 지킨다.
+ * - 그 밖의 곡(선택곡): 모든 날에 불렸으면 한 줄(일차 없음, 번호는 위와 같은
+ *   방식), 아니면 날마다 따로(DAY 1·DAY 2 배지).
+ */
+function collapseRepeatedDays(
+  rows: SetlistRow[],
+  tourSongIds: Set<string>,
+): SetlistRow[] {
+  const days = new Set(
+    rows.flatMap((row) => (row.day_number == null ? [] : [row.day_number])),
+  );
+  if (days.size < 2) return rows;
+
+  const groups = new Map<string, SetlistRow[]>();
+  for (const row of rows) {
+    const key = `${row.songs.id}-${row.is_encore}`;
+    groups.set(key, [...(groups.get(key) ?? []), row]);
+  }
+  return [...groups.values()].flatMap((group) => {
+    const groupDays = new Set(group.map((row) => row.day_number));
+    const numbers = group.map((row) => row.track_number);
+    // 모든 날에 불린 곡이면(번호가 조금 달라도) 일차 없이 한 줄 — 양일 같은
+    // 선택곡은 "선택곡" 배지만 남는다.
+    const sameEveryDay = [...days].every((day) => groupDays.has(day));
+    if (!tourSongIds.has(group[0].songs.id) && !sameEveryDay) return group;
+    const ordered = [...group].sort(
+      (a, b) => (a.day_number ?? 0) - (b.day_number ?? 0),
+    );
+    const count = new Map<number, number>();
+    for (const n of numbers) count.set(n, (count.get(n) ?? 0) + 1);
+    const best = ordered.reduce((picked, row) =>
+      (count.get(row.track_number) ?? 0) > (count.get(picked.track_number) ?? 0)
+        ? row
+        : picked,
+    );
+    return [{ ...best, day_number: null }];
+  });
 }
 
 /**

@@ -10,7 +10,7 @@ import type { LiveSetlistEntry } from "@/features/zutopia/lives/types";
 /**
  * 투어 공통 세트리스트의 "선택곡" 자리 — 공연일마다 다른 곡이 들어가는 번호.
  * songs는 그 자리에 실제로 들어간 곡들과, 곡마다 불린 곳(도시, 일차가 있으면
- * "서울 첫째날"처럼)을 공연일 전체에서 모은 것.
+ * "서울 DAY 1"처럼)을 공연일 전체에서 모은 것.
  */
 export interface SetlistSlot {
   /** 정렬용 위치 — 공통 곡 사이의 빈 번호, 빈 번호가 없으면 15.1처럼 소수. */
