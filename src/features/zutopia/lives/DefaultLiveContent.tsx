@@ -19,6 +19,21 @@ import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
  */
 export function DefaultLiveContent({ live }: { live: LiveDetail }) {
   const visitOrdinal = parseVisitOrdinal(live.metadata);
+  // 추가 이미지 묶음 — 맨 앞에 아이콘 이미지(icon_image_url, 목록 카드 그림)를
+  // 함께 둔다. 포스터와 같거나 추가 이미지에 이미 있는 그림이면 빼서 한 번만.
+  const showIcon =
+    !!live.icon_image_url &&
+    live.icon_image_url !== live.poster_image_url &&
+    !live.additional_image_urls?.includes(live.icon_image_url);
+  const extraImages = [
+    ...(showIcon && live.icon_image_url
+      ? [{ src: live.icon_image_url, alt: `${live.title} 아이콘 이미지` }]
+      : []),
+    ...(live.additional_image_urls ?? []).map((url, i) => ({
+      src: url,
+      alt: `${live.title} 추가 이미지 ${i + 1}`,
+    })),
+  ];
 
   return (
     <div
@@ -39,13 +54,10 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
         />
       )}
 
-      {live.additional_image_urls && live.additional_image_urls.length > 0 && (
+      {extraImages.length > 0 && (
         <div className="flex flex-wrap items-center justify-center gap-2">
           <ZoomableImageGroup
-            images={live.additional_image_urls.map((url, i) => ({
-              src: url,
-              alt: `${live.title} 추가 이미지 ${i + 1}`,
-            }))}
+            images={extraImages}
             thumbnailWidth={96}
             thumbnailHeight={96}
           />
