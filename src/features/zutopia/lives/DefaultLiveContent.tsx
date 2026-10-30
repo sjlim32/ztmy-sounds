@@ -2,10 +2,8 @@ import { cn } from "@/lib/utils";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { formatLiveDate } from "@/features/zutopia/lives/data";
 import { LiveTicket } from "@/features/zutopia/lives/LiveTicket";
-import { LiveTypeBadge } from "@/features/zutopia/lives/LiveTypeBadge";
 import { Setlist } from "@/features/zutopia/lives/Setlist";
 import type { LiveDetail } from "@/features/zutopia/lives/types";
-import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
 import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
 
 /**
@@ -55,15 +53,8 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
       )}
 
       <div className="flex flex-col items-center text-center">
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <LiveTypeBadge type={live.type} />
-          {visitOrdinal !== null && <VisitBadge ordinal={visitOrdinal} />}
-        </div>
         <h1
-          className={cn(
-            "font-rocknroll mt-3 text-xl text-white",
-            "tablet:mt-4 tablet:text-3xl",
-          )}
+          className={cn("font-rocknroll text-xl text-white", "tablet:text-3xl")}
         >
           {live.title_ko ?? live.title}
         </h1>
@@ -78,6 +69,8 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
       </div>
 
       <LiveTicket
+        type={live.type}
+        visitOrdinal={visitOrdinal}
         cells={[
           {
             label: "Date",

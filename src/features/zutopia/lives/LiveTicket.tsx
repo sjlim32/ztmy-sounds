@@ -1,5 +1,10 @@
 import { cn } from "@/lib/utils";
 import { LIVE_SURFACE_CLASS } from "@/features/zutopia/lives/surface";
+import {
+  LiveTypeBadge,
+  type LiveBadgeType,
+} from "@/features/zutopia/lives/LiveTypeBadge";
+import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
 import { AppleMusicIcon } from "@/components/icons/AppleMusicIcon";
 import { SpotifyIcon } from "@/components/icons/SpotifyIcon";
 import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
@@ -49,9 +54,15 @@ export function splitParenSuffix(text: string): {
 export function LiveTicket({
   cells,
   metadata,
+  type,
+  visitOrdinal = null,
 }: {
   cells: TicketCell[];
   metadata: Json | null;
+  /** 티켓 맨 위 줄 왼쪽의 공연 종류(CONCERT·FESTIVAL…). */
+  type: LiveBadgeType;
+  /** 내한 공연이면 몇 번째인지 — 맨 위 줄 오른쪽 태그. */
+  visitOrdinal?: number | null;
 }) {
   const { variation, spotify, youtubeMusic, appleMusic } =
     parseStreamingMetadata(metadata);
@@ -60,6 +71,22 @@ export function LiveTicket({
   return (
     <div className={cn(LIVE_SURFACE_CLASS, "relative w-full overflow-hidden")}>
       <div className="from-ztmy-magenta to-ztmy-purple absolute inset-x-0 top-0 h-0.5 bg-linear-to-r" />
+
+      {/* 맨 위 줄: 공연 종류 + 내한 태그 — 티켓 정보와 한 덩어리로 읽히게 안에
+      두고, 둘을 왼쪽에 나란히 붙여 "콘서트 · 두 번째 내한"처럼 한 번에 읽히게
+      한다(양 끝으로 떨어뜨리면 넓은 화면에서 따로 논다). */}
+      <div
+        className={cn(
+          "flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2.5",
+          "tablet:px-6 tablet:py-3",
+        )}
+      >
+        <LiveTypeBadge type={type} />
+        {visitOrdinal != null && (
+          <VisitBadge ordinal={visitOrdinal} size="lg" />
+        )}
+      </div>
+      <div className="border-ztmy-purple/40 border-t border-dashed" />
 
       <div className={cn("flex flex-col", "tablet:flex-row")}>
         {cells.map((cell, i) => (

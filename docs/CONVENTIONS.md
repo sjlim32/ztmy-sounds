@@ -214,8 +214,12 @@ src/
                              # (collapseRepeatedDays).
                              # lives/tours.metadata.visited("first"/"second"…)가
                              # 있으면 내한 공연 — visit.ts가 파싱하고, 상세는
-                             # VisitBadge, 목록 카드는 ztmy-sun 테두리 +
-                             # "N 번째 내한" 문구로 강조한다.
+                             # 티켓(LiveTicket) 맨 위 줄 공연 종류 바로 옆 VisitBadge(
+                             # 공연 종류 LiveTypeBadge — 점 + CONCERT 등 영문),
+                             # 목록 카드는 마젠타 테두리 + 그림 위 같은 태그로
+                             # 강조한다(둘 다 LIVE_TAG 모양, 알약 없음). 내한 색은
+                             # 홈의 내한 색과 같은 마젠타(노랑은 ENCORE 전용),
+                             # 콘서트 점은 분홍.
                              # 공연별 수동 콘텐츠가 필요하면 lives/<슬러그>/
                              # content.mdx를 만들어 [slug]/page.tsx의
                              # CONTENT_BY_KEY에 등록한다(선택 사항).

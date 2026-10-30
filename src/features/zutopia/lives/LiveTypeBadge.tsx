@@ -2,48 +2,39 @@ import { cn } from "@/lib/utils";
 import type { Live } from "./types";
 
 // "TOUR"은 lives.type에는 없는 값이다 — tours 테이블 항목(투어)은
-// lives.type 값을 안 갖고 있어서, 뱃지 종류를 하나 늘려 표현한다.
-// 단독 콘서트(CONCERT)와 투어(TOUR) 모두 "콘서트"로 통일해 표기한다.
+// lives.type 값을 안 갖고 있어서, 종류를 하나 늘려 표현한다.
+// 단독 콘서트(CONCERT)와 투어(TOUR) 모두 "CONCERT"로 통일해 표기한다.
 export type LiveBadgeType = Live["type"] | "TOUR";
 
-// 페스티벌/콘서트/행사를 한눈에 구분하는 점 색 — 텍스트는 항상
-// 흰색으로 고정하고(배경색 대비 걱정 없이) 점 색으로만 구분한다.
+// 티켓의 다른 항목 이름(DATE, VENUE 등)과 같은 영문 대문자 + 점 색으로 구분.
 const LABEL: Record<LiveBadgeType, string> = {
-  FESTIVAL: "페스티벌",
-  CONCERT: "콘서트",
-  EVENT: "행사",
-  TOUR: "콘서트",
+  FESTIVAL: "Festival",
+  CONCERT: "Concert",
+  EVENT: "Event",
+  TOUR: "Concert",
 };
+// 콘서트는 분홍 — 마젠타는 바로 옆 내한 태그 색이라 겹치지 않게.
 const DOT: Record<LiveBadgeType, string> = {
   FESTIVAL: "bg-ztmy-purple",
-  CONCERT: "bg-ztmy-magenta",
+  CONCERT: "bg-ztmy-pink",
   EVENT: "bg-ztmy-sky",
-  TOUR: "bg-ztmy-magenta",
+  TOUR: "bg-ztmy-pink",
 };
 
 /**
- * 공연/투어 상세 페이지 제목(title_ko) 위에 붙는 타입 뱃지 — DefaultLiveContent와
- * DefaultTourContent가 똑같은 모양(반투명 pill + 점 색 + 라벨)을 쓰도록
- * 여기 하나로 뺐다. 전에는 두 파일이 각자 비슷하지만 미묘하게 다른 뱃지를
- * 그려서(투어 쪽은 배경을 항상 마젠타로 꽉 채우는 등) 같은 상세 페이지
- * 계열인데도 디자인이 어긋나 보였다.
+ * 공연/투어 상세 티켓(LiveTicket) 맨 위 줄의 공연 종류 — 면 없이 점 색 + 영문
+ * 대문자(티켓 항목 이름과 같은 결). 예전엔 제목 위에 따로 떠 있는 알약이었는데,
+ * 티켓 정보와 한 덩어리로 읽히게 티켓 안으로 옮겼다.
  */
 export function LiveTypeBadge({ type }: { type: LiveBadgeType }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1",
-        "font-mono text-xs tracking-[0.2em] text-white uppercase",
-        "tablet:px-3.5 tablet:py-1.5 tablet:text-sm",
+        "inline-flex items-center gap-2 font-mono text-xs font-bold tracking-[0.25em] text-white uppercase",
+        "tablet:text-sm",
       )}
     >
-      <span
-        className={cn(
-          "h-1.5 w-1.5 rounded-full",
-          "tablet:h-2 tablet:w-2",
-          DOT[type],
-        )}
-      />
+      <span className={cn("h-2 w-2 rounded-full", DOT[type])} />
       {LABEL[type]}
     </span>
   );

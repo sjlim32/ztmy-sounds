@@ -2,13 +2,11 @@ import { cn } from "@/lib/utils";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { formatLiveDate } from "@/features/zutopia/lives/data";
 import { LiveTicket } from "@/features/zutopia/lives/LiveTicket";
-import { LiveTypeBadge } from "@/features/zutopia/lives/LiveTypeBadge";
 import {
   TourCommonSetlist,
   TourDateList,
 } from "@/features/zutopia/lives/TourDateList";
 import type { TourDetail } from "@/features/zutopia/lives/types";
-import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
 import { LIVE_SECTION_TITLE_SHADOW } from "@/features/zutopia/lives/surface";
 import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
 
@@ -57,15 +55,8 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
       )}
 
       <div className="flex flex-col items-center text-center">
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <LiveTypeBadge type="TOUR" />
-          {visitOrdinal !== null && <VisitBadge ordinal={visitOrdinal} />}
-        </div>
         <h1
-          className={cn(
-            "font-rocknroll mt-3 text-xl text-white",
-            "tablet:mt-4 tablet:text-3xl",
-          )}
+          className={cn("font-rocknroll text-xl text-white", "tablet:text-3xl")}
         >
           {tour.title_ko}
         </h1>
@@ -80,6 +71,8 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
       </div>
 
       <LiveTicket
+        type="TOUR"
+        visitOrdinal={visitOrdinal}
         cells={[
           {
             label: "Tour Period",

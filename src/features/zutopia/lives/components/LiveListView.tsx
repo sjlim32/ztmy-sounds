@@ -290,9 +290,10 @@ export function LiveListView({
                     <div
                       className={cn(
                         "relative aspect-square overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
-                        // 내한 공연은 테두리와 그림 위 뱃지를 ztmy-sun으로 표시해
+                        // 내한 공연은 테두리와 그림 위 태그를 마젠타(홈의 내한 색)로 표시해
                         // 목록에서 바로 눈에 띄게 한다.
-                        entry.visitOrdinal != null && "ring-ztmy-sun ring-2",
+                        entry.visitOrdinal != null &&
+                          "ring-ztmy-magenta ring-2",
                       )}
                     >
                       {entry.thumbnail ? (
@@ -307,13 +308,10 @@ export function LiveListView({
                         <div className="h-full w-full bg-white/5" />
                       )}
                       {entry.visitOrdinal != null && (
-                        // 상세 화면과 같은 뱃지를 작게 줄여 그림 왼쪽 위에 얹는다.
+                        // 상세 티켓과 같은 태그를 그림 왼쪽 위에 얹는다.
                         <VisitBadge
                           ordinal={entry.visitOrdinal}
-                          className={cn(
-                            "absolute top-2 left-2 px-2 py-0.5 text-[11px] tracking-normal shadow-[0_2px_8px_rgba(0,0,0,0.5)]",
-                            "tablet:px-2.5 tablet:py-0.5 tablet:text-xs",
-                          )}
+                          className="absolute top-2 left-2 shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
                         />
                       )}
                     </div>
