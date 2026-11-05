@@ -119,7 +119,7 @@ export function buildLiveUnits(
     );
 }
 
-/** 곡별 라이브 횟수와 가장 최근 단위. units는 buildLiveUnits 결과(최신 먼저). */
+/** 곡별 라이브 횟수와 가장 최근·가장 처음 단위. units는 buildLiveUnits 결과(최신 먼저). */
 export function buildSongLiveStats(
   units: LiveUnit[],
 ): Record<string, SongLiveStat> {
@@ -127,8 +127,14 @@ export function buildSongLiveStats(
   for (const unit of units) {
     for (const songId of unit.songIds) {
       const stat = stats[songId];
-      if (stat) stat.count += 1;
-      else stats[songId] = { count: 1, lastUnitId: unit.id };
+      // units가 최신 먼저라, 처음 만난 단위가 마지막 라이브이고 계속 덮어쓰면
+      // 남는 단위가 첫 라이브다.
+      if (stat) {
+        stat.count += 1;
+        stat.firstUnitId = unit.id;
+      } else {
+        stats[songId] = { count: 1, lastUnitId: unit.id, firstUnitId: unit.id };
+      }
     }
   }
   return stats;

@@ -30,6 +30,7 @@ export interface LiveUnit {
 export interface SongLiveStat {
   count: number;
   lastUnitId: string;
+  firstUnitId: string;
 }
 
 export interface LiveHistory {

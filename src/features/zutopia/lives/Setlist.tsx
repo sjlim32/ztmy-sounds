@@ -4,6 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { SongLink } from "@/features/zutopia/lives/SongLink";
+import { secondaryTitle } from "@/features/zutopia/song-db/song-title";
 import { LIVE_SURFACE_CLASS } from "@/features/zutopia/lives/surface";
 import type { LiveSetlistEntry } from "@/features/zutopia/lives/types";
 
@@ -110,17 +111,11 @@ export function Setlist({
                   index={row.entry.trackNumber}
                   dayNumber={row.entry.dayNumber}
                   arrange={row.entry.arrange}
-                  subtitle={
-                    // 원어·한국어 제목과 같은 영어 제목(예: "Ham")은 반복하지 않는다.
-                    row.entry.titleEn !== row.entry.title &&
-                    row.entry.titleEn !== row.entry.titleKo
-                      ? row.entry.titleEn
-                      : null
-                  }
+                  subtitle={secondaryTitle(row.entry)}
                   encore={row.entry.isEncore}
                   selected={row.entry.isSelected}
                 >
-                  {row.entry.title} ({row.entry.titleKo})
+                  {row.entry.title}
                 </SongLink>
               </li>
             ) : (

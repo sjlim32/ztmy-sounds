@@ -11,6 +11,7 @@ import type {
   SongWithAlbums,
   SortDirection,
 } from "@/features/zutopia/song-db/types";
+import type { SongLiveSummary } from "@/features/zutopia/live-history/summary";
 
 export interface SongGroup {
   key: string;
@@ -31,6 +32,33 @@ export interface AlbumGroup {
 }
 
 const OTHERS_KEY = "기타";
+/** groupBy === "lastLive"일 때의 유일한 그룹 키 — 목록이 그룹 헤더를 그리지 않는다. */
+export const LAST_LIVE_KEY = "lastLive";
+
+/**
+ * 마지막 라이브 날짜순(asc = 오래 안 부른 곡 먼저, desc = 최근에 부른 곡 먼저).
+ * 라이브 기록 없는 곡은 방향과 상관없이 맨 뒤에 발매일 순으로 둔다 — "오래 안
+ * 부른 순"에서 한 번도 안 부른 곡이 맨 위를 덮으면 목록의 의미가 흐려진다.
+ */
+function sortByLastLive(
+  songs: SongWithAlbums[],
+  direction: SortDirection,
+  liveSummaries: Record<string, SongLiveSummary>,
+): SongWithAlbums[] {
+  const sign = direction === "asc" ? 1 : -1;
+  const played = songs.filter((song) => liveSummaries[song.id]);
+  const never = songs.filter((song) => !liveSummaries[song.id]);
+  return [
+    ...played.sort(
+      (a, b) =>
+        sign *
+          liveSummaries[a.id].last.date.localeCompare(
+            liveSummaries[b.id].last.date,
+          ) || a.release_date.localeCompare(b.release_date),
+    ),
+    ...never.sort((a, b) => a.release_date.localeCompare(b.release_date)),
+  ];
+}
 
 /**
  * SongListView(목록 행)와 SongDetailPanel(드로어 상세) 둘 다에서 쓰인다
@@ -73,7 +101,19 @@ export function groupSongs(
   songs: SongWithAlbums[],
   groupBy: SongGroupBy,
   direction: SortDirection,
+  liveSummaries: Record<string, SongLiveSummary> = {},
 ): SongGroup[] {
+  if (groupBy === "lastLive") {
+    return [
+      {
+        key: LAST_LIVE_KEY,
+        label: "",
+        album: null,
+        songs: sortByLastLive(songs, direction, liveSummaries),
+      },
+    ];
+  }
+
   let groups: SongGroup[];
 
   if (groupBy === "year") {

@@ -61,7 +61,7 @@ export function SongLink({
   indexLabel?: string;
   dayNumber?: number | null;
   arrange?: string | null;
-  /** 제목 아래 흐린 작은 줄(영어 제목). 편곡 정보가 있으면 그 위에 온다. */
+  /** 제목 아래 둘째 줄("한국어 · 영어", song-title.ts). 편곡 정보는 그 아래에 온다. */
   subtitle?: string | null;
   encore?: boolean;
   selected?: boolean;
@@ -115,7 +115,7 @@ export function SongLink({
           {children}
         </span>
         {subtitle && (
-          <span className="truncate text-sm text-white/50">{subtitle}</span>
+          <span className="truncate text-sm text-white/70">{subtitle}</span>
         )}
         {arrange && (
           <span

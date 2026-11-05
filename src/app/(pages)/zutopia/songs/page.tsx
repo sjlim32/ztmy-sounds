@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getSongsWithAlbums } from "@/features/zutopia/song-db/data";
+import {
+  getLiveHistory,
+  getOriginalOf,
+} from "@/features/zutopia/live-history/data";
+import { toSongLiveSummaries } from "@/features/zutopia/live-history/summary";
 import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
 import { SongListView } from "@/features/zutopia/song-db/components/SongListView";
 
@@ -10,7 +15,16 @@ export const metadata: Metadata = {
 };
 
 export default async function ZutopiaSongsPage() {
-  const songs = await getSongsWithAlbums();
+  const [songs, liveHistory, originalOf] = await Promise.all([
+    getSongsWithAlbums(),
+    getLiveHistory(),
+    getOriginalOf(),
+  ]);
+  const liveSummaries = toSongLiveSummaries(
+    songs.map((song) => song.id),
+    liveHistory,
+    originalOf,
+  );
 
   const unreleased = songs.filter(
     (song) => parseSongMetadata(song.metadata).isUnreleased,
@@ -28,6 +42,7 @@ export default async function ZutopiaSongsPage() {
       <Suspense fallback={null}>
         <SongListView
           songs={songs}
+          liveSummaries={liveSummaries}
           summary={`전체 ${released}곡${
             unreleased > 0 ? ` · 미공개 ${unreleased}곡` : ""
           }`}

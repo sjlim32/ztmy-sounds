@@ -191,7 +191,7 @@ describe("buildLiveUnits", () => {
 });
 
 describe("buildSongLiveStats", () => {
-  test("횟수와 가장 최근 단위", () => {
+  test("횟수와 가장 최근·가장 처음 단위", () => {
     const units = build(
       [
         live({ id: "A", start_date: "2024-06-15" }),
@@ -204,8 +204,16 @@ describe("buildSongLiveStats", () => {
       ],
     );
     expect(buildSongLiveStats(units)).toEqual({
-      s1: { count: 2, lastUnitId: "B:2026-03-01" },
-      s2: { count: 1, lastUnitId: "B:2026-03-01" },
+      s1: {
+        count: 2,
+        lastUnitId: "B:2026-03-01",
+        firstUnitId: "A:2024-06-15",
+      },
+      s2: {
+        count: 1,
+        lastUnitId: "B:2026-03-01",
+        firstUnitId: "B:2026-03-01",
+      },
     });
   });
 });
