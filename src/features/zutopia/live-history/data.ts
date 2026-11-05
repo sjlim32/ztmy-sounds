@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
+import { withAssetUrls } from "@/lib/asset-url";
 import { buildLiveUnits, buildSongLiveStats } from "./units";
 import type { LiveHistory } from "./types";
 
@@ -41,12 +42,12 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
       supabase
         .from("lives")
         .select(
-          "id, slug, tour_id, title, title_ko, type, start_date, end_date, live_date, region",
+          "id, slug, tour_id, title, title_ko, type, start_date, end_date, live_date, region, icon_image_url, poster_image_url",
         )
         .eq("status", "ACTIVE"),
       supabase
         .from("tours")
-        .select("id, slug, title, title_ko")
+        .select("id, slug, title, title_ko, poster_image_url")
         .eq("status", "ACTIVE"),
       supabase
         .from("setlists")
@@ -74,8 +75,8 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
   const today = new Date().toISOString().slice(0, 10);
   const units = buildLiveUnits(
     {
-      lives: livesResult.data,
-      tours: toursResult.data,
+      lives: livesResult.data.map(withAssetUrls),
+      tours: toursResult.data.map(withAssetUrls),
       setlists: setlistsResult.data.map(
         ({ live_id, tour_id, song_id, day_number }) => ({
           live_id,

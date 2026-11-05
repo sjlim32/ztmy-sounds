@@ -23,6 +23,8 @@ function live(overrides: Partial<RawLive> & { id: string }): RawLive {
     end_date: null,
     live_date: null,
     region: "서울",
+    icon_image_url: null,
+    poster_image_url: null,
     ...overrides,
   };
 }
@@ -117,6 +119,7 @@ describe("buildLiveUnits", () => {
         slug: "intense-2",
         title: "INTENSE II",
         title_ko: "인텐스 2",
+        poster_image_url: null,
       },
     ];
     const [u] = build(
@@ -133,7 +136,13 @@ describe("buildLiveUnits", () => {
 
   test("tour_id 없이 slug가 투어 slug인 공연도 투어 소속", () => {
     const tours: RawTour[] = [
-      { id: "t1", slug: "intense", title: "INTENSE", title_ko: "인텐스" },
+      {
+        id: "t1",
+        slug: "intense",
+        title: "INTENSE",
+        title_ko: "인텐스",
+        poster_image_url: null,
+      },
     ];
     const [u] = build(
       [live({ id: "L2", slug: "intense", start_date: "2024-03-20" })],
@@ -182,6 +191,53 @@ describe("buildLiveUnits", () => {
       [],
     );
     expect(units.map((u) => u.liveId)).toEqual(["today"]);
+  });
+
+  test("이미지: 공연일 아이콘 → 공연 포스터 → 투어 포스터, 묶음 이미지는 투어 포스터 우선", () => {
+    const tours: RawTour[] = [
+      {
+        id: "t1",
+        slug: "zomcra",
+        title: "T",
+        title_ko: "T",
+        poster_image_url: "tour.webp",
+      },
+    ];
+    const units = build(
+      [
+        live({
+          id: "a",
+          tour_id: "t1",
+          start_date: "2026-03-14",
+          icon_image_url: "icon.webp",
+          poster_image_url: "poster.webp",
+        }),
+        live({
+          id: "b",
+          tour_id: "t1",
+          start_date: "2026-03-28",
+          poster_image_url: "poster-b.webp",
+        }),
+        live({ id: "c", tour_id: "t1", start_date: "2026-04-17" }),
+        live({
+          id: "f",
+          type: "FESTIVAL",
+          start_date: "2026-07-25",
+          icon_image_url: "fes-icon.webp",
+        }),
+      ],
+      [],
+      tours,
+    );
+    const byLive = Object.fromEntries(
+      units.map((u) => [u.liveId, [u.imageUrl, u.groupImageUrl]]),
+    );
+    expect(byLive).toEqual({
+      a: ["icon.webp", "tour.webp"],
+      b: ["poster-b.webp", "tour.webp"],
+      c: ["tour.webp", "tour.webp"],
+      f: ["fes-icon.webp", "fes-icon.webp"],
+    });
   });
 
   test("region에서 한글 도시명을 뽑는다", () => {

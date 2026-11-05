@@ -16,3 +16,5 @@
 | 배포          | Cloudflare Pages (`wrangler.jsonc`, `pnpm pages:deploy`)                                                                                                                                                     |
 | 테스트        | Vitest (`pnpm test`) — 데이터 가공·계산 같은 순수 로직만(`src/**/*.test.ts`), 화면 컴포넌트 테스트 없음                                                                                                      |
 | 이미지 프록시 | Cloudflare Pages Functions (`functions/r2/[[path]].ts`, `public/_routes.json`) — R2 이미지를 `/r2/*`로 같은 출처 제공                                                                                        |
+| 이미지 생성   | `html-to-image` — 참전 기록 이미지(1080×1080 PNG)를 화면 밖 DOM에서 만든다(`attendance/share/`)                                                                                                              |
+| QR 코드       | `uqr` — 참전 기록 이미지의 QR(SVG로 직접 그림)                                                                                                                                                               |

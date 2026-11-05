@@ -72,6 +72,17 @@ export function buildLiveUnits(
       city: extractKoreanCity(live.region),
       tourId: tour?.id ?? null,
       href: slug ? `/zutopia/lives/${slug}` : null,
+      imageUrl:
+        live.icon_image_url ??
+        live.poster_image_url ??
+        tour?.poster_image_url ??
+        null,
+      groupImageUrl: tour
+        ? (tour.poster_image_url ??
+          live.icon_image_url ??
+          live.poster_image_url ??
+          null)
+        : (live.icon_image_url ?? live.poster_image_url ?? null),
     };
     const songsFor = (day: number | null) =>
       uniqueSongIds(

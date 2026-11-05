@@ -1,0 +1,216 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { toBlob } from "html-to-image";
+import { cn } from "@/lib/utils";
+import {
+  SOFT_PRIMARY_BUTTON_CLASS,
+  SOFT_BUTTON_CLASS,
+} from "@/components/button-styles";
+import { DownloadIcon } from "@/components/icons/DownloadIcon";
+import { ShareIcon } from "@/components/icons/ShareIcon";
+import type { AttendanceSummary } from "@/features/zutopia/attendance/summarize";
+import {
+  NICKNAME_MAX_LENGTH,
+  useNickname,
+} from "@/features/zutopia/attendance/useNickname";
+import { pickShareLayout, SHARE_PIXEL_RATIO, SHARE_SIZE } from "./layout";
+import { ShareImage } from "./ShareImage";
+
+const FILE_NAME = "ztmy-live-attendance.png";
+
+/** 화면 밖 이미지 안의 그림(로고·커버)이 다 받아질 때까지 기다린다. */
+async function waitForImages(node: HTMLElement) {
+  await Promise.all(
+    [...node.querySelectorAll("img")].map((img) =>
+      img.complete && img.naturalWidth > 0
+        ? Promise.resolve()
+        : img.decode().catch(() => undefined),
+    ),
+  );
+}
+
+interface Result {
+  blob: Blob;
+  url: string;
+}
+
+/**
+ * 이미지 만들기 모달의 내용 — 닉네임 입력 → 만들기 → 같은 모달 안에서 완성
+ * 이미지 미리보기 + 저장·공유·다시 만들기. 만드는 동안만 1080 배치의 이미지를
+ * 화면 밖에 그려 2160×2160 PNG로 만든다.
+ */
+export function ImageMaker({ summary }: { summary: AttendanceSummary }) {
+  const nodeRef = useRef<HTMLDivElement>(null);
+  const [nickname, setNickname] = useNickname();
+  const [createdAt, setCreatedAt] = useState<Date | null>(null);
+  const [result, setResult] = useState<Result | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const rendering = createdAt !== null;
+  const layout = pickShareLayout(summary.heard.length);
+
+  // 결과를 버리거나 모달을 닫으면 만든 그림의 메모리를 돌려준다.
+  useEffect(() => {
+    if (!result) return;
+    return () => URL.revokeObjectURL(result.url);
+  }, [result]);
+
+  const make = async () => {
+    setError(null);
+    setCreatedAt(new Date());
+    // 화면 밖 이미지가 그려진 다음 프레임까지 기다린다.
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    try {
+      const node = nodeRef.current;
+      if (!node) throw new Error("image node missing");
+      await document.fonts.ready;
+      await waitForImages(node);
+      const blob = await toBlob(node, {
+        width: SHARE_SIZE,
+        height: SHARE_SIZE,
+        pixelRatio: SHARE_PIXEL_RATIO,
+      });
+      if (!blob) throw new Error("empty image");
+      setResult({ blob, url: URL.createObjectURL(blob) });
+    } catch {
+      setError("이미지를 만들지 못했어요. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setCreatedAt(null);
+    }
+  };
+
+  if (result) {
+    return <ResultView result={result} onRemake={() => setResult(null)} />;
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <label className="flex flex-col gap-1.5">
+        <span className="text-sm text-white/70">
+          닉네임 (비우면 &ldquo;나의&rdquo;)
+        </span>
+        <input
+          type="text"
+          value={nickname}
+          maxLength={NICKNAME_MAX_LENGTH}
+          onChange={(event) => setNickname(event.target.value)}
+          placeholder="닉네임"
+          className="focus-visible:outline-ztmy-magenta h-11 rounded-md border border-white/15 bg-black/30 px-3 text-base text-white placeholder:text-white/35 focus-visible:outline-2"
+        />
+      </label>
+      <p className="text-sm text-white/60">
+        제목: {nickname.trim() ? `${nickname.trim()}의` : "나의"} ZUTOMAYO
+        라이브 참전 기록
+        <br />
+        성불 {summary.heard.length}곡 · 2160×2160 PNG
+      </p>
+      <button
+        type="button"
+        onClick={make}
+        disabled={rendering || summary.heard.length === 0}
+        className={cn(
+          SOFT_PRIMARY_BUTTON_CLASS,
+          "w-full px-4 py-3 text-base disabled:opacity-50",
+        )}
+      >
+        {rendering ? "이미지 만드는 중…" : "이미지 만들기"}
+      </button>
+      {error && (
+        <p role="alert" className="text-sm text-white/70">
+          {error}
+        </p>
+      )}
+
+      {createdAt &&
+        createPortal(
+          // 화면 밖에 그린다 — 캡처는 안쪽 이미지 요소만 하므로 위치 값은
+          // 결과에 영향이 없다.
+          <div aria-hidden style={{ position: "fixed", left: -100000, top: 0 }}>
+            <ShareImage
+              ref={nodeRef}
+              summary={summary}
+              layout={layout}
+              nickname={nickname}
+              createdAt={createdAt}
+            />
+          </div>,
+          document.body,
+        )}
+    </div>
+  );
+}
+
+/** 이미지 생성 완료 — 미리보기 + 저장·공유·다시 만들기. */
+function ResultView({
+  result,
+  onRemake,
+}: {
+  result: Result;
+  onRemake: () => void;
+}) {
+  const file = new File([result.blob], FILE_NAME, { type: "image/png" });
+  const canShare =
+    typeof navigator !== "undefined" &&
+    !!navigator.canShare?.({ files: [file] });
+
+  const download = () => {
+    const link = document.createElement("a");
+    link.href = result.url;
+    link.download = FILE_NAME;
+    link.click();
+  };
+
+  const share = async () => {
+    try {
+      await navigator.share({ files: [file] });
+    } catch {
+      // 공유 시트를 닫았거나 막힌 경우 — 그대로 둔다(저장 버튼이 있다).
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-3">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={result.url}
+        alt="참전 기록 이미지"
+        className="aspect-square w-full rounded-md object-contain"
+      />
+      <p className="text-sm text-white/60">
+        휴대폰에서는 이미지를 길게 눌러 사진에 저장할 수도 있어요.
+      </p>
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={download}
+          className={cn(
+            SOFT_PRIMARY_BUTTON_CLASS,
+            "px-4 py-2.5 text-sm",
+            !canShare && "col-span-2",
+          )}
+        >
+          <DownloadIcon className="size-4" />
+          이미지 저장
+        </button>
+        {canShare && (
+          <button
+            type="button"
+            onClick={share}
+            className={cn(SOFT_BUTTON_CLASS, "justify-center")}
+          >
+            <ShareIcon className="size-4" />
+            공유
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onRemake}
+          className={cn(SOFT_BUTTON_CLASS, "col-span-2 justify-center")}
+        >
+          닉네임 바꿔서 다시 만들기
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -18,6 +18,8 @@ function unit(id: string, date: string, songIds: string[]): LiveUnit {
     dayNumber: null,
     href: null,
     songIds,
+    imageUrl: null,
+    groupImageUrl: null,
   };
 }
 

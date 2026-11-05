@@ -25,6 +25,10 @@ export interface LiveUnit {
   href: string | null;
   /** 이날 불린 곡(원곡 id, 중복 없음) */
   songIds: string[];
+  /** 이 공연일의 그림 — 공연일 아이콘 → 공연 포스터 → 투어 포스터 */
+  imageUrl: string | null;
+  /** 묶음(투어·공연) 대표 그림 — 투어면 투어 포스터, 아니면 imageUrl */
+  groupImageUrl: string | null;
 }
 
 export interface SongLiveStat {
@@ -51,6 +55,8 @@ export interface RawLive {
   end_date: string | null;
   live_date: string | null;
   region: string;
+  icon_image_url: string | null;
+  poster_image_url: string | null;
 }
 
 export interface RawTour {
@@ -58,6 +64,7 @@ export interface RawTour {
   slug: string;
   title: string;
   title_ko: string;
+  poster_image_url: string | null;
 }
 
 export interface RawSetlistRow {

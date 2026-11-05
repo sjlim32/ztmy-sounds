@@ -46,3 +46,14 @@ export const GHOST_ICON_BUTTON_CLASS = `inline-flex items-center justify-center 
 /** 목록의 한 줄(가이드 곡 목록·곡 목록 드로어): 고른 줄은 한쪽 막대 대신 줄 전체를 옅게 칠한다. */
 export const LIST_ITEM_CLASS = `rounded-lg transition-colors hover:bg-white/10 ${FOCUS_RING}`;
 export const ACTIVE_LIST_ITEM_CLASS = "bg-white/15 hover:bg-white/15";
+
+/**
+ * 차분한 채움 버튼(참전 기록의 작업 버튼들): 투명 면 대신 옅은 흰 면 + 얇은
+ * 테두리로 배경 위에서 버튼임이 보이되 튀지 않게. 주 동작은 마젠타를 옅게
+ * 섞은 면(SOFT_PRIMARY) — 원색 단색 면보다 눈이 편하다. 보라(SOFT_PURPLE)는
+ * 주 동작과 나란히 놓이는 또 하나의 중요한 동작(공연 체크)에 — 마젠타와 색으로
+ * 구분된다. 보라가 어두운 색이라 면을 조금 더 진하게 섞는다.
+ */
+export const SOFT_BUTTON_CLASS = `inline-flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm font-medium whitespace-nowrap text-white/90 transition-colors hover:border-white/20 hover:bg-white/15 hover:text-white disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING}`;
+export const SOFT_PRIMARY_BUTTON_CLASS = `inline-flex items-center justify-center gap-1.5 rounded-lg border border-ztmy-magenta/35 bg-ztmy-magenta/20 px-3 py-2 text-sm font-semibold whitespace-nowrap text-white transition-colors hover:border-ztmy-magenta/50 hover:bg-ztmy-magenta/30 disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING}`;
+export const SOFT_PURPLE_BUTTON_CLASS = `inline-flex items-center justify-center gap-1.5 rounded-lg border border-ztmy-purple/50 bg-ztmy-purple/30 px-3 py-2 text-sm font-semibold whitespace-nowrap text-white transition-colors hover:border-ztmy-purple/70 hover:bg-ztmy-purple/40 disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING}`;

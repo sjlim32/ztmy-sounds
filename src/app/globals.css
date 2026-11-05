@@ -34,7 +34,7 @@
 */
 @theme {
   --breakpoint-tablet: 50rem; /* 800px */
-  --breakpoint-pc: 67.5rem; /* 1280px */
+  --breakpoint-pc: 67.5rem; /* 1080px */
   --breakpoint-wide: 90rem; /* 1440px */
 }
 

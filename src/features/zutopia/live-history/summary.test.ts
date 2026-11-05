@@ -22,6 +22,8 @@ function unit(overrides: Partial<LiveUnit> & { id: string }): LiveUnit {
     dayNumber: null,
     href: "/zutopia/lives/zomcra",
     songIds: [],
+    imageUrl: null,
+    groupImageUrl: null,
     ...overrides,
   };
 }

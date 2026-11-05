@@ -387,6 +387,8 @@ src/
   `{ version: 1, attended: string[], updatedAt }` JSON으로 둡니다
   (`attendance/storage.ts`). 백업 파일도 같은 형식입니다. 형식을 바꾸면
   `version`을 올리고 이전 버전을 읽는 코드를 남기세요.
+- 공유 코드(`attendance/share-code.ts`)는 `ZT1` + base64url, 공연(lives 행)마다 id 앞 4바이트 + 날짜 비트 1바이트입니다. 공연 순번이 아니라 id로 가리켜서 공연이 추가돼도 퍼진 코드가 깨지지 않습니다. 형식을 바꾸면 `ZT2`처럼 접두사를 올리고 `ZT1` 읽기는 남기세요.
+- 이미지 닉네임은 `ztmy-sounds:attendance-nickname` 키에 따로 저장합니다.
 - 읽기는 `useAttendedUnits`(`useSyncExternalStore`)로만 — 정적 HTML 단계에선
   `ready`가 false라 체크 상태를 그리지 않습니다.
 
@@ -456,6 +458,11 @@ src/
     테두리, 필요하면 끝에 화살표 아이콘
   - 동작(모바일 설치 배너의 "추가"처럼 눌러서 실행): `ACTION_BUTTON_CLASS` — 사이트
     대표색(마젠타) 단색 면
+  - 차분한 채움 버튼(참전 기록 페이지의 작업 버튼): `SOFT_BUTTON_CLASS` — 옅은 흰 면 +
+    얇은 테두리, 주 동작은 `SOFT_PRIMARY_BUTTON_CLASS` — 마젠타를 옅게 섞은 면(원색 단색
+    면 대신), 그와 나란히 놓이는 또 하나의 중요한 동작(공연 체크)은
+    `SOFT_PURPLE_BUTTON_CLASS` — 보라를 옅게 섞은 면. 투명 면·원색 면이 어색한 작업
+    창·현황 줄 버튼에 씁니다.
   - 닫기·헤더 뒤로가기 같은 테두리 없는 아이콘 버튼: `GHOST_ICON_BUTTON_CLASS`
   - 콘텐츠 옆에서 눈에 덜 띄어야 하는 글자 버튼(가이드 상세 영상 위 버튼 줄):
     `GHOST_BUTTON_CLASS` — 면·테두리 없이 흐린 글자, 마우스를 올리면 옅은 면
@@ -463,7 +470,7 @@ src/
     `ACTIVE_LIST_ITEM_CLASS`(줄 전체를 옅게 칠함)
   - 포커스 표시는 `FOCUS_RING`을 씁니다(위 상수들에는 이미 들어 있음).
 
-- 커스텀 브레이크포인트: `tablet`(50rem/800px) / `pc`(67.5rem/1280px) / `wide`(90rem/1440px).
+- 커스텀 브레이크포인트: `tablet`(50rem/800px) / `pc`(67.5rem/1080px) / `wide`(90rem/1440px).
   전부 min-width 기준이며 `src/app/globals.css`의 `@theme`에서 정의합니다. 뷰포트
   **높이**가 낮은 경우를 위한 커스텀 variant `short`(max-height: 880px) / `low`(800px) /
   `xlow`(700px)도 있습니다(겹치면 뒤에 선언된 쪽이 이기도록 이 순서로 선언).
