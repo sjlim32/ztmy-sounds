@@ -14,8 +14,12 @@ export const SHARE_PADDING = 64;
 export const SHARE_HEADER_HEIGHT = 272;
 /** 생성일 · 주소 · QR 줄(위 간격 포함) */
 export const SHARE_FOOTER_HEIGHT = 96;
-/** 화면에서 찍어도 읽히는 가장 작은 크기(2160 저장 기준 칸당 약 4px) */
-export const SHARE_QR_SIZE = 72;
+/**
+ * QR 크기(1080 기준) — 33칸(오류 보정 L, 여백 포함) × 1.5 = 49.5. 저장 이미지(2160)에서
+ * 칸 하나가 정확히 3px(반 픽셀에 걸려 흐려지지 않게)이라, 저장된 이미지를 사진 앱·
+ * 구글 렌즈로 읽을 수 있는 가장 작은 크기.
+ */
+export const SHARE_QR_SIZE = 49.5;
 export const SHARE_COLUMN_GAP = 32;
 
 /** 줄 높이 배율 — ShareImage의 line-height와 같다. */
