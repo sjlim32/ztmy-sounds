@@ -6,7 +6,7 @@ import { useEffect, type RefObject } from "react";
 const DRAG_THRESHOLD = 4;
 
 /**
- * 마우스로 배경(카드 위 포함)을 끌어 좌우로 스크롤한다. 조금이라도 끌었으면
+ * 마우스로 배경(카드 위 포함)을 끌어 스크롤한다(좌우, 세로로 넘쳤으면 위아래도). 조금이라도 끌었으면
  * 놓을 때의 클릭(링크 이동)은 막는다. 터치는 브라우저 기본 스크롤에 맡긴다.
  */
 export function useDragScroll(ref: RefObject<HTMLElement | null>) {
@@ -17,17 +17,21 @@ export function useDragScroll(ref: RefObject<HTMLElement | null>) {
     const onPointerDown = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" || event.button !== 0) return;
       const startX = event.clientX;
+      const startY = event.clientY;
       const startLeft = el.scrollLeft;
+      const startTop = el.scrollTop;
       let dragging = false;
 
       const onMove = (move: PointerEvent) => {
         const dx = move.clientX - startX;
-        if (!dragging && Math.abs(dx) < DRAG_THRESHOLD) return;
+        const dy = move.clientY - startY;
+        if (!dragging && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
         if (!dragging) {
           dragging = true;
           el.dataset.dragging = "true";
         }
         el.scrollLeft = startLeft - dx;
+        el.scrollTop = startTop - dy;
       };
       const onUp = () => {
         window.removeEventListener("pointermove", onMove);

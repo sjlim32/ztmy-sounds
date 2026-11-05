@@ -9,6 +9,7 @@ import {
 import { DownloadIcon } from "@/components/icons/DownloadIcon";
 import { ShareIcon } from "@/components/icons/ShareIcon";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
+import { importableIds } from "@/features/zutopia/attendance/share-import";
 import {
   backupFileName,
   parseBackup,
@@ -123,7 +124,7 @@ export function SharePanel({
     URL.revokeObjectURL(url);
   };
 
-  const knownIds = new Set(units.map((unit) => unit.id));
+  const matched = pending ? importableIds(pending.ids, units) : [];
 
   return (
     <div className="flex flex-col gap-5">
@@ -133,34 +134,56 @@ export function SharePanel({
           aria-label="참전 기록 불러오기"
           className="border-ztmy-magenta/40 bg-ztmy-magenta/10 flex flex-col gap-3 rounded-md border p-3"
         >
-          <p className="text-sm text-white">
-            {pending.source}에서 공연{" "}
-            {pending.ids.filter((id) => knownIds.has(id)).length}개 기록을
-            찾았어요. 어떻게 불러올까요?
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => apply("replace")}
-              className={cn(SOFT_PRIMARY_BUTTON_CLASS, "px-3.5 py-2 text-sm")}
-            >
-              지금 기록을 이걸로 바꾸기
-            </button>
-            <button
-              type="button"
-              onClick={() => apply("merge")}
-              className={SOFT_BUTTON_CLASS}
-            >
-              지금 기록에 합치기
-            </button>
-            <button
-              type="button"
-              onClick={() => setPending(null)}
-              className={SOFT_BUTTON_CLASS}
-            >
-              취소
-            </button>
-          </div>
+          {matched.length === 0 ? (
+            <>
+              <p className="text-sm text-white">
+                {pending.source}에 지금 공연 목록과 맞는 기록이 없어요. 페이지를
+                새로고침해 최신 공연 목록을 받은 뒤 다시 시도해 보세요.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPending(null)}
+                  className={SOFT_BUTTON_CLASS}
+                >
+                  닫기
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-white">
+                {pending.source}에서 공연 {matched.length}개 기록을 찾았어요.
+                어떻게 불러올까요?
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => apply("replace")}
+                  className={cn(
+                    SOFT_PRIMARY_BUTTON_CLASS,
+                    "px-3.5 py-2 text-sm",
+                  )}
+                >
+                  지금 기록을 이걸로 바꾸기
+                </button>
+                <button
+                  type="button"
+                  onClick={() => apply("merge")}
+                  className={SOFT_BUTTON_CLASS}
+                >
+                  지금 기록에 합치기
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPending(null)}
+                  className={SOFT_BUTTON_CLASS}
+                >
+                  취소
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
 

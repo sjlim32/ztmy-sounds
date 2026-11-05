@@ -20,6 +20,7 @@ import {
   dateToOffset,
   type TimelineEvent,
 } from "@/features/zutopia/timeline/events";
+import { wheelIntent } from "@/features/zutopia/timeline/interaction";
 import { useDragScroll } from "@/features/zutopia/timeline/useDragScroll";
 import {
   daysAt,
@@ -190,7 +191,8 @@ export function HorizontalTimeline({
     );
   };
 
-  // 휠: Ctrl/⌘(트랙패드 핀치)면 단계 바꾸기, 아니면 세로 휠을 좌우 이동으로.
+  // 휠: Ctrl/⌘(트랙패드 핀치)면 단계 바꾸기, 세로로 넘친 내용이 없으면 세로
+  // 휠을 좌우 이동으로(넘쳤으면 세로 스크롤 그대로 — wheelIntent).
   // 브라우저 전체 확대·세로 스크롤을 막아야 해서 passive가 아닌 리스너로 단다.
   const wheelRef = useRef({ level, pxPerDay, accumulated: 0 });
   useEffect(() => {
@@ -202,26 +204,25 @@ export function HorizontalTimeline({
     if (!el) return;
     const onWheel = (event: WheelEvent) => {
       const state = wheelRef.current;
-      if (event.ctrlKey || event.metaKey) {
-        event.preventDefault();
-        state.accumulated += event.deltaY;
-        if (Math.abs(state.accumulated) < WHEEL_STEP) return;
-        const direction = state.accumulated < 0 ? 1 : -1;
-        state.accumulated = 0;
-        const next = stepZoom(state.level, direction);
-        if (next === state.level) return;
-        const screenX = event.clientX - el.getBoundingClientRect().left;
-        pendingRef.current = {
-          days: daysAt(el.scrollLeft, screenX, state.pxPerDay, PAD),
-          screenX,
-        };
-        setLevel(next);
+      const intent = wheelIntent(event, el.scrollHeight > el.clientHeight + 1);
+      if (intent === "native") return;
+      event.preventDefault();
+      if (intent === "horizontal") {
+        el.scrollLeft += event.deltaY;
         return;
       }
-      if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
-        event.preventDefault();
-        el.scrollLeft += event.deltaY;
-      }
+      state.accumulated += event.deltaY;
+      if (Math.abs(state.accumulated) < WHEEL_STEP) return;
+      const direction = state.accumulated < 0 ? 1 : -1;
+      state.accumulated = 0;
+      const next = stepZoom(state.level, direction);
+      if (next === state.level) return;
+      const screenX = event.clientX - el.getBoundingClientRect().left;
+      pendingRef.current = {
+        days: daysAt(el.scrollLeft, screenX, state.pxPerDay, PAD),
+        screenX,
+      };
+      setLevel(next);
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
@@ -321,6 +322,8 @@ export function HorizontalTimeline({
               events={events}
               x={x}
               axisY={axisY}
+              top={TIME_BAND}
+              height={height}
               attendedCounts={attendedCounts}
               onOpen={openAt}
             />
