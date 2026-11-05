@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { ThumbImage } from "@/components/ThumbImage";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useKoreaToday } from "@/lib/use-korea-today";
@@ -320,11 +321,9 @@ export function SongListView({
                             >
                               <span className="shrink-0 rounded bg-black/40">
                                 {coverSrc ? (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img
+                                  <ThumbImage
                                     src={coverSrc}
-                                    alt=""
-                                    loading="lazy"
+                                    displayWidth={44}
                                     className="size-11 rounded object-cover"
                                   />
                                 ) : (

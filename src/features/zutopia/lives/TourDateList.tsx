@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { ThumbImage } from "@/components/ThumbImage";
 import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
@@ -347,11 +348,9 @@ function TourDateRow({
       >
         {thumbnail ? (
           <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <ThumbImage
               src={thumbnail}
-              alt=""
-              loading="lazy"
+              displayWidth={320}
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
             {/* 그림 위 날짜가 읽히게 아래에서 위로 어두워지는 막 */}

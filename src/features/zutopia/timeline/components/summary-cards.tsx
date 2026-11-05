@@ -50,6 +50,7 @@ export function YearSummaryCard({
           <EventThumb
             key={event.id}
             src={event.imageUrl}
+            displayWidth={160}
             className="aspect-square w-full"
           />
         ))}

@@ -109,5 +109,9 @@
     전역 `cacheBust`는 글꼴 주소까지 바꿔 캐시를 못 쓰게 하니 쓰지 않습니다.
   - 글꼴은 `buildFontEmbedCss`로 이미지 글자에 필요한 서브셋 woff2만 넘깁니다(안 넘기면
     LINE Seed JP 서브셋 전부, 약 10MB).
+  - 작은 자리(목록 커버·연혁 카드·공연 체크 목록 등)는 `ThumbImage`(`src/components/ThumbImage.tsx`)로
+    Cloudflare 이미지 변환 주소(`/cdn-cgi/image/width=…,format=auto/…`, `src/lib/thumb.ts`)를 씁니다.
+    ztmy-sounds.fans 존의 Images → Transformations가 켜져 있어야 하고(무료 한 달 서로 다른 변환
+    5,000개), 실패하면 원본 주소로 돌아갑니다. 크게 보이는 상세 이미지와 이미지 만들기 커버는 원본.
   - 예전엔 Pages Function 프록시(`/r2/*`)로 같은 출처를 만들었지만, 이미지 요청마다 Function이
     실행되어 무료 한도(하루 10만 요청)를 넘으면 사이트 전체 이미지가 깨질 수 있어 없앴습니다.

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ThumbImage } from "@/components/ThumbImage";
 import type { MouseEvent } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -298,11 +299,10 @@ export function LiveListView({
                       )}
                     >
                       {entry.thumbnail ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <ThumbImage
                           src={entry.thumbnail}
+                          displayWidth={360}
                           alt={entry.name}
-                          loading="lazy"
                           className="h-full w-full object-contain transition-opacity group-hover:opacity-80"
                         />
                       ) : (

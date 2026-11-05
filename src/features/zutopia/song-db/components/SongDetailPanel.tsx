@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThumbImage } from "@/components/ThumbImage";
 import { cn } from "@/lib/utils";
 import { formatDotDate } from "@/lib/ymd";
 import { MicIcon } from "@/components/icons/MicIcon";
@@ -203,11 +204,9 @@ function AlbumList({
                   )}
                 >
                   {album.cover_image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <ThumbImage
                       src={album.cover_image_url}
-                      alt=""
-                      loading="lazy"
+                      displayWidth={44}
                       className="size-11 shrink-0 rounded bg-black/40 object-cover"
                     />
                   ) : (

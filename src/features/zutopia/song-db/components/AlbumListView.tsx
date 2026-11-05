@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { ThumbImage } from "@/components/ThumbImage";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ALBUM_TYPE_SHORT_LABEL } from "@/features/zutopia/song-db/labels";
@@ -204,11 +205,10 @@ export function AlbumListView({ albums, summary }: AlbumListViewProps) {
                       )}
                     >
                       {coverSrc ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <ThumbImage
                           src={coverSrc}
+                          displayWidth={176}
                           alt={album.title}
-                          loading="lazy"
                           className={cn(
                             "h-28 w-28 rounded object-cover shadow-lg ring-1 ring-white/10",
                             "transition-shadow duration-500 ease-in-out",

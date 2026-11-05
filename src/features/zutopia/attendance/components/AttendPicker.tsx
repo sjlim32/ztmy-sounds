@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ThumbImage } from "@/components/ThumbImage";
 import { cn } from "@/lib/utils";
 import { FOCUS_RING } from "@/components/button-styles";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
@@ -14,11 +15,9 @@ import { formatDateWithWeekday } from "./date-format";
 function Thumb({ src, size }: { src: string | null; size: "md" | "sm" }) {
   const box = size === "md" ? "size-12" : "size-9";
   return src ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <ThumbImage
       src={src}
-      alt=""
-      loading="lazy"
+      displayWidth={size === "md" ? 48 : 36}
       className={cn(box, "shrink-0 rounded bg-black/40 object-cover")}
     />
   ) : (

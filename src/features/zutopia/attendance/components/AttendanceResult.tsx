@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ThumbImage } from "@/components/ThumbImage";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
@@ -177,11 +178,9 @@ function SongRow({
   const body = (
     <>
       {song.coverSrc ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <ThumbImage
           src={song.coverSrc}
-          alt=""
-          loading="lazy"
+          displayWidth={40}
           className="size-10 shrink-0 rounded bg-black/40 object-cover"
         />
       ) : (

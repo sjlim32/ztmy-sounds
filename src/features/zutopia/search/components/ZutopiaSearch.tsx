@@ -1,5 +1,6 @@
 "use client";
 
+import { ThumbImage } from "@/components/ThumbImage";
 import {
   useEffect,
   useMemo,
@@ -322,11 +323,9 @@ function ResultRow({
       className={cn(LIST_ITEM_CLASS, "flex items-center gap-3 px-2 py-2")}
     >
       {image ? (
-        // eslint-disable-next-line @next/next/no-img-element -- 외부(곡 DB) 이미지라 크기를 미리 알 수 없고, output: export라 최적화도 안 된다
-        <img
+        <ThumbImage
           src={image}
-          alt=""
-          loading="lazy"
+          displayWidth={48}
           className="h-12 w-12 shrink-0 rounded-md object-cover"
         />
       ) : (
