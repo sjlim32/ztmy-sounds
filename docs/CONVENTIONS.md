@@ -392,6 +392,24 @@ src/
 - 읽기는 `useAttendedUnits`(`useSyncExternalStore`)로만 — 정적 HTML 단계에선
   `ready`가 false라 체크 상태를 그리지 않습니다.
 
+### 활동 연혁: 위치 계산 · 확대 단계
+
+- 일정 위치는 전부 `timeline/events.ts`의 `dateToOffset(날짜, 시작일, pxPerDay)` 하나로
+  계산합니다.
+- 가로 축(PC)은 확대 단계가 셋입니다(`timeline/zoom.ts`): **연**(해마다 요약 카드, 모든
+  해가 화면 폭에 들어가게 `yearPxPerDay`), **월**(달마다 묶음 카드, 5px/일), **주**(일정
+  하나하나, 12px/일 — `assignLanes`로 겹치는 카드를 다른 줄에). 묶기는
+  `timeline/buckets.ts`(주는 월요일 시작). 단계를 바꿀 때 기준점 아래 날짜는
+  `daysAt`/`scrollLeftFor`로 제자리에 둡니다.
+- 가로 축은 화면에 남은 높이를 직접 재서 채웁니다(`HorizontalTimeline` — main의 보이는
+  높이 − 위쪽 내용 − 페이지 아래 padding − 푸터). 페이지가 세로로 스크롤되면 이 계산이
+  어긋난 것입니다.
+- 세로 축(모바일)은 단계 없이 카드 사이 빈칸 0.6px/일(최소 8px·최대 160px).
+- 앨범과 **같은 날** 발매로 들어간 수록곡은 앨범 일정 하나로 합칩니다. 곡 `release_date`가
+  앨범과 하루라도 다르면 따로 그려지니, 데이터의 발매일을 맞춰 두세요.
+- 빌드는 Supabase 조회 결과를 `.next/cache/fetch-cache`에 남깁니다. 데이터를 고쳤는데
+  빌드 결과가 그대로면 이 폴더를 지우고 다시 빌드하세요.
+
 ## 가사 타이밍
 
 - `LyricLine.time`은 `"mm:ss"` 또는 `"mm:ss.s"` 문자열(`Timestamp` 타입)입니다. 초 단위
