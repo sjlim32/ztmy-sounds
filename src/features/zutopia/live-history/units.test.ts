@@ -247,6 +247,34 @@ describe("buildLiveUnits", () => {
   });
 });
 
+describe("하루 공연 보정", () => {
+  test("live_date가 있으면 종류와 상관없이 그날 하루", () => {
+    const units = build(
+      [
+        live({
+          id: "ev",
+          type: "EVENT",
+          start_date: "2025-08-01",
+          end_date: "2025-08-03",
+          live_date: "2025-08-02T00:00:00+09:00",
+        }),
+      ],
+      [row("s1", { live_id: "ev" })],
+    );
+    expect(units.map((u) => [u.id, u.dayNumber])).toEqual([
+      ["ev:2025-08-02", null],
+    ]);
+  });
+
+  test("하루 공연이면 DAY 번호가 붙은 자기 세트리스트 행도 센다", () => {
+    const units = build(
+      [live({ id: "one", start_date: "2025-05-01" })],
+      [row("s1", { live_id: "one" }, 1), row("s2", { live_id: "one" })],
+    );
+    expect(units[0].songIds).toEqual(["s1", "s2"]);
+  });
+});
+
 describe("buildUpcomingUnits", () => {
   test("오늘 뒤의 공연일만, 날짜 오름차순(가까운 것부터)", () => {
     const lives = [

@@ -1,3 +1,4 @@
+import { diffDays } from "@/lib/ymd";
 import type { LiveHistory, LiveUnit } from "./types";
 
 export interface LiveRef {
@@ -17,15 +18,8 @@ export interface SongLiveSummary {
   first: LiveRef;
 }
 
-function toUtc(date: string): number {
-  const [y, m, d] = date.slice(0, 10).split("-").map(Number);
-  return Date.UTC(y, m - 1, d);
-}
-
 /** 두 "YYYY-MM-DD" 사이 일수(to − from). 시간대 영향 없이 날짜만 비교한다. */
-export function daysBetween(from: string, to: string): number {
-  return Math.round((toUtc(to) - toUtc(from)) / 86_400_000);
-}
+export const daysBetween = diffDays;
 
 function unitDetail(unit: LiveUnit): string | null {
   const parts = [unit.city, unit.dayNumber ? `DAY ${unit.dayNumber}` : null];

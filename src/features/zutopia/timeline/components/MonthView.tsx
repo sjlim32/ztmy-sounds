@@ -121,6 +121,7 @@ function Cluster({
     <ClusterCard
       events={bucket.events}
       shown={visibleNameCount(bucket.events.length, space)}
+      compact
       attended={bucket.events.some((event) => attendedCounts.has(event.id))}
       onOpen={() => onOpen(`${bucket.key}-15`)}
       className="absolute z-20 hover:z-40"

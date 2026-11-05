@@ -11,7 +11,7 @@ import { CloseIcon } from "@/components/icons/CloseIcon";
  * 옆에서 나오는 작업 창 — 태블릿 이상은 화면 오른쪽의 좁은 패널(나머지 화면은
  * 옅게 어두워질 뿐 그대로 보인다), 모바일은 아래에서 올라오는 시트. 바깥을
  * 누르거나 Esc로 닫는다. 열릴 때 닫기 버튼에 포커스, 닫히면 열었던 요소로
- * 돌려준다. 내용이 길면 창 안에서 스크롤한다.
+ * 돌려준다. 열려 있는 동안 Tab은 창 안에서만 돈다. 내용이 길면 창 안에서 스크롤한다.
  */
 export function SidePanel({
   open,
@@ -28,6 +28,7 @@ export function SidePanel({
 }) {
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -35,6 +36,30 @@ export function SidePanel({
     closeRef.current?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
+      if (event.key !== "Tab") return;
+      // 창 밖(어두운 배경 뒤)으로 포커스가 새지 않게 Tab을 창 안에서 돌린다.
+      const items = [
+        ...(dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ) ?? []),
+      ];
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (
+        event.shiftKey &&
+        (active === first || !dialogRef.current?.contains(active))
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        (active === last || !dialogRef.current?.contains(active))
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => {
@@ -53,6 +78,7 @@ export function SidePanel({
       }}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}

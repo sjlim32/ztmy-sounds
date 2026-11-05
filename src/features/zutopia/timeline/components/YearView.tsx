@@ -39,7 +39,7 @@ export function YearView({
             style={{ left, width, top, height }}
           >
             {list.length === 0 ? (
-              <p className="w-full text-center text-sm text-white/35">
+              <p className="w-full text-center text-sm text-white/55">
                 일정 없음
               </p>
             ) : (

@@ -28,13 +28,18 @@ type ListMode = "heard" | "unheard";
 export function AttendanceResult({
   summary,
   units,
+  liveCounts,
   ready,
   onOpenPicker,
+  onOpenShare,
 }: {
   units: LiveUnit[];
+  /** 곡 id → 전체 라이브 횟수(성불 대기 곡이 라이브에서 불린 적 있는지 보여 주기) */
+  liveCounts: Readonly<Record<string, number>>;
   summary: AttendanceSummary;
   ready: boolean;
   onOpenPicker: () => void;
+  onOpenShare: () => void;
 }) {
   const [mode, setMode] = useState<ListMode>("heard");
 
@@ -85,7 +90,7 @@ export function AttendanceResult({
           href="/zutopia/songs?lastLive=1"
           target="_blank"
           rel="noopener noreferrer"
-          className="ml-auto inline-flex items-center gap-1 text-sm text-white/60 transition-colors hover:text-white"
+          className="ml-auto inline-flex items-center gap-1 py-1.5 text-sm text-white/70 transition-colors hover:text-white"
         >
           노래별 마지막 라이브
           <ExternalLinkIcon className="size-3.5" />
@@ -140,6 +145,7 @@ export function AttendanceResult({
               key={song.id}
               song={song}
               count={song.count ?? null}
+              liveCount={liveCounts[song.id] ?? 0}
               heardIn={(song.unitIds ?? []).flatMap((id) => {
                 const unit = unitsById.get(id);
                 return unit ? [unit] : [];
@@ -148,6 +154,21 @@ export function AttendanceResult({
           ))}
         </ul>
       </div>
+      <p className="text-sm text-white/60">
+        기록은 이 브라우저에만 저장돼요. 기기를 바꾸거나 브라우저 데이터가
+        지워지면 사라지니{" "}
+        <button
+          type="button"
+          onClick={onOpenShare}
+          className={cn(
+            "rounded text-white/85 underline decoration-white/30 underline-offset-4 hover:text-white",
+            FOCUS_RING,
+          )}
+        >
+          코드로 백업해 두세요
+        </button>
+        .
+      </p>
     </div>
   );
 }
@@ -155,10 +176,13 @@ export function AttendanceResult({
 function SongRow({
   song,
   count,
+  liveCount,
   heardIn,
 }: {
   song: AttendanceSong;
   count: number | null;
+  /** 전체 라이브 횟수 — 성불 대기 곡 오른쪽에 "라이브 N회"/"라이브 기록 없음" */
+  liveCount: number;
   /** 이 곡을 들은 공연일(최신 먼저). 성불 대기 곡은 빈 목록. */
   heardIn: LiveUnit[];
 }) {
@@ -187,6 +211,11 @@ function SongRow({
           {secondaryTitle(song)}
         </span>
       </span>
+      {count === null && (
+        <span className="shrink-0 text-sm text-white/55">
+          {liveCount > 0 ? `라이브 ${liveCount}회` : "라이브 기록 없음"}
+        </span>
+      )}
       {count !== null && (
         <span className="flex shrink-0 items-center gap-1 text-base font-semibold text-white/90 tabular-nums">
           ×{count}

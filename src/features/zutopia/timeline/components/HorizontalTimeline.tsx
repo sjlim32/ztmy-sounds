@@ -153,6 +153,9 @@ export function HorizontalTimeline({
     const observer = new ResizeObserver(measure);
     observer.observe(main);
     observer.observe(wrapper);
+    // 위쪽 내용(범례 줄 등) 높이가 바뀌어 상자가 밀려나도 다시 잰다.
+    observer.observe(inner);
+    if (footer) observer.observe(footer);
     return () => observer.disconnect();
   }, []);
 
@@ -185,7 +188,10 @@ export function HorizontalTimeline({
   }, [pxPerDay]);
 
   const changeLevel = (next: ZoomLevel, days: number, screenX: number) => {
-    if (next === level) return;
+    if (next === level) {
+      pendingRef.current = null;
+      return;
+    }
     pendingRef.current = { days, screenX };
     setLevel(next);
   };
@@ -208,17 +214,28 @@ export function HorizontalTimeline({
   // 휠: Ctrl/⌘(트랙패드 핀치)면 단계 바꾸기, 세로로 넘친 내용이 없으면 세로
   // 휠을 좌우 이동으로(넘쳤으면 세로 스크롤 그대로 — wheelIntent).
   // 브라우저 전체 확대·세로 스크롤을 막아야 해서 passive가 아닌 리스너로 단다.
-  const wheelRef = useRef({ level, pxPerDay, accumulated: 0 });
-  useEffect(() => {
+  const wheelRef = useRef({ level, pxPerDay, cramped: false, accumulated: 0 });
+  // 렌더 직후(같은 프레임) 맞춘다 — 늦으면 바뀐 단계를 모르고 같은 단계로 "바꾸려다"
+  // 기준점만 남는다.
+  useLayoutEffect(() => {
     wheelRef.current.level = level;
     wheelRef.current.pxPerDay = pxPerDay;
-  }, [level, pxPerDay]);
+    wheelRef.current.cramped = size.height <= MIN_HEIGHT;
+  }, [level, pxPerDay, size.height]);
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     const onWheel = (event: WheelEvent) => {
       const state = wheelRef.current;
-      const intent = wheelIntent(event, el.scrollHeight > el.clientHeight + 1);
+      const max = el.scrollWidth - el.clientWidth;
+      const intent = wheelIntent(event, {
+        // 상자 안이 세로로 넘쳤거나, 화면이 낮아 최소 높이로 줄인 경우(페이지가
+        // 세로로 움직여야 한다)
+        canScrollY: el.scrollHeight > el.clientHeight + 1 || state.cramped,
+        atEdge:
+          (event.deltaY < 0 && el.scrollLeft <= 0) ||
+          (event.deltaY > 0 && el.scrollLeft >= max - 1),
+      });
       if (intent === "native") return;
       event.preventDefault();
       if (intent === "horizontal") {
@@ -230,7 +247,10 @@ export function HorizontalTimeline({
       const direction = state.accumulated < 0 ? 1 : -1;
       state.accumulated = 0;
       const next = stepZoom(state.level, direction);
-      if (next === state.level) return;
+      if (next === state.level) {
+        pendingRef.current = null;
+        return;
+      }
       const screenX = event.clientX - el.getBoundingClientRect().left;
       pendingRef.current = {
         days: daysAt(el.scrollLeft, screenX, state.pxPerDay, PAD),

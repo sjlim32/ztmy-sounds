@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { koreaDate } from "@/lib/korea-date";
 import { getLiveHistory } from "@/features/zutopia/live-history/data";
 import {
   getAlbumsWithSongs,
@@ -48,7 +49,7 @@ export default async function ZutopiaTimelinePage() {
     })),
     units: history.units,
     upcomingUnits: history.upcoming,
-    today: new Date().toISOString().slice(0, 10),
+    today: koreaDate(),
   });
 
   return (

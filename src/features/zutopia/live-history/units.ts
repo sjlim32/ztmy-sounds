@@ -1,3 +1,4 @@
+import { addDays, diffDays } from "@/lib/ymd";
 import { extractKoreanCity } from "@/features/zutopia/lives/region";
 import type {
   LiveUnit,
@@ -7,18 +8,10 @@ import type {
   SongLiveStat,
 } from "./types";
 
-/** "YYYY-MM-DD"에 n일을 더한다 — UTC로 계산해 시간대 영향이 없다. */
-export function addDays(date: string, n: number): string {
-  const [y, m, d] = date.slice(0, 10).split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
-}
+export { addDays };
 
 function daysInclusive(start: string, end: string): number {
-  const toUtc = (date: string) => {
-    const [y, m, d] = date.split("-").map(Number);
-    return Date.UTC(y, m - 1, d);
-  };
-  return Math.round((toUtc(end) - toUtc(start)) / 86_400_000) + 1;
+  return diffDays(start, end) + 1;
 }
 
 function buildAllUnits(input: {
@@ -68,18 +61,21 @@ function buildAllUnits(input: {
           null)
         : (live.icon_image_url ?? live.poster_image_url ?? null),
     };
+    // day = null(하루 공연)이면 DAY 번호가 붙은 자기 행도 전부 센다.
     const songsFor = (day: number | null) =>
       uniqueSongIds(
         [
           ...common,
           ...own.filter(
-            (row) => row.day_number == null || row.day_number === day,
+            (row) =>
+              day === null || row.day_number == null || row.day_number === day,
           ),
         ],
         originalOf,
       );
 
-    if (live.type === "FESTIVAL") {
+    // 페스티벌, 그리고 live_date(즛토마요가 실제로 선 날)가 있는 공연은 그날 하루.
+    if (live.type === "FESTIVAL" || live.live_date) {
       const date = (live.live_date ?? live.start_date).slice(0, 10);
       units.push({
         ...base,

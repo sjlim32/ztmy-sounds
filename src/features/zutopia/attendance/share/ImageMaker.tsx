@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { toBlob } from "html-to-image";
 import { cn } from "@/lib/utils";
 import {
   SOFT_PRIMARY_BUTTON_CLASS,
@@ -16,9 +15,12 @@ import {
   useNickname,
 } from "@/features/zutopia/attendance/useNickname";
 import { pickShareLayout, SHARE_PIXEL_RATIO, SHARE_SIZE } from "./layout";
+import { buildFontEmbedCss } from "./font-embed";
 import { ShareImage } from "./ShareImage";
 
 const FILE_NAME = "ztmy-live-attendance.png";
+const SHARE_TEXT =
+  "나의 ZUTOMAYO 라이브 참전 기록 #ずとまよ #즛토마요\nhttps://ztmy-sounds.fans/zutopia/attendance";
 
 /** 화면 밖 이미지 안의 그림(로고·커버)이 다 받아질 때까지 기다린다. */
 async function waitForImages(node: HTMLElement) {
@@ -49,6 +51,14 @@ export function ImageMaker({ summary }: { summary: AttendanceSummary }) {
   const [error, setError] = useState<string | null>(null);
   const rendering = createdAt !== null;
   const layout = pickShareLayout(summary.heard.length);
+  // 만드는 도중 창이 닫히면 결과를 버린다(만든 그림 메모리가 새지 않게).
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   // 결과를 버리거나 모달을 닫으면 만든 그림의 메모리를 돌려준다.
   useEffect(() => {
@@ -66,19 +76,26 @@ export function ImageMaker({ summary }: { summary: AttendanceSummary }) {
       if (!node) throw new Error("image node missing");
       await document.fonts.ready;
       await waitForImages(node);
+      // 라이브러리는 누를 때 불러온다(페이지 첫 로딩에 싣지 않게).
+      const [{ toBlob }, fontEmbedCSS] = await Promise.all([
+        import("html-to-image"),
+        buildFontEmbedCss(node),
+      ]);
       const blob = await toBlob(node, {
         width: SHARE_SIZE,
         height: SHARE_SIZE,
         pixelRatio: SHARE_PIXEL_RATIO,
-        // 페이지 <img>가 CORS 헤더 없이 받아 둔 R2 이미지 캐시를 피한다(RULES.md).
-        cacheBust: true,
+        // 필요한 글꼴 서브셋만(안 넘기면 글꼴 파일 수백 개, 약 10MB를 받는다).
+        fontEmbedCSS,
       });
       if (!blob) throw new Error("empty image");
+      if (!mountedRef.current) return;
       setResult({ blob, url: URL.createObjectURL(blob) });
     } catch {
-      setError("이미지를 만들지 못했어요. 잠시 후 다시 시도해 주세요.");
+      if (mountedRef.current)
+        setError("이미지를 만들지 못했어요. 잠시 후 다시 시도해 주세요.");
     } finally {
-      setCreatedAt(null);
+      if (mountedRef.current) setCreatedAt(null);
     }
   };
 
@@ -165,7 +182,7 @@ function ResultView({
 
   const share = async () => {
     try {
-      await navigator.share({ files: [file] });
+      await navigator.share({ files: [file], text: SHARE_TEXT });
     } catch {
       // 공유 시트를 닫았거나 막힌 경우 — 그대로 둔다(저장 버튼이 있다).
     }

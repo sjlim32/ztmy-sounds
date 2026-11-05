@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useState, useSyncExternalStore } from "react";
+import { useCallback, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useKoreaToday } from "@/lib/use-korea-today";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
 import { ALBUM_TYPE_SHORT_LABEL } from "@/features/zutopia/song-db/labels";
@@ -72,17 +73,9 @@ const SORT_OPTIONS_WITH_LAST_LIVE: { value: SongGroupBy; label: string }[] = [
 /** URL에서 "마지막 라이브" 보기를 켜는 쿼리(참전 기록가 새 창으로 연다). */
 const LAST_LIVE_PARAM = "lastLive";
 
-// "N일 전"은 보는 날 기준이라 클라이언트에서만 계산한다 — 정적 HTML(빌드 날짜)과
-// 첫 렌더가 어긋나지 않도록 서버 스냅샷은 null(그동안은 일수 생략).
-function localToday(): string {
-  const now = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-}
-const subscribeNever = () => () => {};
-function useToday(): string | null {
-  return useSyncExternalStore(subscribeNever, localToday, () => null);
-}
+// "N일 전"은 보는 날(한국 날짜) 기준이라 클라이언트에서만 계산한다 — 정적
+// HTML과 첫 렌더가 어긋나지 않도록 그동안은 일수를 생략한다(useKoreaToday).
+const useToday = useKoreaToday;
 
 export function SongListView({
   songs,

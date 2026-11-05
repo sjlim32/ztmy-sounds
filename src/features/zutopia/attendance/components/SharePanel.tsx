@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
+  FOCUS_RING,
   SOFT_PRIMARY_BUTTON_CLASS,
   SOFT_BUTTON_CLASS,
 } from "@/components/button-styles";
@@ -52,11 +53,14 @@ export function SharePanel({
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState<PendingImport | null>(initialPending);
   const [dragging, setDragging] = useState(false);
+  // 불러오기 직전 기록 — "되돌리기"로 한 번 되살릴 수 있게(바꾸기는 기록을 통째로 덮는다).
+  const [previous, setPrevious] = useState<string[] | null>(null);
   const code = encodeAttendance(units, attended);
 
   const copy = async (text: string, done: string) => {
     try {
       await navigator.clipboard.writeText(text);
+      setPrevious(null);
       setMessage(done);
     } catch {
       setMessage("복사하지 못했어요. 직접 선택해서 복사해 주세요.");
@@ -92,6 +96,7 @@ export function SharePanel({
       setPending({ ids: backup.attended, source });
       return;
     }
+    setPrevious(null);
     setMessage("참전 기록 코드나 백업 파일 형식이 아니에요.");
   };
 
@@ -101,6 +106,7 @@ export function SharePanel({
 
   const apply = (mode: "replace" | "merge") => {
     if (!pending) return;
+    setPrevious([...attended]);
     onReplace(mode === "replace" ? pending.ids : [...attended, ...pending.ids]);
     setMessage(
       mode === "replace"
@@ -292,8 +298,27 @@ export function SharePanel({
       </div>
 
       {message && (
-        <p role="status" className="text-sm text-white/60">
+        <p role="status" className="text-sm text-white/70">
           {message}
+          {previous && (
+            <>
+              {" "}
+              <button
+                type="button"
+                onClick={() => {
+                  onReplace(previous);
+                  setPrevious(null);
+                  setMessage("불러오기 전 기록으로 되돌렸어요.");
+                }}
+                className={cn(
+                  "rounded text-white underline decoration-white/40 underline-offset-4",
+                  FOCUS_RING,
+                )}
+              >
+                되돌리기
+              </button>
+            </>
+          )}
         </p>
       )}
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,8 @@ import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { Popover } from "@/components/Popover";
 import { SidePanel } from "@/components/SidePanel";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
+import { useKoreaToday } from "@/lib/use-korea-today";
+import { withArrivedUnits } from "@/features/zutopia/attendance/arrived-units";
 import { useAttendedUnits } from "@/features/zutopia/attendance/useAttendedUnits";
 import {
   summarizeAttendance,
@@ -21,10 +24,18 @@ import {
   decodeAttendance,
   extractCode,
 } from "@/features/zutopia/attendance/share-code";
-import { ImageMaker } from "@/features/zutopia/attendance/share/ImageMaker";
 import { AttendPicker } from "./AttendPicker";
 import { AttendanceResult } from "./AttendanceResult";
 import { SharePanel, type PendingImport } from "./SharePanel";
+
+// 이미지 만들기(html-to-image·QR·이미지 배치)는 버튼을 눌러 창을 열 때 불러온다.
+const ImageMaker = dynamic(
+  () =>
+    import("@/features/zutopia/attendance/share/ImageMaker").then(
+      (module) => module.ImageMaker,
+    ),
+  { ssr: false },
+);
 
 type Panel = "image" | "share" | null;
 
@@ -91,17 +102,37 @@ function BarButton({
  * 체크 내역은 브라우저에만 저장된다(useAttendedUnits).
  */
 export function AttendanceView({
-  units,
+  units: pastUnits,
+  upcoming,
   songs,
+  liveCounts,
 }: {
+  liveCounts: Readonly<Record<string, number>>;
   units: LiveUnit[];
+  /** 빌드 때 예정이던 공연일 — 브라우저 날짜로 지났으면 체크 대상에 넣는다. */
+  upcoming: LiveUnit[];
   songs: AttendanceSong[];
 }) {
+  const today = useKoreaToday();
+  const units = useMemo(
+    () => withArrivedUnits(pastUnits, upcoming, today),
+    [pastUnits, upcoming, today],
+  );
   const [panel, setPanel] = useState<Panel>(null);
   const [incoming, setIncoming] = useState<PendingImport | null>(null);
   // null = 사용자가 아직 안 건드림 → 체크가 없으면 열린 채로 시작
   const [pickerChoice, setPickerChoice] = useState<boolean | null>(null);
   const { ready, attended, toggle, replaceAll } = useAttendedUnits();
+  // 묶음(투어·여러 날 공연) 전체 체크/해제
+  const setMany = (ids: string[], checked: boolean) => {
+    if (pickerChoice === null) setPickerChoice(true);
+    const next = new Set(attended);
+    for (const id of ids) {
+      if (checked) next.add(id);
+      else next.delete(id);
+    }
+    replaceAll([...next]);
+  };
   const summary = useMemo(
     () => summarizeAttendance(units, attended, songs),
     [units, attended, songs],
@@ -112,8 +143,18 @@ export function AttendanceView({
     setPanel(null);
     setIncoming(null);
   }, []);
-  const togglePanel = (next: Exclude<Panel, null>) =>
+  // 버튼으로 창을 바꾸거나 닫으면 받은 기록(공유 링크) 확인도 끝낸다 — 남겨 두면
+  // 다시 열 때마다 같은 확인이 또 떠서, 그사이 체크한 것을 덮어쓸 수 있다.
+  const togglePanel = (next: Exclude<Panel, null>) => {
     setPanel((current) => (current === next ? null : next));
+    setIncoming(null);
+  };
+  // 첫 방문(체크 0개)에 자동으로 열린 체크 창은 첫 체크 뒤에도 열어 둔다 —
+  // 체크하는 순간 "체크 0개" 조건이 풀려 창이 닫히지 않게 선택을 고정한다.
+  const toggleUnit = (id: string) => {
+    if (pickerChoice === null) setPickerChoice(true);
+    toggle(id);
+  };
 
   // 공유 링크(#code=… 또는 ?code=…)로 들어온 경우 — 주소의 코드를 읽어 공유 창을 열고
   // 주소는 비운다. 받은 기록을 먼저 보여주려고 체크 창은 닫아 둔다.
@@ -149,6 +190,8 @@ export function AttendanceView({
               key={stat.label}
               className="tablet:flex-row tablet:items-baseline tablet:gap-1.5 flex flex-col items-center gap-0.5"
             >
+              {/* 읽는 순서는 이름 → 숫자(dt 먼저), 보이는 순서는 숫자 → 이름 */}
+              <dt className="order-last text-sm text-white/60">{stat.label}</dt>
               <dd
                 className={cn(
                   "text-2xl font-bold tabular-nums",
@@ -157,7 +200,6 @@ export function AttendanceView({
               >
                 {ready ? stat.value : "–"}
               </dd>
-              <dt className="text-sm text-white/60">{stat.label}</dt>
             </div>
           ))}
         </dl>
@@ -171,7 +213,7 @@ export function AttendanceView({
             공연 체크
             {ready && (
               <span className="text-white/70 tabular-nums">
-                {summary.attendedCount}/{units.length}
+                {summary.attendedCount}
               </span>
             )}
           </BarButton>
@@ -188,7 +230,7 @@ export function AttendanceView({
             disabled={!ready}
             onClick={() => togglePanel("share")}
           >
-            공유<span className="tablet:inline hidden"> · 불러오기</span>
+            공유·불러오기
           </BarButton>
         </div>
 
@@ -203,6 +245,7 @@ export function AttendanceView({
         <Popover
           open={panel === "share"}
           onClose={closePanel}
+          closeOnOutside={!incoming}
           label="공유 · 불러오기"
           className="tablet:left-auto tablet:w-[26rem] left-0"
         >
@@ -219,15 +262,19 @@ export function AttendanceView({
       <AttendanceResult
         summary={summary}
         units={units}
+        liveCounts={liveCounts}
         ready={ready}
         onOpenPicker={() => setPickerChoice(true)}
+        onOpenShare={() => setPanel("share")}
       />
 
       <SidePanel
         open={pickerOpen}
         title="공연 체크"
         subtitle={
-          ready ? `${summary.attendedCount}/${units.length}개 체크` : undefined
+          ready
+            ? `${summary.attendedCount}개 체크 · 성불 ${summary.heard.length}곡`
+            : undefined
         }
         onClose={closePicker}
       >
@@ -235,7 +282,12 @@ export function AttendanceView({
           units={units}
           attended={attended}
           ready={ready}
-          onToggle={toggle}
+          onToggle={toggleUnit}
+          onSetMany={setMany}
+          onOpenImport={() => {
+            setPickerChoice(false);
+            setPanel("share");
+          }}
         />
       </SidePanel>
     </div>

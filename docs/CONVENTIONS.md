@@ -381,6 +381,14 @@ src/
   `${lives.id}:${YYYY-MM-DD}`이고 사용자 체크 내역의 저장 키라, 나누는 규칙을
   바꾸면 저장된 체크가 어긋납니다(`live-history/units.ts` 주석 참고).
 
+### 날짜
+
+- "YYYY-MM-DD" 날짜 계산(더하기·차이·요일)은 `src/lib/ymd.ts`만 씁니다(UTC 자정 기준, 시간대 무관).
+- "오늘"은 한국 날짜 — 빌드 쪽 `koreaDate()`(`src/lib/korea-date.ts`), 브라우저 쪽
+  `useKoreaToday()`(`src/lib/use-korea-today.ts`, 정적 HTML 단계에선 null).
+- 참전 기록은 빌드 때 "예정"이던 공연일도 브라우저 날짜로 지났으면 체크 대상에 넣습니다
+  (`attendance/arrived-units.ts`).
+
 ### 참전 기록: 브라우저 저장
 
 - 체크 내역은 `localStorage`의 `ztmy-sounds:live-attendance` 한 키에

@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
+import { koreaDate } from "@/lib/korea-date";
 import {
   buildLiveUnits,
   buildUpcomingUnits,
@@ -75,7 +76,8 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
     );
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  // 한국 날짜 기준(UTC면 한국 아침 9시 전 빌드에서 하루 어긋남).
+  const today = koreaDate();
   const input = {
     lives: livesResult.data,
     tours: toursResult.data,

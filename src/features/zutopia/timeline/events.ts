@@ -1,3 +1,4 @@
+import { dayNumber } from "@/lib/ymd";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
 
 export type TimelineKind = "song" | "album" | "live";
@@ -156,12 +157,6 @@ export function buildTimelineEvents(input: {
     (a, b) =>
       a.date.localeCompare(b.date) || KIND_ORDER[a.kind] - KIND_ORDER[b.kind],
   );
-}
-
-const DAY_MS = 86_400_000;
-
-function dayNumber(date: string): number {
-  return Math.round(Date.parse(`${date.slice(0, 10)}T00:00:00Z`) / DAY_MS);
 }
 
 /**

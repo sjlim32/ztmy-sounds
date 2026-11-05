@@ -94,7 +94,7 @@ export function EventCard({
             {event.subLabel}
           </span>
         )}
-        <span className="truncate text-sm leading-tight text-white/45">
+        <span className="truncate text-sm leading-tight text-white/60">
           {[eventDateText(event), ...(event.tag ? [] : extras)].join(" · ")}
         </span>
       </span>

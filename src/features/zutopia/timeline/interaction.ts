@@ -1,15 +1,15 @@
 /**
- * 연혁 휠 입력 해석 — Ctrl/⌘(트랙패드 핀치)는 확대 단계, 세로 휠은 세로로
- * 넘친 내용이 없을 때만 좌우 이동으로 바꾼다(넘쳤으면 세로 스크롤로 아래 줄에
- * 닿을 수 있어야 한다). 가로 위주 휠은 브라우저 기본.
+ * 연혁 휠 입력 해석 — Ctrl/⌘(트랙패드 핀치)는 확대 단계. 세로 휠은 좌우 이동으로
+ * 바꾸되, 세로로 넘친 내용이 있거나(아래 줄에 닿아야 한다) 좌우 끝에 닿았으면
+ * (페이지가 세로로 움직일 수 있게) 브라우저 기본에 맡긴다. 가로 위주 휠도 기본.
  */
 export function wheelIntent(
   event: { ctrlKey: boolean; metaKey: boolean; deltaX: number; deltaY: number },
-  canScrollY: boolean,
+  state: { canScrollY: boolean; atEdge: boolean },
 ): "zoom" | "horizontal" | "native" {
   if (event.ctrlKey || event.metaKey) return "zoom";
   if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return "native";
-  return canScrollY ? "native" : "horizontal";
+  return state.canScrollY || state.atEdge ? "native" : "horizontal";
 }
 
 /** 묶음 카드 높이 어림값 — 그림 줄, '외 N개' 줄, 이름 하나(한국어 + 일본어 두 줄). */

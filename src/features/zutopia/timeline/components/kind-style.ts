@@ -68,4 +68,4 @@ export function eventTitle(event: TimelineEvent) {
 }
 
 /** 예정 일정 카드 — 흐리게(아직 오지 않은 일). */
-export const UPCOMING_CLASS = "opacity-60";
+export const UPCOMING_CLASS = "opacity-75";

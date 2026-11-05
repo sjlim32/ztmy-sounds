@@ -104,7 +104,10 @@
   만들기(html-to-image → canvas)는 다른 출처 이미지를 fetch로 읽으므로, **R2 버킷의 CORS
   규칙**(GET/HEAD, 사이트 주소·`http://localhost:3000` 허용)이 있어야 합니다. 규칙이 빠지면
   커버가 빈칸이거나 이미지 만들기가 실패합니다.
-  - `toBlob`에 `cacheBust: true`를 줍니다 — 페이지의 `<img>`가 CORS 헤더 없이 받아 둔 캐시를
-    fetch가 다시 쓰면 CORS에 막히기 때문입니다.
+  - 이미지 안 커버 주소에는 `?share=1`을 붙입니다(`ShareImage`의 `shareImageSrc`) — 페이지의
+    `<img>`가 CORS 헤더 없이 받아 둔 캐시를 fetch가 다시 쓰면 CORS에 막히기 때문입니다.
+    전역 `cacheBust`는 글꼴 주소까지 바꿔 캐시를 못 쓰게 하니 쓰지 않습니다.
+  - 글꼴은 `buildFontEmbedCss`로 이미지 글자에 필요한 서브셋 woff2만 넘깁니다(안 넘기면
+    LINE Seed JP 서브셋 전부, 약 10MB).
   - 예전엔 Pages Function 프록시(`/r2/*`)로 같은 출처를 만들었지만, 이미지 요청마다 Function이
     실행되어 무료 한도(하루 10만 요청)를 넘으면 사이트 전체 이미지가 깨질 수 있어 없앴습니다.

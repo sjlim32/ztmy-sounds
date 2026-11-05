@@ -2,7 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-import { FILTER_CHIP_CLASS } from "@/components/button-styles";
+import {
+  ACTIVE_FILTER_CHIP_CLASS,
+  FILTER_CHIP_CLASS,
+} from "@/components/button-styles";
 import { useAttendedUnits } from "@/features/zutopia/attendance/useAttendedUnits";
 import {
   timelineRange,
@@ -78,7 +81,7 @@ export function TimelineView({ events }: { events: TimelineEvent[] }) {
               className={cn(
                 FILTER_CHIP_CLASS,
                 "gap-2",
-                on ? "border-white/25 bg-white/10 text-white" : "text-white/45",
+                on ? ACTIVE_FILTER_CHIP_CLASS : "text-white/55",
               )}
             >
               <span

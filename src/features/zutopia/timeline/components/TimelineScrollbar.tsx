@@ -27,20 +27,31 @@ export function TimelineScrollbar({
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
+    let frame = 0;
     const update = () => {
+      frame = 0;
       const total = el.scrollWidth || 1;
-      setView({
-        left: el.scrollLeft / total,
-        width: Math.min(1, el.clientWidth / total),
-      });
+      const left = el.scrollLeft / total;
+      const width = Math.min(1, el.clientWidth / total);
+      // 값이 같으면 다시 그리지 않는다.
+      setView((current) =>
+        current.left === left && current.width === width
+          ? current
+          : { left, width },
+      );
+    };
+    // 스크롤 이벤트는 프레임당 한 번으로 묶는다.
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
     };
     update();
-    el.addEventListener("scroll", update, { passive: true });
-    const observer = new ResizeObserver(update);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    const observer = new ResizeObserver(onScroll);
     observer.observe(el);
     return () => {
-      el.removeEventListener("scroll", update);
+      el.removeEventListener("scroll", onScroll);
       observer.disconnect();
+      cancelAnimationFrame(frame);
     };
   }, [scrollRef, contentWidth]);
 

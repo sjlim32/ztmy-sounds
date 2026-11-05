@@ -14,20 +14,45 @@ describe("wheelIntent", () => {
   });
 
   test("Ctrl/⌘ + 휠은 확대 단계", () => {
-    expect(wheelIntent(wheel({ ctrlKey: true }), false)).toBe("zoom");
-    expect(wheelIntent(wheel({ metaKey: true }), true)).toBe("zoom");
+    expect(
+      wheelIntent(wheel({ ctrlKey: true }), {
+        canScrollY: false,
+        atEdge: false,
+      }),
+    ).toBe("zoom");
+    expect(
+      wheelIntent(wheel({ metaKey: true }), {
+        canScrollY: true,
+        atEdge: false,
+      }),
+    ).toBe("zoom");
   });
 
   test("세로로 넘친 내용이 없으면 세로 휠을 좌우 이동으로", () => {
-    expect(wheelIntent(wheel({}), false)).toBe("horizontal");
+    expect(wheelIntent(wheel({}), { canScrollY: false, atEdge: false })).toBe(
+      "horizontal",
+    );
   });
 
   test("세로로 넘쳤으면 세로 휠은 브라우저 기본(세로 스크롤)에 맡긴다", () => {
-    expect(wheelIntent(wheel({}), true)).toBe("native");
+    expect(wheelIntent(wheel({}), { canScrollY: true, atEdge: false })).toBe(
+      "native",
+    );
+  });
+
+  test("좌우 끝에 닿았으면 세로 휠을 페이지에 넘긴다", () => {
+    expect(wheelIntent(wheel({}), { canScrollY: false, atEdge: true })).toBe(
+      "native",
+    );
   });
 
   test("가로 휠(트랙패드 좌우)은 기본 동작", () => {
-    expect(wheelIntent(wheel({ deltaX: 50, deltaY: 5 }), false)).toBe("native");
+    expect(
+      wheelIntent(wheel({ deltaX: 50, deltaY: 5 }), {
+        canScrollY: false,
+        atEdge: false,
+      }),
+    ).toBe("native");
   });
 });
 

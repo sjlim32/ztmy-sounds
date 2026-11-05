@@ -23,7 +23,14 @@ export function TimelineItemLink({
       {children}
     </Link>
   ) : (
-    <div tabIndex={0} title={title} className={classes} style={style}>
+    <div
+      tabIndex={0}
+      role="note"
+      aria-label={title}
+      title={title}
+      className={classes}
+      style={style}
+    >
       {children}
     </div>
   );

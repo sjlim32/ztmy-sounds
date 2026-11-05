@@ -153,7 +153,7 @@ export const ShareImage = forwardRef<
               (song.coverSrc ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={song.coverSrc}
+                  src={shareImageSrc(song.coverSrc)}
                   alt=""
                   crossOrigin="anonymous"
                   style={{
@@ -227,3 +227,13 @@ export const ShareImage = forwardRef<
     </div>
   );
 });
+
+/**
+ * 이미지 만들기에 쓰는 R2 커버 주소 — 페이지의 <img>가 CORS 헤더 없이 받아 둔
+ * 캐시를 html-to-image의 fetch가 다시 쓰면 CORS에 막히므로, 주소에 표시를 붙여
+ * 따로 받는다(RULES.md). 같은 출처(로고 등)는 그대로.
+ */
+function shareImageSrc(url: string): string {
+  if (!/^https?:/.test(url)) return url;
+  return `${url}${url.includes("?") ? "&" : "?"}share=1`;
+}

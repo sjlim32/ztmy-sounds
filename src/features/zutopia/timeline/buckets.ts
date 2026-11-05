@@ -1,3 +1,4 @@
+import { addDays, weekdayIndex } from "@/lib/ymd";
 import type {
   TimelineEvent,
   TimelineKind,
@@ -14,20 +15,7 @@ export interface Bucket {
   events: TimelineEvent[];
 }
 
-const DAY_MS = 86_400_000;
-
-function toDate(date: string) {
-  return new Date(`${date.slice(0, 10)}T00:00:00Z`);
-}
-
-function iso(date: Date) {
-  return date.toISOString().slice(0, 10);
-}
-
-/** 날짜에 며칠 더하기(빼기). */
-export function addDays(date: string, days: number) {
-  return iso(new Date(toDate(date).getTime() + days * DAY_MS));
-}
+export { addDays };
 
 /** 날짜가 든 해·달·주(월요일 시작)의 키와 [시작, 끝). */
 export function bucketRange(
@@ -53,7 +41,7 @@ export function bucketRange(
       end: next,
     };
   }
-  const weekday = (toDate(date).getUTCDay() + 6) % 7; // 월=0 … 일=6
+  const weekday = (weekdayIndex(date) + 6) % 7; // 월=0 … 일=6
   const start = addDays(date, -weekday);
   return { key: start, start, end: addDays(start, 7) };
 }

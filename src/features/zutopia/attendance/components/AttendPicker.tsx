@@ -58,11 +58,17 @@ export function AttendPicker({
   attended,
   ready,
   onToggle,
+  onSetMany,
+  onOpenImport,
 }: {
   units: LiveUnit[];
   attended: ReadonlySet<string>;
   ready: boolean;
   onToggle: (id: string) => void;
+  /** 묶음 전체 체크(true)·해제(false) */
+  onSetMany: (ids: string[], checked: boolean) => void;
+  /** 다른 기기 기록 불러오기(공유 창 열기) */
+  onOpenImport: () => void;
 }) {
   const years = groupUnitsByYear(units);
   const [openYears, setOpenYears] = useState<ReadonlySet<string>>(
@@ -84,9 +90,19 @@ export function AttendPicker({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm text-white/50">
+      <p className="text-sm text-white/60">
         다녀온 공연일을 체크하세요. 체크 내역은 이 브라우저에만 저장돼요.
       </p>
+      <button
+        type="button"
+        onClick={onOpenImport}
+        className={cn(
+          "self-start rounded-md text-sm text-white/80 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white",
+          FOCUS_RING,
+        )}
+      >
+        다른 기기에서 쓰던 기록이 있나요? 불러오기
+      </button>
       {years.map((year) => {
         const open = openYears.has(year.year);
         const checked = countChecked(year.unitIds);
@@ -129,6 +145,7 @@ export function AttendPicker({
                     attended={attended}
                     ready={ready}
                     onToggle={onToggle}
+                    onSetMany={onSetMany}
                   />
                 ))}
               </div>
@@ -147,6 +164,7 @@ function GroupCard({
   attended,
   ready,
   onToggle,
+  onSetMany,
 }: {
   group: UnitGroup;
   open: boolean;
@@ -154,7 +172,9 @@ function GroupCard({
   attended: ReadonlySet<string>;
   ready: boolean;
   onToggle: (id: string) => void;
+  onSetMany: (ids: string[], checked: boolean) => void;
 }) {
+  const allChecked = group.units.every((unit) => attended.has(unit.id));
   const checkedCount = group.units.filter((unit) =>
     attended.has(unit.id),
   ).length;
@@ -178,7 +198,7 @@ function GroupCard({
           <span
             className={cn(
               "shrink-0 text-sm tabular-nums",
-              checkedCount > 0 ? "text-white" : "text-white/45",
+              checkedCount > 0 ? "text-white" : "text-white/55",
             )}
           >
             {checkedCount}/{group.units.length}
@@ -188,6 +208,32 @@ function GroupCard({
       </button>
       {open && (
         <ul className="divide-y divide-white/5">
+          {group.units.length > 1 && (
+            <li>
+              <label className="flex cursor-pointer items-center gap-3 px-3 py-2 transition-colors hover:bg-white/5">
+                <input
+                  type="checkbox"
+                  checked={ready && allChecked}
+                  disabled={!ready}
+                  ref={(input) => {
+                    if (input)
+                      input.indeterminate =
+                        ready && checkedCount > 0 && !allChecked;
+                  }}
+                  onChange={() =>
+                    onSetMany(
+                      group.units.map((unit) => unit.id),
+                      !allChecked,
+                    )
+                  }
+                  className="accent-ztmy-magenta size-5 shrink-0"
+                />
+                <span className="text-sm font-medium text-white/80">
+                  이 묶음 전부 ({group.units.length}일)
+                </span>
+              </label>
+            </li>
+          )}
           {group.units.map((unit) => {
             const checked = attended.has(unit.id);
             const ownImage =
@@ -224,7 +270,7 @@ function GroupCard({
                     </span>
                   </span>
                   {unit.songIds.length === 0 && (
-                    <span className="shrink-0 text-sm text-white/40">
+                    <span className="shrink-0 text-sm text-white/55">
                       세트리스트 준비 중
                     </span>
                   )}

@@ -39,7 +39,17 @@ export default async function ZutopiaAttendancePage() {
   return (
     <div>
       <h1 className="sr-only">라이브 참전 기록</h1>
-      <AttendanceView units={history.units} songs={attendanceSongs} />
+      <AttendanceView
+        units={history.units}
+        upcoming={history.upcoming}
+        songs={attendanceSongs}
+        liveCounts={Object.fromEntries(
+          Object.entries(history.statsBySongId).map(([id, stat]) => [
+            id,
+            stat.count,
+          ]),
+        )}
+      />
     </div>
   );
 }

@@ -36,6 +36,10 @@ const GAP_PX_PER_DAY = 0.6;
 const MIN_GAP = 8;
 const MAX_GAP = 160;
 const DOT = 12;
+/** 위에 붙는 단계 버튼 줄(h-16, 위 20px는 스크롤 페이드 마스크 자리)과 해 머리
+ * 높이 — 옮겨 갈 때 가리지 않게 그만큼 내린다. */
+const BAR_HEIGHT = 64;
+const YEAR_HEADER_HEIGHT = 52;
 
 /**
  * 세로 축(모바일) — 위가 옛날, 아래가 최근. PC와 같은 세 단계:
@@ -54,8 +58,10 @@ export function VerticalTimeline({
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [level, setLevel] = useState<ZoomLevel>(DEFAULT_ZOOM_LEVEL);
-  // 단계를 바꾼 뒤 이 해의 머리가 맨 위에 오게 옮긴다.
-  const pendingYearRef = useRef<string | null>(null);
+  // 단계를 바꾼 뒤 옮겨 갈 곳 — 그 해 머리, 달이 있으면 그 달 첫 카드.
+  const pendingRef = useRef<{ year: string; month: string | null } | null>(
+    null,
+  );
   const years = useMemo(() => {
     const groups = new Map<string, TimelineEvent[]>();
     for (const event of events) {
@@ -74,19 +80,30 @@ export function VerticalTimeline({
     const root = rootRef.current;
     const box = main();
     // 태블릿 이상에선 이 축이 숨겨져 있다(offsetParent 없음) — 그땐 건드리지 않는다.
-    if (root?.offsetParent && box) box.scrollTop = box.scrollHeight;
+    // main은 scroll-smooth라 즉시 이동을 명시한다(2018년부터 흘러내리지 않게).
+    if (root?.offsetParent && box)
+      box.scrollTo({ top: box.scrollHeight, behavior: "instant" });
   }, []);
 
   useLayoutEffect(() => {
-    const year = pendingYearRef.current;
+    const target = pendingRef.current;
     const box = main();
     const root = rootRef.current;
-    if (!year || !box || !root) return;
-    pendingYearRef.current = null;
-    const section = root.querySelector<HTMLElement>(`[data-year="${year}"]`);
+    if (!target || !box || !root) return;
+    pendingRef.current = null;
+    const section = root.querySelector<HTMLElement>(
+      `[data-year="${target.year}"]`,
+    );
     if (!section) return;
-    box.scrollTop +=
-      section.getBoundingClientRect().top - box.getBoundingClientRect().top;
+    const monthEl = target.month
+      ? section.querySelector<HTMLElement>(`[data-month="${target.month}"]`)
+      : null;
+    // 위에 붙는 단계 버튼 줄(+ 달로 갈 땐 해 머리까지)에 가리지 않게 그만큼 내린다.
+    const offset = monthEl ? BAR_HEIGHT + YEAR_HEADER_HEIGHT + 8 : BAR_HEIGHT;
+    const top =
+      (monthEl ?? section).getBoundingClientRect().top -
+      box.getBoundingClientRect().top;
+    box.scrollTo({ top: box.scrollTop + top - offset, behavior: "instant" });
   }, [level]);
 
   // 지금 화면 맨 위쪽에 걸친 해
@@ -94,25 +111,30 @@ export function VerticalTimeline({
     const box = main();
     const root = rootRef.current;
     if (!box || !root) return null;
-    const top = box.getBoundingClientRect().top + 56;
+    const top = box.getBoundingClientRect().top + BAR_HEIGHT + 8;
     for (const section of root.querySelectorAll<HTMLElement>("[data-year]"))
       if (section.getBoundingClientRect().bottom > top)
         return section.dataset.year ?? null;
     return null;
   };
-  const changeLevel = (next: ZoomLevel, year: string | null) => {
+  const changeLevel = (
+    next: ZoomLevel,
+    year: string | null,
+    month: string | null = null,
+  ) => {
     if (next === level) return;
-    pendingYearRef.current = year;
+    pendingRef.current = year ? { year, month } : null;
     setLevel(next);
   };
-  const openYear = (year: string) => changeLevel(stepZoom(level, 1), year);
+  const openAt = (year: string, month: string | null = null) =>
+    changeLevel(stepZoom(level, 1), year, month);
 
   return (
     <div ref={rootRef} className="flex flex-col">
       <div
         role="group"
         aria-label="확대 단계"
-        className="bg-background sticky top-0 z-20 flex h-12 items-center gap-1 py-1.5"
+        className="bg-background sticky top-0 z-20 flex h-16 items-center gap-1 pt-5 pb-1"
       >
         {ZOOM_ORDER.map((item) => (
           <button
@@ -134,7 +156,7 @@ export function VerticalTimeline({
       </div>
       {years.map(([year, list]) => (
         <section key={year} data-year={year}>
-          <h2 className="bg-background sticky top-12 z-10 flex items-baseline gap-3 border-b border-white/10 py-2.5">
+          <h2 className="bg-background sticky top-16 z-10 flex items-baseline gap-3 border-b border-white/10 py-2.5">
             <span className="font-mono text-2xl font-semibold tracking-wider text-white">
               {year}
             </span>
@@ -148,14 +170,18 @@ export function VerticalTimeline({
               <YearSummaryCard
                 events={list}
                 attended={list.some((event) => attendedCounts.has(event.id))}
-                onOpen={() => openYear(year)}
+                onOpen={() => openAt(year)}
               />
             </div>
           )}
           {level === "month" && (
             <ol className="flex flex-col gap-2.5 py-3">
               {bucketEvents(list, "month").map((bucket) => (
-                <li key={bucket.key} className="flex gap-3">
+                <li
+                  key={bucket.key}
+                  data-month={bucket.key}
+                  className="flex gap-3"
+                >
                   <span className="w-9 shrink-0 pt-2 text-right text-sm font-semibold text-white/60">
                     {Number(bucket.key.slice(5, 7))}월
                   </span>
@@ -164,7 +190,7 @@ export function VerticalTimeline({
                     attended={bucket.events.some((event) =>
                       attendedCounts.has(event.id),
                     )}
-                    onOpen={() => openYear(year)}
+                    onOpen={() => openAt(year, bucket.key)}
                     className="min-w-0 flex-1"
                   />
                 </li>
@@ -190,6 +216,7 @@ export function VerticalTimeline({
                 return (
                   <li
                     key={event.id}
+                    data-month={event.date.slice(0, 7)}
                     className="relative"
                     style={{ marginTop: index === 0 ? 0 : gap }}
                   >
@@ -249,7 +276,7 @@ function VerticalCard({
         <span className="truncate text-base leading-snug font-medium text-white">
           {event.label}
         </span>
-        <span className="truncate text-sm leading-tight text-white/55">
+        <span className="truncate text-sm leading-tight text-white/60">
           {[eventDateText(event), event.subLabel, ...(event.tag ? [] : extras)]
             .filter(Boolean)
             .join(" · ")}
