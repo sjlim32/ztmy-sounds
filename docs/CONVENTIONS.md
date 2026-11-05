@@ -404,7 +404,10 @@ src/
 - 가로 축은 화면에 남은 높이를 직접 재서 채웁니다(`HorizontalTimeline` — main의 보이는
   높이 − 위쪽 내용 − 페이지 아래 padding − 푸터). 페이지가 세로로 스크롤되면 이 계산이
   어긋난 것입니다.
-- 세로 축(모바일)은 단계 없이 카드 사이 빈칸 0.6px/일(최소 8px·최대 160px).
+- 세로 축(모바일)도 연·월·주 세 단계입니다(주 단계는 카드 사이 빈칸 0.6px/일, 최소 8px·최대
+  160px). 처음 스크롤은 바깥 main의 scrollTop만 바꿉니다(scrollIntoView 금지 — body가 움직임).
+- 예정 공연은 `getLiveHistory().upcoming`(집계에 안 들어감)으로 받아 연혁에만 "예정"으로 그립니다.
+- 화면 높이 측정은 `PageScrollBody`의 `data-page-body`·`data-page-footer` 표시로 찾습니다.
 - 앨범과 **같은 날** 발매로 들어간 수록곡은 앨범 일정 하나로 합칩니다. 곡 `release_date`가
   앨범과 하루라도 다르면 따로 그려지니, 데이터의 발매일을 맞춰 두세요.
 - 빌드는 Supabase 조회 결과를 `.next/cache/fetch-cache`에 남깁니다. 데이터를 고쳤는데

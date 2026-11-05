@@ -37,6 +37,7 @@ describe("daysBetween", () => {
 
 describe("toSongLiveSummaries", () => {
   const history: LiveHistory = {
+    upcoming: [],
     units: [
       unit({ id: "L:2026-03-14", tourId: "t1", dayNumber: 1 }),
       unit({

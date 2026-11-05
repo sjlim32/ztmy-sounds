@@ -21,28 +21,12 @@ function daysInclusive(start: string, end: string): number {
   return Math.round((toUtc(end) - toUtc(start)) / 86_400_000) + 1;
 }
 
-/**
- * lives 행을 공연 단위(하루하루의 공연)로 나눈다. 규칙은 설계 문서
- * (docs/superpowers/specs/2026-11-05-zutopia-live-checklist-timeline-design.md
- * "나누는 규칙")를 따른다.
- * - FESTIVAL: 행 하나 = 단위 하나, 날짜는 즛토마요 출연일(live_date, 없으면 start_date).
- * - CONCERT/EVENT: start_date~end_date 하루마다 단위 하나. DAY N의 곡 =
- *   (투어 공통 곡) + 이 행의 day_number 없는 곡 + day_number = N인 곡.
- *   day_number 없이 이틀짜리로 등록된 행은 양일 같은 세트리스트로 본다.
- * - 투어 소속: tour_id 일치 또는 slug가 투어 slug와 같은 행(lives/data.ts의
- *   tourDateFilter와 같은 기준). 제목·링크는 투어 것을 쓴다.
- * - 곡 id는 어레인지 버전이면 원곡 id로 바꾸고, 같은 날 같은 곡은 한 번만 센다.
- * - today보다 뒤의 단위는 뺀다.
- */
-export function buildLiveUnits(
-  input: {
-    lives: RawLive[];
-    tours: RawTour[];
-    setlists: RawSetlistRow[];
-    originalOf: Record<string, string>;
-  },
-  today: string,
-): LiveUnit[] {
+function buildAllUnits(input: {
+  lives: RawLive[];
+  tours: RawTour[];
+  setlists: RawSetlistRow[];
+  originalOf: Record<string, string>;
+}): LiveUnit[] {
   const { lives, tours, setlists, originalOf } = input;
   const toursById = new Map(tours.map((tour) => [tour.id, tour]));
   const toursBySlug = new Map(tours.map((tour) => [tour.slug, tour]));
@@ -122,11 +106,46 @@ export function buildLiveUnits(
     }
   }
 
-  return units
+  return units;
+}
+
+type BuildInput = Parameters<typeof buildAllUnits>[0];
+
+/**
+ * lives 행을 공연 단위(하루하루의 공연)로 나눈다. 규칙은 설계 문서
+ * (docs/superpowers/specs/2026-11-05-zutopia-live-checklist-timeline-design.md
+ * "나누는 규칙")를 따른다.
+ * - FESTIVAL: 행 하나 = 단위 하나, 날짜는 즛토마요 출연일(live_date, 없으면 start_date).
+ * - CONCERT/EVENT: start_date~end_date 하루마다 단위 하나. DAY N의 곡 =
+ *   (투어 공통 곡) + 이 행의 day_number 없는 곡 + day_number = N인 곡.
+ *   day_number 없이 이틀짜리로 등록된 행은 양일 같은 세트리스트로 본다.
+ * - 투어 소속: tour_id 일치 또는 slug가 투어 slug와 같은 행(lives/data.ts의
+ *   tourDateFilter와 같은 기준). 제목·링크는 투어 것을 쓴다.
+ * - 곡 id는 어레인지 버전이면 원곡 id로 바꾸고, 같은 날 같은 곡은 한 번만 센다.
+ * - today보다 뒤의 단위는 뺀다(예정 공연일은 buildUpcomingUnits).
+ */
+export function buildLiveUnits(input: BuildInput, today: string): LiveUnit[] {
+  return buildAllUnits(input)
     .filter((unit) => unit.date <= today)
     .sort(
       (a, b) =>
         b.date.localeCompare(a.date) || (a.dayNumber ?? 0) - (b.dayNumber ?? 0),
+    );
+}
+
+/**
+ * 예정 공연일 — today보다 뒤의 단위만, 날짜 오름차순(가까운 것부터). 나누는
+ * 규칙은 buildLiveUnits와 같다(활동 연혁의 "예정" 표시용, 집계엔 안 쓴다).
+ */
+export function buildUpcomingUnits(
+  input: BuildInput,
+  today: string,
+): LiveUnit[] {
+  return buildAllUnits(input)
+    .filter((unit) => unit.date > today)
+    .sort(
+      (a, b) =>
+        a.date.localeCompare(b.date) || (a.dayNumber ?? 0) - (b.dayNumber ?? 0),
     );
 }
 

@@ -45,9 +45,10 @@ export function eventDateText(event: TimelineEvent): string {
   }`;
 }
 
-/** 카드에 덧붙이는 정보 — 앨범 신곡 수, 여러 날 공연의 공연 횟수. */
+/** 카드에 덧붙이는 정보 — 예정, 앨범 신곡 수, 여러 날 공연의 공연 횟수. */
 export function eventExtras(event: TimelineEvent): string[] {
   const extras: string[] = [];
+  if (event.upcoming) extras.push("예정");
   if (event.newSongCount > 0) extras.push(`신곡 ${event.newSongCount}곡`);
   if (event.kind === "live" && event.unitIds.length > 1)
     extras.push(`${event.unitIds.length}회`);
@@ -65,3 +66,6 @@ export function eventTitle(event: TimelineEvent) {
     .filter(Boolean)
     .join(" · ");
 }
+
+/** 예정 일정 카드 — 흐리게(아직 오지 않은 일). */
+export const UPCOMING_CLASS = "opacity-60";

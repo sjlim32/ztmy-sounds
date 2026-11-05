@@ -5,6 +5,7 @@ import {
   dateToOffset,
   timelineRange,
   countByYear,
+  latestDate,
   type TimelineEvent,
 } from "@/features/zutopia/timeline/events";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
@@ -44,6 +45,7 @@ function ev(id: string, date: string, endDate: string | null = null) {
     newSongCount: 0,
     imageUrl: null,
     tag: null,
+    upcoming: false,
   } satisfies TimelineEvent;
 }
 
@@ -261,5 +263,49 @@ describe("countByYear", () => {
       "2020": { song: 1, album: 1, live: 1 },
       "2021": { song: 1, album: 0, live: 0 },
     });
+  });
+});
+
+describe("예정 일정", () => {
+  test("예정 공연일만 있는 공연, 오늘 뒤 발매일은 upcoming", () => {
+    const events = buildTimelineEvents({
+      songs: [song("future", "2027-01-10"), song("past", "2026-01-10")],
+      albums: [],
+      units: [unit("done", "2026-10-01")],
+      upcomingUnits: [unit("next", "2026-12-24")],
+      today: "2026-11-05",
+    });
+    const flags = Object.fromEntries(events.map((e) => [e.id, e.upcoming]));
+    expect(flags).toEqual({
+      "song:past": false,
+      "live:done": false,
+      "live:next": true,
+      "song:future": true,
+    });
+  });
+
+  test("진행 중인 투어(지난 + 예정 공연일)는 한 일정, 예정 아님, 끝날 = 마지막 예정일", () => {
+    const [event] = buildTimelineEvents({
+      songs: [],
+      albums: [],
+      units: [unit("a", "2026-10-01", "tour")],
+      upcomingUnits: [unit("b", "2026-12-01", "tour")],
+      today: "2026-11-05",
+    });
+    expect(event).toMatchObject({
+      date: "2026-10-01",
+      endDate: "2026-12-01",
+      upcoming: false,
+    });
+    // 참전 체크는 지난 공연일만 대상
+    expect(event.unitIds).toEqual(["a:2026-10-01"]);
+  });
+});
+
+describe("latestDate", () => {
+  test("가장 늦은 날짜(기간이면 끝날)", () => {
+    expect(
+      latestDate([ev("a", "2020-01-01", "2021-05-01"), ev("b", "2021-03-01")]),
+    ).toBe("2021-05-01");
   });
 });

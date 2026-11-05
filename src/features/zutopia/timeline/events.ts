@@ -22,6 +22,8 @@ export interface TimelineEvent {
   imageUrl: string | null;
   /** 앨범 구분 표기("정규 4집"). 그 밖엔 null. */
   tag: string | null;
+  /** 아직 오지 않은 일정(예정 공연·발매 예정). 흐리게 + "예정". */
+  upcoming: boolean;
 }
 
 export interface TimelineSongInput {
@@ -67,9 +69,15 @@ const KIND_ORDER: Record<TimelineKind, number> = { album: 0, song: 1, live: 2 };
 export function buildTimelineEvents(input: {
   songs: TimelineSongInput[];
   albums: TimelineAlbumInput[];
+  /** 지난 공연일(참전 체크 대상). */
   units: LiveUnit[];
+  /** 예정 공연일 — 투어가 진행 중이면 지난 공연일과 한 일정으로 합친다. */
+  upcomingUnits?: LiveUnit[];
+  /** 이 날 뒤의 발매일은 "예정". 없으면 예정 표시 안 함. */
+  today?: string;
 }): TimelineEvent[] {
   const events: TimelineEvent[] = [];
+  const isFuture = (date: string) => !!input.today && date > input.today;
   const albumDates = new Map(
     input.albums.map((album) => [album.id, album.releaseDate.slice(0, 10)]),
   );
@@ -94,6 +102,7 @@ export function buildTimelineEvents(input: {
       newSongCount: 0,
       imageUrl: song.coverSrc,
       tag: null,
+      upcoming: isFuture(date),
     });
   }
 
@@ -109,18 +118,22 @@ export function buildTimelineEvents(input: {
       newSongCount: folded.get(album.id) ?? 0,
       imageUrl: album.coverSrc,
       tag: album.typeLabel,
+      upcoming: isFuture(album.releaseDate.slice(0, 10)),
     });
   }
 
-  const lives = new Map<string, LiveUnit[]>();
-  for (const unit of input.units) {
+  const lives = new Map<string, { past: LiveUnit[]; all: LiveUnit[] }>();
+  const addUnit = (unit: LiveUnit, past: boolean) => {
     const key = unit.tourId ?? unit.liveId;
-    const list = lives.get(key);
-    if (list) list.push(unit);
-    else lives.set(key, [unit]);
-  }
-  for (const [key, units] of lives) {
-    const dates = units.map((unit) => unit.date).sort();
+    const entry = lives.get(key) ?? { past: [], all: [] };
+    entry.all.push(unit);
+    if (past) entry.past.push(unit);
+    lives.set(key, entry);
+  };
+  for (const unit of input.units) addUnit(unit, true);
+  for (const unit of input.upcomingUnits ?? []) addUnit(unit, false);
+  for (const [key, { past, all }] of lives) {
+    const dates = all.map((unit) => unit.date).sort();
     const first = dates[0];
     const last = dates[dates.length - 1];
     events.push({
@@ -128,13 +141,14 @@ export function buildTimelineEvents(input: {
       kind: "live",
       date: first,
       endDate: last === first ? null : last,
-      label: units[0].titleKo ?? units[0].title,
+      label: all[0].titleKo ?? all[0].title,
       subLabel: null,
-      href: units[0].href,
-      unitIds: units.map((unit) => unit.id),
+      href: all[0].href,
+      unitIds: past.map((unit) => unit.id),
       newSongCount: 0,
-      imageUrl: units[0].groupImageUrl,
+      imageUrl: all[0].groupImageUrl,
       tag: null,
+      upcoming: past.length === 0,
     });
   }
 
@@ -225,4 +239,14 @@ export function countByYear(
     result[year][event.kind] += 1;
   }
   return result;
+}
+
+/** 가장 늦은 일정 날짜(기간이면 끝날) — 연혁을 처음 열 때 이 날이 보이게. */
+export function latestDate(events: TimelineEvent[]): string | null {
+  let latest: string | null = null;
+  for (const event of events) {
+    const end = event.endDate ?? event.date;
+    if (!latest || end > latest) latest = end;
+  }
+  return latest;
 }

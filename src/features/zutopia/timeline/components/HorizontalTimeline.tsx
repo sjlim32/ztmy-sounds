@@ -18,6 +18,7 @@ import {
 } from "@/features/zutopia/timeline/buckets";
 import {
   dateToOffset,
+  latestDate,
   type TimelineEvent,
 } from "@/features/zutopia/timeline/events";
 import { wheelIntent } from "@/features/zutopia/timeline/interaction";
@@ -44,6 +45,8 @@ const TIME_BAND = 72;
 /** 아래 스크롤 막대(36) + 틈(10). */
 const SCROLLBAR_SPACE = 46;
 const MIN_HEIGHT = 360;
+/** 처음 열 때 가장 늦은 일정과 오른쪽 끝 사이 여백(카드 하나 + 조금). */
+const INITIAL_RIGHT_MARGIN = 280;
 /** Ctrl/⌘ + 휠(트랙패드 핀치)을 이만큼 굴리면 한 단계. */
 const WHEEL_STEP = 60;
 
@@ -127,14 +130,14 @@ export function HorizontalTimeline({
     const wrapper = wrapperRef.current;
     const scroller = scrollRef.current;
     const main = wrapper?.closest("main");
-    const body = main?.firstElementChild;
-    const inner = body?.firstElementChild;
-    if (!wrapper || !scroller || !main || !body || !inner) return;
-    const footer =
-      body.lastElementChild !== inner ? body.lastElementChild : null;
+    // 페이지 본문·푸터는 PageScrollBody가 단 표시로 찾는다(구조에 기대지 않게).
+    const inner = wrapper?.closest<HTMLElement>("[data-page-body]");
+    const footer = main?.querySelector<HTMLElement>("[data-page-footer]");
+    if (!wrapper || !scroller || !main || !inner) return;
     const measure = () => {
+      // 스크롤 상자 위쪽(위 도구 줄 아래)부터 잰다.
       const top =
-        wrapper.getBoundingClientRect().top -
+        scroller.getBoundingClientRect().top -
         main.getBoundingClientRect().top +
         main.scrollTop;
       const padBottom = parseFloat(getComputedStyle(inner).paddingBottom) || 0;
@@ -153,12 +156,23 @@ export function HorizontalTimeline({
     return () => observer.disconnect();
   }, []);
 
-  // 처음(크기를 잰 뒤) 한 번 가장 최근 쪽으로
+  // 처음(크기를 잰 뒤) 한 번 — 가장 늦은 일정(예정 포함)이 오른쪽 끝 조금 안에
+  // 오게(축 끝의 빈 달에서 시작하지 않게).
+  const latest = useMemo(() => latestDate(events), [events]);
   useLayoutEffect(() => {
     const el = scrollRef.current;
     if (!el || startedRef.current || size.width === 0) return;
     startedRef.current = true;
-    el.scrollLeft = el.scrollWidth;
+    el.scrollLeft = latest
+      ? scrollLeftFor(
+          dateToOffset(latest, range.start, 1),
+          el.clientWidth - INITIAL_RIGHT_MARGIN,
+          pxPerDay,
+          PAD,
+        )
+      : el.scrollWidth;
+    // 처음 한 번만 — 단계·폭이 바뀐 뒤엔 사용자가 보던 자리를 지킨다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size.width]);
 
   // 단계를 바꾼 뒤 기준 날짜를 제자리로
@@ -248,6 +262,39 @@ export function HorizontalTimeline({
 
   return (
     <div ref={wrapperRef} className="relative flex flex-col gap-2.5">
+      {/* 지금 보는 시기 + 단계 버튼 — 연혁 위 한 줄(연혁 안의 연도·달 눈금을
+          가리지 않게 상자 밖에 둔다) */}
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-lg font-semibold text-white tabular-nums">
+          {viewText || "\u00a0"}
+        </p>
+        <div
+          role="group"
+          aria-label="확대 단계"
+          className="flex items-center gap-1 rounded-lg bg-white/5 p-1"
+        >
+          {ZOOM_ORDER.map((item) => (
+            <button
+              key={item}
+              type="button"
+              aria-pressed={level === item}
+              onClick={() => changeLevelAtCenter(item)}
+              className={cn(
+                "h-8 min-w-9 rounded-md px-2.5 text-sm font-medium transition-colors",
+                FOCUS_RING,
+                level === item
+                  ? "bg-white/15 text-white"
+                  : "text-white/60 hover:bg-white/10 hover:text-white",
+              )}
+            >
+              {ZOOM_LABEL[item]}
+            </button>
+          ))}
+          <span className="wide:inline hidden px-1.5 text-sm text-white/45">
+            Ctrl + 휠
+          </span>
+        </div>
+      </div>
       <div
         id={scrollerId}
         ref={scrollRef}
@@ -349,41 +396,6 @@ export function HorizontalTimeline({
           ratio: x(`${year}-01-01`) / contentWidth,
         }))}
       />
-
-      {/* 지금 보는 시기 — 왼쪽 위에 늘 떠 있게(스크롤해도 그대로) */}
-      {viewText && (
-        <p className="bg-background/75 pointer-events-none absolute top-2 left-2 z-40 rounded-lg px-3 py-1.5 text-lg font-semibold text-white tabular-nums shadow-[0_4px_14px_rgba(0,0,0,0.45)] backdrop-blur-sm">
-          {viewText}
-        </p>
-      )}
-
-      {/* 단계 버튼 — 스크롤 상자 밖(오른쪽 위)에 떠 있게 */}
-      <div
-        role="group"
-        aria-label="확대 단계"
-        className="bg-background/70 absolute top-2 right-2 z-40 flex items-center gap-1 rounded-lg p-1 shadow-[0_4px_14px_rgba(0,0,0,0.45)] backdrop-blur-sm"
-      >
-        {ZOOM_ORDER.map((item) => (
-          <button
-            key={item}
-            type="button"
-            aria-pressed={level === item}
-            onClick={() => changeLevelAtCenter(item)}
-            className={cn(
-              "h-8 min-w-9 rounded-md px-2.5 text-sm font-medium transition-colors",
-              FOCUS_RING,
-              level === item
-                ? "bg-white/15 text-white"
-                : "text-white/60 hover:bg-white/10 hover:text-white",
-            )}
-          >
-            {ZOOM_LABEL[item]}
-          </button>
-        ))}
-        <span className="wide:inline hidden px-1.5 text-sm text-white/45">
-          Ctrl + 휠
-        </span>
-      </div>
     </div>
   );
 }

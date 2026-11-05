@@ -40,6 +40,8 @@ export interface SongLiveStat {
 export interface LiveHistory {
   /** 날짜 내림차순(최신 먼저), 같은 날짜면 dayNumber 오름차순 */
   units: LiveUnit[];
+  /** 예정 공연일 — 날짜 오름차순. 집계(units·통계)엔 들어가지 않는다. */
+  upcoming: LiveUnit[];
   /** 원곡 id → 통계. 라이브 기록 없는 곡은 키 없음. */
   statsBySongId: Record<string, SongLiveStat>;
 }

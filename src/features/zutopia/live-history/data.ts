@@ -1,6 +1,10 @@
 import { cache } from "react";
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
-import { buildLiveUnits, buildSongLiveStats } from "./units";
+import {
+  buildLiveUnits,
+  buildUpcomingUnits,
+  buildSongLiveStats,
+} from "./units";
 import type { LiveHistory } from "./types";
 
 /**
@@ -72,21 +76,23 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const units = buildLiveUnits(
-    {
-      lives: livesResult.data,
-      tours: toursResult.data,
-      setlists: setlistsResult.data.map(
-        ({ live_id, tour_id, song_id, day_number }) => ({
-          live_id,
-          tour_id,
-          song_id,
-          day_number,
-        }),
-      ),
-      originalOf,
-    },
-    today,
-  );
-  return { units, statsBySongId: buildSongLiveStats(units) };
+  const input = {
+    lives: livesResult.data,
+    tours: toursResult.data,
+    setlists: setlistsResult.data.map(
+      ({ live_id, tour_id, song_id, day_number }) => ({
+        live_id,
+        tour_id,
+        song_id,
+        day_number,
+      }),
+    ),
+    originalOf,
+  };
+  const units = buildLiveUnits(input, today);
+  return {
+    units,
+    upcoming: buildUpcomingUnits(input, today),
+    statsBySongId: buildSongLiveStats(units),
+  };
 });

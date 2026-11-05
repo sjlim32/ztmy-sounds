@@ -47,6 +47,8 @@ export default async function ZutopiaTimelinePage() {
       typeLabel: `${ALBUM_TYPE_SHORT_LABEL[album.album_type]} ${album.album_number}집`,
     })),
     units: history.units,
+    upcomingUnits: history.upcoming,
+    today: new Date().toISOString().slice(0, 10),
   });
 
   return (

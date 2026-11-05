@@ -20,8 +20,14 @@ export function PageScrollBody({
 }) {
   return (
     <div className="flex min-h-full flex-col">
-      <div className={cn("flex-1", innerClassName)}>{children}</div>
-      <Footer inline />
+      {/* data-page-body / data-page-footer: 화면 높이를 꽉 채우는 화면(활동 연혁)이
+          아래 여백·푸터 높이를 잴 때 찾는 표시 — 구조를 바꿔도 이 표시는 남겨 두세요. */}
+      <div data-page-body className={cn("flex-1", innerClassName)}>
+        {children}
+      </div>
+      <div data-page-footer>
+        <Footer inline />
+      </div>
     </div>
   );
 }

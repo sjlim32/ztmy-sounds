@@ -27,6 +27,7 @@ function ev(
     newSongCount: 0,
     imageUrl: null,
     tag: null,
+    upcoming: false,
   };
 }
 

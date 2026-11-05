@@ -3,6 +3,7 @@ import {
   addDays,
   buildLiveUnits,
   buildSongLiveStats,
+  buildUpcomingUnits,
 } from "@/features/zutopia/live-history/units";
 import type {
   RawLive,
@@ -243,6 +244,28 @@ describe("buildLiveUnits", () => {
   test("region에서 한글 도시명을 뽑는다", () => {
     const [u] = build([live({ id: "r", region: "大阪 (오사카)" })], []);
     expect(u.city).toBe("오사카");
+  });
+});
+
+describe("buildUpcomingUnits", () => {
+  test("오늘 뒤의 공연일만, 날짜 오름차순(가까운 것부터)", () => {
+    const lives = [
+      live({ id: "past", start_date: "2026-10-01" }),
+      live({ id: "far", start_date: "2027-03-01" }),
+      live({ id: "near", start_date: "2026-12-24", end_date: "2026-12-25" }),
+      live({ id: "today", start_date: TODAY }),
+    ];
+    const input = { lives, tours: [], setlists: [], originalOf: {} };
+    expect(buildUpcomingUnits(input, TODAY).map((u) => u.id)).toEqual([
+      "near:2026-12-24",
+      "near:2026-12-25",
+      "far:2027-03-01",
+    ]);
+    // 지난 공연(오늘 포함)은 buildLiveUnits 쪽에만
+    expect(buildLiveUnits(input, TODAY).map((u) => u.id)).toEqual([
+      "today:2026-11-05",
+      "past:2026-10-01",
+    ]);
   });
 });
 
