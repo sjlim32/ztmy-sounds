@@ -174,7 +174,7 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
 }
 
 const SETLIST_COLUMNS =
-  "track_number, is_encore, day_number, note, songs!inner(id, slug, title, title_ko)";
+  "track_number, is_encore, day_number, note, songs!inner(id, slug, title, title_ko, title_en)";
 const SETLIST_SELECT = `setlists(${SETLIST_COLUMNS})`;
 
 interface SetlistRow {
@@ -182,7 +182,13 @@ interface SetlistRow {
   is_encore: boolean;
   day_number: number | null;
   note: Json | null;
-  songs: { id: string; slug: string; title: string; title_ko: string };
+  songs: {
+    id: string;
+    slug: string;
+    title: string;
+    title_ko: string;
+    title_en: string;
+  };
 }
 
 function parseSetlistArrange(note: Json | null): string | null {
@@ -213,6 +219,7 @@ function toSetlist(
       songId: entry.songs.id,
       title: entry.songs.title,
       titleKo: entry.songs.title_ko,
+      titleEn: entry.songs.title_en,
       guideHref: getGuideHref(entry.songs.slug),
       trackNumber: entry.track_number,
       isEncore: entry.is_encore,

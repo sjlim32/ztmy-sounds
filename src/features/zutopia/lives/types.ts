@@ -7,6 +7,8 @@ export interface LiveSetlistEntry {
   songId: string;
   title: string;
   titleKo: string;
+  // 영어 제목(songs.title_en) — 세트리스트에서 제목 아래 작은 줄로 보여준다.
+  titleEn: string;
   // 이 곡의 응원 가이드(/guide/[songId])가 있으면 그 경로, 없으면 null.
   guideHref: string | null;
   trackNumber: number;

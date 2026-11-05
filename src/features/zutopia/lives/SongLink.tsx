@@ -7,16 +7,25 @@ import {
 import { MicIcon } from "@/components/icons/MicIcon";
 import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 
-// "15-1"(투어 공통 세트리스트의 선택곡 자리)까지 한 줄에 들어가는 폭으로 고정 —
-// 모든 줄이 같은 폭이라 제목 시작 위치도 맞는다.
-const indexBadgeClass =
-  "w-8 shrink-0 font-mono text-xs whitespace-nowrap tabular-nums";
+// 모든 줄이 같은 폭이라 제목 시작 위치도 맞는다. 모바일은 제목 자리를 넓히려고
+// 두 자리 번호만 들어가는 폭으로 줄이고, "15-1"(투어 공통 세트리스트의 선택곡
+// 자리)처럼 숫자 뒤에 붙는 게 있으면 "15" / "-1" 두 줄로 나눈다. PC는 "15-1"까지
+// 한 줄에 들어가는 폭으로 고정.
+const indexBadgeClass = cn(
+  "w-5 shrink-0 font-mono text-xs whitespace-nowrap tabular-nums",
+  "tablet:w-8",
+);
 
 const rowClass = cn(
-  "flex w-full items-center gap-3 px-4 py-2.5",
+  "flex w-full items-center gap-2 px-3 py-2.5",
   "text-sm",
-  "tablet:text-base",
+  "tablet:gap-3 tablet:px-4 tablet:text-base",
 );
+
+function splitIndexLabel(label: string): [string, string] {
+  const match = /^(\d+)(\D.*)$/.exec(label);
+  return match ? [match[1], match[2]] : [label, ""];
+}
 
 export function formatDayNumber(dayNumber: number): string {
   return `DAY ${dayNumber}`;
@@ -39,6 +48,7 @@ export function SongLink({
   index,
   dayNumber,
   arrange,
+  subtitle,
   encore = false,
   selected = false,
   wrapTitle = false,
@@ -51,6 +61,8 @@ export function SongLink({
   indexLabel?: string;
   dayNumber?: number | null;
   arrange?: string | null;
+  /** 제목 아래 흐린 작은 줄(영어 제목). 편곡 정보가 있으면 그 위에 온다. */
+  subtitle?: string | null;
   encore?: boolean;
   selected?: boolean;
   /** 제목을 한 줄로 자르지 않고 여러 줄로(투어 공통 세트리스트의 선택곡 후보 목록). */
@@ -58,6 +70,8 @@ export function SongLink({
   children: ReactNode;
 }) {
   const number = indexLabel ?? String(index).padStart(2, "0");
+  // "15-1" → ["15", "-1"]. 뒤에 붙는 게 없으면 suffix는 빈 문자열.
+  const [numberHead, numberSuffix] = splitIndexLabel(number);
   const dayLabel = dayNumber != null ? formatDayNumber(dayNumber) : null;
 
   return (
@@ -78,12 +92,31 @@ export function SongLink({
           !encore && !selected && "text-white/45",
         )}
       >
-        {number}
+        {numberSuffix ? (
+          <>
+            {numberHead}
+            {/* 모바일은 줄바꿈해서 번호 칸 폭을 그대로 둔다. */}
+            <br className="tablet:hidden" />
+            {numberSuffix}
+          </>
+        ) : (
+          number
+        )}
       </span>
       <div className="flex min-w-0 flex-1 flex-col justify-center">
-        <span className={wrapTitle ? "break-keep" : "truncate"}>
+        {/* 모바일은 폭이 좁아 한 줄로 자르면 제목이 거의 안 보여서 두 줄까지 보여준다. */}
+        <span
+          className={
+            wrapTitle
+              ? "break-keep"
+              : cn("line-clamp-2", "tablet:line-clamp-none tablet:truncate")
+          }
+        >
           {children}
         </span>
+        {subtitle && (
+          <span className="truncate text-sm text-white/50">{subtitle}</span>
+        )}
         {arrange && (
           <span
             className={cn("truncate text-xs text-white/50", "tablet:text-sm")}

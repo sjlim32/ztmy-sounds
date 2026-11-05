@@ -110,6 +110,13 @@ export function Setlist({
                   index={row.entry.trackNumber}
                   dayNumber={row.entry.dayNumber}
                   arrange={row.entry.arrange}
+                  subtitle={
+                    // 원어·한국어 제목과 같은 영어 제목(예: "Ham")은 반복하지 않는다.
+                    row.entry.titleEn !== row.entry.title &&
+                    row.entry.titleEn !== row.entry.titleKo
+                      ? row.entry.titleEn
+                      : null
+                  }
                   encore={row.entry.isEncore}
                   selected={row.entry.isSelected}
                 >
