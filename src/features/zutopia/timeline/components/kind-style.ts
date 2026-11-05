@@ -2,7 +2,7 @@ import type {
   TimelineEvent,
   TimelineKind,
 } from "@/features/zutopia/timeline/events";
-import { formatLiveDate } from "@/features/zutopia/live-history/summary";
+import { formatDotDate } from "@/lib/ymd";
 
 export const KIND_ORDER: readonly TimelineKind[] = ["song", "album", "live"];
 
@@ -38,9 +38,9 @@ export const ATTENDED_CLASS = "ring-2 ring-ztmy-magenta";
 
 /** "2026.02.28 – 06.18"(같은 해면 끝날의 연도 생략). */
 export function eventDateText(event: TimelineEvent): string {
-  if (!event.endDate) return formatLiveDate(event.date);
-  const end = formatLiveDate(event.endDate);
-  return `${formatLiveDate(event.date)} – ${
+  if (!event.endDate) return formatDotDate(event.date);
+  const end = formatDotDate(event.endDate);
+  return `${formatDotDate(event.date)} – ${
     event.endDate.slice(0, 4) === event.date.slice(0, 4) ? end.slice(5) : end
   }`;
 }

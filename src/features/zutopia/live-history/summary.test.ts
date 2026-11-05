@@ -1,8 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
-  daysBetween,
   formatDaysAgo,
-  formatLiveDate,
   toSongLiveSummaries,
 } from "@/features/zutopia/live-history/summary";
 import type {
@@ -27,13 +25,6 @@ function unit(overrides: Partial<LiveUnit> & { id: string }): LiveUnit {
     ...overrides,
   };
 }
-
-describe("daysBetween", () => {
-  test("시간대와 무관한 날짜 차", () => {
-    expect(daysBetween("2026-03-14", "2026-11-05")).toBe(236);
-    expect(daysBetween("2026-11-05", "2026-11-05")).toBe(0);
-  });
-});
 
 describe("toSongLiveSummaries", () => {
   const history: LiveHistory = {
@@ -98,11 +89,5 @@ describe("formatDaysAgo", () => {
   test("지난 일수, 오늘이면 '오늘'", () => {
     expect(formatDaysAgo("2026-03-14", "2026-11-05")).toBe("236일 전");
     expect(formatDaysAgo("2026-11-05", "2026-11-05")).toBe("오늘");
-  });
-});
-
-describe("formatLiveDate", () => {
-  test("점 구분 날짜", () => {
-    expect(formatLiveDate("2026-03-14")).toBe("2026.03.14");
   });
 });

@@ -297,8 +297,8 @@ describe("예정 일정", () => {
       endDate: "2026-12-01",
       upcoming: false,
     });
-    // 참전 체크는 지난 공연일만 대상
-    expect(event.unitIds).toEqual(["a:2026-10-01"]);
+    // 빌드 뒤에 지나 체크된 공연일도 "내가 간 공연"으로 맞춰 볼 수 있게 전부
+    expect(event.unitIds).toEqual(["a:2026-10-01", "b:2026-12-01"]);
   });
 });
 

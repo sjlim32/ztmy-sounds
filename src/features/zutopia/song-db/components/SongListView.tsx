@@ -244,8 +244,12 @@ export function SongListView({
                     </div>
                   )}
 
-                  {/* PC는 넓은 폭에 맞게 두 열 */}
-                  <div className="pc:grid pc:grid-cols-2 pc:gap-x-8">
+                  {/* 넓은 화면(1440px~)은 두 열 — 수록 순서대로 위→아래로 흐르게
+                      columns. 곡 상세(오른쪽 드로어)가 열려 있으면 오른쪽 열을
+                      덮으므로 한 열로 돌아간다. */}
+                  <div
+                    className={cn(!selected && "wide:columns-2 wide:gap-x-8")}
+                  >
                     {/* 행 하나가 실제로는 Enter/Space/클릭으로 여닫는 토글
                   버튼이지 테이블 셀 탐색 단위가 아니라 table 구조와 안
                   맞아 div로 바꿨다(div는 지울 암묵적 role이 없다).
@@ -293,7 +297,7 @@ export function SongListView({
                           key={song.id}
                           data-song-db-item
                           className={cn(
-                            "cursor-help border-b border-white/10 px-2 transition-colors last:border-0 hover:bg-white/5",
+                            "cursor-help break-inside-avoid border-b border-white/10 px-2 transition-colors last:border-0 hover:bg-white/5",
                             isSelected && "bg-white/10",
                           )}
                         >

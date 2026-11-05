@@ -1,5 +1,11 @@
 import { describe, expect, test } from "vitest";
-import { addDays, dayNumber, diffDays, weekdayIndex } from "@/lib/ymd";
+import {
+  addDays,
+  dayNumber,
+  diffDays,
+  formatDotDate,
+  weekdayIndex,
+} from "@/lib/ymd";
 
 describe("ymd", () => {
   test("addDays는 달·해를 넘긴다(시간대 무관)", () => {
@@ -19,5 +25,8 @@ describe("ymd", () => {
 
   test("weekdayIndex: 일=0 … 토=6", () => {
     expect(weekdayIndex("2026-11-05")).toBe(4); // 목
+  });
+  test("formatDotDate", () => {
+    expect(formatDotDate("2026-03-14T00:00:00+09:00")).toBe("2026.03.14");
   });
 });

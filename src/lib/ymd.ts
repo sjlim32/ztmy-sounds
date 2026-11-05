@@ -28,3 +28,8 @@ export function weekdayIndex(date: string): number {
   const [y, m, d] = date.slice(0, 10).split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
 }
+
+/** "2026-03-14" → "2026.03.14"(점 표기 — 연혁·곡 상세의 짧은 날짜). */
+export function formatDotDate(date: string): string {
+  return date.slice(0, 10).replaceAll("-", ".");
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
   FOCUS_RING,
@@ -31,7 +32,6 @@ export function AttendanceResult({
   liveCounts,
   ready,
   onOpenPicker,
-  onOpenShare,
 }: {
   units: LiveUnit[];
   /** 곡 id → 전체 라이브 횟수(성불 대기 곡이 라이브에서 불린 적 있는지 보여 주기) */
@@ -39,7 +39,6 @@ export function AttendanceResult({
   summary: AttendanceSummary;
   ready: boolean;
   onOpenPicker: () => void;
-  onOpenShare: () => void;
 }) {
   const [mode, setMode] = useState<ListMode>("heard");
 
@@ -49,7 +48,8 @@ export function AttendanceResult({
     return (
       <div className="flex flex-col items-center gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-8 text-center">
         <p className={cn("text-base text-white/70", "tablet:text-lg")}>
-          아직 체크한 공연이 없어요.
+          아직 체크한 공연이 없어요. 다녀온 공연일을 체크하면 라이브로 들은
+          곡(성불)과 아직 못 들은 곡(성불 대기)을 모아 보여 줘요.
         </p>
         <button
           type="button"
@@ -135,9 +135,11 @@ export function AttendanceResult({
         </div>
         <ul
           className={cn(
-            "grid grid-cols-1 gap-x-6 px-3 py-1",
-            "tablet:grid-cols-2 tablet:px-4",
-            "pc:grid-cols-3",
+            // 많이 들은 순·발매일 순이 위→아래로 이어지게 columns(가로 Z자 아님).
+            // 곡을 펼쳐도 그 칸만 길어진다.
+            "gap-x-6 px-3 py-1",
+            "tablet:columns-2 tablet:px-4",
+            "pc:columns-3",
           )}
         >
           {list.map((song) => (
@@ -154,21 +156,6 @@ export function AttendanceResult({
           ))}
         </ul>
       </div>
-      <p className="text-sm text-white/60">
-        기록은 이 브라우저에만 저장돼요. 기기를 바꾸거나 브라우저 데이터가
-        지워지면 사라지니{" "}
-        <button
-          type="button"
-          onClick={onOpenShare}
-          className={cn(
-            "rounded text-white/85 underline decoration-white/30 underline-offset-4 hover:text-white",
-            FOCUS_RING,
-          )}
-        >
-          코드로 백업해 두세요
-        </button>
-        .
-      </p>
     </div>
   );
 }
@@ -213,7 +200,7 @@ function SongRow({
       </span>
       {count === null && (
         <span className="shrink-0 text-sm text-white/55">
-          {liveCount > 0 ? `라이브 ${liveCount}회` : "라이브 기록 없음"}
+          {liveCount > 0 ? `전체 라이브 ${liveCount}회` : "라이브 기록 없음"}
         </span>
       )}
       {count !== null && (
@@ -230,16 +217,25 @@ function SongRow({
     </>
   );
 
+  // 성불 대기 곡 — 누르면 곡 상세(라이브 기록 표)로.
   if (heardIn.length === 0)
     return (
-      <li className="flex min-w-0 items-center gap-3 border-b border-white/5 py-2">
-        {body}
+      <li className="min-w-0 break-inside-avoid border-b border-white/5">
+        <Link
+          href={`/zutopia/songs?song=${song.slug}`}
+          className={cn(
+            "flex min-w-0 items-center gap-3 rounded-md py-2 transition-colors hover:bg-white/5",
+            FOCUS_RING,
+          )}
+        >
+          {body}
+        </Link>
       </li>
     );
 
   // 성불한 곡 — 누르면 들은 공연일 목록(최신 먼저)을 펼친다.
   return (
-    <li className="min-w-0 border-b border-white/5">
+    <li className="min-w-0 break-inside-avoid border-b border-white/5">
       <button
         type="button"
         aria-expanded={open}

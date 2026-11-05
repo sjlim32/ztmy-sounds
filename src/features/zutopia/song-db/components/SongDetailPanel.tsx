@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { formatDotDate } from "@/lib/ymd";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ALBUM_TYPE_SHORT_LABEL } from "@/features/zutopia/song-db/labels";
@@ -9,7 +10,6 @@ import { DrawerCloseButton } from "@/features/zutopia/song-db/components/DrawerC
 import { UnreleasedBadge } from "@/features/zutopia/song-db/components/UnreleasedBadge";
 import {
   formatDaysAgo,
-  formatLiveDate,
   type LiveRef,
   type SongLiveSummary,
 } from "@/features/zutopia/live-history/summary";
@@ -86,7 +86,7 @@ export function SongDetailPanel({
         <DetailTable
           className="mt-3"
           rows={[
-            { label: "발매일", value: formatLiveDate(song.release_date) },
+            { label: "발매일", value: formatDotDate(song.release_date) },
             ...(hasArranger
               ? [{ label: "편곡", value: song.arranger!.join(", ") }]
               : []),
@@ -288,7 +288,7 @@ function LiveValue({ live }: { live: LiveRef }) {
     <span className="flex flex-col">
       <LiveLink live={live} wrap />
       <span className="text-sm text-white/50">
-        {[live.detail, formatLiveDate(live.date)].filter(Boolean).join(" · ")}
+        {[live.detail, formatDotDate(live.date)].filter(Boolean).join(" · ")}
       </span>
     </span>
   );

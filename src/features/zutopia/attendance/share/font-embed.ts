@@ -44,6 +44,64 @@ export function pickWoff2Url(src: string): string | null {
   return null;
 }
 
+/** @font-face 하나 — 고르기에 필요한 값만. cssText는 원래 규칙(내보낼 때 src만 바꾼다). */
+export interface FontFace {
+  family: string;
+  /** font-weight 범위(단일 값이면 같은 두 수) */
+  weight: [number, number];
+  url: string;
+  /** unicode-range(없으면 빈 배열 = 전체) */
+  range: [number, number][];
+  cssText?: string;
+}
+
+/**
+ * 이미지에 필요한 면만 고른다 — 쓰인 글꼴·굵기마다, 이미지 글자가 든 서브셋에서
+ * 그 굵기에 가장 가까운 면 하나. 같은 파일(같은 서브셋)을 여러 굵기가 쓰면 하나로
+ * 합치고 굵기를 범위로 넓힌다(파일을 두 번 넣지 않게).
+ */
+export function selectFontFaces(
+  faces: FontFace[],
+  used: ReadonlyMap<string, ReadonlySet<number>>,
+  codes: ReadonlySet<number>,
+): FontFace[] {
+  const distance = (face: FontFace, weight: number) =>
+    weight < face.weight[0]
+      ? face.weight[0] - weight
+      : weight > face.weight[1]
+        ? weight - face.weight[1]
+        : 0;
+  const picked = new Map<string, { face: FontFace; weights: number[] }>();
+  for (const [family, weights] of used) {
+    const candidates = faces.filter(
+      (face) => face.family === family && rangeCovers(face.range, codes),
+    );
+    // 서브셋(unicode-range)마다 따로 고른다.
+    const groups = new Map<string, FontFace[]>();
+    for (const face of candidates) {
+      const key = JSON.stringify(face.range);
+      groups.set(key, [...(groups.get(key) ?? []), face]);
+    }
+    for (const [rangeKey, group] of groups)
+      for (const weight of weights) {
+        const best = group.reduce((a, b) =>
+          distance(b, weight) < distance(a, weight) ? b : a,
+        );
+        const key = `${best.url}|${rangeKey}`;
+        const entry = picked.get(key);
+        if (entry) entry.weights.push(weight);
+        else picked.set(key, { face: best, weights: [weight] });
+      }
+  }
+  const order = new Map(faces.map((face, index) => [face, index]));
+  return [...picked.values()]
+    .sort((a, b) => order.get(a.face)! - order.get(b.face)!)
+    .map(({ face, weights }) => ({
+      ...face,
+      weight: [Math.min(...weights), Math.max(...weights)],
+    }));
+}
+
 function toDataUrl(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -53,24 +111,40 @@ function toDataUrl(blob: Blob): Promise<string> {
   });
 }
 
-function familyNames(node: HTMLElement): Set<string> {
-  const names = new Set<string>();
-  for (const el of [node, ...node.querySelectorAll<HTMLElement>("*")])
-    for (const name of getComputedStyle(el).fontFamily.split(","))
-      names.add(name.trim().replace(/^['"]|['"]$/g, ""));
-  return names;
+function stripQuotes(name: string) {
+  return name.trim().replace(/^['"]|['"]$/g, "");
+}
+
+/** node 안에서 쓰인 (글꼴 이름 → 굵기들). 글꼴 목록의 모든 이름을 넣는다(대체 글꼴 포함). */
+function usedFonts(node: HTMLElement): Map<string, Set<number>> {
+  const used = new Map<string, Set<number>>();
+  for (const el of [node, ...node.querySelectorAll<HTMLElement>("*")]) {
+    const style = getComputedStyle(el);
+    const weight = Number(style.fontWeight) || 400;
+    for (const name of style.fontFamily.split(",")) {
+      const family = stripQuotes(name);
+      used.set(family, (used.get(family) ?? new Set()).add(weight));
+    }
+  }
+  return used;
+}
+
+function parseWeight(value: string): [number, number] {
+  const parts = value.trim().split(/\s+/).map(Number);
+  const [min, max] = [parts[0] || 400, parts[1] || parts[0] || 400];
+  return [min, max];
 }
 
 /**
- * node 안 글자에 필요한 @font-face만 woff2 data URL로 담은 CSS. 페이지가 이미
- * 받아 둔 글꼴 파일이면 브라우저 캐시에서 온다.
+ * node 안 글자·굵기에 필요한 @font-face만 woff2 data URL로 담은 CSS. 원래 규칙의
+ * 다른 속성(ascent-override 같은 세로 보정)은 그대로 두고 src·굵기만 바꾼다.
+ * 페이지가 이미 받아 둔 글꼴 파일이면 브라우저 캐시에서 온다.
  */
 export async function buildFontEmbedCss(node: HTMLElement): Promise<string> {
   const codes = new Set(
     [...(node.textContent ?? "")].map((char) => char.codePointAt(0)!),
   );
-  const families = familyNames(node);
-  const rules: Promise<string | null>[] = [];
+  const faces: FontFace[] = [];
   for (const sheet of document.styleSheets) {
     let cssRules: CSSRuleList;
     try {
@@ -81,27 +155,38 @@ export async function buildFontEmbedCss(node: HTMLElement): Promise<string> {
     for (const rule of cssRules) {
       if (!(rule instanceof CSSFontFaceRule)) continue;
       const style = rule.style;
-      const family = style
-        .getPropertyValue("font-family")
-        .trim()
-        .replace(/^['"]|['"]$/g, "");
-      if (!families.has(family)) continue;
-      const range = style.getPropertyValue("unicode-range");
-      if (range && !rangeCovers(parseUnicodeRange(range), codes)) continue;
       const url = pickWoff2Url(style.getPropertyValue("src"));
       if (!url) continue;
-      const absolute = new URL(url, sheet.href ?? location.href).href;
-      rules.push(
-        fetch(absolute)
-          .then((response) => response.blob())
-          .then(toDataUrl)
-          .then(
-            (data) =>
-              `@font-face{font-family:"${family}";font-style:${style.getPropertyValue("font-style") || "normal"};font-weight:${style.getPropertyValue("font-weight") || "400"};${range ? `unicode-range:${range};` : ""}src:url(${data}) format("woff2");}`,
-          )
-          .catch(() => null),
-      );
+      const range = style.getPropertyValue("unicode-range");
+      faces.push({
+        family: stripQuotes(style.getPropertyValue("font-family")),
+        weight: parseWeight(style.getPropertyValue("font-weight") || "400"),
+        url: new URL(url, sheet.href ?? location.href).href,
+        range: range ? parseUnicodeRange(range) : [],
+        cssText: rule.cssText,
+      });
     }
   }
+  const picked = selectFontFaces(faces, usedFonts(node), codes);
+  const data = new Map<string, Promise<string | null>>();
+  const rules = picked.map(async (face) => {
+    if (!data.has(face.url))
+      data.set(
+        face.url,
+        fetch(face.url)
+          .then((response) => response.blob())
+          .then(toDataUrl)
+          .catch(() => null),
+      );
+    const url = await data.get(face.url)!;
+    if (!url || !face.cssText) return null;
+    const weight =
+      face.weight[0] === face.weight[1]
+        ? `${face.weight[0]}`
+        : `${face.weight[0]} ${face.weight[1]}`;
+    return face.cssText
+      .replace(/src:[^;]+;?/, `src: url("${url}") format("woff2");`)
+      .replace(/font-weight:[^;]+;?/, `font-weight: ${weight};`);
+  });
   return (await Promise.all(rules)).filter(Boolean).join("\n");
 }

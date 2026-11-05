@@ -15,7 +15,7 @@ export interface TimelineEvent {
   /** 병기 — 곡·앨범의 원어(일본어) 제목. 주 표기와 같으면 null. */
   subLabel: string | null;
   href: string | null;
-  /** 공연이면 소속 공연일 ID(참전 기록 체크와 맞춰 보기). */
+  /** 공연이면 소속 공연일 ID — 예정 포함(참전 기록 체크와 맞춰 보기). */
   unitIds: string[];
   /** 앨범이면 같은 날 함께 나온 수록곡 수(따로 곡 일정을 만들지 않고 합친 수). */
   newSongCount: number;
@@ -145,7 +145,9 @@ export function buildTimelineEvents(input: {
       label: all[0].titleKo ?? all[0].title,
       subLabel: null,
       href: all[0].href,
-      unitIds: past.map((unit) => unit.id),
+      // 예정 공연일도 넣는다 — 빌드 뒤에 지나 참전 기록에서 체크한 날이 연혁에서도
+      // "내가 간 공연"으로 보이게(체크하지 않은 예정일은 저장값에 없어 영향 없음).
+      unitIds: all.map((unit) => unit.id),
       newSongCount: 0,
       imageUrl: all[0].groupImageUrl,
       tag: null,

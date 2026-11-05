@@ -1,10 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import {
+  FOCUS_RING,
   SOFT_BUTTON_CLASS,
   SOFT_PRIMARY_BUTTON_CLASS,
   SOFT_PURPLE_BUTTON_CLASS,
@@ -14,6 +15,8 @@ import { Popover } from "@/components/Popover";
 import { SidePanel } from "@/components/SidePanel";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
 import { useKoreaToday } from "@/lib/use-korea-today";
+import { openExternalUrl } from "@/lib/in-app-browser";
+import { useInAppBrowser } from "@/lib/use-in-app-browser";
 import { withArrivedUnits } from "@/features/zutopia/attendance/arrived-units";
 import { useAttendedUnits } from "@/features/zutopia/attendance/useAttendedUnits";
 import {
@@ -126,6 +129,7 @@ export function AttendanceView({
   // 묶음(투어·여러 날 공연) 전체 체크/해제
   const setMany = (ids: string[], checked: boolean) => {
     if (pickerChoice === null) setPickerChoice(true);
+    setUndo(null);
     const next = new Set(attended);
     for (const id of ids) {
       if (checked) next.add(id);
@@ -139,38 +143,55 @@ export function AttendanceView({
   );
   const pickerOpen = pickerChoice ?? (ready && attended.size === 0);
   const closePicker = useCallback(() => setPickerChoice(false), []);
+  // 불러오기 직후 "되돌리기" — 창을 닫아도 남도록 페이지에 둔다(다음 체크 전까지).
+  const [undo, setUndo] = useState<{ previous: string[]; text: string } | null>(
+    null,
+  );
+  const inApp = useInAppBrowser();
+  // 받은 기록 확인을 끝냈으면(불러오기·닫기) 주소의 코드도 그때 지운다 — 미리 지우면
+  // 앱 안 브라우저에서 "다른 브라우저로 열기"를 눌렀을 때 코드가 사라진다.
+  const finishIncoming = useCallback(() => {
+    setIncoming(null);
+    if (/[#?&]code=/.test(window.location.href))
+      history.replaceState(null, "", window.location.pathname);
+  }, []);
   const closePanel = useCallback(() => {
     setPanel(null);
-    setIncoming(null);
-  }, []);
+    finishIncoming();
+  }, [finishIncoming]);
   // 버튼으로 창을 바꾸거나 닫으면 받은 기록(공유 링크) 확인도 끝낸다 — 남겨 두면
   // 다시 열 때마다 같은 확인이 또 떠서, 그사이 체크한 것을 덮어쓸 수 있다.
   const togglePanel = (next: Exclude<Panel, null>) => {
     setPanel((current) => (current === next ? null : next));
-    setIncoming(null);
+    finishIncoming();
   };
   // 첫 방문(체크 0개)에 자동으로 열린 체크 창은 첫 체크 뒤에도 열어 둔다 —
   // 체크하는 순간 "체크 0개" 조건이 풀려 창이 닫히지 않게 선택을 고정한다.
   const toggleUnit = (id: string) => {
     if (pickerChoice === null) setPickerChoice(true);
+    setUndo(null);
     toggle(id);
   };
 
-  // 공유 링크(#code=… 또는 ?code=…)로 들어온 경우 — 주소의 코드를 읽어 공유 창을 열고
-  // 주소는 비운다. 받은 기록을 먼저 보여주려고 체크 창은 닫아 둔다.
+  // 공유 링크(#code=… 또는 ?code=…)로 들어온 경우 — 주소의 코드를 읽어 공유 창을
+  // 연다(주소는 확인을 끝낼 때 비운다). 받은 기록을 먼저 보여주려고 체크 창은 닫아 둔다.
+  // 오늘 날짜가 정해진 뒤에 읽는다 — 그 전엔 빌드 뒤 지난 공연일이 목록에 없어
+  // 그 날 체크가 빠진다.
+  const readCodeRef = useRef(false);
   useEffect(() => {
+    if (!today || readCodeRef.current) return;
+    readCodeRef.current = true;
     // #code=(공유 링크 기본)와 ?code=(직접 붙인 주소) 둘 다 읽는다.
     const code =
       extractCode(window.location.hash) ?? extractCode(window.location.search);
     if (!code) return;
-    history.replaceState(null, "", window.location.pathname);
     const ids = decodeAttendance(code, units);
     if (!ids) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 주소(hash)는 브라우저에서만 읽을 수 있다(정적 HTML과 첫 렌더를 맞추려 effect에서 한 번).
     setIncoming({ ids, source: "공유 링크" });
     setPanel("share");
     setPickerChoice(false);
-  }, [units]);
+  }, [units, today]);
 
   const stats = [
     { label: "참전", value: summary.attendedCount, highlight: false },
@@ -237,6 +258,8 @@ export function AttendanceView({
         <Popover
           open={panel === "image"}
           onClose={closePanel}
+          // 만드는 중·다 만든 이미지가 실수로 한 번 건드려 사라지지 않게
+          closeOnOutside={false}
           label="참전 기록 이미지 만들기"
           className="tablet:left-auto tablet:w-96 left-0"
         >
@@ -254,10 +277,72 @@ export function AttendanceView({
             attended={attended}
             ready={ready}
             onReplace={replaceAll}
+            onImported={(previous, text) => setUndo({ previous, text })}
+            onPendingDone={finishIncoming}
             initialPending={incoming}
           />
         </Popover>
       </div>
+
+      {/* 알림 줄 — 앱 안 브라우저 경고, 불러오기 되돌리기, 백업 안내(하나씩) */}
+      {inApp ? (
+        <p className="rounded-lg bg-white/5 px-3 py-2.5 text-sm text-white/80">
+          {inApp} 안에서 열린 페이지예요. 여기서 체크한 기록은 {inApp} 안에만
+          남아요.{" "}
+          {openExternalUrl(
+            inApp,
+            typeof window === "undefined" ? "" : window.location.href,
+          ) ? (
+            <a
+              href={openExternalUrl(inApp, window.location.href) ?? undefined}
+              className="text-white underline decoration-white/40 underline-offset-4"
+            >
+              기본 브라우저로 열기
+            </a>
+          ) : (
+            "오른쪽 위 메뉴의 \u201c다른 브라우저로 열기\u201d로 Safari·Chrome에서 여는 걸 권해요."
+          )}
+        </p>
+      ) : undo ? (
+        <p
+          role="status"
+          className="rounded-lg bg-white/5 px-3 py-2.5 text-sm text-white/80"
+        >
+          {undo.text}{" "}
+          <button
+            type="button"
+            onClick={() => {
+              replaceAll(undo.previous);
+              setUndo(null);
+            }}
+            className={cn(
+              "rounded text-white underline decoration-white/40 underline-offset-4",
+              FOCUS_RING,
+            )}
+          >
+            되돌리기
+          </button>
+        </p>
+      ) : (
+        ready &&
+        attended.size > 0 && (
+          <p className="text-sm text-white/60">
+            기록은 이 브라우저에만 남아요. 아이폰 Safari는 한동안 들어오지
+            않으면 지울 수 있으니{" "}
+            <button
+              type="button"
+              onClick={() => setPanel("share")}
+              className={cn(
+                "rounded text-white/85 underline decoration-white/30 underline-offset-4 hover:text-white",
+                FOCUS_RING,
+              )}
+            >
+              공유 링크를 나에게 보내 두세요
+            </button>
+            . 그 링크로 언제든 되살릴 수 있어요.
+          </p>
+        )
+      )}
 
       <AttendanceResult
         summary={summary}
@@ -265,7 +350,6 @@ export function AttendanceView({
         liveCounts={liveCounts}
         ready={ready}
         onOpenPicker={() => setPickerChoice(true)}
-        onOpenShare={() => setPanel("share")}
       />
 
       <SidePanel

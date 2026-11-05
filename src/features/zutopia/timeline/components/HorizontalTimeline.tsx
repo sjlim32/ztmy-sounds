@@ -50,11 +50,20 @@ const INITIAL_RIGHT_MARGIN = 280;
 /** Ctrl/⌘ + 휠(트랙패드 핀치)을 이만큼 굴리면 한 단계. */
 const WHEEL_STEP = 60;
 
+/** 바깥 스크롤 상자(main)가 휠 방향으로 더 움직일 수 있는지. */
+function pageCanMove(el: HTMLElement, deltaY: number): boolean {
+  const main = el.closest("main");
+  if (!main) return false;
+  return deltaY > 0
+    ? main.scrollTop < main.scrollHeight - main.clientHeight - 1
+    : main.scrollTop > 0;
+}
+
 /**
  * 가로 축(태블릿 이상) — 연·월·주 세 단계로 확대·축소한다.
  * 연: 해마다 요약 카드 / 월: 달마다 묶음 카드 / 주: 일정 하나하나 카드.
  * 화면에 남은 높이를 꽉 채우고(페이지 세로 스크롤 없음), 좌우 이동은 배경
- * 끌기·휠·아래 스크롤 막대로. Ctrl/⌘ + 휠(핀치)이나 오른쪽 위 단계 버튼으로
+ * 끌기·휠·아래 스크롤 막대로. Ctrl/⌘ + 휠(핀치)이나 위 줄 단계 버튼으로
  * 단계를 바꾸고, 요약·묶음 카드를 누르면 그 시기로 한 단계 확대한다 — 어느
  * 쪽이든 기준점 아래 날짜는 제자리. 처음엔 월 단계, 가장 최근 쪽.
  */
@@ -231,7 +240,9 @@ export function HorizontalTimeline({
       const intent = wheelIntent(event, {
         // 상자 안이 세로로 넘쳤거나, 화면이 낮아 최소 높이로 줄인 경우(페이지가
         // 세로로 움직여야 한다)
-        canScrollY: el.scrollHeight > el.clientHeight + 1 || state.cramped,
+        canScrollY:
+          el.scrollHeight > el.clientHeight + 1 ||
+          (state.cramped && pageCanMove(el, event.deltaY)),
         atEdge:
           (event.deltaY < 0 && el.scrollLeft <= 0) ||
           (event.deltaY > 0 && el.scrollLeft >= max - 1),

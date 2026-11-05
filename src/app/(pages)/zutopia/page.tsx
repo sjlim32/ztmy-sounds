@@ -29,7 +29,14 @@ export default async function ZutopiaHubPage() {
 
       {/* 검색어가 있으면 아래 카드 대신 곡·앨범·공연 검색 결과가 나온다. */}
       <ZutopiaSearch index={searchIndex}>
-        <ul className={cn("grid gap-4", "tablet:grid-cols-2")}>
+        {/* 카드가 정사각형이라 넓은 PC 폭을 다 쓰면 화면보다 커진다 — 예전 폭으로 가운데. */}
+        <ul
+          className={cn(
+            "grid gap-4",
+            "tablet:grid-cols-2",
+            "pc:mx-auto pc:w-full pc:max-w-4xl",
+          )}
+        >
           <li>
             <ZutopiaHubCard
               href="/zutopia/songs"

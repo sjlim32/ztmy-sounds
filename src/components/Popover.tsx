@@ -4,19 +4,22 @@ import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-const FOCUSABLE =
-  'button:not([disabled]), [href], input:not([disabled]), textarea, select, [tabindex]:not([tabindex="-1"])';
+/** 이만큼 움직였으면 누르기가 아니라 스크롤로 본다. */
+const TAP_SLOP = 10;
 
 /**
  * 버튼 바로 밑에 열리는 작은 창(드롭다운). 화면을 가리지 않고, 바깥을 누르거나
  * Esc로 닫는다. 위치 기준이 되는 부모(relative)는 호출부가 만든다 — 모바일에서
  * 부모 폭 전체로 펼치려면 부모를 줄 전체 폭 요소로 둔다.
  *
- * - 바깥 닫기는 pointerdown이 아니라 click 기준 — 모바일에서 화면을 쓸어 스크롤만
- *   해도 닫혀 버리지 않게(스크롤 제스처는 click을 만들지 않는다).
- * - closeOnOutside=false면 바깥을 눌러도 닫지 않는다(받은 기록 확인처럼 실수로
- *   닫히면 되돌릴 수 없는 내용). Esc·여는 버튼으로는 닫힌다.
- * - 열리면 안쪽 첫 입력 요소로 포커스, 닫히면 열었던 요소로 돌려준다.
+ * - 바깥 닫기: 바깥에서 누르고(pointerdown) 거의 움직이지 않고 뗀(pointerup)
+ *   경우만. 화면을 쓸어 스크롤하면 닫지 않고, 창 안에서 누른 버튼이 사라져도
+ *   (안에서 시작한 누르기) 닫지 않고, 창을 연 그 누르기(창이 열리기 전에 시작)도
+ *   닫지 않는다. iOS는 빈 곳 탭에 click을 안 보내므로 pointer 이벤트로 판단한다.
+ * - closeOnOutside=false면 바깥을 눌러도 닫지 않는다. Esc·여는 버튼으로는 닫힌다.
+ * - 열리면 창 자체에 포커스(입력칸에 바로 주면 모바일 키보드가 튀어나온다), 닫히면
+ *   열었던 요소로 — 스크롤은 건드리지 않는다.
+ * - 화면을 덮는 다른 창(aria-modal)이 열려 있으면 Esc는 그 창 몫으로 둔다.
  */
 export function Popover({
   open,
@@ -39,31 +42,51 @@ export function Popover({
     if (!open) return;
     const opener = document.activeElement as HTMLElement | null;
     const node = ref.current;
-    node?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
+    node?.focus({ preventScroll: true });
     return () => {
-      // 포커스가 창 안에 있었거나 사라졌으면 열었던 버튼으로 되돌린다.
       const active = document.activeElement;
       if (!active || active === document.body || node?.contains(active))
-        opener?.focus?.();
+        opener?.focus?.({ preventScroll: true });
     };
   }, [open]);
 
   useEffect(() => {
     if (!open) return;
-    const onClick = (event: MouseEvent) => {
-      if (!closeOnOutside) return;
-      const target = event.target as Node;
-      // 여는 버튼(data-popover-trigger)을 다시 누른 건 버튼이 직접 닫는다.
-      const trigger = (target as Element).closest?.("[data-popover-trigger]");
-      if (!ref.current?.contains(target) && !trigger) onClose();
+    let down: { x: number; y: number } | null = null;
+    const onDown = (event: PointerEvent) => {
+      const target = event.target as Element;
+      // 창 안이나 여는 버튼(data-popover-trigger, 버튼이 직접 닫는다)에서 시작한
+      // 누르기는 바깥 누르기가 아니다.
+      const inside =
+        ref.current?.contains(target) ||
+        target.closest?.("[data-popover-trigger]");
+      down = inside ? null : { x: event.clientX, y: event.clientY };
+    };
+    const onUp = (event: PointerEvent) => {
+      const start = down;
+      down = null;
+      if (!start || !closeOnOutside) return;
+      if (
+        Math.hypot(event.clientX - start.x, event.clientY - start.y) < TAP_SLOP
+      )
+        onClose();
     };
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key !== "Escape") return;
+      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      onClose();
     };
-    document.addEventListener("click", onClick);
+    document.addEventListener("pointerdown", onDown, true);
+    document.addEventListener("pointerup", onUp, true);
+    const onCancel = () => {
+      down = null;
+    };
+    document.addEventListener("pointercancel", onCancel, true);
     window.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener("click", onClick);
+      document.removeEventListener("pointerdown", onDown, true);
+      document.removeEventListener("pointerup", onUp, true);
+      document.removeEventListener("pointercancel", onCancel, true);
       window.removeEventListener("keydown", onKey);
     };
   }, [open, onClose, closeOnOutside]);
@@ -74,8 +97,9 @@ export function Popover({
       ref={ref}
       role="dialog"
       aria-label={label}
+      tabIndex={-1}
       className={cn(
-        "bg-background absolute top-full right-0 z-40 mt-2 max-h-[70dvh] overflow-y-auto rounded-lg border border-white/15 p-3 shadow-[0_8px_24px_rgba(0,0,0,0.55)]",
+        "bg-background absolute top-full right-0 z-40 mt-2 max-h-[70dvh] overflow-y-auto rounded-lg border border-white/15 p-3 shadow-[0_8px_24px_rgba(0,0,0,0.55)] focus:outline-none",
         className,
       )}
     >

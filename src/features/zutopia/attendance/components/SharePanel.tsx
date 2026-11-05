@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
-  FOCUS_RING,
   SOFT_PRIMARY_BUTTON_CLASS,
   SOFT_BUTTON_CLASS,
 } from "@/components/button-styles";
@@ -40,12 +39,18 @@ export function SharePanel({
   attended,
   ready,
   onReplace,
+  onImported,
+  onPendingDone,
   initialPending = null,
 }: {
   units: LiveUnit[];
   attended: ReadonlySet<string>;
   ready: boolean;
   onReplace: (ids: string[]) => void;
+  /** 불러오기를 마쳤을 때 — 바뀌기 전 기록과 알림 문구(페이지가 "되돌리기"를 띄운다). */
+  onImported: (previous: string[], text: string) => void;
+  /** 받은 기록 확인을 끝냈을 때(불러오기·취소 모두) */
+  onPendingDone: () => void;
   initialPending?: PendingImport | null;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -53,14 +58,11 @@ export function SharePanel({
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState<PendingImport | null>(initialPending);
   const [dragging, setDragging] = useState(false);
-  // 불러오기 직전 기록 — "되돌리기"로 한 번 되살릴 수 있게(바꾸기는 기록을 통째로 덮는다).
-  const [previous, setPrevious] = useState<string[] | null>(null);
   const code = encodeAttendance(units, attended);
 
   const copy = async (text: string, done: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      setPrevious(null);
       setMessage(done);
     } catch {
       setMessage("복사하지 못했어요. 직접 선택해서 복사해 주세요.");
@@ -96,7 +98,6 @@ export function SharePanel({
       setPending({ ids: backup.attended, source });
       return;
     }
-    setPrevious(null);
     setMessage("참전 기록 코드나 백업 파일 형식이 아니에요.");
   };
 
@@ -104,17 +105,24 @@ export function SharePanel({
     importText(await file.text(), "백업 파일");
   };
 
+  const finishPending = () => {
+    setPending(null);
+    onPendingDone();
+  };
+
   const apply = (mode: "replace" | "merge") => {
     if (!pending) return;
-    setPrevious([...attended]);
+    const previous = [...attended];
     onReplace(mode === "replace" ? pending.ids : [...attended, ...pending.ids]);
-    setMessage(
+    onImported(
+      previous,
       mode === "replace"
-        ? "불러온 기록으로 바꿨어요."
-        : "불러온 기록을 합쳤어요.",
+        ? `${pending.source} 기록으로 바꿨어요.`
+        : `${pending.source} 기록을 내 기록에 더했어요.`,
     );
-    setPending(null);
+    setMessage(null);
     setInput("");
+    finishPending();
   };
 
   const backup = () => {
@@ -149,7 +157,7 @@ export function SharePanel({
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
-                  onClick={() => setPending(null)}
+                  onClick={finishPending}
                   className={SOFT_BUTTON_CLASS}
                 >
                   닫기
@@ -159,8 +167,10 @@ export function SharePanel({
           ) : (
             <>
               <p className="text-sm text-white">
-                {pending.source}에서 공연 {matched.length}개 기록을 찾았어요.
-                어떻게 불러올까요?
+                받은 참전 기록 — 공연일 {matched.length}일.{" "}
+                {attended.size > 0
+                  ? "내 기록에 어떻게 넣을까요?"
+                  : "내 기록으로 불러올까요?"}
               </p>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -171,21 +181,26 @@ export function SharePanel({
                     "px-3.5 py-2 text-sm",
                   )}
                 >
-                  지금 기록을 이걸로 바꾸기
+                  {attended.size > 0
+                    ? "이 기록으로 바꾸기"
+                    : "이 기록 불러오기"}
                 </button>
+                {/* 내 기록이 없으면 바꾸기·더하기 결과가 같아 버튼 하나만 */}
+                {attended.size > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => apply("merge")}
+                    className={SOFT_BUTTON_CLASS}
+                  >
+                    내 기록에 더하기
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={() => apply("merge")}
+                  onClick={finishPending}
                   className={SOFT_BUTTON_CLASS}
                 >
-                  지금 기록에 합치기
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPending(null)}
-                  className={SOFT_BUTTON_CLASS}
-                >
-                  취소
+                  닫기
                 </button>
               </div>
             </>
@@ -195,7 +210,9 @@ export function SharePanel({
 
       {/* 내보내기 */}
       <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-white/70">내 기록 보내기</p>
+        <p className="text-sm font-medium text-white/70">
+          내 기록 보내기 · 백업
+        </p>
         <div className="flex gap-2">
           <input
             readOnly
@@ -300,25 +317,6 @@ export function SharePanel({
       {message && (
         <p role="status" className="text-sm text-white/70">
           {message}
-          {previous && (
-            <>
-              {" "}
-              <button
-                type="button"
-                onClick={() => {
-                  onReplace(previous);
-                  setPrevious(null);
-                  setMessage("불러오기 전 기록으로 되돌렸어요.");
-                }}
-                className={cn(
-                  "rounded text-white underline decoration-white/40 underline-offset-4",
-                  FOCUS_RING,
-                )}
-              >
-                되돌리기
-              </button>
-            </>
-          )}
         </p>
       )}
     </div>

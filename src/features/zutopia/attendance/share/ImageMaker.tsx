@@ -199,29 +199,31 @@ function ResultView({
       <p className="text-sm text-white/60">
         휴대폰에서는 이미지를 길게 눌러 사진에 저장할 수도 있어요.
       </p>
+      {/* 공유 시트가 되는 기기(대부분 휴대폰)는 그쪽이 주 버튼 — 사진에 바로 저장되고,
+          파일로 내려받기(iOS는 '파일' 앱으로 감)는 보조로. */}
       <div className="grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={download}
-          className={cn(
-            SOFT_PRIMARY_BUTTON_CLASS,
-            "px-4 py-2.5 text-sm",
-            !canShare && "col-span-2",
-          )}
-        >
-          <DownloadIcon className="size-4" />
-          이미지 저장
-        </button>
         {canShare && (
           <button
             type="button"
             onClick={share}
-            className={cn(SOFT_BUTTON_CLASS, "justify-center")}
+            className={cn(SOFT_PRIMARY_BUTTON_CLASS, "px-4 py-2.5 text-sm")}
           >
             <ShareIcon className="size-4" />
-            공유
+            사진 저장 · 공유
           </button>
         )}
+        <button
+          type="button"
+          onClick={download}
+          className={cn(
+            canShare
+              ? cn(SOFT_BUTTON_CLASS, "justify-center")
+              : cn(SOFT_PRIMARY_BUTTON_CLASS, "col-span-2 px-4 py-2.5 text-sm"),
+          )}
+        >
+          <DownloadIcon className="size-4" />
+          {canShare ? "파일로 저장" : "이미지 저장"}
+        </button>
         <button
           type="button"
           onClick={onRemake}

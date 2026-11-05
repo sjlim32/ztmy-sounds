@@ -91,7 +91,8 @@ export function AttendPicker({
   return (
     <div className="flex flex-col gap-2">
       <p className="text-sm text-white/60">
-        다녀온 공연일을 체크하세요. 체크 내역은 이 브라우저에만 저장돼요.
+        다녀온 공연일을 체크하면 라이브로 들은 곡(성불)과 아직 못 들은 곡(성불
+        대기)을 모아 보여 줘요. 체크 내역은 이 브라우저에만 저장돼요.
       </p>
       <button
         type="button"

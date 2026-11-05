@@ -18,9 +18,6 @@ export interface SongLiveSummary {
   first: LiveRef;
 }
 
-/** 두 "YYYY-MM-DD" 사이 일수(to − from). 시간대 영향 없이 날짜만 비교한다. */
-export const daysBetween = diffDays;
-
 function unitDetail(unit: LiveUnit): string | null {
   const parts = [unit.city, unit.dayNumber ? `DAY ${unit.dayNumber}` : null];
   const detail = parts.filter(Boolean).join(" ");
@@ -58,13 +55,8 @@ export function toSongLiveSummaries(
   return summaries;
 }
 
-/** "2026-03-14" → "2026.03.14" */
-export function formatLiveDate(date: string): string {
-  return date.replaceAll("-", ".");
-}
-
 /** "236일 전", 오늘(이후)이면 "오늘". 두 값 모두 "YYYY-MM-DD". */
 export function formatDaysAgo(date: string, today: string): string {
-  const days = daysBetween(date, today);
+  const days = diffDays(date, today);
   return days <= 0 ? "오늘" : `${days}일 전`;
 }
