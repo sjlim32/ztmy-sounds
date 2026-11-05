@@ -69,7 +69,7 @@ const SORT_OPTIONS_WITH_LAST_LIVE: { value: SongGroupBy; label: string }[] = [
   { value: "lastLive", label: "최근 공연일" },
 ];
 
-/** URL에서 "마지막 라이브" 보기를 켜는 쿼리(성불 체크리스트가 새 창으로 연다). */
+/** URL에서 "마지막 라이브" 보기를 켜는 쿼리(참전 기록가 새 창으로 연다). */
 const LAST_LIVE_PARAM = "lastLive";
 
 // "N일 전"은 보는 날 기준이라 클라이언트에서만 계산한다 — 정적 HTML(빌드 날짜)과

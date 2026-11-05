@@ -376,6 +376,19 @@ src/
   `output: "export"`(정적 export) 빌드라 런타임 서버가 없고, 클라이언트
   컴포넌트로 전달할 수 없습니다. 자세한 제약은
   `docs/RULES.md`의 관련 항목을 참고하세요.
+- 공연을 하루하루의 "공연 단위"로 나눈 데이터(`live-history/`)는 디스코그래피
+  마지막 라이브·참전 기록·활동 연혁이 같이 씁니다. 공연 단위 ID는
+  `${lives.id}:${YYYY-MM-DD}`이고 사용자 체크 내역의 저장 키라, 나누는 규칙을
+  바꾸면 저장된 체크가 어긋납니다(`live-history/units.ts` 주석 참고).
+
+### 참전 기록: 브라우저 저장
+
+- 체크 내역은 `localStorage`의 `ztmy-sounds:live-attendance` 한 키에
+  `{ version: 1, attended: string[], updatedAt }` JSON으로 둡니다
+  (`attendance/storage.ts`). 백업 파일도 같은 형식입니다. 형식을 바꾸면
+  `version`을 올리고 이전 버전을 읽는 코드를 남기세요.
+- 읽기는 `useAttendedUnits`(`useSyncExternalStore`)로만 — 정적 HTML 단계에선
+  `ready`가 false라 체크 상태를 그리지 않습니다.
 
 ## 가사 타이밍
 
@@ -545,7 +558,9 @@ navigator.maxTouchPoints > 1` 조합으로만 구분 가능 — `navigator.platf
   달라져 hydration mismatch가 납니다. 항상 시간/환경과 무관한 고정값으로
   초기화하고, `useEffect` 안에서 한 번 보정하세요(예:
   `page.tsx`의 `getInitialTabletOpenAccent`, `InstallPromptBanner`의
-  iOS/dismissed 판별).
+  iOS/dismissed 판별). 여러 곳이 같이 읽는 값은 `useSyncExternalStore`
+  (서버 스냅샷 = 고정값)로 읽으면 effect 없이 해결됩니다(예: `useAttendedUnits`,
+  `SongListView`의 `useToday`).
 - 이 패턴은 `react-hooks/set-state-in-effect` 린트 규칙과 충돌합니다(effect
   본문에서 직접 `setState`를 부르지 말라는 규칙) — 위 사유로 불가피한
   경우, 이유를 적은 `// eslint-disable-next-line react-hooks/set-state-in-effect --

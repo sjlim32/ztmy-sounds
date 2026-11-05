@@ -31,7 +31,7 @@ export const getOriginalOf = cache(
 
 /**
  * 모든 공연 단위(하루하루의 공연)와 곡별 라이브 기록 — 디스코그래피 마지막
- * 라이브, 성불 체크리스트, 활동 연혁이 같이 쓴다. 빌드 시점 날짜 이후의
+ * 라이브, 참전 기록, 활동 연혁이 같이 쓴다. 빌드 시점 날짜 이후의
  * 공연은 뺀다.
  */
 export const getLiveHistory = cache(async (): Promise<LiveHistory> => {

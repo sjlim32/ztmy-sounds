@@ -1,8 +1,8 @@
-# 즛토피아 성불 체크리스트 · 마지막 라이브 · 활동 연혁 Implementation Plan
+# 즛토피아 참전 기록 · 마지막 라이브 · 활동 연혁 Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** R2 이미지 프록시, 세트리스트 영어 제목, 디스코그래피 마지막 라이브, 라이브 성불 체크리스트(이미지 저장·백업 포함), 활동 연혁을 순서대로 추가한다.
+**Goal:** R2 이미지 프록시, 세트리스트 영어 제목, 디스코그래피 마지막 라이브, 라이브 참전 기록(이미지 저장·백업 포함), 활동 연혁을 순서대로 추가한다.
 
 **Architecture:** 모든 Supabase 조회는 빌드 타임 서버 컴포넌트에서 하고, 공연 단위·곡별 라이브 기록 계산은 순수 함수 모듈(`live-history/units.ts`)에 모아 디스코그래피·체크리스트·연혁이 같이 쓴다. 사용자 체크 내역은 `localStorage`에만 저장하고 하이드레이션 후 읽는다. R2 이미지는 Pages Function(`/r2/*`)으로 같은 출처 프록시한다.
 
@@ -223,18 +223,18 @@
 ### Task 4: 체크 내역 저장 · 백업 형식
 
 **Files:**
-- Create: `src/features/zutopia/checklist/storage.ts`, `storage.test.ts`
-- Create: `src/features/zutopia/checklist/useAttendedUnits.ts`
+- Create: `src/features/zutopia/attendance/storage.ts`, `storage.test.ts`
+- Create: `src/features/zutopia/attendance/useAttendedUnits.ts`
 
 **Interfaces:**
 - Produces (`storage.ts`):
   ```ts
-  const CHECKLIST_STORAGE_KEY = "ztmy-sounds:live-checklist";
-  interface ChecklistData { version: 1; attended: string[]; updatedAt: string }
-  function parseChecklist(raw: string | null): ChecklistData   // 잘못되면 빈 데이터(attended [])
-  function parseBackup(raw: string): ChecklistData | null      // 엄격: version 1·attended string[]가 아니면 null
-  function serializeChecklist(attended: Iterable<string>, now: Date): string
-  function backupFileName(now: Date): string                   // "ztmy-checklist-YYYYMMDD.json" (로컬 날짜)
+  const ATTENDANCE_STORAGE_KEY = "ztmy-sounds:live-attendance";
+  interface AttendanceData { version: 1; attended: string[]; updatedAt: string }
+  function parseAttendance(raw: string | null): AttendanceData   // 잘못되면 빈 데이터(attended [])
+  function parseBackup(raw: string): AttendanceData | null      // 엄격: version 1·attended string[]가 아니면 null
+  function serializeAttendance(attended: Iterable<string>, now: Date): string
+  function backupFileName(now: Date): string                   // "ztmy-attendance-YYYYMMDD.json" (로컬 날짜)
   function safeRead(storage: Pick<Storage,"getItem"> | undefined): string | null  // 예외 시 null
   function safeWrite(storage: Pick<Storage,"setItem"> | undefined, value: string): boolean
   ```
@@ -242,18 +242,18 @@
 
 - [ ] **Step 1: 실패하는 테스트**
   ```ts
-  test("parseChecklist: null·깨진 JSON·다른 형식은 빈 데이터", () => {
-    for (const raw of [null, "{", "[]", '{"version":2,"attended":["a"]}']) expect(parseChecklist(raw).attended).toEqual([]);
+  test("parseAttendance: null·깨진 JSON·다른 형식은 빈 데이터", () => {
+    for (const raw of [null, "{", "[]", '{"version":2,"attended":["a"]}']) expect(parseAttendance(raw).attended).toEqual([]);
   });
-  test("parseChecklist: 문자열 아닌 항목은 버리고 중복 제거", () => {
-    expect(parseChecklist('{"version":1,"attended":["a",1,"a","b"],"updatedAt":""}').attended).toEqual(["a","b"]);
+  test("parseAttendance: 문자열 아닌 항목은 버리고 중복 제거", () => {
+    expect(parseAttendance('{"version":1,"attended":["a",1,"a","b"],"updatedAt":""}').attended).toEqual(["a","b"]);
   });
   test("parseBackup: 형식이 다르면 null", () => {
     expect(parseBackup('{"foo":1}')).toBeNull();
     expect(parseBackup("not json")).toBeNull();
   });
   test("serialize → parse 왕복", () => {});
-  test("backupFileName", () => { expect(backupFileName(new Date(2026, 10, 5))).toBe("ztmy-checklist-20261105.json"); });
+  test("backupFileName", () => { expect(backupFileName(new Date(2026, 10, 5))).toBe("ztmy-attendance-20261105.json"); });
   test("safeRead/safeWrite는 예외를 삼킨다", () => {
     const throwing = { getItem() { throw new Error("denied"); }, setItem() { throw new Error("quota"); } };
     expect(safeRead(throwing)).toBeNull();
@@ -270,21 +270,21 @@
 ### Task 5: 체크 결과 집계
 
 **Files:**
-- Create: `src/features/zutopia/checklist/summarize.ts`, `summarize.test.ts`
+- Create: `src/features/zutopia/attendance/summarize.ts`, `summarize.test.ts`
 
 **Interfaces:**
 - Consumes: `LiveUnit` (Task 2)
 - Produces:
   ```ts
-  interface ChecklistSong { id: string; slug: string; title: string; titleKo: string; titleEn: string; releaseDate: string; coverSrc: string | null }
-  interface HeardSong extends ChecklistSong { count: number }
+  interface AttendanceSong { id: string; slug: string; title: string; titleKo: string; titleEn: string; releaseDate: string; coverSrc: string | null }
+  interface HeardSong extends AttendanceSong { count: number }
   interface AttendanceSummary {
     attendedCount: number;            // 현재 데이터에 존재하는 체크 단위 수
     heard: HeardSong[];               // count desc → releaseDate asc → title
-    unheard: ChecklistSong[];         // releaseDate asc
+    unheard: AttendanceSong[];         // releaseDate asc
     period: { from: string; to: string } | null; // 체크한 단위 날짜 범위
   }
-  function summarizeAttendance(units: LiveUnit[], attended: ReadonlySet<string>, songs: ChecklistSong[]): AttendanceSummary
+  function summarizeAttendance(units: LiveUnit[], attended: ReadonlySet<string>, songs: AttendanceSong[]): AttendanceSummary
   ```
   `songs`는 페이지에서 **원곡·발매곡만**(미공개곡, `original_song_id` 있는 곡 제외) 넘긴다. `units.songIds`에 있지만 `songs`에 없는 id는 무시.
 
@@ -302,41 +302,41 @@
 
 ---
 
-### Task 6: 성불 체크리스트 페이지 (탭 · 체크 · 결과 · 백업/복원)
+### Task 6: 참전 기록 페이지 (탭 · 체크 · 결과 · 백업/복원)
 
 **Files:**
-- Create: `src/app/(pages)/zutopia/checklist/page.tsx`
-- Create: `src/features/zutopia/checklist/components/ChecklistView.tsx` (탭 상태, `useAttendedUnits`)
-- Create: `src/features/zutopia/checklist/components/AttendPicker.tsx`
-- Create: `src/features/zutopia/checklist/components/ChecklistResult.tsx`
-- Create: `src/features/zutopia/checklist/components/BackupControls.tsx`
-- Modify: `src/features/zutopia/nav.ts` (`{ href: "/zutopia/checklist", label: "성불", paths: ["/zutopia/checklist"] }`)
+- Create: `src/app/(pages)/zutopia/attendance/page.tsx`
+- Create: `src/features/zutopia/attendance/components/AttendanceView.tsx` (탭 상태, `useAttendedUnits`)
+- Create: `src/features/zutopia/attendance/components/AttendPicker.tsx`
+- Create: `src/features/zutopia/attendance/components/AttendanceResult.tsx`
+- Create: `src/features/zutopia/attendance/components/BackupControls.tsx`
+- Modify: `src/features/zutopia/nav.ts` (`{ href: "/zutopia/attendance", label: "참전", paths: ["/zutopia/attendance"] }`)
 - Modify: `README.md`, `docs/CONVENTIONS.md`(체크 내역 localStorage 키·형식 한 단락)
 
 **Interfaces:**
-- Consumes: `getLiveHistory`, `LiveUnit` (T2), `useAttendedUnits`, `serializeChecklist`, `parseBackup`, `backupFileName` (T4), `summarizeAttendance`, `ChecklistSong` (T5), `toAssetUrl` 적용된 커버(T0), `getSongsWithAlbums`·`getSongCoverSrc`(기존)
-- Produces: `ChecklistResult`가 `summary: AttendanceSummary`를 Task 7의 `<ShareImageButton summary={summary} />`에 넘길 자리(Task 7 전까지는 버튼 없음).
+- Consumes: `getLiveHistory`, `LiveUnit` (T2), `useAttendedUnits`, `serializeAttendance`, `parseBackup`, `backupFileName` (T4), `summarizeAttendance`, `AttendanceSong` (T5), `toAssetUrl` 적용된 커버(T0), `getSongsWithAlbums`·`getSongCoverSrc`(기존)
+- Produces: `AttendanceResult`가 `summary: AttendanceSummary`를 Task 7의 `<ShareImageButton summary={summary} />`에 넘길 자리(Task 7 전까지는 버튼 없음).
 
-- [ ] **Step 1: page.tsx** — `getLiveHistory()`, `getSongsWithAlbums()` → `ChecklistSong[]`(원곡·발매곡만, `coverSrc = getSongCoverSrc`) → `<ChecklistView units songs />`. `metadata.title = "라이브 성불 체크리스트"`. sr-only h1.
+- [ ] **Step 1: page.tsx** — `getLiveHistory()`, `getSongsWithAlbums()` → `AttendanceSong[]`(원곡·발매곡만, `coverSrc = getSongCoverSrc`) → `<AttendanceView units songs />`. `metadata.title = "라이브 참전 기록"`. sr-only h1.
 - [ ] **Step 2: AttendPicker** — 투어 단위는 `tourId`로 묶어 투어 제목 아래 공연일 목록(날짜 · 도시 · `DAY N`), 그 밖은 한 줄씩. 그룹 순서는 최신순(units가 이미 최신순). 각 줄은 `<label>` + 체크박스(키보드 접근). 상단 "간 공연 N개".
-- [ ] **Step 3: ChecklistResult** — 숫자(간 공연·들은 곡·못 들은 곡), "들은 곡 / 못 들은 곡" 전환, 행 = 커버 + 일본어/한국어/영어 + `×N`. 버튼: "노래별 마지막 라이브 보러가기"(`<a href="/zutopia/songs?lastLive=1" target="_blank" rel="noopener">`). 체크 0개면 빈 상태 문구 + ① 탭으로 이동 버튼.
-- [ ] **Step 4: BackupControls** — 백업: `Blob([serializeChecklist(...)])` → `backupFileName(new Date())`로 다운로드. 복원: `<input type="file" accept="application/json">` → `parseBackup` null이면 "백업 파일 형식이 아니에요" 안내, 아니면 `window.confirm("지금 체크 내역을 백업 파일 내용으로 바꿀까요?")` 후 `replaceAll`.
+- [ ] **Step 3: AttendanceResult** — 숫자(간 공연·들은 곡·못 들은 곡), "들은 곡 / 못 들은 곡" 전환, 행 = 커버 + 일본어/한국어/영어 + `×N`. 버튼: "노래별 마지막 라이브 보러가기"(`<a href="/zutopia/songs?lastLive=1" target="_blank" rel="noopener">`). 체크 0개면 빈 상태 문구 + ① 탭으로 이동 버튼.
+- [ ] **Step 4: BackupControls** — 백업: `Blob([serializeAttendance(...)])` → `backupFileName(new Date())`로 다운로드. 복원: `<input type="file" accept="application/json">` → `parseBackup` null이면 "백업 파일 형식이 아니에요" 안내, 아니면 `window.confirm("지금 체크 내역을 백업 파일 내용으로 바꿀까요?")` 후 `replaceAll`.
 - [ ] **Step 5: `ready`가 false인 동안** 체크박스·결과 숫자를 그리지 않거나 비활성(깜빡임 방지).
-- [ ] **Step 6: 검증** — `tsc`, `lint`, `pnpm test`, `pnpm build` 성공, `out/zutopia/checklist/index.html` 존재.
-- [ ] **Step 7: 커밋 (승인 후)** — `feat: 즛토피아 라이브 성불 체크리스트 페이지 추가` (Task 4·5 파일 포함)
+- [ ] **Step 6: 검증** — `tsc`, `lint`, `pnpm test`, `pnpm build` 성공, `out/zutopia/attendance/index.html` 존재.
+- [ ] **Step 7: 커밋 (승인 후)** — `feat: 즛토피아 라이브 참전 기록 페이지 추가` (Task 4·5 파일 포함)
 
 ---
 
-### Task 7: 성불 기록 이미지 저장
+### Task 7: 참전 기록 이미지 저장
 
 **Files:**
 - Modify: `package.json` (`html-to-image`)
-- Create: `src/features/zutopia/checklist/share/tally.ts`, `tally.test.ts`
-- Create: `src/features/zutopia/checklist/share/layout.ts`, `layout.test.ts`
-- Create: `src/features/zutopia/checklist/share/Tally.tsx`
-- Create: `src/features/zutopia/checklist/share/ShareImage.tsx`
-- Create: `src/features/zutopia/checklist/share/ShareImageButton.tsx`
-- Modify: `ChecklistResult.tsx` (버튼 배치)
+- Create: `src/features/zutopia/attendance/share/tally.ts`, `tally.test.ts`
+- Create: `src/features/zutopia/attendance/share/layout.ts`, `layout.test.ts`
+- Create: `src/features/zutopia/attendance/share/Tally.tsx`
+- Create: `src/features/zutopia/attendance/share/ShareImage.tsx`
+- Create: `src/features/zutopia/attendance/share/ShareImageButton.tsx`
+- Modify: `AttendanceResult.tsx` (버튼 배치)
 - Modify: `docs/STACK.md`, `README.md`
 
 **Interfaces:**
@@ -354,7 +354,7 @@
   function defaultShareFormat(isWide: boolean): ShareFormat // true → "square"
   ```
 
-디자인 값(스펙 확정): 배경 `#050223` + 흰 테두리, 상단 가운데(로고 흰 외곽선 = `MobileHeader.tsx`의 4방향 1px `drop-shadow` — 1080px 캔버스에서는 2~3px로 비례 확대) → 제목 "나의 ZUTOMAYO 라이브 성불 기록" → 숫자(간 공연, 들은 곡). 2열 목록: 커버 + 일본어 / 한국어 / 영어 + 탤리(`ztmy-magenta`). 하단: `period`(YYYY.MM ~ YYYY.MM) · `ztmy-sounds.fans`. 들은 곡만, `summary.heard` 순서 그대로.
+디자인 값(스펙 확정): 배경 `#050223` + 흰 테두리, 상단 가운데(로고 흰 외곽선 = `MobileHeader.tsx`의 4방향 1px `drop-shadow` — 1080px 캔버스에서는 2~3px로 비례 확대) → 제목 "나의 ZUTOMAYO 라이브 참전 기록" → 숫자(간 공연, 들은 곡). 2열 목록: 커버 + 일본어 / 한국어 / 영어 + 탤리(`ztmy-magenta`). 하단: `period`(YYYY.MM ~ YYYY.MM) · `ztmy-sounds.fans`. 들은 곡만, `summary.heard` 순서 그대로.
 
 - [ ] **Step 1: 실패하는 테스트**
   ```ts
@@ -385,7 +385,7 @@
 - [ ] **Step 6: ShareImage.tsx** — 고정 픽셀 크기(`SHARE_SIZE`)의 화면 밖(`position: fixed; left: -99999px`) 요소. 커버는 `<img crossOrigin="anonymous">`.
 - [ ] **Step 7: ShareImageButton.tsx** — "이미지 저장" + "정사각형 / 세로" 전환(`defaultShareFormat(matchMedia("(min-width: 50rem)").matches)`). 클릭 시 `document.fonts.ready` → 이미지 로드 대기 → `toBlob(node, { pixelRatio: 1, width, height })`. 모바일에서 `navigator.canShare?.({ files: [file] })`이면 `navigator.share`, 아니면 `<a download="ztmy-live-record.png">`. 들은 곡이 0이면 버튼 비활성. 실패 시 안내 문구.
 - [ ] **Step 8: 검증** — `tsc`, `lint`, `pnpm test`, `pnpm build`. 이미지 실물 확인은 배포 환경 또는 `pnpm build && wrangler pages dev out`(같은 출처 `/r2/`)에서 — 사용자에게 확인 요청(5곡/40곡/80곡 체크 상태에서 정사각형·세로 각각).
-- [ ] **Step 9: 커밋 (승인 후)** — `feat: 성불 체크리스트 결과를 정사각형·세로 이미지로 저장`
+- [ ] **Step 9: 커밋 (승인 후)** — `feat: 참전 기록 결과를 정사각형·세로 이미지로 저장`
 
 ---
 

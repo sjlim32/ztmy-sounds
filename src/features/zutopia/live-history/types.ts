@@ -3,7 +3,7 @@ import type { Database } from "@/lib/supabase/database.types";
 export type LiveUnitType = Database["public"]["Tables"]["lives"]["Row"]["type"];
 
 /**
- * 공연 단위 — 실제로 열린 하루하루의 공연. 성불 체크리스트의 체크 단위이고,
+ * 공연 단위 — 실제로 열린 하루하루의 공연. 참전 기록의 체크 단위이고,
  * 곡별 라이브 횟수·마지막 라이브도 이 단위로 센다.
  */
 export interface LiveUnit {

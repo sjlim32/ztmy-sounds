@@ -4,7 +4,7 @@ const R2_ORIGIN = "https://assets.ztmy-sounds.fans/";
  * Supabase에 들어 있는 R2 이미지 절대 주소를 프로덕션 빌드에서만 메인 도메인의
  * /r2/ 경로로 바꾼다. /r2/*는 Pages Function(functions/r2/[[path]].ts)이 R2로
  * 넘겨 주는 프록시라, 브라우저 입장에선 같은 출처가 된다 — 메인 도메인의
- * HTTP/3 연결을 그대로 쓰고, 성불 이미지 저장(canvas)이 CORS에 막히지 않는다.
+ * HTTP/3 연결을 그대로 쓰고, 참전 기록 이미지 저장(canvas)이 CORS에 막히지 않는다.
  * next dev에서는 Pages Function이 돌지 않으므로 원래 주소를 그대로 둔다.
  */
 export function toAssetUrl(url: string): string;

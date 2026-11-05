@@ -15,4 +15,9 @@ export const ZUTOPIA_NAV_ITEMS: readonly ZutopiaNavItem[] = [
   { href: "/zutopia/songs", label: "곡", paths: ["/zutopia/songs"] },
   { href: "/zutopia/albums", label: "앨범", paths: ["/zutopia/albums"] },
   { href: "/zutopia/lives", label: "공연", paths: ["/zutopia/lives"] },
+  {
+    href: "/zutopia/attendance",
+    label: "참전",
+    paths: ["/zutopia/attendance"],
+  },
 ];
