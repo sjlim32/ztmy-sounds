@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
 import { getGuideHref } from "@/features/zutopia/guide-link";
+import { toAssetUrl, withAssetUrls } from "@/lib/asset-url";
 import type { Json } from "@/lib/supabase/database.types";
 import type { ZutopiaEntry, ZutopiaEntryType } from "@/features/zutopia/types";
 import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
@@ -142,7 +143,9 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
             label: live.title_ko ?? live.title,
             name: live.title,
             date: formatEntryDateRange(live.start_date, live.end_date),
-            thumbnail: live.icon_image_url ?? live.poster_image_url ?? "",
+            thumbnail: toAssetUrl(
+              live.icon_image_url ?? live.poster_image_url ?? "",
+            ),
             type: LIVE_TYPE_TO_ENTRY_TYPE[live.type],
             startDate: live.start_date,
             city: extractKoreanCity(live.region),
@@ -159,7 +162,7 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
     label: tour.title_ko,
     name: tour.title,
     date: formatEntryDateRange(tour.start_date, tour.end_date),
-    thumbnail: tour.poster_image_url ?? "",
+    thumbnail: toAssetUrl(tour.poster_image_url ?? ""),
     type: "concert",
     startDate: tour.start_date,
     visitOrdinal: parseVisitOrdinal(tour.metadata),
@@ -321,7 +324,7 @@ export const getLiveBySlug = cache(
     if (!data) return null;
 
     const { setlists, ...live } = data;
-    return { ...live, setlist: toSetlist(setlists) };
+    return withAssetUrls({ ...live, setlist: toSetlist(setlists) });
   },
 );
 
@@ -388,15 +391,17 @@ export const getTourBySlug = cache(
         cityOriginal: original,
         region: live.region,
         venue: live.live_venue,
-        iconImageUrl: live.icon_image_url,
-        posterImageUrl: live.poster_image_url,
-        additionalImageUrls: live.additional_image_urls ?? [],
+        iconImageUrl: toAssetUrl(live.icon_image_url),
+        posterImageUrl: toAssetUrl(live.poster_image_url),
+        additionalImageUrls: (live.additional_image_urls ?? []).map((url) =>
+          toAssetUrl(url),
+        ),
         setlist: mergeTourSetlist(tourSetlist, live.setlists),
       };
     });
 
     // 투어 공통 세트리스트(공연일마다 바뀌는 선택곡 제외) — 상세에서 한 번만
     // 보여주고, 공연일 행엔 그날의 선택곡만 미리 보여준다(TourDateList).
-    return { ...tour, setlist: toSetlist(tourSetlist), dates };
+    return withAssetUrls({ ...tour, setlist: toSetlist(tourSetlist), dates });
   },
 );

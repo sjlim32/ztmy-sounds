@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "fonts:subset": "node scripts/subset-fonts.mjs",
-    "pages:deploy": "pnpm build && wrangler pages deploy out"
+    "pages:deploy": "pnpm build && wrangler pages deploy out",
+    "test": "vitest run"
   },
   "dependencies": {
     "@fontsource/line-seed-jp": "^5.3.1",
@@ -45,6 +46,7 @@
     "supabase": "^2.117.0",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vitest": "^5.1.0",
     "wrangler": "^4"
   },
   "pnpm": {

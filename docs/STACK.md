@@ -14,3 +14,5 @@
 | 폰트          | LINE Seed KR(로컬, `src/fonts/`)/JP(`@fontsource/line-seed-jp`), IBM Plex Mono·RocknRoll One(Google Fonts) — 851MkPOP(로컬 폰트). 로컬 폰트는 `subset-font`로 만든 서브셋을 로드(`scripts/subset-fonts.mjs`) |
 | 데이터베이스  | Supabase (`src/lib/supabase/`) — zutopia 곡/앨범 DB. `output: "export"` 정적 빌드라 빌드 타임 전용 클라이언트만 사용                                                                                         |
 | 배포          | Cloudflare Pages (`wrangler.jsonc`, `pnpm pages:deploy`)                                                                                                                                                     |
+| 테스트        | Vitest (`pnpm test`) — 데이터 가공·계산 같은 순수 로직만(`src/**/*.test.ts`), 화면 컴포넌트 테스트 없음                                                                                                      |
+| 이미지 프록시 | Cloudflare Pages Functions (`functions/r2/[[path]].ts`, `public/_routes.json`) — R2 이미지를 `/r2/*`로 같은 출처 제공                                                                                        |
