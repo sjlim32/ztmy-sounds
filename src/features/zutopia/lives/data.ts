@@ -5,6 +5,10 @@ import { toAssetUrl, withAssetUrls } from "@/lib/asset-url";
 import type { Json } from "@/lib/supabase/database.types";
 import type { ZutopiaEntry, ZutopiaEntryType } from "@/features/zutopia/types";
 import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
+import {
+  extractKoreanCity,
+  splitRegion,
+} from "@/features/zutopia/lives/region";
 import type { Live, LiveDetail, LiveSetlistEntry, TourDetail } from "./types";
 
 /**
@@ -69,27 +73,6 @@ const LIVE_TYPE_TO_ENTRY_TYPE: Record<Live["type"], ZutopiaEntryType> = {
   CONCERT: "concert",
   EVENT: "event",
 };
-
-/**
- * lives.region은 "大阪 (오사카)"처럼 "원어 (한글)" 형식이다 — 목록 카드엔
- * 한글 도시명만 보여준다. 괄호가 없는(패턴에 안 맞는) 값은 원본 그대로
- * 돌려준다.
- */
-function extractKoreanCity(region: string): string {
-  return splitRegion(region).city;
-}
-
-// "大阪 (오사카)" → { city: "오사카", original: "大阪" }. 괄호가 없으면 원본을
-// 그대로 city로 쓴다.
-function splitRegion(region: string): {
-  city: string;
-  original: string | null;
-} {
-  const match = region.match(/^(.*\S)\s*\(([^()]*)\)\s*$/);
-  return match
-    ? { city: match[2], original: match[1] }
-    : { city: region, original: null };
-}
 
 /**
  * 허브/카테고리 목록 카드용 — 두 출처를 하나의 목록으로 합친다.
@@ -259,8 +242,8 @@ function mergeTourSetlist(
  * 이틀 이상 공연(day_number가 있는 공연일)에서 날마다 세트리스트 전체를 따로
  * 등록한 경우, 같은 곡이 날마다 한 줄씩 반복되지 않게 한 줄로 합친다.
  * - 투어 공통 곡: 날짜와 상관없이 한 줄(일차 없음). 번호는 여러 날 중 가장
- *   많이 쓰인 번호(같으면 앞 날) — 어느 날 데이터에 같은 곡이 두 번 들어간
- *   경우(예: INTENSE 서울 둘째날의 어둡게 검게 8·10번)에도 제자리를 지킨다.
+ *   많이 쓰인 번호(같으면 앞 날) — 어느 날 데이터에 같은 곡이 두 번 잘못
+ *   들어간 경우에도 제자리를 지킨다.
  * - 그 밖의 곡(선택곡): 모든 날에 불렸으면 한 줄(일차 없음, 번호는 위와 같은
  *   방식), 아니면 날마다 따로(DAY 1·DAY 2 배지).
  */
