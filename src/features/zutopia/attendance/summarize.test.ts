@@ -86,6 +86,20 @@ describe("summarizeAttendance", () => {
     expect(result.unheard.map((s) => s.id)).toEqual(["s3", "s4"]);
   });
 
+  test("들은 곡마다 들은 공연일 ID(최신 먼저)", () => {
+    const result = summarizeAttendance(
+      units,
+      new Set(["A:2024-06-15", "B:2026-03-14"]),
+      songs,
+    );
+    const byId = Object.fromEntries(result.heard.map((s) => [s.id, s.unitIds]));
+    expect(byId).toEqual({
+      s1: ["B:2026-03-14", "A:2024-06-15"],
+      s2: ["B:2026-03-14"],
+      s3: ["A:2024-06-15"],
+    });
+  });
+
   test("period는 체크한 단위의 최소~최대 날짜", () => {
     const result = summarizeAttendance(
       units,

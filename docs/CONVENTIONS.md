@@ -387,7 +387,7 @@ src/
   `{ version: 1, attended: string[], updatedAt }` JSON으로 둡니다
   (`attendance/storage.ts`). 백업 파일도 같은 형식입니다. 형식을 바꾸면
   `version`을 올리고 이전 버전을 읽는 코드를 남기세요.
-- 공유 코드(`attendance/share-code.ts`)는 `ZT1` + base64url, 공연(lives 행)마다 id 앞 4바이트 + 날짜 비트 1바이트입니다. 공연 순번이 아니라 id로 가리켜서 공연이 추가돼도 퍼진 코드가 깨지지 않습니다. 형식을 바꾸면 `ZT2`처럼 접두사를 올리고 `ZT1` 읽기는 남기세요.
+- 공유 코드(`attendance/share-code.ts`)는 `ZT1` + base64url, 공연(lives 행)마다 id 앞 4바이트 + 날짜 비트 1바이트입니다(8일 넘는 공연은 같은 id 블록을 이어 붙여 9~16일째…를 담음 — 나온 순서가 몇째 8일 묶음). 공연 순번이 아니라 id로 가리켜서 공연이 추가돼도 퍼진 코드가 깨지지 않습니다. 형식을 바꾸면 `ZT2`처럼 접두사를 올리고 `ZT1` 읽기는 남기세요.
 - 이미지 닉네임은 `ztmy-sounds:attendance-nickname` 키에 따로 저장합니다.
 - 읽기는 `useAttendedUnits`(`useSyncExternalStore`)로만 — 정적 HTML 단계에선
   `ready`가 false라 체크 상태를 그리지 않습니다.

@@ -80,6 +80,30 @@ describe("share code", () => {
   });
 });
 
+describe("8일 넘는 공연", () => {
+  const LONG = "77aa0000-4444-4000-8000-000000000004";
+  const longUnits = Array.from({ length: 12 }, (_, i) =>
+    unit(LONG, `2026-07-${String(i + 1).padStart(2, "0")}`),
+  );
+
+  test("9일째 이후 체크도 왕복한다", () => {
+    const checked = new Set([
+      longUnits[1].id,
+      longUnits[8].id,
+      longUnits[11].id,
+    ]);
+    const code = encodeAttendance(longUnits, checked);
+    expect(new Set(decodeAttendance(code, longUnits))).toEqual(checked);
+  });
+
+  test("8일 안쪽만 체크하면 예전(ZT1) 코드와 같은 길이", () => {
+    const code = encodeAttendance(longUnits, new Set([longUnits[0].id]));
+    expect(code).toBe(
+      encodeAttendance(longUnits.slice(0, 8), new Set([longUnits[0].id])),
+    );
+  });
+});
+
 describe("extractCode", () => {
   test("코드, 링크(#code=, ?code=), 앞뒤 공백 모두", () => {
     expect(extractCode("  ZT1abc_-  ")).toBe("ZT1abc_-");

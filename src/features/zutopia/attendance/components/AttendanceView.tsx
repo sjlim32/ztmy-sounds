@@ -115,10 +115,12 @@ export function AttendanceView({
   const togglePanel = (next: Exclude<Panel, null>) =>
     setPanel((current) => (current === next ? null : next));
 
-  // 공유 링크(#code=…)로 들어온 경우 — 주소의 코드를 읽어 공유 창을 열고
+  // 공유 링크(#code=… 또는 ?code=…)로 들어온 경우 — 주소의 코드를 읽어 공유 창을 열고
   // 주소는 비운다. 받은 기록을 먼저 보여주려고 체크 창은 닫아 둔다.
   useEffect(() => {
-    const code = extractCode(window.location.hash);
+    // #code=(공유 링크 기본)와 ?code=(직접 붙인 주소) 둘 다 읽는다.
+    const code =
+      extractCode(window.location.hash) ?? extractCode(window.location.search);
     if (!code) return;
     history.replaceState(null, "", window.location.pathname);
     const ids = decodeAttendance(code, units);
@@ -216,6 +218,7 @@ export function AttendanceView({
 
       <AttendanceResult
         summary={summary}
+        units={units}
         ready={ready}
         onOpenPicker={() => setPickerChoice(true)}
       />

@@ -14,6 +14,8 @@ export interface AttendanceSong {
 
 export interface HeardSong extends AttendanceSong {
   count: number;
+  /** 이 곡을 들은 공연일 ID — 최신 먼저(units 순서). */
+  unitIds: string[];
 }
 
 export interface AttendanceSummary {
@@ -41,18 +43,23 @@ export function summarizeAttendance(
   songs: AttendanceSong[],
 ): AttendanceSummary {
   const checked = units.filter((unit) => attended.has(unit.id));
-  const counts = new Map<string, number>();
+  const heardIn = new Map<string, string[]>();
   for (const unit of checked) {
     for (const songId of unit.songIds) {
-      counts.set(songId, (counts.get(songId) ?? 0) + 1);
+      const list = heardIn.get(songId);
+      if (list) list.push(unit.id);
+      else heardIn.set(songId, [unit.id]);
     }
   }
 
   const heard: HeardSong[] = songs
-    .filter((song) => counts.has(song.id))
-    .map((song) => ({ ...song, count: counts.get(song.id)! }))
+    .filter((song) => heardIn.has(song.id))
+    .map((song) => {
+      const unitIds = heardIn.get(song.id)!;
+      return { ...song, count: unitIds.length, unitIds };
+    })
     .sort((a, b) => b.count - a.count || byRelease(a, b));
-  const unheard = songs.filter((song) => !counts.has(song.id)).sort(byRelease);
+  const unheard = songs.filter((song) => !heardIn.has(song.id)).sort(byRelease);
 
   const dates = checked.map((unit) => unit.date).sort();
   return {

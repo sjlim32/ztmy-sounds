@@ -2,8 +2,9 @@ import type { LiveUnit } from "@/features/zutopia/live-history/types";
 
 /**
  * 참전 기록 공유 코드 — "ZT1" + base64url. 체크한 공연(lives 행)마다 5바이트:
- * lives.id 앞 4바이트(16진수 8자리) + 그 공연의 몇째 날을 체크했는지 비트(최대
- * 8일, 0번 비트 = 첫날). 공연 목록의 순번이 아니라 공연 ID로 가리켜서, 나중에
+ * lives.id 앞 4바이트(16진수 8자리) + 그 공연의 몇째 날을 체크했는지 비트(8일,
+ * 0번 비트 = 첫날). 8일 넘는 공연은 같은 ID 블록을 이어 붙여 9~16일째, 17~24일째…
+ * (같은 ID가 나온 순서 = 몇째 8일 묶음)를 담는다 — 8일 이하 공연은 예전과 똑같다. 공연 목록의 순번이 아니라 공연 ID로 가리켜서, 나중에
  * 지난 공연이 추가되거나 순서가 바뀌어도 이미 퍼진 코드가 깨지지 않는다.
  * 지금 데이터에 없는 공연은 읽을 때 버린다.
  */
@@ -50,15 +51,21 @@ export function encodeAttendance(
 ): string {
   const bytes: number[] = [];
   for (const [liveId, list] of unitsByLive(units)) {
-    let mask = 0;
-    list.slice(0, 8).forEach((unit, index) => {
-      if (attended.has(unit.id)) mask |= 1 << index;
+    const masks: number[] = [];
+    list.forEach((unit, index) => {
+      const block = Math.floor(index / 8);
+      masks[block] ??= 0;
+      if (attended.has(unit.id)) masks[block] |= 1 << (index % 8);
     });
-    if (!mask) continue;
+    // 마지막으로 체크가 있는 묶음까지만(중간의 빈 묶음은 순서 유지용으로 넣는다)
+    let last = masks.length - 1;
+    while (last >= 0 && !masks[last]) last--;
     const key = liveKey(liveId);
-    for (let i = 0; i < 8; i += 2)
-      bytes.push(parseInt(key.slice(i, i + 2), 16));
-    bytes.push(mask);
+    for (let block = 0; block <= last; block++) {
+      for (let i = 0; i < 8; i += 2)
+        bytes.push(parseInt(key.slice(i, i + 2), 16));
+      bytes.push(masks[block]);
+    }
   }
   return PREFIX + toBase64Url(bytes);
 }
@@ -77,17 +84,22 @@ export function decodeAttendance(
     byKey.set(liveKey(liveId), list);
 
   const ids: string[] = [];
+  // 같은 공연 ID 블록이 몇 번째로 나왔는지 = 몇째 8일 묶음
+  const seen = new Map<string, number>();
   for (let i = 0; i < bytes.length; i += BYTES_PER_LIVE) {
     const key = bytes
       .slice(i, i + 4)
       .map((byte) => byte.toString(16).padStart(2, "0"))
       .join("");
     const mask = bytes[i + 4];
+    const block = seen.get(key) ?? 0;
+    seen.set(key, block + 1);
     const list = byKey.get(key);
     if (!list) continue;
-    list.forEach((unit, index) => {
-      if (index < 8 && mask & (1 << index)) ids.push(unit.id);
-    });
+    for (let bit = 0; bit < 8; bit++) {
+      const unit = list[block * 8 + bit];
+      if (unit && mask & (1 << bit)) ids.push(unit.id);
+    }
   }
   return ids;
 }

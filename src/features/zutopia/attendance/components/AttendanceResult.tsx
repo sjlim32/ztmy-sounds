@@ -6,6 +6,9 @@ import {
   FOCUS_RING,
   SOFT_PURPLE_BUTTON_CLASS,
 } from "@/components/button-styles";
+import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
+import type { LiveUnit } from "@/features/zutopia/live-history/types";
+import { formatDateWithWeekday } from "./date-format";
 import { ExternalLinkIcon } from "@/components/icons/ExternalLinkIcon";
 import { FilterChip } from "@/components/FilterChips";
 import { secondaryTitle } from "@/features/zutopia/song-db/song-title";
@@ -20,13 +23,15 @@ type ListMode = "heard" | "unheard";
  * 참전 기록 — 성불(라이브로 들은 곡, 많이 들은 순) / 성불 대기(아직 못 들은
  * 곡, 발매일 순) 목록. 태블릿 2열, PC 3열. 숫자 요약은 페이지 위 현황 막대에 있다.
  * 두 목록 고르기는 태블릿 이상은 목록 위 필터 칩, 모바일은 목록 카드 안 위쪽
- * 두 칸 토글.
+ * 두 칸 토글. 성불한 곡을 누르면 그 곡을 들은 공연일 목록을 펼친다.
  */
 export function AttendanceResult({
   summary,
+  units,
   ready,
   onOpenPicker,
 }: {
+  units: LiveUnit[];
   summary: AttendanceSummary;
   ready: boolean;
   onOpenPicker: () => void;
@@ -52,7 +57,8 @@ export function AttendanceResult({
     );
   }
 
-  const list: (AttendanceSong & { count?: number })[] =
+  const unitsById = new Map(units.map((unit) => [unit.id, unit]));
+  const list: (AttendanceSong & { count?: number; unitIds?: string[] })[] =
     mode === "heard" ? summary.heard : summary.unheard;
 
   const modes = [
@@ -130,7 +136,15 @@ export function AttendanceResult({
           )}
         >
           {list.map((song) => (
-            <SongRow key={song.id} song={song} count={song.count ?? null} />
+            <SongRow
+              key={song.id}
+              song={song}
+              count={song.count ?? null}
+              heardIn={(song.unitIds ?? []).flatMap((id) => {
+                const unit = unitsById.get(id);
+                return unit ? [unit] : [];
+              })}
+            />
           ))}
         </ul>
       </div>
@@ -141,12 +155,16 @@ export function AttendanceResult({
 function SongRow({
   song,
   count,
+  heardIn,
 }: {
   song: AttendanceSong;
   count: number | null;
+  /** 이 곡을 들은 공연일(최신 먼저). 성불 대기 곡은 빈 목록. */
+  heardIn: LiveUnit[];
 }) {
-  return (
-    <li className="flex min-w-0 items-center gap-3 border-b border-white/5 py-2">
+  const [open, setOpen] = useState(false);
+  const body = (
+    <>
       {song.coverSrc ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -170,9 +188,64 @@ function SongRow({
         </span>
       </span>
       {count !== null && (
-        <span className="shrink-0 text-base font-semibold text-white/90 tabular-nums">
+        <span className="flex shrink-0 items-center gap-1 text-base font-semibold text-white/90 tabular-nums">
           ×{count}
+          <ChevronDownIcon
+            className={cn(
+              "size-4 text-white/50 transition-transform",
+              open && "rotate-180",
+            )}
+          />
         </span>
+      )}
+    </>
+  );
+
+  if (heardIn.length === 0)
+    return (
+      <li className="flex min-w-0 items-center gap-3 border-b border-white/5 py-2">
+        {body}
+      </li>
+    );
+
+  // 성불한 곡 — 누르면 들은 공연일 목록(최신 먼저)을 펼친다.
+  return (
+    <li className="min-w-0 border-b border-white/5">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+        className={cn(
+          "flex w-full min-w-0 items-center gap-3 rounded-md py-2 text-left transition-colors hover:bg-white/5",
+          FOCUS_RING,
+        )}
+      >
+        {body}
+      </button>
+      {open && (
+        <ol className="mb-2 ml-13 flex flex-col gap-1.5 border-l border-white/10 pl-3">
+          {heardIn.map((unit) => (
+            <li key={unit.id} className="min-w-0 text-sm">
+              <span className="block font-mono text-white/60">
+                {formatDateWithWeekday(unit.date)}
+              </span>
+              <span className="block truncate text-white/90">
+                {unit.titleKo ?? unit.title}
+                {(unit.city || unit.dayNumber) && (
+                  <span className="text-white/50">
+                    {" · "}
+                    {[
+                      unit.city,
+                      unit.dayNumber ? `DAY ${unit.dayNumber}` : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  </span>
+                )}
+              </span>
+            </li>
+          ))}
+        </ol>
       )}
     </li>
   );
