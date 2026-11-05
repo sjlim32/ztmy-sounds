@@ -100,13 +100,11 @@
   0%)에 고정해 두었으니 지우지 마세요. 폰트 파일을 바꾸면 이 값도 새 파일의 hhea로
   다시 맞춥니다. (LINE Seed JP·IBM Plex Mono·RocknRoll One·851MkPOP은 두 OS가 같은 값을
   써서 해당 없음.)
-- R2 이미지(`assets.ztmy-sounds.fans`)는 프로덕션 빌드에서 `/r2/...` 주소로 바뀝니다
-  (`src/lib/asset-url.ts`의 `toAssetUrl`/`withAssetUrls`, 데이터 계층에서 적용). `/r2/*`는
-  Pages Function(`functions/r2/[[path]].ts`)이 R2로 넘겨 주는 프록시라 메인 도메인의
-  HTTP/3 연결을 쓰고, 같은 출처라 canvas 이미지 저장이 CORS에 막히지 않습니다.
-  - 접두사로 `/assets/`를 쓰면 안 됩니다 — `public/assets/` 정적 파일과 겹쳐 Function이
-    먼저 잡고 기존 이미지가 깨집니다. `public/_routes.json`이 Function을 `/r2/*`에만 연결합니다.
-  - `next dev`에선 Pages Function이 돌지 않아 원래 주소를 그대로 씁니다(그래서 개발 서버에선
-    R2 이미지가 다른 출처라 canvas 저장이 막힐 수 있음 — 확인은 `wrangler pages dev out`).
-  - 이미지 요청마다 Function이 한 번 실행되어 Workers 무료 한도(하루 10만 요청)에 잡힙니다.
-  - Supabase에 새 이미지 컬럼이 생기면 `withAssetUrls`의 키 목록에도 추가하세요.
+- R2 이미지(`assets.ztmy-sounds.fans`)는 Supabase에 든 주소 그대로 씁니다. 참전 기록 이미지
+  만들기(html-to-image → canvas)는 다른 출처 이미지를 fetch로 읽으므로, **R2 버킷의 CORS
+  규칙**(GET/HEAD, 사이트 주소·`http://localhost:3000` 허용)이 있어야 합니다. 규칙이 빠지면
+  커버가 빈칸이거나 이미지 만들기가 실패합니다.
+  - `toBlob`에 `cacheBust: true`를 줍니다 — 페이지의 `<img>`가 CORS 헤더 없이 받아 둔 캐시를
+    fetch가 다시 쓰면 CORS에 막히기 때문입니다.
+  - 예전엔 Pages Function 프록시(`/r2/*`)로 같은 출처를 만들었지만, 이미지 요청마다 Function이
+    실행되어 무료 한도(하루 10만 요청)를 넘으면 사이트 전체 이미지가 깨질 수 있어 없앴습니다.

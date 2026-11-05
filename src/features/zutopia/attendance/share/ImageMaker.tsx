@@ -70,6 +70,8 @@ export function ImageMaker({ summary }: { summary: AttendanceSummary }) {
         width: SHARE_SIZE,
         height: SHARE_SIZE,
         pixelRatio: SHARE_PIXEL_RATIO,
+        // 페이지 <img>가 CORS 헤더 없이 받아 둔 R2 이미지 캐시를 피한다(RULES.md).
+        cacheBust: true,
       });
       if (!blob) throw new Error("empty image");
       setResult({ blob, url: URL.createObjectURL(blob) });

@@ -1,6 +1,5 @@
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
 import { getGuideHref } from "@/features/zutopia/guide-link";
-import { withAssetUrls } from "@/lib/asset-url";
 import type { Song } from "./types";
 import type { AlbumWithSongs, SongCounts, SongWithAlbums } from "./types";
 
@@ -167,7 +166,7 @@ export async function getSongsWithAlbums(): Promise<SongWithAlbums[]> {
       }))
       .sort((a, b) => a.release_date.localeCompare(b.release_date));
 
-    return withAssetUrls({ ...song, albums: albums.map(withAssetUrls) });
+    return { ...song, albums };
   });
 }
 
@@ -215,6 +214,6 @@ export async function getAlbumsWithSongs(): Promise<AlbumWithSongs[]> {
         };
       });
 
-    return withAssetUrls({ ...album, songs: songs.map(withAssetUrls) });
+    return { ...album, songs };
   });
 }
