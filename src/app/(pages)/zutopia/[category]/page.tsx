@@ -47,7 +47,14 @@ async function CategoryContent({ category }: { category: ZutopiaCategory }) {
   }
 
   return (
-    <ul className={cn("grid gap-4", "tablet:grid-cols-2", "pc:grid-cols-3")}>
+    <ul
+      className={cn(
+        "grid gap-4",
+        "tablet:grid-cols-2",
+        "pc:grid-cols-3",
+        "wide:grid-cols-4",
+      )}
+    >
       {entries.map((entry) => (
         <li key={entry.slug}>
           <Link

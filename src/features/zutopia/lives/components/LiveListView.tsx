@@ -278,6 +278,7 @@ export function LiveListView({
                 "grid grid-cols-2 gap-3",
                 "tablet:gap-4",
                 "pc:grid-cols-3",
+                "wide:grid-cols-4",
               )}
             >
               {group.entries.map((entry) => (

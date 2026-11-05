@@ -18,10 +18,6 @@ import { useScrollFadeMask } from "@/lib/use-scroll-fade-mask";
 // 아래 <main>의 id이자 ScrollToTopButton이 스크롤을 지켜볼 대상.
 const ZUTOPIA_SCROLL_CONTAINER_ID = "zutopia-scroll-container";
 
-// PC에서 넓게(최대 1440px) 쓰는 페이지 — 좌우로 두 칸을 함께 보여주는 화면.
-// 나머지 즛토피아 페이지도 넓히는 건 다음 계획(plans/2026-11-05-…-timeline.md 끝).
-const WIDE_PATHS = ["/zutopia/attendance", "/zutopia/timeline"];
-
 export function ZutopiaScrollArea({ children }: { children: ReactNode }) {
   const scrollRef = useScrollFadeMask<HTMLElement>();
   const pathname = usePathname();
@@ -56,8 +52,9 @@ export function ZutopiaScrollArea({ children }: { children: ReactNode }) {
           innerClassName={cn(
             "mx-auto w-full px-3 pt-6 pb-10",
             "tablet:max-w-4xl tablet:px-6 tablet:pt-10 tablet:pb-16",
-            WIDE_PATHS.some((path) => pathname.startsWith(path)) &&
-              "pc:max-w-[90rem] pc:px-10",
+            // PC는 즛토피아 전체를 최대 1440px까지 넓게 — 목록은 열을 늘리고,
+            // 줄글 위주 상세(공연 상세 등)는 각자 좁은 폭으로 가운데 둔다.
+            "pc:max-w-[90rem] pc:px-10",
           )}
         >
           <EntranceFade>{children}</EntranceFade>

@@ -251,7 +251,8 @@ export function SongListView({
                     </div>
                   )}
 
-                  <div>
+                  {/* PC는 넓은 폭에 맞게 두 열 */}
+                  <div className="pc:grid pc:grid-cols-2 pc:gap-x-8">
                     {/* 행 하나가 실제로는 Enter/Space/클릭으로 여닫는 토글
                   버튼이지 테이블 셀 탐색 단위가 아니라 table 구조와 안
                   맞아 div로 바꿨다(div는 지울 암묵적 role이 없다).
