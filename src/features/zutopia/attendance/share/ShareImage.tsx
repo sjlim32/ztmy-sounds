@@ -14,7 +14,6 @@ import {
   SHARE_PADDING,
   SHARE_QR_SIZE,
   SHARE_SIZE,
-  TOP_COUNT,
   TOP_GAP,
   TOP_TEXT,
   type RestLayout,
