@@ -204,10 +204,11 @@ function ResultView({
       />
       {touch && (
         <p className="text-sm text-white/60">
-          이미지를 길게 눌러 사진에 저장할 수도 있어요.
+          사진 앱에 넣으려면 공유 → &ldquo;이미지 저장&rdquo;을 누르거나,
+          이미지를 길게 눌러 저장하세요.
         </p>
       )}
-      {/* 휴대폰은 "사진 저장 · 공유"(공유 시트)가 주 버튼, PC는 "이미지 저장"
+      {/* 휴대폰은 "공유"(공유 시트 → 사진에 저장)가 주 버튼, PC는 "저장"
           (내려받기)이 주 버튼 — saveActions. */}
       <div className="grid grid-cols-2 gap-2">
         {actions.map((action) => (

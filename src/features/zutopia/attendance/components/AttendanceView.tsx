@@ -244,14 +244,14 @@ export function AttendanceView({
             disabled={!ready || summary.heard.length === 0}
             onClick={() => togglePanel("image")}
           >
-            이미지<span className="tablet:inline hidden"> 만들기</span>
+            저장
           </BarButton>
           <BarButton
             active={panel === "share"}
             disabled={!ready}
             onClick={() => togglePanel("share")}
           >
-            공유·불러오기
+            백업
           </BarButton>
         </div>
 
@@ -260,7 +260,7 @@ export function AttendanceView({
           onClose={closePanel}
           // 만드는 중·다 만든 이미지가 실수로 한 번 건드려 사라지지 않게
           closeOnOutside={false}
-          label="참전 기록 이미지 만들기"
+          label="참전 기록 이미지 저장"
           className="tablet:left-auto tablet:w-96 left-0"
         >
           <ImageMaker summary={summary} />
@@ -269,7 +269,7 @@ export function AttendanceView({
           open={panel === "share"}
           onClose={closePanel}
           closeOnOutside={!incoming}
-          label="공유 · 불러오기"
+          label="백업 · 공유 · 불러오기"
           className="tablet:left-auto tablet:w-[26rem] left-0"
         >
           <SharePanel

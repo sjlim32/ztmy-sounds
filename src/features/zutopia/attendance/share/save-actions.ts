@@ -17,15 +17,14 @@ export function saveActions({
   canShare: boolean;
   touch: boolean;
 }): SaveAction[] {
-  if (!canShare)
-    return [{ kind: "download", label: "이미지 저장", primary: true }];
+  if (!canShare) return [{ kind: "download", label: "저장", primary: true }];
   return touch
     ? [
-        { kind: "share", label: "사진 저장 · 공유", primary: true },
-        { kind: "download", label: "파일로 저장", primary: false },
+        { kind: "share", label: "공유", primary: true },
+        { kind: "download", label: "저장", primary: false },
       ]
     : [
-        { kind: "download", label: "이미지 저장", primary: true },
+        { kind: "download", label: "저장", primary: true },
         { kind: "share", label: "공유", primary: false },
       ];
 }
