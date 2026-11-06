@@ -28,6 +28,9 @@ function ev(
     imageUrl: null,
     tag: null,
     upcoming: false,
+    liveGroup: null,
+    shows: 0,
+    upcomingShows: 0,
   };
 }
 

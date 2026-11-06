@@ -8,6 +8,7 @@ import {
 } from "@/components/button-styles";
 import { useAttendedUnits } from "@/features/zutopia/attendance/useAttendedUnits";
 import {
+  liveSummary,
   timelineRange,
   type TimelineEvent,
   type TimelineKind,
@@ -49,11 +50,19 @@ export function TimelineView({ events }: { events: TimelineEvent[] }) {
     return result;
   }, [events, attended, ready]);
 
+  const lives = useMemo(() => liveSummary(events), [events]);
+  // 곡·앨범은 일정 수, 공연은 총 공연 횟수(지난 공연일: 투어 공연일 + 그 밖 공연일)
   const counts = useMemo(() => {
-    const result: Record<TimelineKind, number> = { song: 0, album: 0, live: 0 };
-    for (const event of events) result[event.kind] += 1;
+    const result: Record<TimelineKind, number> = {
+      song: 0,
+      album: 0,
+      live: lives.total,
+    };
+    for (const event of events)
+      if (event.kind !== "live") result[event.kind] += 1;
     return result;
-  }, [events]);
+  }, [events, lives.total]);
+  const attendedShows = [...attendedCounts.values()].reduce((a, b) => a + b, 0);
 
   const toggle = (kind: TimelineKind) =>
     setHidden((current) => {
@@ -93,7 +102,10 @@ export function TimelineView({ events }: { events: TimelineEvent[] }) {
                 )}
               />
               {KIND_LABEL[kind]}
-              <span className="text-white/50 tabular-nums">{counts[kind]}</span>
+              <span className="text-white/50 tabular-nums">
+                {counts[kind]}
+                {kind === "live" && "회"}
+              </span>
             </button>
           );
         })}
@@ -103,10 +115,16 @@ export function TimelineView({ events }: { events: TimelineEvent[] }) {
               aria-hidden
               className={cn("size-3", KIND_DOT_CLASS.live, ATTENDED_CLASS)}
             />
-            내가 간 공연 {attendedCounts.size}
+            내가 간 공연 {attendedShows}회
           </span>
         )}
       </div>
+      {/* 총 공연 횟수의 묶음별 내역 — 단콘 = 투어 + 단독 콘서트 */}
+      <p className="-mt-2 text-sm text-white/60">
+        총 공연 {lives.total}회 · 단콘 {lives.concert} · 페스티벌{" "}
+        {lives.festival} · 이벤트 {lives.event}
+        {lives.upcoming > 0 && ` · 예정 ${lives.upcoming}회`}
+      </p>
 
       <div className="tablet:block hidden">
         <HorizontalTimeline

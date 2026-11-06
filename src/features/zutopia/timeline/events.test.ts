@@ -6,6 +6,7 @@ import {
   timelineRange,
   countByYear,
   latestDate,
+  liveSummary,
   type TimelineEvent,
 } from "@/features/zutopia/timeline/events";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
@@ -14,12 +15,13 @@ function unit(
   liveId: string,
   date: string,
   tourId: string | null = null,
+  type: LiveUnit["type"] = tourId ? "CONCERT" : "FESTIVAL",
 ): LiveUnit {
   return {
     id: `${liveId}:${date}`,
     liveId,
     date,
-    type: tourId ? "CONCERT" : "FESTIVAL",
+    type,
     title: `${tourId ?? liveId}-ja`,
     titleKo: `${tourId ?? liveId}-ko`,
     city: "서울",
@@ -46,6 +48,9 @@ function ev(id: string, date: string, endDate: string | null = null) {
     imageUrl: null,
     tag: null,
     upcoming: false,
+    liveGroup: null,
+    shows: 0,
+    upcomingShows: 0,
   } satisfies TimelineEvent;
 }
 
@@ -307,5 +312,48 @@ describe("latestDate", () => {
     expect(
       latestDate([ev("a", "2020-01-01", "2021-05-01"), ev("b", "2021-03-01")]),
     ).toBe("2021-05-01");
+  });
+});
+
+describe("공연 묶음과 횟수", () => {
+  const events = buildTimelineEvents({
+    songs: [],
+    albums: [],
+    units: [
+      unit("t2", "2026-03-01", "tour"),
+      unit("t1", "2026-02-28", "tour"),
+      unit("solo", "2025-05-02", null, "CONCERT"),
+      unit("solo", "2025-05-01", null, "CONCERT"),
+      unit("fes", "2025-08-01", null, "FESTIVAL"),
+      unit("ev", "2024-01-01", null, "EVENT"),
+    ],
+    upcomingUnits: [unit("t3", "2026-12-01", "tour")],
+    today: "2026-11-05",
+  });
+
+  test("투어·단독 콘서트는 단콘, 공연일 수를 지난/예정으로 나눠 센다", () => {
+    const tour = events.find((e) => e.id === "live:tour")!;
+    expect(tour).toMatchObject({
+      liveGroup: "concert",
+      tag: "단콘",
+      shows: 2,
+      upcomingShows: 1,
+    });
+    expect(events.find((e) => e.id === "live:solo")).toMatchObject({
+      liveGroup: "concert",
+      shows: 2,
+    });
+    expect(events.find((e) => e.id === "live:fes")?.tag).toBe("페스티벌");
+    expect(events.find((e) => e.id === "live:ev")?.tag).toBe("이벤트");
+  });
+
+  test("총 공연 횟수 = 투어 공연일 + 그 밖 공연일(지난 것), 묶음별·예정 따로", () => {
+    expect(liveSummary(events)).toEqual({
+      total: 6,
+      concert: 4,
+      festival: 1,
+      event: 1,
+      upcoming: 1,
+    });
   });
 });

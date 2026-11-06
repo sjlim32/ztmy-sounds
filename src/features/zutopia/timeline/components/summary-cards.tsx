@@ -10,6 +10,7 @@ import {
   ATTENDED_CLASS,
   KIND_CARD_CLASS,
   KIND_DOT_CLASS,
+  TAG_TEXT_CLASS,
   UPCOMING_CLASS,
 } from "./kind-style";
 import { KindCounts } from "./parts";
@@ -176,7 +177,9 @@ export function ClusterCard({
                   <span className="block text-white/60">{event.subLabel}</span>
                 )}
                 {event.tag && (
-                  <span className="text-ztmy-sun block">{event.tag}</span>
+                  <span className={cn("block", TAG_TEXT_CLASS[event.kind])}>
+                    {event.tag}
+                  </span>
                 )}
                 {event.upcoming && (
                   <span className="block text-white/60">예정</span>

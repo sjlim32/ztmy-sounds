@@ -8,6 +8,7 @@ import {
   eventTitle,
   KIND_CARD_CLASS,
   KIND_DOT_CLASS,
+  TAG_TEXT_CLASS,
   UPCOMING_CLASS,
 } from "./kind-style";
 import { TimelineItemLink } from "./TimelineItemLink";
@@ -82,7 +83,12 @@ export function EventCard({
       />
       <span className="flex max-w-[10rem] min-w-0 flex-col">
         {event.tag && (
-          <span className="text-ztmy-sun truncate text-sm leading-tight">
+          <span
+            className={cn(
+              "truncate text-sm leading-tight",
+              TAG_TEXT_CLASS[event.kind],
+            )}
+          >
             {[event.tag, ...extras].join(" · ")}
           </span>
         )}
@@ -111,7 +117,12 @@ export function KindCounts({
   className?: string;
 }) {
   const counts = { song: 0, album: 0, live: 0 };
-  for (const event of events) counts[event.kind] += 1;
+  // 공연은 공연일 수(투어 하나 = 그 투어의 공연 횟수)
+  for (const event of events)
+    counts[event.kind] +=
+      event.kind === "live"
+        ? Math.max(1, event.shows + event.upcomingShows)
+        : 1;
   const items = (
     [
       ["song", "곡"],

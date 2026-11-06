@@ -69,3 +69,10 @@ export function eventTitle(event: TimelineEvent) {
 
 /** 예정 일정 카드 — 흐리게(아직 오지 않은 일). */
 export const UPCOMING_CLASS = "opacity-75";
+
+/** 카드 맨 위 분류 줄 색 — 앨범("정규 4집")은 해 색, 공연(단콘·페스티벌·이벤트)은 분홍. */
+export const TAG_TEXT_CLASS: Record<TimelineKind, string> = {
+  song: "text-white/60",
+  album: "text-ztmy-sun",
+  live: "text-ztmy-pink",
+};

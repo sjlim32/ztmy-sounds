@@ -25,6 +25,24 @@ export interface TimelineEvent {
   tag: string | null;
   /** 아직 오지 않은 일정(예정 공연·발매 예정). 흐리게 + "예정". */
   upcoming: boolean;
+  /** 공연 묶음 — 투어·단독 콘서트는 단콘(concert), 그 밖은 페스티벌·이벤트. 공연이 아니면 null. */
+  liveGroup: LiveGroup | null;
+  /** 공연이면 지난 공연일 수 / 예정 공연일 수 */
+  shows: number;
+  upcomingShows: number;
+}
+
+export type LiveGroup = "concert" | "festival" | "event";
+
+export const LIVE_GROUP_LABEL: Record<LiveGroup, string> = {
+  concert: "단콘",
+  festival: "페스티벌",
+  event: "이벤트",
+};
+
+function liveGroupOf(unit: LiveUnit): LiveGroup {
+  if (unit.tourId || unit.type === "CONCERT") return "concert";
+  return unit.type === "FESTIVAL" ? "festival" : "event";
 }
 
 export interface TimelineSongInput {
@@ -104,6 +122,9 @@ export function buildTimelineEvents(input: {
       imageUrl: song.coverSrc,
       tag: null,
       upcoming: isFuture(date),
+      liveGroup: null,
+      shows: 0,
+      upcomingShows: 0,
     });
   }
 
@@ -120,6 +141,9 @@ export function buildTimelineEvents(input: {
       imageUrl: album.coverSrc,
       tag: album.typeLabel,
       upcoming: isFuture(album.releaseDate.slice(0, 10)),
+      liveGroup: null,
+      shows: 0,
+      upcomingShows: 0,
     });
   }
 
@@ -150,8 +174,11 @@ export function buildTimelineEvents(input: {
       unitIds: all.map((unit) => unit.id),
       newSongCount: 0,
       imageUrl: all[0].groupImageUrl,
-      tag: null,
+      tag: LIVE_GROUP_LABEL[liveGroupOf(all[0])],
       upcoming: past.length === 0,
+      liveGroup: liveGroupOf(all[0]),
+      shows: past.length,
+      upcomingShows: all.length - past.length,
     });
   }
 
@@ -225,7 +252,7 @@ export function timelineRange(
   };
 }
 
-/** 해마다 종류별 일정 수(시작일의 해 기준) — 모바일 해 머리 표기용. */
+/** 해마다 종류별 수(시작일의 해 기준, 공연은 공연일 수) — 모바일 해 머리 표기용. */
 export function countByYear(
   events: TimelineEvent[],
 ): Record<string, Record<TimelineKind, number>> {
@@ -233,7 +260,11 @@ export function countByYear(
   for (const event of events) {
     const year = event.date.slice(0, 4);
     result[year] ??= { song: 0, album: 0, live: 0 };
-    result[year][event.kind] += 1;
+    // 공연은 공연일 수로 센다(투어 하나 = 그 투어의 공연 횟수).
+    result[year][event.kind] +=
+      event.kind === "live"
+        ? Math.max(1, event.shows + event.upcomingShows)
+        : 1;
   }
   return result;
 }
@@ -246,4 +277,25 @@ export function latestDate(events: TimelineEvent[]): string | null {
     if (!latest || end > latest) latest = end;
   }
   return latest;
+}
+
+/**
+ * 공연 횟수 요약 — 총 공연 횟수(지난 공연일: 투어 공연일 + 그 밖 공연일)와 묶음별
+ * (단콘 = 투어 + 단독 콘서트, 페스티벌, 이벤트), 예정 공연일 수.
+ */
+export function liveSummary(events: TimelineEvent[]): {
+  total: number;
+  concert: number;
+  festival: number;
+  event: number;
+  upcoming: number;
+} {
+  const result = { total: 0, concert: 0, festival: 0, event: 0, upcoming: 0 };
+  for (const event of events) {
+    if (!event.liveGroup) continue;
+    result.total += event.shows;
+    result[event.liveGroup] += event.shows;
+    result.upcoming += event.upcomingShows;
+  }
+  return result;
 }

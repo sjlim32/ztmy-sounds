@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { formatLiveDate } from "@/features/zutopia/lives/data";
 import { LiveTicket } from "@/features/zutopia/lives/LiveTicket";
+import { countTourShows } from "@/features/zutopia/lives/tour-shows";
 import {
   TourCommonSetlist,
   TourDateList,
@@ -82,6 +83,16 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
                 : formatLiveDate(tour.start_date),
             mono: true,
           },
+          // 공연일 데이터가 있으면 총 공연 횟수(이틀 공연은 2회)
+          ...(tour.dates.length > 0
+            ? [
+                {
+                  label: "Total Shows",
+                  value: `${countTourShows(tour.dates)}회`,
+                  mono: true,
+                },
+              ]
+            : []),
         ]}
         metadata={tour.metadata}
       />

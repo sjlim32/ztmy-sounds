@@ -26,6 +26,7 @@ import {
   eventTitle,
   KIND_CARD_CLASS,
   KIND_DOT_CLASS,
+  TAG_TEXT_CLASS,
   UPCOMING_CLASS,
 } from "./kind-style";
 import { ClusterCard, YearSummaryCard } from "./summary-cards";
@@ -269,7 +270,12 @@ function VerticalCard({
       />
       <span className="flex min-w-0 flex-1 flex-col">
         {event.tag && (
-          <span className="text-ztmy-sun truncate text-sm leading-tight">
+          <span
+            className={cn(
+              "truncate text-sm leading-tight",
+              TAG_TEXT_CLASS[event.kind],
+            )}
+          >
             {[event.tag, ...extras].join(" · ")}
           </span>
         )}
