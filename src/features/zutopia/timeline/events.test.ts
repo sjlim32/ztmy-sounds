@@ -7,6 +7,7 @@ import {
   countByYear,
   latestDate,
   liveSummary,
+  totalShows,
   type TimelineEvent,
 } from "@/features/zutopia/timeline/events";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
@@ -355,5 +356,27 @@ describe("공연 묶음과 횟수", () => {
       event: 1,
       upcoming: 1,
     });
+  });
+});
+
+describe("해 요약 공연 수", () => {
+  const events = buildTimelineEvents({
+    songs: [],
+    albums: [],
+    units: [
+      unit("t2", "2026-03-01", "tour"),
+      unit("t1", "2026-02-28", "tour"),
+      unit("fes", "2026-08-01", null, "FESTIVAL"),
+    ],
+    upcomingUnits: [unit("t3", "2026-12-01", "tour")],
+    today: "2026-11-05",
+  });
+
+  test("총 공연 횟수는 공연일 수(예정 포함)", () => {
+    expect(totalShows(events)).toBe(4);
+  });
+
+  test("곡·앨범과 같은 줄의 공연 수는 투어·페스티벌·이벤트 하나당 1", () => {
+    expect(countByYear(events)["2026"].live).toBe(2);
   });
 });

@@ -252,7 +252,7 @@ export function timelineRange(
   };
 }
 
-/** 해마다 종류별 수(시작일의 해 기준, 공연은 공연일 수) — 모바일 해 머리 표기용. */
+/** 해마다 종류별 일정 수(시작일의 해 기준, 투어·페스티벌·이벤트 하나당 1) — 모바일 해 머리 표기용. */
 export function countByYear(
   events: TimelineEvent[],
 ): Record<string, Record<TimelineKind, number>> {
@@ -260,11 +260,8 @@ export function countByYear(
   for (const event of events) {
     const year = event.date.slice(0, 4);
     result[year] ??= { song: 0, album: 0, live: 0 };
-    // 공연은 공연일 수로 센다(투어 하나 = 그 투어의 공연 횟수).
-    result[year][event.kind] +=
-      event.kind === "live"
-        ? Math.max(1, event.shows + event.upcomingShows)
-        : 1;
+    // 공연도 하나당 1(투어 하나·페스티벌 하나 = 1) — 공연일 수는 totalShows.
+    result[year][event.kind] += 1;
   }
   return result;
 }
@@ -298,4 +295,13 @@ export function liveSummary(events: TimelineEvent[]): {
     result.upcoming += event.upcomingShows;
   }
   return result;
+}
+
+/** 공연일 수 합계(예정 포함) — 해 요약 맨 위 "총 공연 N회". */
+export function totalShows(events: TimelineEvent[]): number {
+  return events.reduce(
+    (sum, event) =>
+      event.kind === "live" ? sum + event.shows + event.upcomingShows : sum,
+    0,
+  );
 }

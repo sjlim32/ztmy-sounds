@@ -117,12 +117,8 @@ export function KindCounts({
   className?: string;
 }) {
   const counts = { song: 0, album: 0, live: 0 };
-  // 공연은 공연일 수(투어 하나 = 그 투어의 공연 횟수)
-  for (const event of events)
-    counts[event.kind] +=
-      event.kind === "live"
-        ? Math.max(1, event.shows + event.upcomingShows)
-        : 1;
+  // 공연도 하나당 1(투어·페스티벌·이벤트 하나 = 1). 공연일 수는 해 요약 맨 위에.
+  for (const event of events) counts[event.kind] += 1;
   const items = (
     [
       ["song", "곡"],
