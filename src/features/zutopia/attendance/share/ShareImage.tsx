@@ -158,7 +158,7 @@ export const ShareImage = forwardRef<
       <div
         style={{
           display: "flex",
-          justifyContent: layout.topCount < TOP_COUNT ? "center" : "flex-start",
+          justifyContent: "center",
           gap: TOP_GAP,
         }}
       >

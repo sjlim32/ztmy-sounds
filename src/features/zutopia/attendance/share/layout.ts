@@ -4,8 +4,8 @@
  * 그려서 여기서 계산한 높이가 실제 이미지와 맞는다(layout.test.ts가 "몇 곡이든
  * 자리 안에 들어간다"를 확인).
  *
- * 구성(위→아래): 머리(작은 제목·숫자, 오른쪽 위 작은 로고) → TOP 5(큰 앨범 표지
- * 카드, 늘 표지) → 6위부터 목록(성불 COVER_UNTIL곡 미만이면 표지를 꼭 넣고, 곡이
+ * 구성(위→아래): 머리(작은 제목·숫자, 오른쪽 위 작은 로고) → TOP 5(앨범 표지
+ * 카드, 늘 표지, 가운데 정렬) → 6위부터 목록(성불 COVER_UNTIL곡 미만이면 표지를 꼭 넣고, 곡이
  * 많으면 열을 늘린다) → 생성일 · 주소 · QR.
  */
 export const SHARE_SIZE = 1080;
@@ -37,10 +37,15 @@ export const LINE_HEIGHT = 1.25;
 /** TOP 카드 수와 카드 사이 간격 */
 export const TOP_COUNT = 5;
 export const TOP_GAP = 16;
+/**
+ * TOP 카드 크기 배율 — 한 줄을 꽉 채우는 폭의 2/3. 남는 높이를 6위부터 목록에
+ * 돌려 곡 간격·제목이 잘 보이게(42곡 기준 피드백).
+ */
+const TOP_SCALE = 2 / 3;
 /** 곡이 적어 TOP 카드가 다섯 장보다 적을 때 카드 최대 폭 */
-const TOP_MAX_WIDTH = 300;
+const TOP_MAX_WIDTH = 200;
 /** TOP 카드 글자: 원어 제목 · 한국어 · 횟수 */
-export const TOP_TEXT = { titlePx: 22, subPx: 17, countPx: 20 };
+export const TOP_TEXT = { titlePx: 18, subPx: 14, countPx: 17 };
 /** TOP 카드 표지 아래 글자 영역 높이(간격 포함) */
 export const TOP_TEXT_HEIGHT =
   10 +
@@ -53,6 +58,8 @@ export const TOP_TEXT_HEIGHT =
 export const COVER_UNTIL = 50;
 /** 6위부터 목록에서 이 크기 이상이면 "읽기 좋다"로 본다. */
 export const READABLE_REST_PX = 18;
+/** 6위부터 제목 글자의 최소 크기 — 이보다 작아지는 단계는 다른 단계가 없을 때만. */
+const MIN_REST_TITLE_PX = 16;
 
 export interface RestLayout {
   /** 6위부터 곡 수 */
@@ -78,7 +85,7 @@ export interface ShareLayout {
 /** TOP 카드 n장의 폭 — 다섯 장이면 한 줄을 꽉, 적으면 크게(최대 TOP_MAX_WIDTH). */
 function topCardWidth(n: number): number {
   const fit = (SHARE_INNER_WIDTH - TOP_GAP * (TOP_COUNT - 1)) / TOP_COUNT;
-  if (n >= TOP_COUNT) return Math.floor(fit);
+  if (n >= TOP_COUNT) return Math.floor(fit * TOP_SCALE);
   return Math.floor(
     Math.min(TOP_MAX_WIDTH, (SHARE_INNER_WIDTH - TOP_GAP * (n - 1)) / n),
   );
@@ -98,8 +105,11 @@ export function restAreaHeight(): number {
   );
 }
 
-/** 곡이 적을 때의 크기 */
-const BASE = { coverPx: 64, titlePx: 24, subPx: 18, rowGapPx: 12 };
+/**
+ * 곡이 적을 때의 크기. 표지는 글자 두 줄 높이보다 10% 작게(57) — 표지가 줄
+ * 높이를 정하지 않아 같은 자리에 글자·간격이 더 크게 들어간다.
+ */
+const BASE = { coverPx: 45, titlePx: 24, subPx: 18, rowGapPx: 14 };
 
 type Stage = Pick<RestLayout, "columns" | "showCover" | "showEnglish">;
 /** 표지를 꼭 넣는 경우(성불 COVER_UNTIL곡 미만): 열을 늘리고, 3열부터 영어를 뺀다. */
@@ -145,9 +155,27 @@ function fitStage(count: number, stage: Stage): RestLayout {
 }
 
 /**
- * 성불 곡 수에 맞춰 배치를 고른다(들은 곡은 전부 한 장에). TOP 5는 늘 큰 카드.
- * 6위부터는 단계를 차례로 보며 제목이 READABLE_REST_PX 이상인 첫 단계를 쓰고,
- * 어느 단계도 안 되면 글자가 가장 큰 단계를 쓴다.
+ * 한 칸에서 원어 제목이 대략 몇 글자 보이는지 — 칸 폭에서 순위·표지·탤리·간격을
+ * 빼고 제목 글자 크기로 나눈다(ShareImage의 RestList와 같은 값). 글자가 커도 열이
+ * 많아 칸이 좁으면 제목이 몇 글자 만에 잘리므로, 단계 고르기에 함께 쓴다.
+ */
+export function visibleTitleChars(layout: RestLayout): number {
+  const columnWidth =
+    (SHARE_INNER_WIDTH - SHARE_COLUMN_GAP * (layout.columns - 1)) /
+    layout.columns;
+  const gap = Math.max(4, Math.round(layout.subPx * 0.5));
+  const rank = Math.round(layout.subPx * 1.4);
+  const tally = Math.round(layout.subPx * 0.95) * 1.6;
+  const cover = layout.showCover ? layout.coverPx + gap : 0;
+  const text = columnWidth - rank - gap - cover - gap - tally;
+  return Math.max(0, text / layout.titlePx);
+}
+
+/**
+ * 성불 곡 수에 맞춰 배치를 고른다(들은 곡은 전부 한 장에). TOP 5는 늘 카드.
+ * 6위부터는 제목이 MIN_REST_TITLE_PX 이상인 단계 중 제목이 가장 많이 보이는
+ * 단계(같으면 글자가 큰 쪽)를 쓴다 — 열을 늘려 글자만 키우면 칸이 좁아져 제목이
+ * 잘리기 때문. 어느 단계도 그 크기가 안 되면 글자가 가장 큰 단계.
  */
 export function pickShareLayout(heardCount: number): ShareLayout {
   const topCount = Math.min(TOP_COUNT, heardCount);
@@ -156,10 +184,17 @@ export function pickShareLayout(heardCount: number): ShareLayout {
     return { topCount, topCardWidth: topCardWidth(topCount), rest: null };
   const stages = heardCount < COVER_UNTIL ? COVER_STAGES : TEXT_STAGES;
   const candidates = stages.map((stage) => fitStage(restCount, stage));
-  const rest =
-    candidates.find((layout) => layout.titlePx >= READABLE_REST_PX) ??
-    candidates.reduce((best, layout) =>
-      layout.titlePx > best.titlePx ? layout : best,
-    );
+  const readable = candidates.filter(
+    (layout) => layout.titlePx >= MIN_REST_TITLE_PX,
+  );
+  const score = (layout: RestLayout) =>
+    Math.floor(visibleTitleChars(layout)) * 100 + layout.titlePx;
+  const rest = readable.length
+    ? readable.reduce((best, layout) =>
+        score(layout) > score(best) ? layout : best,
+      )
+    : candidates.reduce((best, layout) =>
+        layout.titlePx > best.titlePx ? layout : best,
+      );
   return { topCount, topCardWidth: topCardWidth(TOP_COUNT), rest };
 }

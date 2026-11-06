@@ -8,6 +8,7 @@ import {
   SHARE_INNER_WIDTH,
   TOP_COUNT,
   TOP_GAP,
+  visibleTitleChars,
 } from "@/features/zutopia/attendance/share/layout";
 
 describe("pickShareLayout", () => {
@@ -42,6 +43,13 @@ describe("pickShareLayout", () => {
     expect(pickShareLayout(12).rest!.titlePx).toBeGreaterThanOrEqual(
       READABLE_REST_PX,
     );
+  });
+
+  test("42곡: 제목이 더 많이 보이게 열을 줄인다(글자 16px 이상)", () => {
+    const rest = pickShareLayout(42).rest!;
+    expect(rest.columns).toBeLessThanOrEqual(4);
+    expect(rest.titlePx).toBeGreaterThanOrEqual(16);
+    expect(visibleTitleChars(rest)).toBeGreaterThanOrEqual(6);
   });
 
   test("몇 곡이든 나머지 목록이 자리 안에 들어간다", () => {
