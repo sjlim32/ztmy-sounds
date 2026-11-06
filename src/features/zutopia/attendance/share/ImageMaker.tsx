@@ -16,6 +16,7 @@ import {
 } from "@/features/zutopia/attendance/useNickname";
 import { pickShareLayout, SHARE_PIXEL_RATIO, SHARE_SIZE } from "./layout";
 import { buildFontEmbedCss } from "./font-embed";
+import { saveActions } from "./save-actions";
 import { ShareImage } from "./ShareImage";
 
 const FILE_NAME = "ztmy-live-attendance.png";
@@ -172,6 +173,11 @@ function ResultView({
   const canShare =
     typeof navigator !== "undefined" &&
     !!navigator.canShare?.({ files: [file] });
+  // 터치가 주 입력인 기기(휴대폰·태블릿) — 결과 화면은 브라우저에서만 그려진다.
+  const touch =
+    typeof window !== "undefined" &&
+    window.matchMedia("(pointer: coarse)").matches;
+  const actions = saveActions({ canShare, touch });
 
   const download = () => {
     const link = document.createElement("a");
@@ -196,34 +202,37 @@ function ResultView({
         alt="참전 기록 이미지"
         className="aspect-square w-full rounded-md object-contain"
       />
-      <p className="text-sm text-white/60">
-        휴대폰에서는 이미지를 길게 눌러 사진에 저장할 수도 있어요.
-      </p>
-      {/* 공유 시트가 되는 기기(대부분 휴대폰)는 그쪽이 주 버튼 — 사진에 바로 저장되고,
-          파일로 내려받기(iOS는 '파일' 앱으로 감)는 보조로. */}
+      {touch && (
+        <p className="text-sm text-white/60">
+          이미지를 길게 눌러 사진에 저장할 수도 있어요.
+        </p>
+      )}
+      {/* 휴대폰은 "사진 저장 · 공유"(공유 시트)가 주 버튼, PC는 "이미지 저장"
+          (내려받기)이 주 버튼 — saveActions. */}
       <div className="grid grid-cols-2 gap-2">
-        {canShare && (
+        {actions.map((action) => (
           <button
+            key={action.kind}
             type="button"
-            onClick={share}
-            className={cn(SOFT_PRIMARY_BUTTON_CLASS, "px-4 py-2.5 text-sm")}
+            onClick={action.kind === "share" ? share : download}
+            className={
+              action.primary
+                ? cn(
+                    SOFT_PRIMARY_BUTTON_CLASS,
+                    "px-4 py-2.5 text-sm",
+                    actions.length === 1 && "col-span-2",
+                  )
+                : cn(SOFT_BUTTON_CLASS, "justify-center")
+            }
           >
-            <ShareIcon className="size-4" />
-            사진 저장 · 공유
+            {action.kind === "share" ? (
+              <ShareIcon className="size-4" />
+            ) : (
+              <DownloadIcon className="size-4" />
+            )}
+            {action.label}
           </button>
-        )}
-        <button
-          type="button"
-          onClick={download}
-          className={cn(
-            canShare
-              ? cn(SOFT_BUTTON_CLASS, "justify-center")
-              : cn(SOFT_PRIMARY_BUTTON_CLASS, "col-span-2 px-4 py-2.5 text-sm"),
-          )}
-        >
-          <DownloadIcon className="size-4" />
-          {canShare ? "파일로 저장" : "이미지 저장"}
-        </button>
+        ))}
         <button
           type="button"
           onClick={onRemake}
