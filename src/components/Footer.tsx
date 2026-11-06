@@ -27,14 +27,21 @@ const FOOTER_ICON_BUTTON_CLASS = "h-7 w-7";
  *   (InstallPromptBanner)에 있다.
  *
  * 어디에 뜨나: 루트 레이아웃의 인스턴스는 메인 화면(/)에서만 그린다.
- * 스크롤 페이지(/info, /credits, /zutopia)는 PageScrollBody가 자기 스크롤
- * 끝에 inline으로 붙이고, 이건 모바일에서만 보인다(PC는 콘텐츠를 넓게 쓰도록).
+ * 스크롤 페이지는 PageScrollBody가 자기 스크롤 끝에 inline으로 붙이는데, 출처
+ * 페이지(/credits)에서만 그리고 모바일에서만 보인다(PC는 콘텐츠를 넓게 쓰도록).
+ * /info·/zutopia 같은 상세 화면엔 없다.
  * 가이드·슬램 화면엔 없다 — 목록·가사가 화면 높이를 다 쓴다.
  */
+/** 스크롤 페이지 중 끝에 푸터를 붙이는 곳(모바일). 메인(/)은 루트 레이아웃이 따로 그린다. */
+const INLINE_FOOTER_PATHS = new Set(["/credits"]);
+
 export function Footer({ inline = false }: { inline?: boolean } = {}) {
   const pathname = usePathname();
   const isHome = pathname === "/";
   if (!inline && !isHome) return null;
+  // 스크롤 페이지 끝의 푸터(모바일 전용)는 출처 페이지에서만 — 즛토피아·정보 같은
+  // 상세 화면은 콘텐츠에 집중하도록 뺀다(공식 링크·건의는 메인과 출처에 있다).
+  if (inline && !INLINE_FOOTER_PATHS.has(pathname)) return null;
 
   return (
     <footer
