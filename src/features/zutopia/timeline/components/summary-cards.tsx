@@ -72,13 +72,16 @@ export function YearSummaryCard({
           {names.slice(0, 4).map((event) => (
             <span
               key={event.id}
-              className="flex min-w-0 items-center gap-1.5 text-sm text-white/85"
+              className="flex min-w-0 items-start gap-1.5 text-sm leading-snug text-white/85"
             >
               <span
                 aria-hidden
-                className={cn("size-2 shrink-0", KIND_DOT_CLASS[event.kind])}
+                className={cn(
+                  "mt-1.5 size-2 shrink-0",
+                  KIND_DOT_CLASS[event.kind],
+                )}
               />
-              <span className="truncate">{event.label}</span>
+              <span className="min-w-0 break-words">{event.label}</span>
             </span>
           ))}
           {names.length > 4 && (
@@ -100,7 +103,6 @@ export function YearSummaryCard({
 export function ClusterCard({
   events,
   shown = events.length,
-  compact = false,
   attended,
   onOpen,
   className,
@@ -108,12 +110,6 @@ export function ClusterCard({
 }: {
   events: TimelineEvent[];
   shown?: number;
-  /**
-   * 좁은 카드(PC 월 단계, 한 달 폭) — 이름마다 한국어 한 줄 + 병기·분류·예정 한
-   * 줄로 줄여(말줄임, 전체는 마우스를 올리면) 높이를 이름당 두 줄로 고정한다.
-   * 넘침 어림(visibleNameCount)이 실제 높이와 맞게.
-   */
-  compact?: boolean;
   attended: boolean;
   onOpen: () => void;
   className?: string;
@@ -165,38 +161,20 @@ export function ClusterCard({
                 KIND_DOT_CLASS[event.kind],
               )}
             />
-            {compact ? (
-              <span
-                className="min-w-0 text-sm leading-snug"
-                title={[event.label, event.subLabel, event.tag]
-                  .filter(Boolean)
-                  .join(" · ")}
-              >
-                <span className="block truncate font-semibold text-white">
-                  {event.label}
+            <span className="min-w-0 text-sm leading-snug break-words">
+              <span className="font-semibold text-white">{event.label}</span>
+              {event.subLabel && (
+                <span className="block text-white/60">{event.subLabel}</span>
+              )}
+              {event.tag && (
+                <span className={cn("block", TAG_TEXT_CLASS[event.kind])}>
+                  {event.tag}
                 </span>
-                <span className="block truncate text-white/60">
-                  {[event.subLabel, event.tag, event.upcoming ? "예정" : null]
-                    .filter(Boolean)
-                    .join(" · ") || "\u00a0"}
-                </span>
-              </span>
-            ) : (
-              <span className="min-w-0 text-sm leading-snug break-words">
-                <span className="font-semibold text-white">{event.label}</span>
-                {event.subLabel && (
-                  <span className="block text-white/60">{event.subLabel}</span>
-                )}
-                {event.tag && (
-                  <span className={cn("block", TAG_TEXT_CLASS[event.kind])}>
-                    {event.tag}
-                  </span>
-                )}
-                {event.upcoming && (
-                  <span className="block text-white/60">예정</span>
-                )}
-              </span>
-            )}
+              )}
+              {event.upcoming && (
+                <span className="block text-white/60">예정</span>
+              )}
+            </span>
           </span>
         ))}
         {hidden > 0 && (

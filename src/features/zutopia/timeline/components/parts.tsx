@@ -14,6 +14,8 @@ import {
 import { TimelineItemLink } from "./TimelineItemLink";
 
 export const DOT = 12;
+/** 카드 글자 칸 최대 폭(max-w-[10rem]) — 줄바꿈 높이 어림에 쓴다. */
+export const EVENT_TEXT_WIDTH = 160;
 
 /** 축과 카드를 잇는 가는 세로선. 카드보다 먼저 그려 카드 밑에 깔린다. */
 export function Stem({
@@ -85,22 +87,22 @@ export function EventCard({
         {event.tag && (
           <span
             className={cn(
-              "truncate text-sm leading-tight",
+              "text-sm leading-tight break-words",
               TAG_TEXT_CLASS[event.kind],
             )}
           >
             {[event.tag, ...extras].join(" · ")}
           </span>
         )}
-        <span className="truncate text-sm leading-snug font-semibold text-white">
+        <span className="text-sm leading-snug font-semibold break-words text-white">
           {event.label}
         </span>
         {event.subLabel && (
-          <span className="truncate text-sm leading-tight text-white/60">
+          <span className="text-sm leading-tight break-words text-white/60">
             {event.subLabel}
           </span>
         )}
-        <span className="truncate text-sm leading-tight text-white/60">
+        <span className="text-sm leading-tight break-words text-white/60">
           {[eventDateText(event), ...(event.tag ? [] : extras)].join(" · ")}
         </span>
       </span>
@@ -123,7 +125,7 @@ export function KindCounts({
     [
       ["song", "곡"],
       ["album", "앨범"],
-      ["live", "공연"],
+      ["live", "단콘"],
     ] as const
   ).filter(([kind]) => counts[kind] > 0);
   return (

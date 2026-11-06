@@ -162,7 +162,7 @@ export function VerticalTimeline({
               {year}
             </span>
             <span className="text-sm text-white/55">
-              곡 {counts[year].song} · 앨범 {counts[year].album} · 공연{" "}
+              곡 {counts[year].song} · 앨범 {counts[year].album} · 단콘{" "}
               {counts[year].live}
             </span>
           </h2>

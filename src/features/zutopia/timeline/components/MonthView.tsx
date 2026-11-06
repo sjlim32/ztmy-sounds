@@ -1,7 +1,10 @@
 import { cn } from "@/lib/utils";
 import { bucketEvents, type Bucket } from "@/features/zutopia/timeline/buckets";
 import type { TimelineEvent } from "@/features/zutopia/timeline/events";
-import { visibleNameCount } from "@/features/zutopia/timeline/interaction";
+import {
+  textLines,
+  visibleNameCount,
+} from "@/features/zutopia/timeline/interaction";
 import { Dot, Stem } from "./parts";
 import { ClusterCard } from "./summary-cards";
 
@@ -11,8 +14,8 @@ const GAP = 28;
 /**
  * 월 단계 — 달마다 공연 묶음(축 위)과 발매 묶음(축 아래) 카드 하나씩. 그림을
  * 겹쳐 쌓고(앨범이 나온 달은 앨범 커버 하나만) 그 달 일정 이름을 전부(한국어 + 일본어 병기). 투어는 축 바로 위 기간 막대. 묶음을 누르면
- * 그 달로 확대(주 단계). 카드가 축 위·아래 자리를 넘으면 이름을 들어가는 만큼만
- * 적고 '외 N개'(넘친 부분이 잘려 닿을 수 없게 되지 않도록).
+ * 그 달로 확대(주 단계). 이름은 말줄임 없이 줄바꿈하고, 카드가 축 위·아래 자리를
+ * 넘으면 들어가는 만큼만 적고 '외 N개'(넘친 부분이 잘려 닿을 수 없게 되지 않도록).
  */
 export function MonthView({
   events,
@@ -100,6 +103,22 @@ export function MonthView({
   );
 }
 
+/**
+ * 묶음 카드 이름 하나의 높이 어림 — 한국어(진하게)·일본어·분류·예정을 말줄임 없이
+ * 줄바꿈하므로 글 길이로 줄 수를 어림한다(text-sm, leading-snug 19.25px) + 간격 4.
+ */
+function clusterNameHeight(event: TimelineEvent, textWidth: number): number {
+  const lines = (text: string | null) => textLines(text ?? "", textWidth, 14);
+  return (
+    (lines(event.label) +
+      lines(event.subLabel) +
+      lines(event.tag) +
+      (event.upcoming ? 1 : 0)) *
+      19.25 +
+    4
+  );
+}
+
 function Cluster({
   bucket,
   x,
@@ -117,15 +136,18 @@ function Cluster({
   onOpen: (midDate: string) => void;
 }) {
   const left = x(bucket.start);
+  const width = x(bucket.end) - left - 6;
   return (
     <ClusterCard
       events={bucket.events}
-      shown={visibleNameCount(bucket.events.length, space)}
-      compact
+      shown={visibleNameCount(
+        bucket.events.map((event) => clusterNameHeight(event, width - 26)),
+        space,
+      )}
       attended={bucket.events.some((event) => attendedCounts.has(event.id))}
       onOpen={() => onOpen(`${bucket.key}-15`)}
       className="absolute z-20 hover:z-40"
-      style={{ left: left + 3, width: x(bucket.end) - left - 6, ...style }}
+      style={{ left: left + 3, width, ...style }}
     />
   );
 }
