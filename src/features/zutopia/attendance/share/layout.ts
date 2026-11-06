@@ -1,40 +1,65 @@
 /**
- * 참전 기록 이미지(정사각형, PC·모바일 같음)의 크기 계산. 배치는 1080×1080
- * 기준으로 하고, 저장할 때 SHARE_PIXEL_RATIO배(2160×2160)로 그린다.
- * ShareImage.tsx가 같은 상수로 그려서, 여기서 계산한 목록 높이가 실제 이미지와
- * 맞는다(layout.test.ts가 "몇 곡이든 캔버스 안에 들어간다"를 확인).
+ * 참전 기록 이미지(정사각형, PC·모바일 같음)의 배치 계산. 1080×1080 기준으로 하고,
+ * 저장할 때 SHARE_PIXEL_RATIO배(2160×2160)로 그린다. ShareImage.tsx가 같은 상수로
+ * 그려서 여기서 계산한 높이가 실제 이미지와 맞는다(layout.test.ts가 "몇 곡이든
+ * 자리 안에 들어간다"를 확인).
+ *
+ * 구성(위→아래): 머리(작은 제목·숫자, 오른쪽 위 작은 로고) → TOP 5(큰 앨범 표지
+ * 카드, 늘 표지) → 6위부터 목록(성불 COVER_UNTIL곡 미만이면 표지를 꼭 넣고, 곡이
+ * 많으면 열을 늘린다) → 생성일 · 주소 · QR.
  */
 export const SHARE_SIZE = 1080;
 /** 저장 해상도 배율 — 1080 배치를 2160×2160 PNG로 */
 export const SHARE_PIXEL_RATIO = 2;
 
 /** 흰 테두리 안쪽 여백 */
-export const SHARE_PADDING = 64;
-/** 로고 + 제목 + 숫자 영역(아래 간격 포함) */
-export const SHARE_HEADER_HEIGHT = 272;
-/** 생성일 · 주소 · QR 줄(위 간격 포함) */
-export const SHARE_FOOTER_HEIGHT = 96;
+export const SHARE_PADDING = 56;
+export const SHARE_INNER_WIDTH = SHARE_SIZE - SHARE_PADDING * 2;
+/** 머리: 작은 제목 + 숫자 줄(오른쪽 위 작은 로고) */
+export const SHARE_HEADER_HEIGHT = 112;
+/** 구역 사이 간격 */
+export const SECTION_GAP = 28;
+/** 구역 이름 줄("TOP 5", "6위부터") — 글자 + 아래 간격 */
+export const SECTION_LABEL_HEIGHT = 34;
+/** 생성일 · 주소 · QR 줄 */
+export const SHARE_FOOTER_HEIGHT = 64;
 /**
  * QR 크기(1080 기준) — 33칸(오류 보정 L, 여백 포함) × 1.5 = 49.5. 저장 이미지(2160)에서
  * 칸 하나가 정확히 3px(반 픽셀에 걸려 흐려지지 않게)이라, 저장된 이미지를 사진 앱·
  * 구글 렌즈로 읽을 수 있는 가장 작은 크기.
  */
 export const SHARE_QR_SIZE = 49.5;
-export const SHARE_COLUMN_GAP = 32;
+export const SHARE_COLUMN_GAP = 24;
 
 /** 줄 높이 배율 — ShareImage의 line-height와 같다. */
 export const LINE_HEIGHT = 1.25;
 
-/**
- * 1080px 이미지를 폰 화면 폭으로 볼 때 읽을 수 있는 원어 제목 크기. 이보다
- * 작아질 상황이면 다음 단계(열 늘리기·커버 빼기)로 넘어간다.
- */
-export const READABLE_TITLE_PX = 24;
+/** TOP 카드 수와 카드 사이 간격 */
+export const TOP_COUNT = 5;
+export const TOP_GAP = 16;
+/** 곡이 적어 TOP 카드가 다섯 장보다 적을 때 카드 최대 폭 */
+const TOP_MAX_WIDTH = 300;
+/** TOP 카드 글자: 원어 제목 · 한국어 · 횟수 */
+export const TOP_TEXT = { titlePx: 22, subPx: 17, countPx: 20 };
+/** TOP 카드 표지 아래 글자 영역 높이(간격 포함) */
+export const TOP_TEXT_HEIGHT =
+  10 +
+  TOP_TEXT.titlePx * LINE_HEIGHT +
+  TOP_TEXT.subPx * LINE_HEIGHT +
+  6 +
+  TOP_TEXT.countPx * LINE_HEIGHT;
 
-export interface ShareLayout {
+/** 성불 곡이 이 수보다 적으면 6위부터 목록에도 표지를 꼭 넣는다(아무리 작아도). */
+export const COVER_UNTIL = 50;
+/** 6위부터 목록에서 이 크기 이상이면 "읽기 좋다"로 본다. */
+export const READABLE_REST_PX = 18;
+
+export interface RestLayout {
+  /** 6위부터 곡 수 */
+  count: number;
   columns: number;
   showCover: boolean;
-  /** false면 곡마다 일본어 + 한국어만(영어 줄을 뺀다) */
+  /** false면 곡마다 원어 + 한국어만(영어 줄을 뺀다) */
   showEnglish: boolean;
   coverPx: number;
   titlePx: number;
@@ -42,30 +67,57 @@ export interface ShareLayout {
   rowGapPx: number;
 }
 
-/** 곡이 적을 때의 크기 — 넉넉하게(시안이 너무 작고 빽빽하다는 피드백). */
-const BASE = { coverPx: 112, titlePx: 36, subPx: 26, rowGapPx: 22 };
+export interface ShareLayout {
+  /** TOP 카드 수(성불 곡이 5곡보다 적으면 그 수) */
+  topCount: number;
+  topCardWidth: number;
+  /** 6위부터 목록. 5곡 이하면 null */
+  rest: RestLayout | null;
+}
 
-/**
- * 곡이 많아질수록 차례로 넘어가는 단계. 2열 + 커버 → 3열 + 커버 → 커버 빼고
- * 3열 → 4열. 커버가 있는 단계는 커버가 줄 높이를 정해서, 영어 줄을 빼도
- * 줄어들지 않으므로 영어를 남긴다. 커버를 뺀 단계부터는 영어도 빼고
- * 일본어 + 한국어만 남긴다(어느 단계에서도 이 둘은 남긴다).
- */
-const STAGES: Pick<ShareLayout, "columns" | "showCover" | "showEnglish">[] = [
-  { columns: 2, showCover: true, showEnglish: true },
-  { columns: 3, showCover: true, showEnglish: true },
-  { columns: 3, showCover: false, showEnglish: false },
-  { columns: 4, showCover: false, showEnglish: false },
-];
-
-export function listAreaHeight(): number {
-  return (
-    SHARE_SIZE - SHARE_PADDING * 2 - SHARE_HEADER_HEIGHT - SHARE_FOOTER_HEIGHT
+/** TOP 카드 n장의 폭 — 다섯 장이면 한 줄을 꽉, 적으면 크게(최대 TOP_MAX_WIDTH). */
+function topCardWidth(n: number): number {
+  const fit = (SHARE_INNER_WIDTH - TOP_GAP * (TOP_COUNT - 1)) / TOP_COUNT;
+  if (n >= TOP_COUNT) return Math.floor(fit);
+  return Math.floor(
+    Math.min(TOP_MAX_WIDTH, (SHARE_INNER_WIDTH - TOP_GAP * (n - 1)) / n),
   );
 }
 
-/** 곡 한 칸 높이 — (커버를 그리면) 커버와 제목 줄들 중 큰 쪽 + 줄 간격 */
-export function rowHeight(layout: ShareLayout): number {
+/** 6위부터 목록이 쓸 수 있는 높이(TOP 카드 다섯 장 기준) */
+export function restAreaHeight(): number {
+  return (
+    SHARE_SIZE -
+    SHARE_PADDING * 2 -
+    SHARE_HEADER_HEIGHT -
+    SECTION_GAP -
+    (SECTION_LABEL_HEIGHT + topCardWidth(TOP_COUNT) + TOP_TEXT_HEIGHT) -
+    SECTION_GAP -
+    SECTION_LABEL_HEIGHT -
+    SHARE_FOOTER_HEIGHT
+  );
+}
+
+/** 곡이 적을 때의 크기 */
+const BASE = { coverPx: 64, titlePx: 24, subPx: 18, rowGapPx: 12 };
+
+type Stage = Pick<RestLayout, "columns" | "showCover" | "showEnglish">;
+/** 표지를 꼭 넣는 경우(성불 COVER_UNTIL곡 미만): 열을 늘리고, 3열부터 영어를 뺀다. */
+const COVER_STAGES: Stage[] = [
+  { columns: 2, showCover: true, showEnglish: true },
+  { columns: 3, showCover: true, showEnglish: false },
+  { columns: 4, showCover: true, showEnglish: false },
+  { columns: 5, showCover: true, showEnglish: false },
+];
+/** 곡이 많을 때: 표지를 빼고 원어 + 한국어만, 열을 늘린다. */
+const TEXT_STAGES: Stage[] = [
+  { columns: 3, showCover: false, showEnglish: false },
+  { columns: 4, showCover: false, showEnglish: false },
+  { columns: 5, showCover: false, showEnglish: false },
+];
+
+/** 6위부터 한 칸 높이 — (표지가 있으면) 표지와 글자 줄 중 큰 쪽 + 줄 간격 */
+export function restRowHeight(layout: Omit<RestLayout, "count">): number {
   const subLines = layout.showEnglish ? 2 : 1;
   const text =
     layout.titlePx * LINE_HEIGHT + subLines * layout.subPx * LINE_HEIGHT;
@@ -74,17 +126,18 @@ export function rowHeight(layout: ShareLayout): number {
   );
 }
 
-function fitStage(
-  songCount: number,
-  stage: (typeof STAGES)[number],
-): ShareLayout {
-  const rows = Math.max(1, Math.ceil(songCount / stage.columns));
-  const base = rowHeight({ ...BASE, ...stage });
-  const scale = Math.min(1, listAreaHeight() / (rows * base));
+function fitStage(count: number, stage: Stage): RestLayout {
+  const rows = Math.max(1, Math.ceil(count / stage.columns));
+  const base = restRowHeight({ ...BASE, ...stage });
+  const scale = Math.min(1, restAreaHeight() / (rows * base));
   // 소수 픽셀은 내림 — 반올림하면 계산보다 커져 마지막 줄이 넘칠 수 있다.
   return {
+    count,
     ...stage,
-    coverPx: Math.floor(BASE.coverPx * scale),
+    coverPx: Math.max(
+      stage.showCover ? 1 : 0,
+      Math.floor(BASE.coverPx * scale),
+    ),
     titlePx: Math.floor(BASE.titlePx * scale),
     subPx: Math.floor(BASE.subPx * scale),
     rowGapPx: Math.floor(BASE.rowGapPx * scale),
@@ -92,21 +145,21 @@ function fitStage(
 }
 
 /**
- * 곡 수에 맞춰 단계와 크기를 고른다(들은 곡은 전부 한 장에). 단계를 차례로
- * 보며 원어 제목이 READABLE_TITLE_PX 이상이 되는 첫 단계를 쓰고, 어느 단계도
- * 안 되면 가장 글자가 큰 단계를 쓴다. maxColumns는 비교용(테스트).
+ * 성불 곡 수에 맞춰 배치를 고른다(들은 곡은 전부 한 장에). TOP 5는 늘 큰 카드.
+ * 6위부터는 단계를 차례로 보며 제목이 READABLE_REST_PX 이상인 첫 단계를 쓰고,
+ * 어느 단계도 안 되면 글자가 가장 큰 단계를 쓴다.
  */
-export function pickShareLayout(
-  songCount: number,
-  { maxColumns = 4 }: { maxColumns?: number } = {},
-): ShareLayout {
-  const candidates = STAGES.filter((stage) => stage.columns <= maxColumns).map(
-    (stage) => fitStage(songCount, stage),
-  );
-  return (
-    candidates.find((layout) => layout.titlePx >= READABLE_TITLE_PX) ??
+export function pickShareLayout(heardCount: number): ShareLayout {
+  const topCount = Math.min(TOP_COUNT, heardCount);
+  const restCount = heardCount - topCount;
+  if (restCount <= 0)
+    return { topCount, topCardWidth: topCardWidth(topCount), rest: null };
+  const stages = heardCount < COVER_UNTIL ? COVER_STAGES : TEXT_STAGES;
+  const candidates = stages.map((stage) => fitStage(restCount, stage));
+  const rest =
+    candidates.find((layout) => layout.titlePx >= READABLE_REST_PX) ??
     candidates.reduce((best, layout) =>
       layout.titlePx > best.titlePx ? layout : best,
-    )
-  );
+    );
+  return { topCount, topCardWidth: topCardWidth(TOP_COUNT), rest };
 }
