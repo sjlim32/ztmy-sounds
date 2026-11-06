@@ -107,23 +107,19 @@ export function ImageMaker({ summary }: { summary: AttendanceSummary }) {
   return (
     <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm text-white/70">
-          닉네임 (비우면 &ldquo;나의&rdquo;)
-        </span>
+        <span className="text-sm text-white/70">닉네임</span>
         <input
           type="text"
           value={nickname}
           maxLength={NICKNAME_MAX_LENGTH}
           onChange={(event) => setNickname(event.target.value)}
-          placeholder="닉네임"
+          placeholder="나의"
           className="focus-visible:outline-ztmy-magenta h-11 rounded-md border border-white/15 bg-black/30 px-3 text-base text-white placeholder:text-white/35 focus-visible:outline-2"
         />
       </label>
       <p className="text-sm text-white/60">
         제목: {nickname.trim() ? `${nickname.trim()}의` : "나의"} ZUTOMAYO
         라이브 참전 기록
-        <br />
-        성불 {summary.heard.length}곡 · 2160×2160 PNG
       </p>
       <button
         type="button"

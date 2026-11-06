@@ -42,16 +42,22 @@ const ImageMaker = dynamic(
 
 type Panel = "image" | "share" | null;
 
+/**
+ * 막대 오른쪽 동작의 모양 — 주 동작(공연 체크)은 보라 버튼, 그 밖(저장·백업)은
+ * 밑줄 글자 링크로 둬서 한눈에 구분되게.
+ */
 const TONE_CLASS = {
   plain: SOFT_BUTTON_CLASS,
   pink: SOFT_PRIMARY_BUTTON_CLASS,
   purple: SOFT_PURPLE_BUTTON_CLASS,
+  link: `inline-flex items-center rounded text-sm font-medium whitespace-nowrap text-white/80 underline decoration-white/35 underline-offset-4 transition-colors hover:text-white hover:decoration-white disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING}`,
 };
-/** 열려 있는 버튼은 면을 한 단계 진하게. */
+/** 열려 있으면 한 단계 진하게(링크는 글자·밑줄을 흰색으로). */
 const ACTIVE_TONE_CLASS = {
   plain: "border-white/20 bg-white/15 text-white",
   pink: "border-ztmy-magenta/50 bg-ztmy-magenta/30",
   purple: "border-ztmy-purple/70 bg-ztmy-purple/40",
+  link: "text-white decoration-white",
 };
 
 /** 현황 막대 오른쪽의 작은 버튼. chevron이면 누를 때 바로 밑에 작은 창이 열린다. */
@@ -64,7 +70,7 @@ function BarButton({
   children,
 }: {
   active: boolean;
-  tone?: "plain" | "pink" | "purple";
+  tone?: keyof typeof TONE_CLASS;
   disabled?: boolean;
   chevron?: boolean;
   onClick: () => void;
@@ -79,7 +85,9 @@ function BarButton({
       onClick={onClick}
       className={cn(
         TONE_CLASS[tone],
-        "tablet:flex-none tablet:gap-1.5 tablet:px-3 h-9 min-w-0 flex-auto gap-1 px-2 py-0",
+        tone === "link"
+          ? "h-9 flex-none gap-0.5 px-1"
+          : "tablet:flex-none tablet:gap-1.5 tablet:px-3 h-9 min-w-0 flex-auto gap-1 px-2 py-0",
         active && ACTIVE_TONE_CLASS[tone],
       )}
     >
@@ -224,7 +232,7 @@ export function AttendanceView({
             </div>
           ))}
         </dl>
-        <div className="tablet:ml-auto tablet:gap-2 flex gap-1.5">
+        <div className="tablet:ml-auto tablet:gap-4 flex items-center gap-3">
           <BarButton
             tone="purple"
             active={pickerOpen}
@@ -239,7 +247,7 @@ export function AttendanceView({
             )}
           </BarButton>
           <BarButton
-            tone="pink"
+            tone="link"
             active={panel === "image"}
             disabled={!ready || summary.heard.length === 0}
             onClick={() => togglePanel("image")}
@@ -247,6 +255,7 @@ export function AttendanceView({
             저장
           </BarButton>
           <BarButton
+            tone="link"
             active={panel === "share"}
             disabled={!ready}
             onClick={() => togglePanel("share")}
