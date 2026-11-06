@@ -10,7 +10,7 @@ interface ZutopiaHubCardProps {
 }
 
 /**
- * 즛토피아 허브(/zutopia)의 대분류 카드. 이미지가 있으면 배경으로 꽉 채우고,
+ * 즛토피아 허브(/zutopia)의 대분류 카드(모바일 2열 · PC 한 줄 네 장). 이미지가 있으면 배경으로 꽉 채우고,
  * 없으면 ztmy 톤 그라데이션으로 대체한다. 이미지가 있을 때는 평소엔 어둡게
  * 눌러뒀다가 호버하면 밝아지면서 살짝 확대되도록(group-hover) 해서, 눌러보고
  * 싶게 만드는 대비를 준다.
@@ -50,13 +50,16 @@ export function ZutopiaHubCard({
 
       <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-transparent" />
 
-      <div className="absolute inset-x-0 bottom-0 p-4">
-        <p className="group-hover:text-ztmy-pink text-lg font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] transition-colors">
+      {/* 모바일은 2열이라 카드가 작다 — 제목·한 줄 정보만, 설명은 태블릿부터. */}
+      <div className="tablet:p-4 absolute inset-x-0 bottom-0 p-3">
+        <p className="group-hover:text-ztmy-pink tablet:text-lg text-base leading-snug font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] transition-colors">
           {title}
         </p>
-        <p className="mt-1 line-clamp-2 text-sm text-white/60">{description}</p>
+        <p className="tablet:line-clamp-2 mt-1 hidden text-sm text-white/60">
+          {description}
+        </p>
         {meta && (
-          <p className="mt-2 font-mono text-xs tracking-[0.2em] text-white/60 uppercase">
+          <p className="tablet:mt-2 tablet:tracking-[0.2em] mt-1 line-clamp-2 text-sm text-white/60 uppercase">
             {meta}
           </p>
         )}

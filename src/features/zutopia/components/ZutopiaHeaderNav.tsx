@@ -20,7 +20,7 @@ export function ZutopiaHeaderNav({ className }: { className?: string }) {
   return (
     <nav
       aria-label="즛토피아"
-      className={cn("flex h-full items-stretch gap-6", className)}
+      className={cn("tablet:gap-6 flex h-full items-stretch gap-4", className)}
     >
       {ZUTOPIA_NAV_ITEMS.map((item) => {
         const isActive = item.paths.some((path) => pathname.startsWith(path));

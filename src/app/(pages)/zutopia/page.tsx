@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { thumbSrc } from "@/lib/thumb";
 import { ARTIST } from "@/data/artist";
 import { ZUTOPIA_CATEGORIES } from "@/features/zutopia/registry";
 import { summarizeEntryTypes } from "@/features/zutopia/types";
@@ -6,6 +7,16 @@ import { ZutopiaHubCard } from "@/features/zutopia/components/ZutopiaHubCard";
 import { getSongsCount, getAlbumsCount } from "@/features/zutopia/song-db/data";
 import { getZutopiaSearchIndex } from "@/features/zutopia/search/data";
 import { ZutopiaSearch } from "@/features/zutopia/search/components/ZutopiaSearch";
+
+// 참전 기록·연혁 카드 그림 — 투어 키 비주얼과 최신 정규 앨범 표지(R2, 줄여 받기).
+const ATTENDANCE_CARD_IMAGE = thumbSrc(
+  "https://assets.ztmy-sounds.fans/concert/2026/zomcra_kv.webp",
+  360,
+);
+const TIMELINE_CARD_IMAGE = thumbSrc(
+  "https://assets.ztmy-sounds.fans/full-album/04_keisoudo_jk.webp",
+  360,
+);
 
 export default async function ZutopiaHubPage() {
   const [songCounts, albumCount, searchIndex, categoryCards] =
@@ -29,12 +40,13 @@ export default async function ZutopiaHubPage() {
 
       {/* 검색어가 있으면 아래 카드 대신 곡·앨범·공연 검색 결과가 나온다. */}
       <ZutopiaSearch index={searchIndex}>
-        {/* 카드가 정사각형이라 넓은 PC 폭을 다 쓰면 화면보다 커진다 — 예전 폭으로 가운데. */}
+        {/* 모바일도 2열 — 카드 네 장이 한 화면에 보이게. PC는 한 줄 네 장(정사각형이라
+            두 줄로 두면 화면보다 커진다). */}
         <ul
           className={cn(
-            "grid gap-4",
-            "tablet:grid-cols-2",
-            "pc:mx-auto pc:w-full pc:max-w-4xl",
+            "grid grid-cols-2 gap-3",
+            "tablet:gap-4",
+            "pc:grid-cols-4",
           )}
         >
           <li>
@@ -62,6 +74,25 @@ export default async function ZutopiaHubPage() {
               />
             </li>
           ))}
+
+          <li>
+            <ZutopiaHubCard
+              href="/zutopia/attendance"
+              title="라이브 참전 기록"
+              description="다녀온 공연을 체크하면 라이브로 들은 곡과 횟수를 모아 보여 줘요"
+              meta="성불 · 성불 대기 · 이미지"
+              imageUrl={ATTENDANCE_CARD_IMAGE}
+            />
+          </li>
+          <li>
+            <ZutopiaHubCard
+              href="/zutopia/timeline"
+              title="활동 연혁"
+              description="곡 발매 · 앨범 발매 · 공연을 실제 시간 간격대로 한 줄로"
+              meta="연 · 월 · 주"
+              imageUrl={TIMELINE_CARD_IMAGE}
+            />
+          </li>
         </ul>
       </ZutopiaSearch>
     </div>
