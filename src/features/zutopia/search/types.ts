@@ -12,6 +12,8 @@ export interface SearchSong {
   titleEn: string;
   cover: string | null;
   releaseYear: string;
+  /** 별명(DB aliases) — 제목처럼 검색된다. */
+  aliases: string[];
 }
 
 export interface SearchAlbum {
@@ -23,6 +25,8 @@ export interface SearchAlbum {
   cover: string | null;
   releaseYear: string;
   songIds: string[];
+  /** 별명(DB aliases) */
+  aliases: string[];
 }
 
 export interface SearchLive {
@@ -37,6 +41,8 @@ export interface SearchLive {
   thumbnail: string;
   /** 이 공연(투어면 모든 공연일 합쳐서)의 세트리스트에 있는 곡 id. */
   songIds: string[];
+  /** 별명(DB aliases) — 투어면 투어와 소속 공연일의 별명을 합친 것. */
+  aliases: string[];
 }
 
 export interface ZutopiaSearchIndex {

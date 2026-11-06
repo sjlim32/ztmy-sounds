@@ -20,15 +20,14 @@ import type {
 async function getSetlistLinks(): Promise<{
   songIdsBySlug: Map<string, Set<string>>;
   titleEnBySlug: Map<string, string>;
+  aliasesBySlug: Map<string, string[]>;
 }> {
   const supabase = createBuildTimeSupabaseClient();
   const [setlists, lives, tours] = await Promise.all([
     supabase.from("setlists").select("song_id, live_id, tour_id"),
-    supabase
-      .from("lives")
-      .select("id, slug, tour_id, title_en")
-      .eq("status", "ACTIVE"),
-    supabase.from("tours").select("id, slug, title_en").eq("status", "ACTIVE"),
+    // "*" — aliases 컬럼이 아직 없는 DB에서도 빌드가 깨지지 않게 이름을 집지 않는다.
+    supabase.from("lives").select("*").eq("status", "ACTIVE"),
+    supabase.from("tours").select("*").eq("status", "ACTIVE"),
   ]);
   for (const result of [setlists, lives, tours]) {
     if (result.error) {
@@ -68,18 +67,45 @@ async function getSetlistLinks(): Promise<{
   ]) {
     if (row.slug && row.title_en) titleEnBySlug.set(row.slug, row.title_en);
   }
-  return { songIdsBySlug, titleEnBySlug };
+  // 목록 항목별 별명 — 투어는 투어 별명 + 소속 공연일 별명을 합친다.
+  const aliasesBySlug = new Map<string, string[]>();
+  const addAliases = (slug: string | undefined | null, row: object) => {
+    const aliases = aliasesOf(row);
+    if (!slug || aliases.length === 0) return;
+    aliasesBySlug.set(slug, [...(aliasesBySlug.get(slug) ?? []), ...aliases]);
+  };
+  for (const tour of tours.data!) addAliases(tour.slug, tour);
+  for (const live of lives.data!)
+    addAliases(entrySlugByLiveId.get(live.id), live);
+  return { songIdsBySlug, titleEnBySlug, aliasesBySlug };
+}
+
+/**
+ * 행의 별명(aliases text[]) — 컬럼이 아직 없거나 비었으면 빈 배열. 빈 문자열·
+ * 앞뒤 공백은 뺀다.
+ */
+function aliasesOf(row: object): string[] {
+  const value = (row as { aliases?: unknown }).aliases;
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((alias): alias is string => typeof alias === "string")
+    .map((alias) => alias.trim())
+    .filter(Boolean);
 }
 
 /** 즛토피아 첫 화면 통합 검색용 인덱스(빌드 때 한 번). */
 export async function getZutopiaSearchIndex(): Promise<ZutopiaSearchIndex> {
-  const [songs, albums, liveEntries, { songIdsBySlug, titleEnBySlug }] =
-    await Promise.all([
-      getSongsWithAlbums(),
-      getAlbumsWithSongs(),
-      getLiveEntries(),
-      getSetlistLinks(),
-    ]);
+  const [
+    songs,
+    albums,
+    liveEntries,
+    { songIdsBySlug, titleEnBySlug, aliasesBySlug },
+  ] = await Promise.all([
+    getSongsWithAlbums(),
+    getAlbumsWithSongs(),
+    getLiveEntries(),
+    getSetlistLinks(),
+  ]);
 
   const lives: SearchLive[] = liveEntries.map((entry) => ({
     slug: entry.slug,
@@ -90,6 +116,7 @@ export async function getZutopiaSearchIndex(): Promise<ZutopiaSearchIndex> {
     year: entry.startDate?.slice(0, 4) ?? "",
     thumbnail: entry.thumbnail,
     songIds: [...(songIdsBySlug.get(entry.slug) ?? [])],
+    aliases: aliasesBySlug.get(entry.slug) ?? [],
   }));
 
   return {
@@ -102,6 +129,7 @@ export async function getZutopiaSearchIndex(): Promise<ZutopiaSearchIndex> {
       // 곡 커버가 없으면 첫 앨범 커버(곡 목록과 같은 기준).
       cover: song.cover_image_url ?? song.albums[0]?.cover_image_url ?? null,
       releaseYear: song.release_date.slice(0, 4),
+      aliases: aliasesOf(song),
     })),
     albums: albums.map((album) => ({
       id: album.id,
@@ -112,6 +140,7 @@ export async function getZutopiaSearchIndex(): Promise<ZutopiaSearchIndex> {
       cover: album.cover_image_url,
       releaseYear: album.release_date.slice(0, 4),
       songIds: album.songs.map((song) => song.id),
+      aliases: aliasesOf(album),
     })),
     lives,
   };

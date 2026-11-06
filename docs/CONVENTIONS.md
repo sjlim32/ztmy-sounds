@@ -381,6 +381,16 @@ src/
   `${lives.id}:${YYYY-MM-DD}`이고 사용자 체크 내역의 저장 키라, 나누는 규칙을
   바꾸면 저장된 체크가 어긋납니다(`live-history/units.ts` 주석 참고).
 
+### 별명(aliases)과 통합 검색
+
+- `songs`·`albums`·`tours`·`lives`에 `aliases text[]`(기본 `'{}'`)가 있습니다
+  (`supabase/migrations/20261106000000_add_aliases.sql`). 통합 검색(`search/search.ts`)이 제목과
+  똑같이 찾습니다 — 띄어쓰기를 뺀 검색어가 들어 있거나, 띄어 친 단어가 각각 들어 있으면 걸립니다
+  ("니와 투 니라"는 "니와"·"투"·"니라"·"니라 니와"로 찾힘). 투어는 소속 공연일의 별명도 합칩니다.
+- 검색 인덱스는 빌드 때 만들어지므로 별명을 고치면 다시 빌드·배포해야 반영됩니다(`.next/cache/fetch-cache`
+  캐시 주의).
+- 공연·투어 검색용 조회는 컬럼이 없는 DB에서도 깨지지 않게 `select("*")` + `aliasesOf()`로 읽습니다.
+
 ### 날짜
 
 - "YYYY-MM-DD" 날짜 계산(더하기·차이·요일)은 `src/lib/ymd.ts`만 씁니다(UTC 자정 기준, 시간대 무관).

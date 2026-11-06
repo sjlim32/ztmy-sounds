@@ -15,6 +15,7 @@ export interface Database {
     Tables: {
       songs: {
         Row: {
+          aliases: string[];
           id: string;
           slug: string;
           title: string;
@@ -34,6 +35,7 @@ export interface Database {
           updated_at: string;
         };
         Insert: {
+          aliases?: string[];
           id?: string;
           slug: string;
           title: string;
@@ -53,6 +55,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: {
+          aliases?: string[];
           id?: string;
           slug?: string;
           title?: string;
@@ -83,6 +86,7 @@ export interface Database {
       };
       albums: {
         Row: {
+          aliases: string[];
           id: string;
           slug: string;
           title: string;
@@ -99,6 +103,7 @@ export interface Database {
           updated_at: string;
         };
         Insert: {
+          aliases?: string[];
           id?: string;
           slug: string;
           title: string;
@@ -115,6 +120,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: {
+          aliases?: string[];
           id?: string;
           slug?: string;
           title?: string;
@@ -176,6 +182,7 @@ export interface Database {
       };
       lives: {
         Row: {
+          aliases: string[];
           id: string;
           slug: string | null;
           tour_id: string | null;
@@ -200,6 +207,7 @@ export interface Database {
           updated_at: string;
         };
         Insert: {
+          aliases?: string[];
           id?: string;
           slug?: string | null;
           tour_id?: string | null;
@@ -224,6 +232,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: {
+          aliases?: string[];
           id?: string;
           slug?: string | null;
           tour_id?: string | null;
@@ -251,6 +260,7 @@ export interface Database {
       };
       tours: {
         Row: {
+          aliases: string[];
           id: string;
           slug: string;
           title: string;
@@ -266,6 +276,7 @@ export interface Database {
           updated_at: string;
         };
         Insert: {
+          aliases?: string[];
           id?: string;
           slug: string;
           title: string;
@@ -281,6 +292,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: {
+          aliases?: string[];
           id?: string;
           slug?: string;
           title?: string;
