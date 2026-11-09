@@ -5,6 +5,8 @@ import { ZUTOPIA_CATEGORIES } from "@/features/zutopia/registry";
 import { summarizeEntryTypes } from "@/features/zutopia/types";
 import { ZutopiaHubCard } from "@/features/zutopia/components/ZutopiaHubCard";
 import { getSongsCount, getAlbumsCount } from "@/features/zutopia/song-db/data";
+import { getLiveHistory } from "@/features/zutopia/live-history/data";
+import { koreaDate } from "@/lib/korea-date";
 import { getZutopiaSearchIndex } from "@/features/zutopia/search/data";
 import { ZutopiaSearch } from "@/features/zutopia/search/components/ZutopiaSearch";
 
@@ -19,11 +21,12 @@ const TIMELINE_CARD_IMAGE = thumbSrc(
 );
 
 export default async function ZutopiaHubPage() {
-  const [songCounts, albumCount, searchIndex, categoryCards] =
+  const [songCounts, albumCount, searchIndex, liveHistory, categoryCards] =
     await Promise.all([
       getSongsCount(),
       getAlbumsCount(),
       getZutopiaSearchIndex(),
+      getLiveHistory(),
       Promise.all(
         ZUTOPIA_CATEGORIES.map(async (category) => ({
           category,
@@ -31,6 +34,15 @@ export default async function ZutopiaHubPage() {
         })),
       ),
     ]);
+
+  // 연혁 카드 하단 — 첫 발매 연도부터 올해까지. 검색 인덱스에 곡 발매 연도가
+  // 이미 있어서 따로 조회하지 않는다.
+  const firstYear = Math.min(
+    ...searchIndex.songs
+      .map((song) => Number(song.releaseYear))
+      .filter(Boolean),
+  );
+  const thisYear = Number(koreaDate().slice(0, 4));
 
   return (
     <div className="flex flex-col gap-8">
@@ -53,7 +65,7 @@ export default async function ZutopiaHubPage() {
             <ZutopiaHubCard
               href="/zutopia/songs"
               title="디스코그래피"
-              description="전체 곡과 앨범 목록"
+              description="발매곡과 앨범, 곡별 라이브 기록"
               meta={`${songCounts.released}곡${
                 songCounts.unreleased > 0
                   ? ` (미공개 ${songCounts.unreleased}곡)`
@@ -79,8 +91,8 @@ export default async function ZutopiaHubPage() {
             <ZutopiaHubCard
               href="/zutopia/attendance"
               title="라이브 참전 기록"
-              description="다녀온 공연을 체크하면 라이브로 들은 곡과 횟수를 모아 보여 줘요"
-              meta="성불 · 성불 대기 · 이미지"
+              description="참전한 라이브 체크하고 들은 곡 모아보기"
+              meta={`공연 ${liveHistory.units.length}회 중 몇 번이나 참가했을까`}
               imageUrl={ATTENDANCE_CARD_IMAGE}
             />
           </li>
@@ -88,8 +100,8 @@ export default async function ZutopiaHubPage() {
             <ZutopiaHubCard
               href="/zutopia/timeline"
               title="활동 연혁"
-              description="곡 발매 · 앨범 발매 · 공연을 실제 시간 간격대로 한 줄로"
-              meta="연 · 월 · 주"
+              description="ZUTOMAYO 활동 총 정리"
+              meta={`${firstYear} – ${thisYear} · ${thisYear - firstYear + 1}년`}
               imageUrl={TIMELINE_CARD_IMAGE}
             />
           </li>
