@@ -4,10 +4,18 @@ allowBuilds:
   unrs-resolver: true
   workerd: true
 overrides:
-  # @serwist/turbopack이 browserslist를 취약 버전(4.28.6)으로 정확히 고정해
-  # pnpm audit high가 뜬다(GHSA: 무한 메모리 증가·prototype 쓰기) — serwist가
-  # 패치 버전으로 올리면 이 항목은 지워도 된다.
-  "browserslist@<4.28.7": ^4.28.7
+  # @serwist/build·turbopack 9.5.13이 zod를 취약 버전(4.6.5)으로 정확히 고정해
+  # pnpm audit high가 뜬다(큰 제약 검증 시 메모리 고갈) — serwist가 패치 버전으로
+  # 올리면 이 항목은 지워도 된다.
+  "zod@<4.6.6": ^4.6.6
+  # @serwist/build 9.5.13이 glob 13.0.6을 고정해 pnpm audit moderate가 뜬다
+  # (GHSA-3g3m-2fjr-6pw4: AbortSignal 취소 우회). 패치가 14.0.2부터라 메이저를
+  # 올린다(14도 CommonJS 지원). serwist가 glob 14로 올리면 지워도 된다.
+  "glob@>=9 <14.0.2": ^14.0.4
+  # glob 13·@typescript-eslint가 minimatch ^10을 써서 pnpm audit moderate가 뜬다
+  # (GHSA-g3hv-75wg-m249: globparts 증폭 DoS). 패치가 11.0.1부터라 메이저를 올린다
+  # (11도 CommonJS 지원). 3.x는 취약 범위가 아니라 건드리지 않는다.
+  "minimatch@>=7 <11.0.1": ^11.0.5
   # wrangler의 miniflare가 sharp를 취약 버전(0.35.4)으로 정확히 고정해
   # pnpm audit high가 뜬다(GHSA-wq5f-xc86-pv6w: librsvg 취약점) — miniflare가
   # 패치 버전으로 올리면 이 항목은 지워도 된다.
