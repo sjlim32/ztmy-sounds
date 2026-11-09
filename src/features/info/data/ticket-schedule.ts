@@ -33,11 +33,11 @@ export const TICKET_PRESALE_SCHEDULE: TicketScheduleRound[] = [
     limit: "1공연당 2매까지 (동반자는 비회원 가능, 지정석 접수)",
     links: [
       {
-        name: "국내 신청 바로가기",
+        name: "당락 확인·지불",
         href: "https://zutomayo.net/apicula-denki_apply_pre/",
       },
       {
-        name: "Apply (Outside Japan)",
+        name: "당락 확인·지불 (해외)",
         href: "https://zutomayo.net/apicula-denki_apply_pre_en/",
       },
     ],
@@ -52,6 +52,16 @@ export const TICKET_PRESALE_SCHEDULE: TicketScheduleRound[] = [
     paymentEnd: "2026-11-20T23:59:59+09:00",
     paymentLabel: "11/17(화) 18:00 ~ 11/20(금) 23:59",
     limit: "1공연당 2매까지",
+    links: [
+      {
+        name: "내국인(일본) 신청",
+        href: "https://zutomayo.net/apicula-denki_apply_pre_2nd/",
+      },
+      {
+        name: "해외 신청",
+        href: "https://zutomayo.net/apicula-denki_apply_pre_en_2nd/",
+      },
+    ],
   },
   {
     id: "general-fastest",
@@ -73,7 +83,8 @@ export const TICKET_PRESALE_SCHEDULE: TicketScheduleRound[] = [
     paymentStart: "2026-12-12T18:00:00+09:00",
     paymentEnd: "2026-12-15T23:59:59+09:00",
     paymentLabel: "12/12(토) 18:00 ~ 12/15(화) 23:59",
-    limit: "PREMIUM 선행(1차·2차) 지정석 구매 회원 대상 (1공연당 2매)",
+    limit:
+      "PREMIUM 선행(1차·2차) 지정석 구매 회원 대상 (1공연당 2매, 선행에서 구매한 매수와 같은 수로 신청해야 하며 다르면 낙선 처리)",
   },
 ];
 

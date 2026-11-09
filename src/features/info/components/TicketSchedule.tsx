@@ -180,8 +180,8 @@ export function TicketSchedule() {
                 </div>
               </div>
 
-              {/* 바로가기 신청 버튼 (진행 중일 때 강조) */}
-              {round.links && round.links.length > 0 && (
+              {/* 바로가기 버튼 (진행 중일 때 강조, 끝난 회차는 숨김) */}
+              {!isEnded && round.links && round.links.length > 0 && (
                 <div
                   className={cn(
                     "flex flex-wrap items-center gap-2 pt-2",

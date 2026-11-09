@@ -36,8 +36,9 @@ export function getApplyingRound(nowMs: number) {
 /**
  * 홈 공연 안내 패널용 티켓 접수 일정 — /info의 TicketSchedule을 좁은 자리에
  * 맞게 줄인 목록. /info처럼 접수 중인 회차는 분홍, 당락·입금 중인 회차는
- * 노랑으로 강조하고 끝난 회차는 흐리게 한다. 접수 중인 회차만 마감 D-day와
- * 신청 링크를 보여준다.
+ * 노랑으로 강조하고 끝난 회차는 흐리게 한다. 당락 발표·입금 기간은 끝나지
+ * 않은 회차 모두에 보여 주고, 마감 D-day는 접수 중인 회차만, 링크(신청 /
+ * 당락 확인·지불)는 접수 중·입금 중인 회차만 보여준다.
  */
 export function TicketRoundList({ nowMs }: { nowMs: number }) {
   return (
@@ -85,14 +86,15 @@ export function TicketRoundList({ nowMs }: { nowMs: number }) {
               <span className="text-white/50">접수 </span>
               {round.applyLabel}
             </p>
-            {(isPayment || state === "drawing") && (
+            {state !== "ended" && (
               <p className="font-mono text-xs text-white/75">
-                <span className="text-white/50">입금 </span>
+                <span className="text-white/50">당락·입금 </span>
                 {round.paymentLabel}
               </p>
             )}
-            {/* 신청 링크 — /info처럼 첫 링크는 분홍 면, 나머지는 테두리 버튼 */}
-            {isApplying && round.links && (
+            {/* 신청 링크는 /info처럼 첫 링크만 분홍 면, 나머지는 테두리 버튼.
+                당락 확인·지불(입금 기간) 링크는 모두 테두리 링크 버튼. */}
+            {(isApplying || isPayment) && round.links && (
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {round.links.map((link, index) => (
                   <a
@@ -101,7 +103,7 @@ export function TicketRoundList({ nowMs }: { nowMs: number }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
-                      index === 0
+                      isApplying && index === 0
                         ? ACTION_BUTTON_CLASS
                         : cn(LINK_BUTTON_CLASS, "py-0"),
                       "h-8 px-3 text-sm",
