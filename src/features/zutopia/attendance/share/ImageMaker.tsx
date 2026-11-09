@@ -9,6 +9,7 @@ import {
 } from "@/components/button-styles";
 import { DownloadIcon } from "@/components/icons/DownloadIcon";
 import { ShareIcon } from "@/components/icons/ShareIcon";
+import { CopyIcon } from "@/components/icons/CopyIcon";
 import type { AttendanceSummary } from "@/features/zutopia/attendance/summarize";
 import {
   NICKNAME_MAX_LENGTH,
@@ -23,15 +24,19 @@ const FILE_NAME = "ztmy-live-attendance.png";
 const SHARE_TEXT =
   "나의 ZUTOMAYO 라이브 참전 기록 #ずとまよ #즛토마요\nhttps://ztmy-sounds.fans/zutopia/attendance";
 
-/** 화면 밖 이미지 안의 그림(로고·커버)이 다 받아질 때까지 기다린다. */
-async function waitForImages(node: HTMLElement) {
-  await Promise.all(
+/** 화면 밖 이미지 안의 그림(로고·커버)이 다 받아질 때까지 기다린다(최대 4초). */
+async function waitForImages(node: HTMLElement, timeoutMs = 4000) {
+  const waitAll = Promise.all(
     [...node.querySelectorAll("img")].map((img) =>
       img.complete && img.naturalWidth > 0
         ? Promise.resolve()
         : img.decode().catch(() => undefined),
     ),
   );
+  await Promise.race([
+    waitAll,
+    new Promise((resolve) => setTimeout(resolve, timeoutMs)),
+  ]);
 }
 
 interface Result {
@@ -70,8 +75,10 @@ export function ImageMaker({ summary }: { summary: AttendanceSummary }) {
   const make = async () => {
     setError(null);
     setCreatedAt(new Date());
-    // 화면 밖 이미지가 그려진 다음 프레임까지 기다린다.
-    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    // 화면 밖 이미지가 그려지고 레이아웃/스타일 계산이 완료될 때까지 두 프레임 기다린다.
+    await new Promise((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(resolve)),
+    );
     try {
       const node = nodeRef.current;
       if (!node) throw new Error("image node missing");
@@ -165,15 +172,20 @@ function ResultView({
   result: Result;
   onRemake: () => void;
 }) {
+  const [copied, setCopied] = useState(false);
   const file = new File([result.blob], FILE_NAME, { type: "image/png" });
   const canShare =
     typeof navigator !== "undefined" &&
     !!navigator.canShare?.({ files: [file] });
+  const canCopy =
+    typeof navigator !== "undefined" &&
+    typeof ClipboardItem !== "undefined" &&
+    !!navigator.clipboard?.write;
   // 터치가 주 입력인 기기(휴대폰·태블릿) — 결과 화면은 브라우저에서만 그려진다.
   const touch =
     typeof window !== "undefined" &&
     window.matchMedia("(pointer: coarse)").matches;
-  const actions = saveActions({ canShare, touch });
+  const actions = saveActions({ canShare, touch, canCopy });
 
   const download = () => {
     const link = document.createElement("a");
@@ -190,6 +202,30 @@ function ResultView({
     }
   };
 
+  const copy = async () => {
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({ [result.blob.type]: result.blob }),
+      ]);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // 복사 권한 제한 등으로 실패 시 다운로드로 유도할 수 있도록 동작 유지
+    }
+  };
+
+  const handleAction = (kind: (typeof actions)[number]["kind"]) => {
+    if (kind === "share") return share();
+    if (kind === "copy") return copy();
+    return download();
+  };
+
+  const renderIcon = (kind: (typeof actions)[number]["kind"]) => {
+    if (kind === "share") return <ShareIcon className="size-4" />;
+    if (kind === "copy") return <CopyIcon className="size-4" />;
+    return <DownloadIcon className="size-4" />;
+  };
+
   return (
     <div className="flex flex-col gap-3">
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -200,18 +236,18 @@ function ResultView({
       />
       {touch && (
         <p className="text-sm text-white/60">
-          사진 앱에 넣으려면 공유 → &ldquo;이미지 저장&rdquo;을 누르거나,
-          이미지를 길게 눌러 저장하세요.
+          {canShare
+            ? "사진 앱에 넣으려면 공유 → “이미지 저장”을 누르거나, 이미지를 길게 눌러 저장하세요."
+            : "인앱 브라우저나 일부 환경에서는 저장이 제한될 수 있어요. 이미지를 길게 눌러 사진에 저장하세요."}
         </p>
       )}
-      {/* 휴대폰은 "공유"(공유 시트 → 사진에 저장)가 주 버튼, PC는 "저장"
-          (내려받기)이 주 버튼 — saveActions. */}
+      {/* 휴대폰은 "공유"(공유 시트 → 사진에 저장)가 주 버튼, PC는 "저장"(내려받기) 또는 "복사" — saveActions. */}
       <div className="grid grid-cols-2 gap-2">
         {actions.map((action) => (
           <button
             key={action.kind}
             type="button"
-            onClick={action.kind === "share" ? share : download}
+            onClick={() => handleAction(action.kind)}
             className={
               action.primary
                 ? cn(
@@ -222,12 +258,8 @@ function ResultView({
                 : cn(SOFT_BUTTON_CLASS, "justify-center")
             }
           >
-            {action.kind === "share" ? (
-              <ShareIcon className="size-4" />
-            ) : (
-              <DownloadIcon className="size-4" />
-            )}
-            {action.label}
+            {renderIcon(action.kind)}
+            {action.kind === "copy" && copied ? "복사됨!" : action.label}
           </button>
         ))}
         <button

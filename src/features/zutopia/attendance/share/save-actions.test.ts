@@ -16,6 +16,13 @@ describe("saveActions", () => {
     ]);
   });
 
+  test("PC + 클립보드 복사 가능: 이미지 저장이 주, 복사는 보조", () => {
+    expect(saveActions({ canShare: true, touch: false, canCopy: true })).toEqual([
+      { kind: "download", label: "저장", primary: true },
+      { kind: "copy", label: "복사", primary: false },
+    ]);
+  });
+
   test("공유를 못 하면 저장 하나", () => {
     for (const touch of [true, false])
       expect(saveActions({ canShare: false, touch })).toEqual([
