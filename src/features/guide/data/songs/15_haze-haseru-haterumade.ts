@@ -10,6 +10,8 @@ const song: Song = {
   id: "haze-haseru-haterumade",
   title: haze,
   youtubeId: "ElnxZtiBDvs",
+  swingGif: "/assets/guide/haze.webp",
+  swingGifWidth: 180,
   lyrics: [
     //================ 1절 ================//
     {
@@ -308,11 +310,12 @@ const song: Song = {
       original: "​​明日にはもう 忘れてしまうのに。。",
       pronunciation: "아시타니와 모- 와스레테시마우노니。。",
       translation: "내일이면 이제 잊어버릴 텐데..",
-      slam: "하제 댄스",
       cheer: {
-        tag: "swing",
+        tag: "dance",
         text: "",
       },
+      slam: "하제 댄스",
+      swingGif: true,
     },
     {
       time: "2:40.4",
@@ -321,10 +324,11 @@ const song: Song = {
       translation: "",
       interlude: true,
       cheer: {
-        tag: "swing",
+        tag: "dance",
         text: "하제 댄스",
       },
       slam: "하제 댄스",
+      swingGif: true,
     },
     //================ 3절 ================//
     {
@@ -332,21 +336,36 @@ const song: Song = {
       original: "何が抗うの",
       pronunciation: "나니가 아라가우노",
       translation: "무엇이 저항하는 걸까",
+      cheer: {
+        tag: "dance",
+        text: "하제 댄스",
+      },
       slam: "하제 댄스",
+      swingGif: true,
     },
     {
       time: "2:54.3",
       original: "何を憎めるの",
       pronunciation: "나니오 니쿠메루노",
       translation: "무엇을 미워하는 걸까",
+      cheer: {
+        tag: "dance",
+        text: "하제 댄스",
+      },
       slam: "하제 댄스",
+      swingGif: true,
     },
     {
       time: "2:59.4",
       original: "​​​預けないでいてよ",
       pronunciation: "아즈케나이데 이테요",
       translation: "맡겨두지 말아줘",
+      cheer: {
+        tag: "dance",
+        text: "하제 댄스",
+      },
       slam: "하제 댄스",
+      swingGif: true,
     },
     {
       time: "3:04.3",
