@@ -262,99 +262,118 @@ export function LiveListView({
           조건에 맞는 항목이 없습니다.
         </p>
       ) : (
-        groups.map((group) => (
-          <section key={group.key} className="flex flex-col gap-3">
-            <h2
-              className={cn(
-                "text-sm font-semibold text-white/60",
-                "tablet:text-base",
-              )}
+        // 그룹 사이는 카드 사이보다 훨씬 넓게 띄워, 연도가 바뀌는 지점이 바로 보이게 한다.
+        <div className={cn("flex flex-col gap-10", "tablet:gap-14")}>
+          {groups.map((group) => (
+            <section
+              key={group.key}
+              aria-labelledby={`live-group-${group.key}`}
+              className={cn("flex flex-col gap-4", "tablet:gap-5")}
             >
-              {group.label}
-            </h2>
-            <ul
-              className={cn(
-                // 모바일도 2열 — 1열이면 정사각 카드 한 장이 화면을 다 차지해
-                // 목록을 훑기 어렵다. 3열은 카드 위 글자가 포스터를 덮어서 안 쓴다.
-                "grid grid-cols-2 gap-3",
-                "tablet:gap-4",
-                "pc:grid-cols-3",
-                "wide:grid-cols-4",
-              )}
-            >
-              {group.entries.map((entry) => (
-                <li key={entry.slug}>
-                  <Link
-                    href={`/zutopia/${categorySlug}/${entry.slug}`}
-                    onClick={handleEntryClick}
-                    className="group flex flex-col gap-2 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
-                  >
-                    <div
-                      className={cn(
-                        "relative aspect-square overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
-                        // 내한 공연은 테두리와 그림 위 태그를 마젠타(홈의 내한 색)로 표시해
-                        // 목록에서 바로 눈에 띄게 한다.
-                        entry.visitOrdinal != null &&
-                          "ring-ztmy-magenta ring-2",
-                      )}
+              {/* 연도(형식) 제목 + 개수 + 남은 폭을 채우는 가로선 — 선이 그룹의
+            시작을 끊어 줘서, 카드가 이어지는 그리드 안에서도 경계가 분명하다. */}
+              <div className="flex items-baseline gap-3">
+                <h2
+                  id={`live-group-${group.key}`}
+                  className={cn(
+                    "text-xl font-bold text-white tabular-nums",
+                    "tablet:text-2xl",
+                  )}
+                >
+                  {group.label}
+                </h2>
+                <span className="text-sm text-white/50 tabular-nums">
+                  {group.entries.length}개
+                </span>
+                <span
+                  aria-hidden
+                  className="h-px flex-1 self-center bg-white/15"
+                />
+              </div>
+              <ul
+                className={cn(
+                  // 모바일도 2열 — 1열이면 정사각 카드 한 장이 화면을 다 차지해
+                  // 목록을 훑기 어렵다. 3열은 카드 위 글자가 포스터를 덮어서 안 쓴다.
+                  "grid grid-cols-2 gap-3",
+                  "tablet:gap-4",
+                  "pc:grid-cols-3",
+                  "wide:grid-cols-4",
+                )}
+              >
+                {group.entries.map((entry) => (
+                  <li key={entry.slug}>
+                    <Link
+                      href={`/zutopia/${categorySlug}/${entry.slug}`}
+                      onClick={handleEntryClick}
+                      className="group flex flex-col gap-2 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
                     >
-                      {entry.thumbnail ? (
-                        <ThumbImage
-                          src={entry.thumbnail}
-                          displayWidth={360}
-                          alt={entry.name}
-                          className="h-full w-full object-contain transition-opacity group-hover:opacity-80"
-                        />
-                      ) : (
-                        <div className="h-full w-full bg-white/5" />
-                      )}
-                      {entry.visitOrdinal != null && (
-                        // 상세 티켓과 같은 태그를 그림 왼쪽 위에 얹는다.
-                        <VisitBadge
-                          ordinal={entry.visitOrdinal}
-                          className="absolute top-2 left-2 shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
-                        />
-                      )}
-                    </div>
-
-                    {/* 글자는 그림 위에 겹치지 않고 아래에 둔다 — 겹쳐 놓으면
-                    포스터 무늬에 묻혀 잘 안 읽힌다. */}
-                    <div className="flex flex-col gap-0.5 px-0.5">
-                      <span
+                      <div
                         className={cn(
-                          // 모바일 2열 카드는 좁아서 원제는 1줄만
-                          "group-hover:text-ztmy-pink line-clamp-1 text-xs font-semibold break-keep text-white transition-colors",
-                          "tablet:line-clamp-2 tablet:text-sm",
+                          "relative aspect-square overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
+                          // 내한 공연은 테두리와 그림 위 태그를 마젠타(홈의 내한 색)로 표시해
+                          // 목록에서 바로 눈에 띄게 한다.
+                          entry.visitOrdinal != null &&
+                            "ring-ztmy-magenta ring-2",
                         )}
                       >
-                        {entry.name}
-                      </span>
-                      {entry.label !== entry.name && (
+                        {entry.thumbnail ? (
+                          <ThumbImage
+                            src={entry.thumbnail}
+                            displayWidth={360}
+                            alt={entry.name}
+                            className="h-full w-full object-contain transition-opacity group-hover:opacity-80"
+                          />
+                        ) : (
+                          <div className="h-full w-full bg-white/5" />
+                        )}
+                        {entry.visitOrdinal != null && (
+                          // 상세 티켓과 같은 태그를 그림 왼쪽 위에 얹는다.
+                          <VisitBadge
+                            ordinal={entry.visitOrdinal}
+                            className="absolute top-2 left-2 shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+                          />
+                        )}
+                      </div>
+
+                      {/* 글자는 그림 위에 겹치지 않고 아래에 둔다 — 겹쳐 놓으면
+                    포스터 무늬에 묻혀 잘 안 읽힌다. */}
+                      <div className="flex flex-col gap-0.5 px-0.5">
                         <span
                           className={cn(
-                            "line-clamp-2 text-xs break-keep text-white/70",
-                            "tablet:text-sm",
+                            // 모바일 2열 카드는 좁아서 원제는 1줄만
+                            "group-hover:text-ztmy-pink line-clamp-1 text-xs font-semibold break-keep text-white transition-colors",
+                            "tablet:line-clamp-2 tablet:text-sm",
                           )}
                         >
-                          {entry.label}
+                          {entry.name}
                         </span>
-                      )}
-                      <span
-                        className={cn(
-                          "text-[10px] text-white/55",
-                          "tablet:text-xs",
+                        {entry.label !== entry.name && (
+                          <span
+                            className={cn(
+                              "line-clamp-2 text-xs break-keep text-white/70",
+                              "tablet:text-sm",
+                            )}
+                          >
+                            {entry.label}
+                          </span>
                         )}
-                      >
-                        {entry.city && `${entry.city} · `}
-                        {entry.date}
-                      </span>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
+                        <span
+                          className={cn(
+                            "text-[10px] text-white/55",
+                            "tablet:text-xs",
+                          )}
+                        >
+                          {entry.city && `${entry.city} · `}
+                          {entry.date}
+                        </span>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
       )}
     </div>
   );
