@@ -317,12 +317,22 @@ export function LiveListView({
                         )}
                       >
                         {entry.thumbnail ? (
-                          <ThumbImage
-                            src={entry.thumbnail}
-                            displayWidth={360}
-                            alt={entry.name}
-                            className="h-full w-full object-contain transition-opacity group-hover:opacity-80"
-                          />
+                          <>
+                            {/* 정사각형이 아닌 포스터의 빈 칸을 같은 그림을 흐리게 깔아
+                            채운다 — 본 그림은 잘리지 않게 contain 그대로. 주소가 같아
+                            다운로드는 한 번이다. */}
+                            <ThumbImage
+                              src={entry.thumbnail}
+                              displayWidth={360}
+                              className="absolute inset-0 h-full w-full scale-125 object-cover blur-xl brightness-50"
+                            />
+                            <ThumbImage
+                              src={entry.thumbnail}
+                              displayWidth={360}
+                              alt={entry.name}
+                              className="relative h-full w-full object-contain transition-opacity group-hover:opacity-80"
+                            />
+                          </>
                         ) : (
                           <div className="h-full w-full bg-white/5" />
                         )}
