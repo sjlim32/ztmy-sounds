@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { splitParenSuffix } from "./LiveTicket";
+import { splitParenSuffix } from "./split-paren-suffix";
 
 describe("splitParenSuffix", () => {
   test("끝 괄호를 부연설명으로 뗀다", () => {

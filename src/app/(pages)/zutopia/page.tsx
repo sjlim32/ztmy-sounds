@@ -56,10 +56,6 @@ export default async function ZutopiaHubPage() {
   const topSong = statSections
     .flatMap((section) => section.records)
     .find((record) => record.id === "song-most-played")?.rows[0];
-  const statRecordCount = statSections.reduce(
-    (sum, section) => sum + section.records.length,
-    0,
-  );
 
   return (
     <div className="flex flex-col gap-8">

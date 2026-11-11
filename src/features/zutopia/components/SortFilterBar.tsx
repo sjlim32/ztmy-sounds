@@ -3,21 +3,17 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { FilterChip, FilterRow } from "@/components/FilterChips";
+import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
 
 /**
- * 정렬/필터 줄(SortFilterBar)들을 감싸는 카드 — 곡·앨범·공연 목록이 모두 이걸
- * 써서 생김새·여백·줄 간격이 같다(FilterPanel). 배경 그림이 화려해서 옅은 흰
- * 면으로는 칩이 묻혀, 공연 상세 티켓(LIVE_SURFACE_CLASS)과 같은 어두운 면을 쓴다.
- * 참전 기록 현황 막대·목록 카드처럼 필터가 아닌 카드도 이 면을 같이 쓴다.
+ * 정렬/필터 줄(SortFilterBar)들을 감싸는 카드 — 곡·앨범·공연·참전·연혁·통계가
+ * 모두 이걸 써서 생김새·여백·줄 간격이 같다(FilterPanel). 면은 공통
+ * ZUTOPIA_SURFACE_CLASS(surface.ts).
  */
-export const ZUTOPIA_SURFACE_CLASS =
-  "rounded-lg border border-white/10 bg-black/60 shadow-[0_4px_16px_rgba(0,0,0,0.4)] backdrop-blur-md";
-
-/** 필터 카드 = 공통 면(ZUTOPIA_SURFACE_CLASS) + 줄 쌓기·안쪽 여백. */
-export const SORT_FILTER_CARD_CLASS = `${ZUTOPIA_SURFACE_CLASS} flex flex-col gap-2 px-3 py-2.5 tablet:px-4 tablet:py-3`;
+const SORT_FILTER_CARD_CLASS = `${ZUTOPIA_SURFACE_CLASS} flex flex-col gap-2 px-3 py-2.5 tablet:px-4 tablet:py-3`;
 
 /**
- * 곡·앨범·공연 목록 위 필터 카드 — 안에 SortFilterBar 줄들을 쌓고, summary
+ * 목록 위 필터 카드 — 안에 SortFilterBar 줄들을 쌓고, summary
  * (개수 등)는 태블릿 이상에서 오른쪽 위, 모바일에선 맨 위 줄에 둔다.
  */
 export function FilterPanel({

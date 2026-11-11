@@ -1,8 +1,9 @@
 /**
- * 즛토피아 하위 구역(곡·앨범·공연) 사이를 오가는 헤더 내비게이션 항목
- * (ZutopiaHeaderNav). 헤더는 클라이언트 컴포넌트라 서버 데이터를 불러오는
+ * 즛토피아 하위 구역(곡·앨범·공연·참전·연혁·통계) 사이를 오가는 헤더 내비게이션
+ * 항목(ZutopiaHeaderNav). 헤더는 클라이언트 컴포넌트라 서버 데이터를 불러오는
  * registry.ts를 쓰지 못해서 여기 따로 둔다 — registry.ts의 ZUTOPIA_CATEGORIES에
- * 카테고리를 더하면 여기에도 같이 더한다.
+ * 카테고리를 더하면 여기에도 같이 더하고, 카테고리가 아닌 페이지(참전·연혁·통계)는
+ * 여기에만 더한다.
  */
 export interface ZutopiaNavItem {
   href: string;

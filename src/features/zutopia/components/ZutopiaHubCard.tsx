@@ -32,7 +32,7 @@ export function ZutopiaHubCard({
       className={cn(
         "group relative block aspect-square overflow-hidden rounded-xl border border-white/10 bg-black/30",
         "shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
-        "transition-[transform,box-shadow,border-color] duration-300 ease-out",
+        "transition-[transform,box-shadow,border-color] duration-300 ease-out motion-reduce:transition-none motion-reduce:hover:translate-y-0",
         "hover:border-ztmy-magenta/60 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(225,71,191,0.25)]",
         className,
       )}
@@ -44,7 +44,7 @@ export function ZutopiaHubCard({
             src={imageUrl}
             alt=""
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
           {/* 평소엔 이미지를 살짝 어둡게 눌러뒀다가, 호버하면 걷혀서 밝아진다. */}
           <div className="absolute inset-0 bg-black/45 transition-opacity duration-300 ease-out group-hover:opacity-0" />

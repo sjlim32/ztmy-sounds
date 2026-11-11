@@ -245,8 +245,9 @@ src/
                              # (같은 숫자가 두 번 보이지 않게).
                              # 성불한 곡의 들은 공연일은 행 밑 Popover(한 번에 하나,
                              # 목록 배치를 바꾸지 않게 카드에 overflow-hidden 금지).
-                             # 카드 면은 ZUTOPIA_SURFACE_CLASS(어두운 면) — 참전
-                             # 현황 막대·목록 카드도 같이 쓴다.
+                             # 카드 면은 zutopia/surface.ts의 ZUTOPIA_SURFACE_CLASS
+                             # (어두운 면, 순수 모듈) — 필터 카드·참전 현황 막대·
+                             # 목록 카드·통계 카드가 같이 쓴다.
                              # 공연 상세는 PC에서 max-w-4xl(목록 1440px과 폭 차이
                              # 완화).
                              # 화면 전환: ZutopiaScrollArea의 <main>을 ViewTransition
@@ -263,9 +264,11 @@ src/
                              # content.mdx를 만들어 [slug]/page.tsx의
                              # CONTENT_BY_KEY에 등록한다(선택 사항).
       song-db/              # 곡/앨범 DB 조회·정렬·표시 로직 (Supabase 소스)
-                             # 곡·앨범·공연 목록 위 정렬/필터 카드는 모두
-                             # components/SortFilterBar.tsx의 SORT_FILTER_CARD_CLASS
-                             # (안쪽 여백 통일). 줄 모양은 공용 FilterRow/FilterChip.
+                             # 목록 위 정렬/필터 카드는 모두 components/SortFilterBar.tsx의
+                             # FilterPanel(안쪽 여백 통일). 줄 모양은 공용
+                             # FilterRow/FilterChip. "원곡·발매곡" 판별은
+                             # song-metadata.ts의 isCountableOriginal 하나
+                             # (참전·통계가 같은 기준).
       stats/                # 통계(/zutopia/stats). data.ts가 빌드 때 공연일
                              # (getLiveHistory)·곡·앨범·투어를 모아 compute.ts
                              # (순수 함수·테스트)로 기록을 다 계산하고, 화면
@@ -300,24 +303,24 @@ src/
                              # route.ts)을 처음 열 때 한 번 받는다. 검색창
                              # (SearchField)·결과(SearchResults, 일치 글자는
                              # findMatchRanges로 마젠타 면)는 첫 화면과 창이 같이 쓴다.
-      (스크롤)              # ZUTOPIA는 모든 페이지가 스크롤 박스 하나
-                             # (ZutopiaScrollArea)를 같이 써서, 경로가 바뀌면
-                             # 항상 맨 위로 되돌린다(쿼리만 바뀌는 드로어는 제외).
-                             # 예외로 공연 목록은 상세에서 돌아오면(뒤로가기·
-                             # 헤더 공연 탭) 필터와 스크롤 위치를 복원한다
-                             # (LiveListView — 초기화 뒤에 돌아서 덮어씀).
-      nav.ts                # 헤더의 즛토피아 구역 이동(곡·앨범·공연) 항목.
-                             # 헤더가 클라이언트라 registry.ts를 못 써서 따로
-                             # 둔다 — 카테고리를 더하면 여기도 더한다. 곡·앨범
-                             # 페이지 본문엔 따로 탭을 두지 않는다(헤더와 중복).
-  components/               # 여러 기능이 공유하는 전역 컴포넌트
-    mobile/                 # 모바일 전용 전역 컴포넌트
                              # 열림 상태는 search-dialog-store, 버튼은
                              # ZutopiaSearchButton, 창 본체는 SiteHeader가 dynamic으로
                              # (다른 페이지 번들에 안 들어가게). 창의 여닫힘·포커스는
                              # SidePanel과 같은 lib/use-presence·use-dialog-focus.
                              # "열린 창이 있는지"는 lib/open-modal의 hasOpenModal
                              # (닫혀도 DOM에 남는 드로어는 aria-hidden으로 제외).
+      (스크롤)              # ZUTOPIA는 모든 페이지가 스크롤 박스 하나
+                             # (ZutopiaScrollArea)를 같이 써서, 경로가 바뀌면
+                             # 항상 맨 위로 되돌린다(쿼리만 바뀌는 드로어는 제외).
+                             # 예외로 공연 목록은 상세에서 돌아오면(뒤로가기·
+                             # 헤더 공연 탭) 필터와 스크롤 위치를 복원한다
+                             # (LiveListView — 초기화 뒤에 돌아서 덮어씀).
+      nav.ts                # 헤더의 즛토피아 구역 이동(곡·앨범·공연·참전·연혁·통계) 항목.
+                             # 헤더가 클라이언트라 registry.ts를 못 써서 따로
+                             # 둔다 — 카테고리를 더하면 여기도 더한다. 곡·앨범
+                             # 페이지 본문엔 따로 탭을 두지 않는다(헤더와 중복).
+  components/               # 여러 기능이 공유하는 전역 컴포넌트
+    mobile/                 # 모바일 전용 전역 컴포넌트
     icons/                  # 커스텀 SVG 아이콘 (외부 아이콘 라이브러리 미사용)
     SiteHeader.tsx           # 하위 페이지(guide·slam·info·zutopia) 공용 헤더.
                              # 태블릿 이상: 왼쪽 [로고(메인 링크) │ ‹ 페이지 이름
