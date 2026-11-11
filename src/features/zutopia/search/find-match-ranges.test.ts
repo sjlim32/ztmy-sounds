@@ -24,3 +24,15 @@ describe("findMatchRanges", () => {
     expect(findMatchRanges("초침을 깨물다", "  ")).toEqual([]);
   });
 });
+
+describe("findMatchRanges — 특수 글자", () => {
+  test("서로게이트 쌍(이모지·확장 한자)이 앞에 있어도 위치가 맞다", () => {
+    expect(findMatchRanges("😀abc", "abc")).toEqual([[2, 5]]);
+    expect(findMatchRanges("𠮷野家 abc", "野家")).toEqual([[2, 4]]);
+    expect(findMatchRanges("a😀b", "😀")).toEqual([[1, 3]]);
+  });
+
+  test("반각 탁점처럼 앞 글자와 합쳐지는 글자도 강조한다", () => {
+    expect(findMatchRanges("ｶﾞｸ", "ガ")).toEqual([[0, 2]]);
+  });
+});

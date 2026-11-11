@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef } from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
+import { useDialogFocus } from "@/lib/use-dialog-focus";
+import { usePresence } from "@/lib/use-presence";
 import { GHOST_ICON_BUTTON_CLASS } from "@/components/button-styles";
 import { CloseIcon } from "@/components/icons/CloseIcon";
 
@@ -36,52 +38,15 @@ export function SidePanel({
   const closeRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const opener = document.activeElement as HTMLElement | null;
-    closeRef.current?.focus();
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-      if (event.key !== "Tab") return;
-      // 창 밖(어두운 배경 뒤)으로 포커스가 새지 않게 Tab을 창 안에서 돌린다.
-      const items = [
-        ...(dialogRef.current?.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])',
-        ) ?? []),
-      ];
-      if (items.length === 0) return;
-      const first = items[0];
-      const last = items[items.length - 1];
-      const active = document.activeElement;
-      if (
-        event.shiftKey &&
-        (active === first || !dialogRef.current?.contains(active))
-      ) {
-        event.preventDefault();
-        last.focus();
-      } else if (
-        !event.shiftKey &&
-        (active === last || !dialogRef.current?.contains(active))
-      ) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      opener?.focus?.();
-    };
-  }, [open, onClose]);
+  useDialogFocus({
+    open,
+    containerRef: dialogRef,
+    initialFocusRef: closeRef,
+    onClose,
+  });
 
-  // 닫힌 뒤에도 움직임이 끝날 때까지 그려 두는지. 열리면 바로 그린다(렌더 중 맞춤).
-  const [present, setPresent] = useState(open);
-  if (open && !present) setPresent(true);
-  useEffect(() => {
-    if (open || !present) return;
-    const timer = setTimeout(() => setPresent(false), PANEL_TRANSITION_MS);
-    return () => clearTimeout(timer);
-  }, [open, present]);
+  // 닫힌 뒤에도 움직임이 끝날 때까지 그려 둔다.
+  const present = usePresence(open, PANEL_TRANSITION_MS);
 
   if (!present) return null;
 
@@ -90,7 +55,7 @@ export function SidePanel({
       className={cn(
         "tablet:items-stretch tablet:justify-end fixed inset-0 z-50 flex items-end bg-black/40",
         // 처음 그려질 땐 투명에서 시작(@starting-style), 닫히는 동안엔 투명으로.
-        "transition-opacity duration-300 starting:opacity-0",
+        "transition-opacity duration-300 motion-reduce:transition-none starting:opacity-0",
         !open && "pointer-events-none opacity-0",
       )}
       onClick={(event) => {
@@ -106,7 +71,7 @@ export function SidePanel({
           "bg-background flex max-h-[85dvh] w-full flex-col rounded-t-xl border-t border-white/15 shadow-[0_-8px_32px_rgba(0,0,0,0.5)]",
           "tablet:max-h-none tablet:w-[34rem] pc:w-[40rem] tablet:rounded-none tablet:border-t-0 tablet:border-l",
           // 모바일은 아래에서, 태블릿 이상은 오른쪽에서 밀려 나온다.
-          "transition-transform duration-300 ease-out",
+          "transition-transform duration-300 ease-out motion-reduce:transition-none",
           "tablet:starting:translate-x-full tablet:starting:translate-y-0 starting:translate-y-full",
           !open &&
             "tablet:translate-x-full tablet:translate-y-0 translate-y-full",

@@ -95,7 +95,7 @@ export function FilterChip({
     >
       {children}
       {count != null && (
-        <span className="ml-0.5 text-xs font-normal text-white/50 tabular-nums">
+        <span className="ml-0.5 text-sm font-normal text-white/50 tabular-nums">
           {count}
         </span>
       )}

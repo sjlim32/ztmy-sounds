@@ -143,16 +143,33 @@ export function findMatchRanges(
   const query = parseQuery(rawQuery);
   if (!query.joined || !text) return [];
 
-  // 정규화된 글자 하나하나가 원문 몇 번째 글자에서 왔는지.
-  let normalized = "";
-  const origin: number[] = [];
+  // 원문을 "따로 정규화해도 결과가 같은" 덩어리로 나눈다 — 반각 탁점(ｶﾞ→ガ)처럼
+  // 앞 글자와 합쳐져야 정규화되는 글자는 앞 덩어리에 붙인다.
+  const chunks: { text: string; start: number }[] = [];
   let index = 0;
   for (const char of text) {
-    for (const piece of normalizeSearchText(char)) {
-      normalized += piece;
-      origin.push(index);
-    }
+    const last = chunks.at(-1);
+    if (
+      last &&
+      normalizeSearchText(last.text + char) !==
+        normalizeSearchText(last.text) + normalizeSearchText(char)
+    )
+      last.text += char;
+    else chunks.push({ text: char, start: index });
     index += char.length;
+  }
+
+  // 정규화된 글자(UTF-16 한 칸)마다 원문의 어느 덩어리 [시작, 끝)에서 왔는지.
+  let normalized = "";
+  const starts: number[] = [];
+  const ends: number[] = [];
+  for (const chunk of chunks) {
+    const piece = normalizeSearchText(chunk.text);
+    normalized += piece;
+    for (let i = 0; i < piece.length; i++) {
+      starts.push(chunk.start);
+      ends.push(chunk.start + chunk.text.length);
+    }
   }
 
   const ranges: [number, number][] = [];
@@ -160,10 +177,7 @@ export function findMatchRanges(
   for (const needle of needles) {
     let from = normalized.indexOf(needle);
     while (from !== -1) {
-      const last = origin[from + needle.length - 1];
-      // 마지막 글자가 서로게이트 쌍이면 끝을 그 뒤로.
-      const lastLength = text.codePointAt(last)! > 0xffff ? 2 : 1;
-      ranges.push([origin[from], last + lastLength]);
+      ranges.push([starts[from], ends[from + needle.length - 1]]);
       from = normalized.indexOf(needle, from + 1);
     }
   }

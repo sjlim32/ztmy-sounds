@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { hasOpenModal } from "@/lib/open-modal";
 
 /** 이만큼 움직였으면 누르기가 아니라 스크롤로 본다. */
 const TAP_SLOP = 10;
@@ -73,7 +74,7 @@ export function Popover({
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
-      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      if (hasOpenModal()) return;
       onClose();
     };
     document.addEventListener("pointerdown", onDown, true);

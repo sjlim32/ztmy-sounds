@@ -303,6 +303,12 @@ src/
                              # 페이지 본문엔 따로 탭을 두지 않는다(헤더와 중복).
   components/               # 여러 기능이 공유하는 전역 컴포넌트
     mobile/                 # 모바일 전용 전역 컴포넌트
+                             # 열림 상태는 search-dialog-store, 버튼은
+                             # ZutopiaSearchButton, 창 본체는 SiteHeader가 dynamic으로
+                             # (다른 페이지 번들에 안 들어가게). 창의 여닫힘·포커스는
+                             # SidePanel과 같은 lib/use-presence·use-dialog-focus.
+                             # "열린 창이 있는지"는 lib/open-modal의 hasOpenModal
+                             # (닫혀도 DOM에 남는 드로어는 aria-hidden으로 제외).
     icons/                  # 커스텀 SVG 아이콘 (외부 아이콘 라이브러리 미사용)
     SiteHeader.tsx           # 하위 페이지(guide·slam·info·zutopia) 공용 헤더.
                              # 태블릿 이상: 왼쪽 [로고(메인 링크) │ ‹ 페이지 이름

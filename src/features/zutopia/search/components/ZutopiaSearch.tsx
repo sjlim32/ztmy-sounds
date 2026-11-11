@@ -2,6 +2,7 @@
 
 import {
   useCallback,
+  useDeferredValue,
   useEffect,
   useMemo,
   useRef,
@@ -64,7 +65,12 @@ export function ZutopiaSearch({
   children: ReactNode;
 }) {
   const query = useSyncExternalStore(subscribeQuery, readQuery, () => "");
-  const result = useMemo(() => searchZutopia(index, query), [index, query]);
+  // 글자를 빨리 칠 때 입력이 밀리지 않게 결과 계산은 한 박자 늦게.
+  const deferredQuery = useDeferredValue(query);
+  const result = useMemo(
+    () => searchZutopia(index, deferredQuery),
+    [index, deferredQuery],
+  );
   const isSearching = query.trim().length > 0;
   // 태블릿 이상 드롭다운 열림 여부. 처음엔 열린 상태라, 결과를 눌렀다가
   // 뒤로 오면(?q= 유지) 결과가 바로 다시 보인다.
@@ -128,7 +134,7 @@ export function ZutopiaSearch({
               "bg-background/95 max-h-[max(15rem,calc(100dvh-21rem))] overflow-y-auto overscroll-contain rounded-xl border border-white/15 p-4 shadow-2xl backdrop-blur-md",
             )}
           >
-            <SearchResults query={query} result={result} />
+            <SearchResults query={deferredQuery} result={result} />
           </div>
         )}
       </div>
@@ -138,7 +144,7 @@ export function ZutopiaSearch({
       <div className={cn(isSearching && "max-tablet:hidden")}>{children}</div>
       {isSearching && (
         <div className="tablet:hidden">
-          <SearchResults query={query} result={result} />
+          <SearchResults query={deferredQuery} result={result} />
         </div>
       )}
     </div>

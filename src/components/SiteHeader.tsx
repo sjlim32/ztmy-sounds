@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -13,10 +14,17 @@ import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { findSitePage } from "@/components/site-pages";
 import { InfoTabs } from "@/features/info/components/InfoTabs";
 import { ZutopiaHeaderNav } from "@/features/zutopia/components/ZutopiaHeaderNav";
-import {
-  ZutopiaSearchButton,
-  ZutopiaSearchDialog,
-} from "@/features/zutopia/search/components/ZutopiaSearchDialog";
+import { ZutopiaSearchButton } from "@/features/zutopia/search/components/ZutopiaSearchButton";
+
+// 통합 검색 창 — 즛토피아 하위 페이지에서만 그리므로 가이드·공연 정보 등 다른 페이지
+// 번들에 넣지 않게 따로 불러온다.
+const ZutopiaSearchDialog = dynamic(
+  () =>
+    import("@/features/zutopia/search/components/ZutopiaSearchDialog").then(
+      (module) => module.ZutopiaSearchDialog,
+    ),
+  { ssr: false },
+);
 
 /**
  * 하위 페이지(응원 가이드·슬램 가이드·공연 정보·즛토피아) 공용 헤더.
@@ -32,7 +40,7 @@ import {
  * 페이지 전용 내비게이션(getPageNavKind):
  * - 가이드·슬램: 없음
  * - 공연 정보: 본문 탭(투어 일정·공연 지도·…)
- * - 즛토피아: 첫 화면엔 없음, 곡·앨범·공연 안으로 들어가면 구역 이동 + 통합
+ * - 즛토피아: 첫 화면엔 없음, 하위 페이지(곡·앨범·공연·참전·연혁·통계)면 구역 이동 + 통합
  *   검색 버튼(첫 화면은 본문에 검색창이 있어서 하위 페이지에만)
  */
 export function SiteHeader() {

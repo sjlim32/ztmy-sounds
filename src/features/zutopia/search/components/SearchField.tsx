@@ -3,11 +3,12 @@
 import { useEffect } from "react";
 import type { KeyboardEvent, Ref } from "react";
 import { cn } from "@/lib/utils";
+import { hasOpenModal } from "@/lib/open-modal";
 import { GHOST_ICON_BUTTON_CLASS } from "@/components/button-styles";
 import { CloseIcon } from "@/components/icons/CloseIcon";
 import { SearchIcon } from "@/components/icons/SearchIcon";
 
-export const SEARCH_PLACEHOLDER = "곡·별명·앨범·공연 이름으로 검색";
+const SEARCH_PLACEHOLDER = "곡·별명·앨범·공연 이름으로 검색";
 
 /**
  * 즛토피아 통합 검색창 — 첫 화면(ZutopiaSearch)과 헤더 검색 창
@@ -42,7 +43,12 @@ export function SearchField({
         autoFocus={autoFocus}
         onChange={(event) => onChange(event.target.value)}
         onFocus={onFocus}
-        onKeyDown={onKeyDown}
+        onKeyDown={(event) => {
+          // 모바일 키보드의 "검색" 키 — 결과는 이미 보이니 키보드만 내려 결과가 가리지 않게.
+          if (event.key === "Enter" && !event.nativeEvent.isComposing)
+            event.currentTarget.blur();
+          onKeyDown?.(event);
+        }}
         enterKeyHint="search"
         aria-label="곡·앨범·공연 검색"
         placeholder={SEARCH_PLACEHOLDER}
@@ -98,7 +104,7 @@ export function useSearchShortcut(onTrigger: () => void) {
         !event.ctrlKey &&
         !event.altKey;
       if (!isCommandK && !isSlash) return;
-      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      if (hasOpenModal()) return;
       event.preventDefault();
       onTrigger();
     };

@@ -3,6 +3,7 @@
 import { Fragment } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ThumbImage } from "@/components/ThumbImage";
 import { cn } from "@/lib/utils";
 import { LIST_ITEM_CLASS } from "@/components/button-styles";
@@ -28,19 +29,26 @@ export function SearchResults({
   result: ZutopiaSearchResult;
   onNavigate?: () => void;
 }) {
-  if (result.total === 0) {
-    return (
-      <p className="py-10 text-center text-sm text-white/60">
-        「{query.trim()}」 검색 결과가 없어요.
-      </p>
-    );
-  }
+  // 결과 수 안내 — 결과가 있든 없든 같은 자리(role="status")에서 글만 바꿔 화면
+  // 읽기 도구가 바뀔 때마다 읽게 한다.
+  const status = (
+    <p
+      role="status"
+      className={cn(
+        "text-sm text-white/60",
+        result.total === 0 && "py-10 text-center",
+      )}
+    >
+      {result.total === 0
+        ? `「${query.trim()}」 검색 결과가 없어요.`
+        : `「${query.trim()}」 검색 결과 ${result.total}개`}
+    </p>
+  );
+  if (result.total === 0) return status;
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-sm text-white/60" aria-live="polite">
-        「{query.trim()}」 검색 결과 {result.total}개
-      </p>
+      {status}
       <ResultGroup
         title="곡"
         hits={result.songs}
@@ -177,11 +185,15 @@ function ResultRow({
   reason?: string | null;
 }) {
   const showEnglish = !!englishTitle && englishTitle !== title;
+  const pathname = usePathname();
 
   return (
     <Link
       href={href}
-      transitionTypes={["nav-forward"]}
+      // 지금 페이지에서 쿼리만 바뀌는 이동(곡 목록 → 곡 드로어)은 본문을 밀지 않는다.
+      transitionTypes={
+        href.split("?")[0] === pathname ? undefined : ["nav-forward"]
+      }
       onClick={onNavigate}
       className={cn(LIST_ITEM_CLASS, "flex items-center gap-3 px-2 py-2")}
     >
@@ -199,7 +211,7 @@ function ResultRow({
           <Highlight text={title} query={query} />
         </span>
         {showEnglish && (
-          <span className="truncate text-xs text-white/45">
+          <span className="truncate text-sm text-white/45">
             <Highlight text={englishTitle} query={query} />
           </span>
         )}
@@ -207,7 +219,7 @@ function ResultRow({
           <Highlight text={subtitle} query={query} />
         </span>
         {reason && (
-          <span className="text-ztmy-pink truncate text-xs">{reason}</span>
+          <span className="text-ztmy-pink truncate text-sm">{reason}</span>
         )}
       </span>
     </Link>
