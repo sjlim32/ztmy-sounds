@@ -324,3 +324,25 @@ describe("buildSongLiveStats", () => {
     });
   });
 });
+
+describe("오프닝·앵콜 곡(통계용)", () => {
+  test("앵콜이 아닌 곡 중 순서가 가장 앞선 곡이 첫 곡, 앵콜 곡은 원곡 id로", () => {
+    const rows: RawSetlistRow[] = [
+      { ...row("b", { live_id: "L" }), track_number: 2, is_encore: false },
+      { ...row("a", { live_id: "L" }), track_number: 1, is_encore: false },
+      { ...row("arr", { live_id: "L" }), track_number: 9, is_encore: true },
+    ];
+    const [unit] = build([live({ id: "L", live_venue: "Zepp" })], rows, [], {
+      arr: "orig",
+    });
+    expect(unit.openingSongId).toBe("a");
+    expect(unit.encoreSongIds).toEqual(["orig"]);
+    expect(unit.venue).toBe("Zepp");
+  });
+
+  test("순서 정보가 없는 원시 데이터면 필드를 만들지 않는다", () => {
+    const [unit] = build([live({ id: "L" })], [row("a", { live_id: "L" })]);
+    expect(unit.openingSongId).toBeUndefined();
+    expect(unit.encoreSongIds).toBeUndefined();
+  });
+});

@@ -266,6 +266,16 @@ src/
                              # 곡·앨범·공연 목록 위 정렬/필터 카드는 모두
                              # components/SortFilterBar.tsx의 SORT_FILTER_CARD_CLASS
                              # (안쪽 여백 통일). 줄 모양은 공용 FilterRow/FilterChip.
+      stats/                # 통계(/zutopia/stats). data.ts가 빌드 때 공연일
+                             # (getLiveHistory)·곡·앨범·투어를 모아 compute.ts
+                             # (순수 함수·테스트)로 기록을 다 계산하고, 화면
+                             # (StatsView)엔 글자로 정리된 순위 줄만 내린다.
+                             # 공연일 1개 = 1회, 세트리스트 없는 공연일은 곡·공연
+                             # 기록에서 빼고 횟수·장소·공백엔 넣는다. 참가율 = 발매
+                             # 후 세트리스트 있는 공연일 중 부른 비율. 페스티벌은
+                             # 연도 표기를 뗀 이름, 공연장은 괄호를 뗀 원어 이름으로
+                             # 묶는다. 카드(1위 크게 + 2~5위) → "자세히 보기"는
+                             # SidePanel 전체 표. 동점은 같은 순위.
       search/               # 첫 화면(/zutopia) 통합 검색. data.ts가 빌드 때 곡·
                              # 앨범·공연 + 곡별 세트리스트 연결(공연일은 투어로
                              # 묶음)로 인덱스를 만들고, search.ts가 브라우저에서

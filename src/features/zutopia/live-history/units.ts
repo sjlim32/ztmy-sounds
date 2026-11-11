@@ -62,17 +62,22 @@ function buildAllUnits(input: {
         : (live.icon_image_url ?? live.poster_image_url ?? null),
     };
     // day = null(하루 공연)이면 DAY 번호가 붙은 자기 행도 전부 센다.
-    const songsFor = (day: number | null) =>
-      uniqueSongIds(
-        [
-          ...common,
-          ...own.filter(
-            (row) =>
-              day === null || row.day_number == null || row.day_number === day,
-          ),
-        ],
-        originalOf,
-      );
+    const rowsFor = (day: number | null) => [
+      ...common,
+      ...own.filter(
+        (row) =>
+          day === null || row.day_number == null || row.day_number === day,
+      ),
+    ];
+    const unitFields = (day: number | null) => {
+      const rows = rowsFor(day);
+      return {
+        songIds: uniqueSongIds(rows, originalOf),
+        ...setlistDetails(rows, originalOf),
+        ...(live.live_venue !== undefined && { venue: live.live_venue }),
+        ...(live.country !== undefined && { country: live.country }),
+      };
+    };
 
     // 페스티벌, 그리고 live_date(즛토마요가 실제로 선 날)가 있는 공연은 그날 하루.
     if (live.type === "FESTIVAL" || live.live_date) {
@@ -82,7 +87,7 @@ function buildAllUnits(input: {
         id: `${live.id}:${date}`,
         date,
         dayNumber: null,
-        songIds: songsFor(null),
+        ...unitFields(null),
       });
       continue;
     }
@@ -97,7 +102,7 @@ function buildAllUnits(input: {
         id: `${live.id}:${date}`,
         date,
         dayNumber: days > 1 ? n : null,
-        songIds: songsFor(days > 1 ? n : null),
+        ...unitFields(days > 1 ? n : null),
       });
     }
   }
@@ -179,4 +184,28 @@ function uniqueSongIds(
   return [
     ...new Set(rows.map((row) => originalOf[row.song_id] ?? row.song_id)),
   ];
+}
+
+/**
+ * 오프닝·앵콜 곡(통계용) — track_number·is_encore가 있는 행에서만. 첫 곡은 앵콜이
+ * 아닌 곡 중 순서가 가장 앞선 곡(같으면 투어 공통 행이 먼저). 둘 다 없으면 빈 값.
+ */
+function setlistDetails(
+  rows: RawSetlistRow[],
+  originalOf: Record<string, string>,
+): Pick<LiveUnit, "openingSongId" | "encoreSongIds"> {
+  if (!rows.some((row) => row.track_number !== undefined)) return {};
+  const original = (row: RawSetlistRow) =>
+    originalOf[row.song_id] ?? row.song_id;
+  let opening: RawSetlistRow | null = null;
+  for (const row of rows) {
+    if (row.is_encore || row.track_number === undefined) continue;
+    if (!opening || row.track_number < opening.track_number!) opening = row;
+  }
+  return {
+    openingSongId: opening ? original(opening) : null,
+    encoreSongIds: [
+      ...new Set(rows.filter((row) => row.is_encore).map(original)),
+    ],
+  };
 }

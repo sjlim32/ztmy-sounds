@@ -29,6 +29,14 @@ export interface LiveUnit {
   imageUrl: string | null;
   /** 묶음(투어·공연) 대표 그림 — 투어면 투어 포스터, 아니면 imageUrl */
   groupImageUrl: string | null;
+  /** lives.live_venue(통계용 — 원시 데이터에 있을 때만) */
+  venue?: string;
+  /** lives.country(통계용) */
+  country?: string;
+  /** 이날 첫 곡(앵콜 아닌 곡 중 track_number가 가장 작은 곡, 원곡 id) */
+  openingSongId?: string | null;
+  /** 이날 앵콜로 부른 곡(원곡 id, 중복 없음) */
+  encoreSongIds?: string[];
 }
 
 export interface SongLiveStat {
@@ -59,6 +67,8 @@ export interface RawLive {
   region: string;
   icon_image_url: string | null;
   poster_image_url: string | null;
+  live_venue?: string;
+  country?: string;
 }
 
 export interface RawTour {
@@ -74,4 +84,6 @@ export interface RawSetlistRow {
   tour_id: string | null;
   song_id: string;
   day_number: number | null;
+  track_number?: number;
+  is_encore?: boolean;
 }

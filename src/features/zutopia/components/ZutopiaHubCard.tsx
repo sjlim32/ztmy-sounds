@@ -7,10 +7,12 @@ interface ZutopiaHubCardProps {
   description: string;
   meta?: string;
   imageUrl?: string;
+  /** 카드 비율 등을 바꿀 때(예: 한 줄을 다 차지하는 가로 카드) */
+  className?: string;
 }
 
 /**
- * 즛토피아 허브(/zutopia)의 대분류 카드(모바일 2열 · PC 한 줄 네 장). 이미지가 있으면 배경으로 꽉 채우고,
+ * 즛토피아 허브(/zutopia)의 대분류 카드(모바일 2열 · PC 한 줄 다섯 장). 이미지가 있으면 배경으로 꽉 채우고,
  * 없으면 ztmy 톤 그라데이션으로 대체한다. 이미지가 있을 때는 평소엔 어둡게
  * 눌러뒀다가 호버하면 밝아지면서 살짝 확대되도록(group-hover) 해서, 눌러보고
  * 싶게 만드는 대비를 준다.
@@ -21,6 +23,7 @@ export function ZutopiaHubCard({
   description,
   meta,
   imageUrl,
+  className,
 }: ZutopiaHubCardProps) {
   return (
     <Link
@@ -31,6 +34,7 @@ export function ZutopiaHubCard({
         "shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
         "transition-[transform,box-shadow,border-color] duration-300 ease-out",
         "hover:border-ztmy-magenta/60 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(225,71,191,0.25)]",
+        className,
       )}
     >
       {imageUrl ? (

@@ -46,7 +46,7 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
       supabase
         .from("lives")
         .select(
-          "id, slug, tour_id, title, title_ko, type, start_date, end_date, live_date, region, icon_image_url, poster_image_url",
+          "id, slug, tour_id, title, title_ko, type, start_date, end_date, live_date, region, country, live_venue, icon_image_url, poster_image_url",
         )
         .eq("status", "ACTIVE"),
       supabase
@@ -55,7 +55,9 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
         .eq("status", "ACTIVE"),
       supabase
         .from("setlists")
-        .select("live_id, tour_id, song_id, day_number, songs!inner(status)")
+        .select(
+          "live_id, tour_id, song_id, day_number, track_number, is_encore, songs!inner(status)",
+        )
         .eq("songs.status", "ACTIVE"),
       getOriginalOf(),
     ]);
@@ -82,11 +84,13 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
     lives: livesResult.data,
     tours: toursResult.data,
     setlists: setlistsResult.data.map(
-      ({ live_id, tour_id, song_id, day_number }) => ({
+      ({ live_id, tour_id, song_id, day_number, track_number, is_encore }) => ({
         live_id,
         tour_id,
         song_id,
         day_number,
+        track_number,
+        is_encore,
       }),
     ),
     originalOf,

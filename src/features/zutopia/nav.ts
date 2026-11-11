@@ -21,4 +21,5 @@ export const ZUTOPIA_NAV_ITEMS: readonly ZutopiaNavItem[] = [
     paths: ["/zutopia/attendance"],
   },
   { href: "/zutopia/timeline", label: "연혁", paths: ["/zutopia/timeline"] },
+  { href: "/zutopia/stats", label: "통계", paths: ["/zutopia/stats"] },
 ];
