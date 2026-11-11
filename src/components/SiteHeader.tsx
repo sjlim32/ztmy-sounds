@@ -13,6 +13,10 @@ import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { findSitePage } from "@/components/site-pages";
 import { InfoTabs } from "@/features/info/components/InfoTabs";
 import { ZutopiaHeaderNav } from "@/features/zutopia/components/ZutopiaHeaderNav";
+import {
+  ZutopiaSearchButton,
+  ZutopiaSearchDialog,
+} from "@/features/zutopia/search/components/ZutopiaSearchDialog";
 
 /**
  * 하위 페이지(응원 가이드·슬램 가이드·공연 정보·즛토피아) 공용 헤더.
@@ -28,7 +32,8 @@ import { ZutopiaHeaderNav } from "@/features/zutopia/components/ZutopiaHeaderNav
  * 페이지 전용 내비게이션(getPageNavKind):
  * - 가이드·슬램: 없음
  * - 공연 정보: 본문 탭(투어 일정·공연 지도·…)
- * - 즛토피아: 첫 화면엔 없음, 곡·앨범·공연 안으로 들어가면 구역 이동
+ * - 즛토피아: 첫 화면엔 없음, 곡·앨범·공연 안으로 들어가면 구역 이동 + 통합
+ *   검색 버튼(첫 화면은 본문에 검색창이 있어서 하위 페이지에만)
  */
 export function SiteHeader() {
   const pathname = usePathname();
@@ -98,8 +103,12 @@ export function SiteHeader() {
           )}
         </div>
         {navKind && (
-          <div className="h-full min-w-0 overflow-x-auto">
-            <PageNav kind={navKind} />
+          <div className="flex h-full min-w-0 items-center gap-6">
+            {/* 즛토피아는 탭 묶음 앞(곡 왼쪽)에 통합 검색 */}
+            {navKind === "zutopia" && <ZutopiaSearchButton />}
+            <div className="h-full min-w-0 overflow-x-auto">
+              <PageNav kind={navKind} />
+            </div>
           </div>
         )}
       </header>
@@ -107,13 +116,20 @@ export function SiteHeader() {
       {navKind && (
         <div
           className={cn(
-            "h-11 shrink-0 scrollbar-none overflow-x-auto border-b border-white/10 bg-black/40 px-4 backdrop-blur-md",
+            "flex h-11 shrink-0 items-center gap-2 border-b border-white/10 bg-black/40 pr-4 backdrop-blur-md",
+            navKind === "zutopia" ? "pl-1" : "pl-4",
             "tablet:hidden",
           )}
         >
-          <PageNav kind={navKind} className="w-max" />
+          {/* 즛토피아는 줄 앞(곡 왼쪽)에 통합 검색 — 탭이 넘쳐 가로로 넘겨도 자리를 지킨다. */}
+          {navKind === "zutopia" && <ZutopiaSearchButton compact />}
+          <div className="h-full min-w-0 flex-1 scrollbar-none overflow-x-auto">
+            <PageNav kind={navKind} className="w-max" />
+          </div>
         </div>
       )}
+
+      {navKind === "zutopia" && <ZutopiaSearchDialog />}
     </>
   );
 }

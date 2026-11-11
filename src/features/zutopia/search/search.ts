@@ -129,3 +129,52 @@ function collectHits<T>(
   }
   return [...direct, ...related];
 }
+
+/**
+ * 결과 글자 강조용 — 검색어(띄어쓰기를 뺀 전체, 그리고 띄어 친 단어마다)가
+ * 원문의 어디에 들어 있는지 [시작, 끝) 범위로 돌려준다. 비교는 검색과 같은
+ * 기준(normalizeSearchText — 대소문자·전각/반각·띄어쓰기 무시)이라, 원문 글자를
+ * 하나씩 맞춰 가며 정규화된 위치를 원문 위치로 되돌린다. 겹치는 범위는 합친다.
+ */
+export function findMatchRanges(
+  text: string,
+  rawQuery: string,
+): [number, number][] {
+  const query = parseQuery(rawQuery);
+  if (!query.joined || !text) return [];
+
+  // 정규화된 글자 하나하나가 원문 몇 번째 글자에서 왔는지.
+  let normalized = "";
+  const origin: number[] = [];
+  let index = 0;
+  for (const char of text) {
+    for (const piece of normalizeSearchText(char)) {
+      normalized += piece;
+      origin.push(index);
+    }
+    index += char.length;
+  }
+
+  const ranges: [number, number][] = [];
+  const needles = new Set([query.joined, ...query.tokens]);
+  for (const needle of needles) {
+    let from = normalized.indexOf(needle);
+    while (from !== -1) {
+      const last = origin[from + needle.length - 1];
+      // 마지막 글자가 서로게이트 쌍이면 끝을 그 뒤로.
+      const lastLength = text.codePointAt(last)! > 0xffff ? 2 : 1;
+      ranges.push([origin[from], last + lastLength]);
+      from = normalized.indexOf(needle, from + 1);
+    }
+  }
+
+  ranges.sort((a, b) => a[0] - b[0]);
+  const merged: [number, number][] = [];
+  for (const range of ranges) {
+    const previous = merged.at(-1);
+    if (previous && range[0] <= previous[1])
+      previous[1] = Math.max(previous[1], range[1]);
+    else merged.push([...range]);
+  }
+  return merged;
+}

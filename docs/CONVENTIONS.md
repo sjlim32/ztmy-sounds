@@ -273,6 +273,12 @@ src/
                              # 아래 드롭다운(배경막 없음, 바깥 클릭·Esc로
                              # 닫힘), 모바일은 카드 자리에 그대로. 검색어는
                              # 주소 ?q=에 둔다(뒤로가기·공유 유지).
+                             # 하위 페이지는 헤더 검색 버튼·"/"·⌘K로 여는 검색 창
+                             # (ZutopiaSearchDialog). 인덱스는 페이지에 싣지 않고
+                             # 빌드 때 만든 /zutopia/search-index.json(force-static
+                             # route.ts)을 처음 열 때 한 번 받는다. 검색창
+                             # (SearchField)·결과(SearchResults, 일치 글자는
+                             # findMatchRanges로 마젠타 면)는 첫 화면과 창이 같이 쓴다.
       (스크롤)              # ZUTOPIA는 모든 페이지가 스크롤 박스 하나
                              # (ZutopiaScrollArea)를 같이 써서, 경로가 바뀌면
                              # 항상 맨 위로 되돌린다(쿼리만 바뀌는 드로어는 제외).

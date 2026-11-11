@@ -1,7 +1,7 @@
 "use client";
 
-import { ThumbImage } from "@/components/ThumbImage";
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -9,23 +9,11 @@ import {
   useSyncExternalStore,
 } from "react";
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
-import {
-  GHOST_ICON_BUTTON_CLASS,
-  LIST_ITEM_CLASS,
-} from "@/components/button-styles";
-import { CloseIcon } from "@/components/icons/CloseIcon";
-import { SearchIcon } from "@/components/icons/SearchIcon";
 import { searchZutopia } from "@/features/zutopia/search/search";
-import type {
-  SearchHit,
-  ZutopiaSearchResult,
-} from "@/features/zutopia/search/search";
-import type {
-  SearchSong,
-  ZutopiaSearchIndex,
-} from "@/features/zutopia/search/types";
+import type { ZutopiaSearchIndex } from "@/features/zutopia/search/types";
+import { SearchResults } from "./SearchResults";
+import { SearchField, useSearchShortcut } from "./SearchField";
 
 // 검색어는 주소의 ?q=에 둔다 — 결과를 눌러 들어갔다가 뒤로 오면 같은 검색
 // 결과가 그대로 있고, 링크로 공유해도 같은 결과가 열린다.
@@ -66,6 +54,7 @@ const clearQuery = () => writeQuery("");
  *   없음, 아래 카드는 그대로). 바깥을 누르거나 Esc면 닫히고 검색어는 남는다
  *   — 검색창을 다시 누르면 같은 결과가 열린다. ×는 검색어를 지운다.
  * - 모바일: 드롭다운 없이 카드 자리에 결과를 그대로 보여준다.
+ * - 검색창은 SearchField(헤더 검색 창과 같은 모양), "/"·⌘K로 바로 들어간다.
  */
 export function ZutopiaSearch({
   index,
@@ -81,6 +70,13 @@ export function ZutopiaSearch({
   // 뒤로 오면(?q= 유지) 결과가 바로 다시 보인다.
   const [isDropdownOpen, setDropdownOpen] = useState(true);
   const boxRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  // "/"·⌘K로 검색창에 바로 들어간다.
+  const focusInput = useCallback(() => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, []);
+  useSearchShortcut(focusInput);
 
   // 검색창·드롭다운 바깥을 누르면 드롭다운을 닫는다.
   useEffect(() => {
@@ -97,49 +93,28 @@ export function ZutopiaSearch({
   return (
     <div className="flex flex-col gap-6">
       <div ref={boxRef} className="relative">
-        <div className="relative">
-          <SearchIcon className="pointer-events-none absolute top-1/2 left-3.5 z-10 h-5 w-5 -translate-y-1/2 text-white/50" />
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => {
-              writeQuery(event.target.value);
-              setDropdownOpen(true);
-            }}
-            onFocus={() => setDropdownOpen(true)}
-            onKeyDown={(event) => {
-              if (event.key !== "Escape") return;
-              // type="search" 입력란은 Esc에 글자를 스스로 지워서, 지울지 말지를
-              // 여기서 직접 정한다.
-              event.preventDefault();
-              // 태블릿 이상은 드롭다운만 닫고, 이미 닫혀 있으면(모바일 포함) 지운다.
-              if (isDropdownOpen && isSearching) setDropdownOpen(false);
-              else clearQuery();
-            }}
-            enterKeyHint="search"
-            aria-label="곡·앨범·공연 검색"
-            placeholder="ZUTOPIA 통합 검색 (곡·별명·앨범·공연 이름)"
-            className={cn(
-              // 모바일 Safari는 16px 미만 입력란에 포커스하면 화면을 확대해서 text-base.
-              "h-12 w-full rounded-lg border-2 border-white/15 bg-black/50 pr-12 pl-11 text-base text-white backdrop-blur-sm transition-colors placeholder:text-white/40 hover:border-white/30 focus:border-white/60 focus:outline-none",
-              // 브라우저 기본 지우기(×) 버튼 대신 아래 버튼을 쓴다.
-              "[&::-webkit-search-cancel-button]:appearance-none",
-            )}
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={clearQuery}
-              aria-label="검색어 지우기"
-              className={cn(
-                GHOST_ICON_BUTTON_CLASS,
-                "absolute top-1/2 right-2 h-8 w-8 -translate-y-1/2",
-              )}
-            >
-              <CloseIcon className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+        <SearchField
+          inputRef={inputRef}
+          value={query}
+          onChange={(value) => {
+            writeQuery(value);
+            setDropdownOpen(true);
+          }}
+          onClear={() => {
+            clearQuery();
+            inputRef.current?.focus();
+          }}
+          onFocus={() => setDropdownOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key !== "Escape") return;
+            // type="search" 입력란은 Esc에 글자를 스스로 지워서, 지울지 말지를
+            // 여기서 직접 정한다.
+            event.preventDefault();
+            // 태블릿 이상은 드롭다운만 닫고, 이미 닫혀 있으면(모바일 포함) 지운다.
+            if (isDropdownOpen && isSearching) setDropdownOpen(false);
+            else clearQuery();
+          }}
+        />
 
         {/* 태블릿 이상 드롭다운 — 검색창 바로 아래, 카드 위에 겹친다. 결과가
         길면 드롭다운 안에서만 스크롤된다. 높이는 화면 아래를 넘지 않게
@@ -167,182 +142,5 @@ export function ZutopiaSearch({
         </div>
       )}
     </div>
-  );
-}
-
-function SearchResults({
-  query,
-  result,
-}: {
-  query: string;
-  result: ZutopiaSearchResult;
-}) {
-  if (result.total === 0) {
-    return (
-      <p className="py-10 text-center text-sm text-white/60">
-        「{query.trim()}」 검색 결과가 없어요.
-      </p>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-6">
-      <p className="text-sm text-white/60" aria-live="polite">
-        「{query.trim()}」 검색 결과 {result.total}개
-      </p>
-      <ResultGroup
-        title="곡"
-        hits={result.songs}
-        render={({ item }) => (
-          <ResultRow
-            href={`/zutopia/songs?song=${item.slug}`}
-            image={item.cover}
-            title={item.title}
-            subtitle={`${item.titleKo} · ${item.releaseYear}`}
-            englishTitle={item.titleEn}
-          />
-        )}
-      />
-      <ResultGroup
-        title="앨범"
-        hits={result.albums}
-        render={(hit) => (
-          <ResultRow
-            href={`/zutopia/albums?album=${hit.item.slug}`}
-            image={hit.item.cover}
-            title={hit.item.title}
-            subtitle={`${hit.item.titleKo} · ${hit.item.releaseYear}`}
-            englishTitle={hit.item.titleEn}
-            reason={hit.related ? `${songList(hit.viaSongs)} 수록` : null}
-          />
-        )}
-      />
-      <ResultGroup
-        title="공연"
-        hits={result.lives}
-        groupBy={(hit) => hit.item.year}
-        render={(hit) => (
-          <ResultRow
-            href={`/zutopia/lives/${hit.item.slug}`}
-            image={hit.item.thumbnail || null}
-            title={hit.item.label}
-            subtitle={hit.item.date}
-            englishTitle={hit.item.titleEn}
-            reason={hit.related ? `${songList(hit.viaSongs)} 세트리스트` : null}
-          />
-        )}
-      />
-    </div>
-  );
-}
-
-// 「초침을 깨물다」, 여러 곡이면 「초침을 깨물다」 외 2곡.
-function songList(songs: SearchSong[]): string {
-  const first = `「${songs[0].titleKo}」`;
-  return songs.length > 1 ? `${first} 외 ${songs.length - 1}곡` : first;
-}
-
-function ResultGroup<T extends { slug: string }>({
-  title,
-  hits,
-  render,
-  groupBy,
-}: {
-  title: string;
-  hits: SearchHit<T>[];
-  render: (hit: SearchHit<T>) => ReactNode;
-  /** 주면 그 값(예: 공연 연도)으로 묶어 최신(큰 값)부터 소제목과 함께 보여준다. */
-  groupBy?: (hit: SearchHit<T>) => string;
-}) {
-  if (hits.length === 0) return null;
-
-  const renderList = (items: SearchHit<T>[]) => (
-    <ul className="flex flex-col rounded-lg border border-white/10 bg-black/40 p-1.5 backdrop-blur-sm">
-      {items.map((hit) => (
-        <li key={hit.item.slug}>{render(hit)}</li>
-      ))}
-    </ul>
-  );
-
-  return (
-    <section className="flex flex-col gap-2">
-      <h2 className="text-base font-bold text-white">
-        {title}
-        <span className="ml-1.5 text-sm font-medium text-white/50">
-          {hits.length}
-        </span>
-      </h2>
-      {groupBy
-        ? groupHits(hits, groupBy).map(([key, items]) => (
-            <div key={key} className="flex flex-col gap-1.5">
-              <h3 className="font-mono text-sm font-semibold text-white/70">
-                {key}
-              </h3>
-              {renderList(items)}
-            </div>
-          ))
-        : renderList(hits)}
-    </section>
-  );
-}
-
-// 같은 키끼리 묶고 키 내림차순(최신 연도 먼저)으로. 묶음 안 순서는 그대로 둔다.
-function groupHits<T>(
-  hits: SearchHit<T>[],
-  keyOf: (hit: SearchHit<T>) => string,
-): [string, SearchHit<T>[]][] {
-  const groups = new Map<string, SearchHit<T>[]>();
-  for (const hit of hits) {
-    const key = keyOf(hit);
-    groups.set(key, [...(groups.get(key) ?? []), hit]);
-  }
-  return [...groups].sort(([a], [b]) => b.localeCompare(a));
-}
-
-function ResultRow({
-  href,
-  image,
-  title,
-  subtitle,
-  englishTitle,
-  reason = null,
-}: {
-  href: string;
-  image: string | null;
-  title: string;
-  subtitle: string;
-  /** 영어 제목 — 없거나 위 제목과 같으면(영어 원제 공연 등) 줄을 생략한다. */
-  englishTitle: string | null;
-  reason?: string | null;
-}) {
-  const showEnglish = !!englishTitle && englishTitle !== title;
-
-  return (
-    <Link
-      href={href}
-      className={cn(LIST_ITEM_CLASS, "flex items-center gap-3 px-2 py-2")}
-    >
-      {image ? (
-        <ThumbImage
-          src={image}
-          displayWidth={48}
-          className="h-12 w-12 shrink-0 rounded-md object-cover"
-        />
-      ) : (
-        <span className="block h-12 w-12 shrink-0 rounded-md bg-white/10" />
-      )}
-      <span className="flex min-w-0 flex-col">
-        <span className="truncate text-sm font-semibold text-white">
-          {title}
-        </span>
-        {showEnglish && (
-          <span className="truncate text-xs text-white/45">{englishTitle}</span>
-        )}
-        <span className="truncate text-sm text-white/60">{subtitle}</span>
-        {reason && (
-          <span className="text-ztmy-pink truncate text-xs">{reason}</span>
-        )}
-      </span>
-    </Link>
   );
 }
