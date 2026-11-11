@@ -129,11 +129,7 @@ export default async function ZutopiaHubPage() {
               href="/zutopia/stats"
               title="통계"
               description="가장 많이 불린 곡부터 가장 긴 투어까지, 곡·앨범·공연·장소별 기록"
-              meta={
-                topSong
-                  ? `라이브 최다 「${topSong.name}」 ${topSong.cells[0]} · 기록 ${statRecordCount}개`
-                  : `기록 ${statRecordCount}개`
-              }
+              meta={""}
               imageUrl={
                 topSong?.image ? thumbSrc(topSong.image, 360) : undefined
               }
