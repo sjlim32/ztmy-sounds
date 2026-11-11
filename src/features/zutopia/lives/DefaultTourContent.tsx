@@ -1,3 +1,5 @@
+import { ViewTransition } from "react";
+import { posterTransitionName } from "@/features/zutopia/lives/poster-transition";
 import { cn } from "@/lib/utils";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { formatLiveDate } from "@/features/zutopia/lives/data";
@@ -28,18 +30,27 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
       className={cn(
         "mx-auto flex w-full max-w-md flex-col items-center gap-6",
         "tablet:max-w-2xl tablet:gap-8",
+        // PC는 목록(최대 1440px)에서 들어왔을 때 폭이 확 줄어 보이지 않게 한 단계 넓힌다.
+        "pc:max-w-4xl",
       )}
     >
       {tour.poster_image_url && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={tour.poster_image_url}
-          alt={tour.title}
-          className={cn(
-            "max-h-[60vh] max-w-full rounded-lg object-contain",
-            "tablet:max-h-[65vh]",
-          )}
-        />
+        // 목록 카드 그림과 같은 이름 — 목록에서 들어올 때 그 그림이 이 자리로 이어진다.
+        <ViewTransition
+          name={posterTransitionName(tour.slug ?? "")}
+          share="morph"
+          default="none"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={tour.poster_image_url}
+            alt={tour.title}
+            className={cn(
+              "max-h-[60vh] max-w-full rounded-lg object-contain",
+              "tablet:max-h-[65vh]",
+            )}
+          />
+        </ViewTransition>
       )}
 
       {tour.additional_image_urls && tour.additional_image_urls.length > 0 && (

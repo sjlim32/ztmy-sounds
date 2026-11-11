@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, ViewTransition } from "react";
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { EntranceFade } from "@/components/EntranceFade";
@@ -39,27 +39,41 @@ export function ZutopiaScrollArea({ children }: { children: ReactNode }) {
           아니라 스크롤 내용에 붙어 같이 올라가 버린다. */}
       <ScrollToTopButton containerId={ZUTOPIA_SCROLL_CONTAINER_ID} />
 
-      <main
-        id={ZUTOPIA_SCROLL_CONTAINER_ID}
-        ref={scrollRef}
-        className={cn(
-          "min-h-0 w-full flex-1 overflow-y-auto scroll-smooth",
-          "scrollbar-thin [scrollbar-color:transparent_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
-          "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
-        )}
+      {/* 페이지 이동 때 이 스크롤 박스만 통째로 움직인다(globals.css의
+          nav-forward·nav-back·nav-fade). 레이아웃은 남아 있으니 enter/exit가
+          아니라 update로 받는다. 타입 없는 이동(드로어 열기 등)은 그대로. */}
+      <ViewTransition
+        name="zutopia-main"
+        update={{
+          "nav-forward": "nav-forward",
+          "nav-back": "nav-back",
+          "nav-fade": "nav-fade",
+          default: "none",
+        }}
+        default="none"
       >
-        <PageScrollBody
-          innerClassName={cn(
-            "mx-auto w-full px-3 pt-6 pb-10",
-            "tablet:max-w-4xl tablet:px-6 tablet:pt-10 tablet:pb-16",
-            // PC는 즛토피아 전체를 최대 1440px까지 넓게 — 목록은 열을 늘리고,
-            // 줄글 위주 상세(공연 상세 등)는 각자 좁은 폭으로 가운데 둔다.
-            "pc:max-w-[90rem] pc:px-10",
+        <main
+          id={ZUTOPIA_SCROLL_CONTAINER_ID}
+          ref={scrollRef}
+          className={cn(
+            "min-h-0 w-full flex-1 overflow-y-auto scroll-smooth",
+            "scrollbar-thin [scrollbar-color:transparent_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
+            "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
           )}
         >
-          <EntranceFade>{children}</EntranceFade>
-        </PageScrollBody>
-      </main>
+          <PageScrollBody
+            innerClassName={cn(
+              "mx-auto w-full px-3 pt-6 pb-10",
+              "tablet:max-w-4xl tablet:px-6 tablet:pt-10 tablet:pb-16",
+              // PC는 즛토피아 전체를 최대 1440px까지 넓게 — 목록은 열을 늘리고,
+              // 줄글 위주 상세(공연 상세 등)는 각자 좁은 폭으로 가운데 둔다.
+              "pc:max-w-[90rem] pc:px-10",
+            )}
+          >
+            <EntranceFade>{children}</EntranceFade>
+          </PageScrollBody>
+        </main>
+      </ViewTransition>
     </>
   );
 }

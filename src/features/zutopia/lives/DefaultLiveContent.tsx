@@ -1,3 +1,5 @@
+import { ViewTransition } from "react";
+import { posterTransitionName } from "@/features/zutopia/lives/poster-transition";
 import { cn } from "@/lib/utils";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { formatLiveDate } from "@/features/zutopia/lives/data";
@@ -19,11 +21,13 @@ import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
  */
 export function DefaultLiveContent({ live }: { live: LiveDetail }) {
   const visitOrdinal = parseVisitOrdinal(live.metadata);
+  // 대표 그림 — 포스터가 없으면 아이콘(목록 카드 그림)으로 대신한다.
+  const heroImageUrl = live.poster_image_url ?? live.icon_image_url;
   // 추가 이미지 묶음 — 맨 앞에 아이콘 이미지(icon_image_url, 목록 카드 그림)를
-  // 함께 둔다. 포스터와 같거나 추가 이미지에 이미 있는 그림이면 빼서 한 번만.
+  // 함께 둔다. 대표 그림과 같거나 추가 이미지에 이미 있는 그림이면 빼서 한 번만.
   const showIcon =
     !!live.icon_image_url &&
-    live.icon_image_url !== live.poster_image_url &&
+    live.icon_image_url !== heroImageUrl &&
     !live.additional_image_urls?.includes(live.icon_image_url);
   const extraImages = [
     ...(showIcon && live.icon_image_url
@@ -40,18 +44,27 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
       className={cn(
         "mx-auto flex w-full max-w-md flex-col items-center gap-6",
         "tablet:max-w-2xl tablet:gap-8",
+        // PC는 목록(최대 1440px)에서 들어왔을 때 폭이 확 줄어 보이지 않게 한 단계 넓힌다.
+        "pc:max-w-4xl",
       )}
     >
-      {live.poster_image_url && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={live.poster_image_url}
-          alt={live.title}
-          className={cn(
-            "max-h-[60vh] max-w-full rounded-lg object-contain",
-            "tablet:max-h-[65vh]",
-          )}
-        />
+      {heroImageUrl && (
+        // 목록 카드 그림과 같은 이름 — 목록에서 들어올 때 그 그림이 이 자리로 이어진다.
+        <ViewTransition
+          name={posterTransitionName(live.slug ?? "")}
+          share="morph"
+          default="none"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroImageUrl}
+            alt={live.title}
+            className={cn(
+              "max-h-[60vh] max-w-full rounded-lg object-contain",
+              "tablet:max-h-[65vh]",
+            )}
+          />
+        </ViewTransition>
       )}
 
       {extraImages.length > 0 && (
@@ -94,7 +107,12 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
             mono: true,
           },
           ...(live.region ? [{ label: "Region", value: live.region }] : []),
-          { label: "Venue", value: live.live_venue },
+          {
+            label: "Venue",
+            value: live.live_venue,
+            wide: true,
+            href: live.venue_url,
+          },
         ]}
         metadata={live.metadata}
       />

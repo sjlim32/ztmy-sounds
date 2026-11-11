@@ -176,7 +176,11 @@ export function SongListView({
           아직 등록된 곡이 없습니다.
         </p>
       ) : (
-        <div className="flex flex-col gap-8">
+        // 정렬·보기를 바꾸면 key가 바뀌어 새 결과가 살짝 올라오며 나타난다.
+        <div
+          key={`${groupBy}-${sortDirection}-${hideUnreleased}-${showLastLive}`}
+          className="animate-content-in flex flex-col gap-8"
+        >
           {groupSongs(visibleSongs, groupBy, sortDirection, liveSummaries).map(
             (group) => {
               const albumNumberLabel = group.album
@@ -443,6 +447,7 @@ export function SongListView({
         selected={selected}
         onClose={closeDrawer}
         ariaLabel={selected ? `${selected.song.title} 상세 정보` : undefined}
+        contentKey={({ song }) => song.slug}
         renderContent={({ song, contextAlbumSlug }) => (
           <SongDetailPanel
             song={song}

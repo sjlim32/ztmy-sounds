@@ -143,7 +143,11 @@ export function AlbumListView({ albums, summary }: AlbumListViewProps) {
           아직 등록된 앨범이 없습니다.
         </p>
       ) : (
-        <div className="flex flex-col gap-8">
+        // 정렬·커버를 바꾸면 key가 바뀌어 새 결과가 살짝 올라오며 나타난다.
+        <div
+          key={`${groupBy}-${sortDirection}-${coverVersion}`}
+          className="animate-content-in flex flex-col gap-8"
+        >
           {groups.map((group) => (
             <section key={group.key}>
               <p
@@ -161,6 +165,8 @@ export function AlbumListView({ albums, summary }: AlbumListViewProps) {
                   "grid-cols-[repeat(auto-fill,4.5rem)]",
                   "overflow-x-clip",
                   "tablet:overflow-visible tablet:mt-3 tablet:grid-cols-[repeat(auto-fill,9.75rem)] tablet:pt-6 tablet:pr-6 tablet:pl-0 tablet:gap-y-10",
+                  // PC는 목록 폭이 넓어(최대 1440px) 표지가 왼쪽에만 몰려 보이지 않게 키운다.
+                  "pc:grid-cols-[repeat(auto-fill,14rem)] pc:pr-10",
                 )}
               >
                 {group.albums.map((album, index) => {
@@ -193,6 +199,7 @@ export function AlbumListView({ albums, summary }: AlbumListViewProps) {
                       className={cn(
                         "group relative h-28 w-28 cursor-help",
                         "tablet:h-44 tablet:w-44",
+                        "pc:h-64 pc:w-64",
                         "transition-[transform,filter] duration-500 ease-in-out",
                         SHELF_TILT[index % SHELF_TILT.length],
                         SHELF_LEAN[index % SHELF_LEAN.length],
@@ -207,12 +214,13 @@ export function AlbumListView({ albums, summary }: AlbumListViewProps) {
                       {coverSrc ? (
                         <ThumbImage
                           src={coverSrc}
-                          displayWidth={176}
+                          displayWidth={256}
                           alt={album.title}
                           className={cn(
                             "h-28 w-28 rounded object-cover shadow-lg ring-1 ring-white/10",
                             "transition-shadow duration-500 ease-in-out",
                             "tablet:h-44 tablet:w-44",
+                            "pc:h-64 pc:w-64",
                             "tablet:group-hover:shadow-2xl",
                             isSelected &&
                               "ring-ztmy-magenta/70 shadow-2xl ring-2",
@@ -223,6 +231,7 @@ export function AlbumListView({ albums, summary }: AlbumListViewProps) {
                           className={cn(
                             "h-28 w-28 rounded bg-white/5 ring-1 ring-white/10",
                             "tablet:h-44 tablet:w-44",
+                            "pc:h-64 pc:w-64",
                           )}
                         />
                       )}
@@ -256,6 +265,7 @@ export function AlbumListView({ albums, summary }: AlbumListViewProps) {
         selected={selected}
         onClose={closeDrawer}
         ariaLabel={selected ? `${selected.title} 상세 정보` : undefined}
+        contentKey={(album) => album.slug}
         renderContent={(album) => (
           <AlbumDetailPanel
             album={album}

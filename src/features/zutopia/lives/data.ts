@@ -38,40 +38,35 @@ function formatLiveDateRange(
 
 function splitDateParts(isoDate: string): [string, string, string] {
   const [year, month, day] = isoDate.split("T")[0].split("-");
-  return [year.slice(2), month, day];
+  return [year, month, day];
 }
 
 /**
- * 목록 카드 전용 컴팩트 날짜 표시 — "YY.MM.DD" 기준, 범위면 겹치는 앞자리를
- * 생략한다: 연도·월이 같으면 "26.09.06 - 07", 연도만 같으면
- * "26.09.06 - 10.11", 아예 다르면 "26.09.06 - 27.01.01". 상세 페이지
- * 티켓 스텁이 쓰는 formatLiveDate(한글 "2026년 9월 6일" 표기)와는 완전히
- * 별도 포맷이라, 상세 페이지 표기는 이 함수와 무관하게 그대로 유지된다.
+ * 목록 카드 전용 날짜 표시 — "2026.09.12", 범위면 "2026.09.12 – 09.21"
+ * (해가 같으면 끝 날짜는 월.일만, 해를 넘기면 "2025.12.28 – 2026.01.02").
+ * "– 21"처럼 일만 남기면 끝 날짜가 몇 월인지 한 번 더 읽어야 해서 월은 항상
+ * 붙인다. 상세 페이지 티켓의 한글 표기(formatLiveDate)와는 별개다.
  */
 function formatEntryDateRange(
   startDate: string,
   endDate: string | null,
 ): string {
   const [startYear, startMonth, startDay] = splitDateParts(startDate);
-  if (!endDate || endDate === startDate) {
-    return `${startYear}.${startMonth}.${startDay}`;
-  }
+  const start = `${startYear}.${startMonth}.${startDay}`;
+  if (!endDate || endDate === startDate) return start;
 
   const [endYear, endMonth, endDay] = splitDateParts(endDate);
-  if (startYear !== endYear) {
-    return `${startYear}.${startMonth}.${startDay} - ${endYear}.${endMonth}.${endDay}`;
-  }
-  if (startMonth !== endMonth) {
-    return `${startYear}.${startMonth}.${startDay} - ${endMonth}.${endDay}`;
-  }
-  return `${startYear}.${startMonth}.${startDay} - ${endDay}`;
+  const end =
+    startYear === endYear
+      ? `${endMonth}.${endDay}`
+      : `${endYear}.${endMonth}.${endDay}`;
+  return `${start} – ${end}`;
 }
 
-const LIVE_TYPE_TO_ENTRY_TYPE: Record<Live["type"], ZutopiaEntryType> = {
-  FESTIVAL: "festival",
-  CONCERT: "concert",
-  EVENT: "event",
-};
+// 페스티벌이 아닌 단독 공연(CONCERT·EVENT…)은 모두 콘서트로 묶는다.
+function liveEntryType(type: Live["type"]): ZutopiaEntryType {
+  return type === "FESTIVAL" ? "festival" : "concert";
+}
 
 /**
  * 허브/카테고리 목록 카드용 — 두 출처를 하나의 목록으로 합친다.
@@ -126,7 +121,7 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
             name: live.title,
             date: formatEntryDateRange(live.start_date, live.end_date),
             thumbnail: live.icon_image_url ?? live.poster_image_url ?? "",
-            type: LIVE_TYPE_TO_ENTRY_TYPE[live.type],
+            type: liveEntryType(live.type),
             startDate: live.start_date,
             city: extractKoreanCity(live.region),
             visitOrdinal: parseVisitOrdinal(live.metadata),
@@ -135,15 +130,13 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
       : [],
   );
 
-  // 투어는 페스티벌 출연이 아니라 줏토마요 자신의 콘서트(투어)라 concert
-  // 타입으로 분류한다.
   const tourEntries: ZutopiaEntry[] = toursResult.data.map((tour) => ({
     slug: tour.slug,
     label: tour.title_ko,
     name: tour.title,
     date: formatEntryDateRange(tour.start_date, tour.end_date),
     thumbnail: tour.poster_image_url ?? "",
-    type: "concert",
+    type: "tour",
     startDate: tour.start_date,
     visitOrdinal: parseVisitOrdinal(tour.metadata),
   }));

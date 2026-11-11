@@ -16,18 +16,31 @@ import { ZUTOPIA_NAV_ITEMS } from "@/features/zutopia/nav";
  */
 export function ZutopiaHeaderNav({ className }: { className?: string }) {
   const pathname = usePathname();
+  const currentIndex = ZUTOPIA_NAV_ITEMS.findIndex((item) =>
+    item.paths.some((path) => pathname.startsWith(path)),
+  );
+
+  // 탭 순서대로 밀리는 방향을 정한다 — 오른쪽 탭은 왼쪽으로(앞으로), 왼쪽
+  // 탭은 오른쪽으로(뒤로). 같은 탭이라도 상세에서 목록으로 올라가면 뒤로.
+  const transitionTypesFor = (index: number, href: string) => {
+    if (currentIndex === -1) return ["nav-fade"];
+    if (index > currentIndex) return ["nav-forward"];
+    if (index < currentIndex) return ["nav-back"];
+    return pathname === href ? undefined : ["nav-back"];
+  };
 
   return (
     <nav
       aria-label="즛토피아"
       className={cn("tablet:gap-6 flex h-full items-stretch gap-4", className)}
     >
-      {ZUTOPIA_NAV_ITEMS.map((item) => {
+      {ZUTOPIA_NAV_ITEMS.map((item, index) => {
         const isActive = item.paths.some((path) => pathname.startsWith(path));
         return (
           <Link
             key={item.href}
             href={item.href}
+            transitionTypes={transitionTypesFor(index, item.href)}
             aria-current={isActive ? "page" : undefined}
             className={cn(
               HEADER_TAB_CLASS,

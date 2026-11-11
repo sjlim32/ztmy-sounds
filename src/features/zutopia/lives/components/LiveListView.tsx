@@ -1,49 +1,44 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, ViewTransition } from "react";
 import { ThumbImage } from "@/components/ThumbImage";
 import type { MouseEvent } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import {
-  SORT_FILTER_CARD_CLASS,
-  SortFilterBar,
-} from "@/features/zutopia/components/SortFilterBar";
+import { FilterChip, FilterRow } from "@/components/FilterChips";
+import { SORT_FILTER_CARD_CLASS } from "@/features/zutopia/components/SortFilterBar";
+import { GridIcon } from "@/components/icons/GridIcon";
+import { ListIcon } from "@/components/icons/ListIcon";
 import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
-import type { ZutopiaEntry, ZutopiaEntryType } from "@/features/zutopia/types";
+import { LIVE_TAG_CLASS } from "@/features/zutopia/lives/surface";
+import { useListViewMode } from "@/features/zutopia/lives/useListViewMode";
+import { posterTransitionName } from "@/features/zutopia/lives/poster-transition";
+import {
+  ENTRY_TYPE_DOT,
+  ENTRY_TYPE_TAG,
+  ENTRY_TYPE_LABEL,
+  ENTRY_TYPE_ORDER,
+  type ZutopiaEntry,
+  type ZutopiaEntryType,
+} from "@/features/zutopia/types";
 
 type SortBy = "year" | "format";
-type EntryFormat = Extract<ZutopiaEntryType, "festival" | "concert">;
-type FormatFilter = "all" | EntryFormat;
+type FormatFilter = "all" | ZutopiaEntryType;
 
 const SORT_OPTIONS: { value: SortBy; label: string }[] = [
   { value: "year", label: "연도별" },
   { value: "format", label: "형식별" },
 ];
 
-// "공연"은 이 목록 문맥에서 쓰는 라벨이다 — types.ts의 전역
-// ENTRY_TYPE_LABEL과는 별개로, 줏토마요 자신이
-// 헤드라이너인 공연(투어·콘서트·행사)이라는 의미를 이 페이지에서 더 분명히
-// 드러낸다.
-const FORMAT_OPTIONS: { value: FormatFilter; label: string }[] = [
-  { value: "all", label: "전체" },
-  { value: "festival", label: "페스티벌" },
-  { value: "concert", label: "공연" },
-];
-const FORMAT_GROUP_LABEL: Record<EntryFormat, string> = {
-  festival: "페스티벌",
-  concert: "공연",
+// 고른 형식 칩은 마젠타 대신 그 종류 색으로 옅게 칠한다 — 포스터 위 종류
+// 태그와 같은 색이라 필터와 목록이 같은 색으로 읽힌다(마젠타는 내한 전용).
+const FORMAT_ACTIVE_CLASS: Record<ZutopiaEntryType, string> = {
+  tour: "border-ztmy-sky/80 bg-ztmy-sky/15 text-white hover:border-ztmy-sky",
+  festival:
+    "border-ztmy-purple bg-ztmy-purple/30 text-white hover:border-ztmy-purple",
+  concert:
+    "border-ztmy-pink/80 bg-ztmy-pink/15 text-white hover:border-ztmy-pink",
 };
-const FORMAT_GROUP_ORDER: EntryFormat[] = ["festival", "concert"];
-
-// 형식 필터는 페스티벌/공연 둘뿐이라 행사(EVENT)는 공연으로
-// 묶는다. entry.type 자체는 허브 카드 요약("N개의 행사")에 그대로 쓰이므로
-// 바꾸지 않는다.
-function entryFormat(entry: ZutopiaEntry): EntryFormat | null {
-  if (entry.type === "festival") return "festival";
-  if (entry.type === "concert" || entry.type === "event") return "concert";
-  return null;
-}
 
 const ALL_YEAR = "all";
 
@@ -113,7 +108,8 @@ interface EntryGroup {
 }
 
 /**
- * /zutopia/lives 목록 — 정렬(연도별/형식별) + 형식/연도 필터를 갖는다.
+ * /zutopia/lives 목록 — 형식·연도 필터(카드) + 결과 개수·묶는 기준·보기
+ * 방식(카드 아래 도구 막대).
  * 이전엔 ZutopiaCategoryTabs가 모든 항목을 탭 버튼으로 나열했는데, 투어가
  * 추가되며 항목 수가 계속 늘어날 예정이라 그 방식은 확장성이 없어 제거하고
  * 이 필터 UI로 대체했다([category]/layout.tsx 참고).
@@ -141,6 +137,7 @@ export function LiveListView({
   const [yearFilter, setYearFilter] = useState(
     initialSnapshot?.yearFilter ?? ALL_YEAR,
   );
+  const [viewMode, setViewMode] = useListViewMode();
 
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -168,41 +165,56 @@ export function LiveListView({
     });
   };
 
-  const yearOptions = useMemo(() => {
-    const years = new Set<string>();
+  // 형식 칩 개수는 고른 연도 안에서 센다 — 눌렀을 때 몇 개가 나오는지 미리 보이게.
+  const formatCounts = useMemo(() => {
+    const counts: Record<FormatFilter, number> = {
+      all: 0,
+      tour: 0,
+      festival: 0,
+      concert: 0,
+    };
+    for (const entry of entries) {
+      if (yearFilter !== ALL_YEAR && entryYear(entry) !== yearFilter) continue;
+      counts.all++;
+      if (entry.type) counts[entry.type]++;
+    }
+    return counts;
+  }, [entries, yearFilter]);
+
+  // 연도 칩 — 고른 형식에 해당 공연이 없는 해는 흐리게(누를 수 없게).
+  const years = useMemo(() => {
+    const all = new Set<string>();
+    const inFormat = new Set<string>();
     for (const entry of entries) {
       const year = entryYear(entry);
-      if (year) years.add(year);
+      if (!year) continue;
+      all.add(year);
+      if (formatFilter === "all" || entry.type === formatFilter)
+        inFormat.add(year);
     }
-    return [
-      { value: ALL_YEAR, label: "전체" },
-      ...[...years]
-        .sort((a, b) => b.localeCompare(a))
-        // "년"을 빼 칩을 줄여 최대한 한 줄에 들어가게(줄 이름이 이미 "연도").
-        .map((year) => ({ value: year, label: year })),
-    ];
-  }, [entries]);
+    return [...all]
+      .sort((a, b) => b.localeCompare(a))
+      .map((year) => ({ year, empty: !inFormat.has(year) }));
+  }, [entries, formatFilter]);
+
+  const isFiltered = formatFilter !== "all" || yearFilter !== ALL_YEAR;
 
   const filtered = useMemo(
     () =>
-      entries.filter((entry) => {
-        if (formatFilter !== "all" && entryFormat(entry) !== formatFilter) {
-          return false;
-        }
-        if (yearFilter !== ALL_YEAR && entryYear(entry) !== yearFilter) {
-          return false;
-        }
-        return true;
-      }),
+      entries.filter(
+        (entry) =>
+          (formatFilter === "all" || entry.type === formatFilter) &&
+          (yearFilter === ALL_YEAR || entryYear(entry) === yearFilter),
+      ),
     [entries, formatFilter, yearFilter],
   );
 
   const groups = useMemo<EntryGroup[]>(() => {
     if (sortBy === "format") {
-      return FORMAT_GROUP_ORDER.map((type) => ({
+      return ENTRY_TYPE_ORDER.map((type) => ({
         key: type,
-        label: FORMAT_GROUP_LABEL[type],
-        entries: filtered.filter((entry) => entryFormat(entry) === type),
+        label: ENTRY_TYPE_LABEL[type],
+        entries: filtered.filter((entry) => entry.type === type),
       })).filter((group) => group.entries.length > 0);
     }
 
@@ -224,36 +236,114 @@ export function LiveListView({
 
   return (
     <div ref={rootRef} className="flex flex-col gap-6">
-      {/* SortFilterBar 자신은 폭을 스스로 정하지 않는다(AlbumListView처럼
-      두 필터를 한 줄에 나란히 놓는 쓰임도 있어서 공용 컴포넌트에 w-full을
-      강제하지 않음) — 여기서는 세 필터가 항상 세로로 쌓이므로 각 줄을
-      w-full로 감싸, 선택값이 바뀌어도(버튼 텍스트 길이가 달라도) 카드
-      폭이 흔들리지 않게 고정한다. */}
-      <div className={cn(SORT_FILTER_CARD_CLASS, "w-full")}>
-        <div className="w-full">
-          <SortFilterBar
-            options={SORT_OPTIONS}
-            value={sortBy}
-            onChange={setSortBy}
-            label="정렬"
-          />
+      <div className="flex flex-col gap-3">
+        {/* 필터 카드 — 걸러 내는 조건(형식·연도)만. */}
+        <div className={cn(SORT_FILTER_CARD_CLASS, "w-full")}>
+          <FilterRow role="group" aria-label="형식 필터" label="형식" wrap>
+            {(["all", ...ENTRY_TYPE_ORDER] as const).map((option) => (
+              <FilterChip
+                key={option}
+                active={formatFilter === option}
+                onClick={() => setFormatFilter(option)}
+                disabled={formatCounts[option] === 0 && formatFilter !== option}
+                activeClassName={
+                  option === "all" ? undefined : FORMAT_ACTIVE_CLASS[option]
+                }
+              >
+                {option !== "all" && (
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "h-2 w-2 shrink-0 rounded-full",
+                      ENTRY_TYPE_DOT[option],
+                    )}
+                  />
+                )}
+                {option === "all" ? "전체" : ENTRY_TYPE_LABEL[option]}
+                <span className="ml-0.5 text-xs font-normal text-white/50 tabular-nums">
+                  {formatCounts[option]}
+                </span>
+              </FilterChip>
+            ))}
+          </FilterRow>
+          <div className="h-px bg-white/10" />
+          <FilterRow role="group" aria-label="연도 필터" label="연도" wrap>
+            <FilterChip
+              active={yearFilter === ALL_YEAR}
+              onClick={() => setYearFilter(ALL_YEAR)}
+              compact
+            >
+              전체
+            </FilterChip>
+            {years.map(({ year, empty }) => (
+              <FilterChip
+                key={year}
+                active={yearFilter === year}
+                onClick={() => setYearFilter(year)}
+                disabled={empty && yearFilter !== year}
+                compact
+              >
+                <span className="tabular-nums">{year}</span>
+              </FilterChip>
+            ))}
+          </FilterRow>
         </div>
-        <div className="w-full">
-          <SortFilterBar
-            options={FORMAT_OPTIONS}
-            value={formatFilter}
-            onChange={setFormatFilter}
-            label="형식"
-          />
-        </div>
-        <div className="w-full">
-          <SortFilterBar
-            options={yearOptions}
-            value={yearFilter}
-            onChange={setYearFilter}
-            label="연도"
-            compact
-          />
+
+        {/* 도구 막대 — 왼쪽은 결과 개수(+ 초기화), 오른쪽은 묶는 기준과 보기
+        방식. 걸러 내는 조건이 아니라 표시 옵션이라 카드 밖에 둔다. */}
+        <div className="flex items-center justify-between gap-3">
+          <p className="flex min-w-0 items-center gap-3 text-sm text-white/60">
+            <span className="whitespace-nowrap">
+              <span className="font-semibold text-white tabular-nums">
+                {filtered.length}
+              </span>
+              개 공연
+            </span>
+            {isFiltered && (
+              <button
+                type="button"
+                onClick={() => {
+                  setFormatFilter("all");
+                  setYearFilter(ALL_YEAR);
+                }}
+                className="hover:text-ztmy-pink rounded text-sm whitespace-nowrap text-white/50 underline underline-offset-4 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
+              >
+                필터 초기화
+              </button>
+            )}
+          </p>
+          <div className="flex shrink-0 items-center gap-2">
+            <div role="group" aria-label="묶는 기준" className="flex gap-1">
+              {SORT_OPTIONS.map((option) => (
+                <FilterChip
+                  key={option.value}
+                  active={sortBy === option.value}
+                  onClick={() => setSortBy(option.value)}
+                >
+                  {option.label}
+                </FilterChip>
+              ))}
+            </div>
+            <span aria-hidden className="h-5 w-px bg-white/15" />
+            <div role="group" aria-label="보기 방식" className="flex gap-1">
+              <FilterChip
+                active={viewMode === "card"}
+                onClick={() => setViewMode("card")}
+                label="카드로 보기"
+                compact
+              >
+                <GridIcon className="h-4 w-4" />
+              </FilterChip>
+              <FilterChip
+                active={viewMode === "list"}
+                onClick={() => setViewMode("list")}
+                label="리스트로 보기"
+                compact
+              >
+                <ListIcon className="h-4 w-4" />
+              </FilterChip>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -263,7 +353,14 @@ export function LiveListView({
         </p>
       ) : (
         // 그룹 사이는 카드 사이보다 훨씬 넓게 띄워, 연도가 바뀌는 지점이 바로 보이게 한다.
-        <div className={cn("flex flex-col gap-10", "tablet:gap-14")}>
+        // 필터·묶음·보기를 바꾸면 key가 바뀌어 새 결과가 살짝 올라오며 나타난다.
+        <div
+          key={`${formatFilter}-${yearFilter}-${sortBy}-${viewMode}`}
+          className={cn(
+            "animate-content-in flex flex-col gap-10",
+            "tablet:gap-14",
+          )}
+        >
           {groups.map((group) => (
             <section
               key={group.key}
@@ -290,101 +387,238 @@ export function LiveListView({
                   className="h-px flex-1 self-center bg-white/15"
                 />
               </div>
-              <ul
-                className={cn(
-                  // 모바일도 2열 — 1열이면 정사각 카드 한 장이 화면을 다 차지해
-                  // 목록을 훑기 어렵다. 3열은 카드 위 글자가 포스터를 덮어서 안 쓴다.
-                  "grid grid-cols-2 gap-3",
-                  "tablet:gap-4",
-                  "pc:grid-cols-3",
-                  "wide:grid-cols-4",
-                )}
-              >
-                {group.entries.map((entry) => (
-                  <li key={entry.slug}>
-                    <Link
-                      href={`/zutopia/${categorySlug}/${entry.slug}`}
-                      onClick={handleEntryClick}
-                      className="group flex flex-col gap-2 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
-                    >
-                      <div
-                        className={cn(
-                          "relative aspect-square overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
-                          // 내한 공연은 테두리와 그림 위 태그를 마젠타(홈의 내한 색)로 표시해
-                          // 목록에서 바로 눈에 띄게 한다.
-                          entry.visitOrdinal != null &&
-                            "ring-ztmy-magenta ring-2",
-                        )}
-                      >
-                        {entry.thumbnail ? (
-                          <>
-                            {/* 정사각형이 아닌 포스터의 빈 칸을 같은 그림을 흐리게 깔아
-                            채운다 — 본 그림은 잘리지 않게 contain 그대로. 주소가 같아
-                            다운로드는 한 번이다. */}
-                            <ThumbImage
-                              src={entry.thumbnail}
-                              displayWidth={360}
-                              className="absolute inset-0 h-full w-full scale-125 object-cover blur-xl brightness-50"
-                            />
-                            <ThumbImage
-                              src={entry.thumbnail}
-                              displayWidth={360}
-                              alt={entry.name}
-                              className="relative h-full w-full object-contain transition-opacity group-hover:opacity-80"
-                            />
-                          </>
-                        ) : (
-                          <div className="h-full w-full bg-white/5" />
-                        )}
-                        {entry.visitOrdinal != null && (
-                          // 상세 티켓과 같은 태그를 그림 왼쪽 위에 얹는다.
-                          <VisitBadge
-                            ordinal={entry.visitOrdinal}
-                            className="absolute top-2 left-2 shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
-                          />
-                        )}
-                      </div>
-
-                      {/* 글자는 그림 위에 겹치지 않고 아래에 둔다 — 겹쳐 놓으면
-                    포스터 무늬에 묻혀 잘 안 읽힌다. */}
-                      <div className="flex flex-col gap-0.5 px-0.5">
-                        <span
-                          className={cn(
-                            // 모바일 2열 카드는 좁아서 원제는 1줄만
-                            "group-hover:text-ztmy-pink line-clamp-1 text-xs font-semibold break-keep text-white transition-colors",
-                            "tablet:line-clamp-2 tablet:text-sm",
-                          )}
-                        >
-                          {entry.name}
-                        </span>
-                        {entry.label !== entry.name && (
-                          <span
-                            className={cn(
-                              "line-clamp-2 text-xs break-keep text-white/70",
-                              "tablet:text-sm",
-                            )}
-                          >
-                            {entry.label}
-                          </span>
-                        )}
-                        <span
-                          className={cn(
-                            "text-[10px] text-white/55",
-                            "tablet:text-xs",
-                          )}
-                        >
-                          {entry.city && `${entry.city} · `}
-                          {entry.date}
-                        </span>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              {viewMode === "list" ? (
+                <ul className={cn("grid gap-2", "pc:grid-cols-2 pc:gap-x-4")}>
+                  {group.entries.map((entry) => (
+                    <li key={entry.slug} className="min-w-0">
+                      <LiveRow
+                        entry={entry}
+                        href={`/zutopia/${categorySlug}/${entry.slug}`}
+                        onClick={handleEntryClick}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <ul
+                  className={cn(
+                    // 모바일도 2열 — 1열이면 정사각 카드 한 장이 화면을 다 차지해
+                    // 목록을 훑기 어렵다. 3열은 카드 위 글자가 포스터를 덮어서 안 쓴다.
+                    "grid grid-cols-2 gap-3",
+                    "tablet:gap-4",
+                    "pc:grid-cols-3",
+                    "wide:grid-cols-4",
+                  )}
+                >
+                  {group.entries.map((entry) => (
+                    <li key={entry.slug}>
+                      <LiveCard
+                        entry={entry}
+                        href={`/zutopia/${categorySlug}/${entry.slug}`}
+                        onClick={handleEntryClick}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
           ))}
         </div>
       )}
     </div>
+  );
+}
+
+interface LiveItemProps {
+  entry: ZutopiaEntry;
+  href: string;
+  onClick: (event: MouseEvent<HTMLAnchorElement>) => void;
+}
+
+/** 종류 태그 — 면 전체가 종류 색이라 색만으로 바로 구분된다. */
+function EntryTypeTag({
+  type,
+  className,
+}: {
+  type: ZutopiaEntryType;
+  className?: string;
+}) {
+  return (
+    <span className={cn(LIVE_TAG_CLASS, ENTRY_TYPE_TAG[type], className)}>
+      {ENTRY_TYPE_LABEL[type]}
+    </span>
+  );
+}
+
+/** 카드 보기 한 장 — 포스터가 주인공, 글자는 그 아래 세 줄. */
+function LiveCard({ entry, href, onClick }: LiveItemProps) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      transitionTypes={["nav-forward"]}
+      className="group flex flex-col gap-2 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
+    >
+      {/* 상세 페이지 포스터와 같은 이름 — 상세로 갈 때 이 그림이 그 자리로 이어지며 커진다. */}
+      <ViewTransition
+        name={posterTransitionName(entry.slug)}
+        share="morph"
+        default="none"
+      >
+        <div
+          className={cn(
+            "relative aspect-square overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
+            // 내한 공연은 테두리와 그림 위 태그를 마젠타(홈의 내한 색)로 표시해
+            // 목록에서 바로 눈에 띄게 한다.
+            entry.visitOrdinal != null && "ring-ztmy-magenta ring-2",
+          )}
+        >
+          {entry.thumbnail ? (
+            <>
+              {/* 정사각형이 아닌 포스터의 빈 칸을 같은 그림을 흐리게 깔아
+            채운다 — 본 그림은 잘리지 않게 contain 그대로. 주소가 같아
+            다운로드는 한 번이다. */}
+              <ThumbImage
+                src={entry.thumbnail}
+                displayWidth={360}
+                className="absolute inset-0 h-full w-full scale-125 object-cover blur-xl brightness-50"
+              />
+              <ThumbImage
+                src={entry.thumbnail}
+                displayWidth={360}
+                alt={entry.name}
+                className="relative h-full w-full object-contain transition-opacity group-hover:opacity-80"
+              />
+            </>
+          ) : (
+            <div className="h-full w-full bg-white/5" />
+          )}
+          {/* 종류·내한 태그를 그림 왼쪽 위에 나란히 — 상세 티켓 맨 위
+        줄("콘서트 · 두 번째 내한")과 같은 순서. 종류 태그는 면
+        전체가 종류 색이라 색만으로 바로 구분된다. 호버하면 포스터가
+        온전히 보이게 태그를 숨긴다. */}
+          {(entry.type || entry.visitOrdinal != null) && (
+            <div className="absolute top-2 left-2 flex flex-wrap gap-1 transition-opacity duration-200 group-hover:opacity-0">
+              {entry.type && (
+                <EntryTypeTag
+                  type={entry.type}
+                  className="shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+                />
+              )}
+              {entry.visitOrdinal != null && (
+                <VisitBadge
+                  ordinal={entry.visitOrdinal}
+                  className="shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+                />
+              )}
+            </div>
+          )}
+        </div>
+      </ViewTransition>
+
+      {/* 글자는 그림 아래에 세 줄로만 — 원제, 한글 제목, 날짜·도시.
+      겹쳐 놓으면 포스터 무늬에 묻혀 잘 안 읽힌다. */}
+      <div className="flex min-w-0 flex-col gap-0.5 px-0.5">
+        <span
+          className={cn(
+            "group-hover:text-ztmy-pink truncate text-xs font-semibold text-white transition-colors",
+            "tablet:text-sm",
+          )}
+        >
+          {entry.name}
+        </span>
+        {entry.label !== entry.name && (
+          <span
+            className={cn("truncate text-xs text-white/70", "tablet:text-sm")}
+          >
+            {entry.label}
+          </span>
+        )}
+        {/* 날짜는 숫자 폭을 맞춰 또렷하게, 도시는 자리가 모자라면
+        먼저 줄어든다. */}
+        <span
+          className={cn(
+            "flex min-w-0 items-center gap-1.5 text-xs text-white/55",
+            "tablet:text-sm",
+          )}
+        >
+          <span className="shrink-0 font-medium whitespace-nowrap text-white/85 tabular-nums">
+            {entry.date}
+          </span>
+          {entry.city && (
+            <>
+              <span className="text-white/30">·</span>
+              <span className="truncate">{entry.city}</span>
+            </>
+          )}
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+/**
+ * 리스트 보기 한 줄 — 작은 썸네일 + 제목·날짜, 오른쪽에 종류·내한 태그. 많은
+ * 공연을 빠르게 훑는 용도라 포스터는 작게만 둔다.
+ */
+function LiveRow({ entry, href, onClick }: LiveItemProps) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      transitionTypes={["nav-forward"]}
+      className={cn(
+        "group flex items-center gap-3 rounded-lg border bg-white/5 p-2 transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+        // 내한 공연은 카드 보기와 같이 마젠타 테두리로 표시한다.
+        entry.visitOrdinal != null ? "border-ztmy-magenta" : "border-white/10",
+      )}
+    >
+      <ViewTransition
+        name={posterTransitionName(entry.slug)}
+        share="morph"
+        default="none"
+      >
+        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded bg-black/30">
+          {entry.thumbnail ? (
+            <ThumbImage
+              src={entry.thumbnail}
+              displayWidth={56}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="h-full w-full bg-white/5" />
+          )}
+        </div>
+      </ViewTransition>
+
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="group-hover:text-ztmy-pink truncate text-sm font-semibold text-white transition-colors">
+          {entry.name}
+        </span>
+        {entry.label !== entry.name && (
+          <span className="truncate text-xs text-white/70">{entry.label}</span>
+        )}
+        <span className="flex min-w-0 items-center gap-1.5 text-xs text-white/55">
+          <span className="shrink-0 font-medium whitespace-nowrap text-white/85 tabular-nums">
+            {entry.date}
+          </span>
+          {entry.city && (
+            <>
+              <span className="text-white/30">·</span>
+              <span className="truncate">{entry.city}</span>
+            </>
+          )}
+        </span>
+      </div>
+
+      {(entry.type || entry.visitOrdinal != null) && (
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          {entry.type && <EntryTypeTag type={entry.type} />}
+          {entry.visitOrdinal != null && (
+            <VisitBadge ordinal={entry.visitOrdinal} />
+          )}
+        </div>
+      )}
+    </Link>
   );
 }

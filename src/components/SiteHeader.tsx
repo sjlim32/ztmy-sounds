@@ -74,6 +74,7 @@ export function SiteHeader() {
                 {back && (
                   <Link
                     href={back.href}
+                    transitionTypes={["nav-back"]}
                     aria-label={back.label}
                     title={back.label}
                     className={cn(GHOST_ICON_BUTTON_CLASS, "group h-8 w-8")}
@@ -83,6 +84,7 @@ export function SiteHeader() {
                 )}
                 <Link
                   href={page.href}
+                  transitionTypes={["nav-back"]}
                   aria-current={pathname === page.href ? "page" : undefined}
                   className={cn(
                     "rounded-md text-base font-semibold whitespace-nowrap text-white transition-colors hover:text-white/70",

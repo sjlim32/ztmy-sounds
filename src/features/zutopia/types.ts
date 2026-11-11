@@ -1,12 +1,36 @@
-export type ZutopiaEntryType = "concert" | "festival" | "event";
+/**
+ * 공연 목록의 종류 — 투어(tours 테이블), 페스티벌(lives.type FESTIVAL), 콘서트
+ * (그 밖의 모든 lives.type: CONCERT·EVENT…). 목록 필터·카드 표시·허브 요약이
+ * 모두 이 세 가지를 쓴다.
+ */
+export type ZutopiaEntryType = "tour" | "festival" | "concert";
 
-const ENTRY_TYPE_LABEL: Record<ZutopiaEntryType, string> = {
-  concert: "투어",
+export const ENTRY_TYPE_LABEL: Record<ZutopiaEntryType, string> = {
+  tour: "투어",
   festival: "페스티벌",
-  event: "콘서트",
+  concert: "콘서트",
 };
-// summarizeEntryTypes가 항상 이 순서로 보여주기 위한 목록.
-const ENTRY_TYPE_ORDER: ZutopiaEntryType[] = ["concert", "festival", "event"];
+// 종류 색 — 투어 하늘, 페스티벌 보라, 콘서트 분홍. 마젠타는 내한 태그 색이라
+// 쓰지 않고, 내한 태그와 가장 자주 나란히 놓이는 투어에 마젠타와 가장 먼
+// 하늘색을 준다. 점(DOT)은 상세 티켓의 종류 표시(LiveTypeBadge)가, 꽉 찬
+// 면(TAG)은 목록 카드의 포스터 위 태그가 쓴다 — 포스터 위에서는 점만으로는
+// 구분이 안 돼 면 전체를 종류 색으로 채운다(밝은 색 면엔 어두운 글자).
+export const ENTRY_TYPE_DOT: Record<ZutopiaEntryType, string> = {
+  tour: "bg-ztmy-sky",
+  festival: "bg-ztmy-purple",
+  concert: "bg-ztmy-pink",
+};
+export const ENTRY_TYPE_TAG: Record<ZutopiaEntryType, string> = {
+  tour: "bg-ztmy-sky text-black/85",
+  festival: "bg-ztmy-purple text-white",
+  concert: "bg-ztmy-pink text-black/85",
+};
+// 필터·그룹·요약이 항상 이 순서로 보여주기 위한 목록.
+export const ENTRY_TYPE_ORDER: ZutopiaEntryType[] = [
+  "tour",
+  "festival",
+  "concert",
+];
 
 export interface ZutopiaEntry {
   slug: string;

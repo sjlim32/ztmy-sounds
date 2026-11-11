@@ -223,8 +223,33 @@ src/
                              # 공연 종류 LiveTypeBadge — 점 + CONCERT 등 영문),
                              # 목록 카드는 마젠타 테두리 + 그림 위 같은 태그로
                              # 강조한다(둘 다 LIVE_TAG 모양, 알약 없음). 내한 색은
-                             # 홈의 내한 색과 같은 마젠타(노랑은 ENCORE 전용),
-                             # 콘서트 점은 분홍.
+                             # 홈의 내한 색과 같은 마젠타(노랑은 ENCORE 전용).
+                             # 공연 종류는 투어(tours)·페스티벌(FESTIVAL)·콘서트
+                             # (그 밖의 모든 lives.type) 세 가지 — types.ts의
+                             # ZutopiaEntryType/ENTRY_TYPE_DOT을 목록 필터·카드·
+                             # 허브 요약·티켓 배지가 같이 쓴다(투어 하늘, 페스티벌
+                             # 보라, 콘서트 분홍). 목록 카드는 그림 왼쪽 위에 종류
+                             # 태그(종류 색으로 꽉 찬 면) → 내한 태그 순으로 얹고,
+                             # 그림 아래 글자는 원제·한글 제목·날짜·도시 세 줄.
+                             # 목록은 카드/리스트 보기를 전환할 수 있고
+                             # (useListViewMode — localStorage, 정적 HTML은 항상
+                             # 카드), 리스트 보기는 작은 썸네일 + 오른쪽 태그 한 줄.
+                             # 필터 카드엔 걸러 내는 조건(형식·연도)만 두고(형식
+                             # 칩은 종류 색 점·개수, 고르면 종류 색; 해당 없는
+                             # 칩은 disabled), 결과 개수·초기화·묶는 기준·보기
+                             # 전환은 카드 아래 도구 막대.
+                             # 공연 상세는 PC에서 max-w-4xl(목록 1440px과 폭 차이
+                             # 완화).
+                             # 화면 전환: ZutopiaScrollArea의 <main>을 ViewTransition
+                             # (zutopia-main)으로 감싸고, 링크의 transitionTypes
+                             # (nav-forward·nav-back·nav-fade)로 방향을 정한다 —
+                             # 헤더 탭은 탭 순서, 허브 카드·목록→상세는 forward,
+                             # 헤더 뒤로가기는 back. 공연 그림↔상세 포스터는
+                             # posterTransitionName으로 이어진다. 스타일은
+                             # globals.css(transform·opacity만, 동작 줄이기면 끔).
+                             # 필터 결과·드로어 내용은 key + .animate-content-in.
+                             # 티켓 장소(Venue) 칸은 날짜·지역 아래 전체 폭 한 줄
+                             # (줄바꿈 없음), lives.venue_url이 있으면 지도 링크.
                              # 공연별 수동 콘텐츠가 필요하면 lives/<슬러그>/
                              # content.mdx를 만들어 [slug]/page.tsx의
                              # CONTENT_BY_KEY에 등록한다(선택 사항).

@@ -54,28 +54,41 @@ export function FilterRow({
 
 /**
  * 필터 칩 하나 — 고른 칸은 마젠타로 옅게(FILTER_CHIP_CLASS). compact면 좌우
- * 여백을 줄인 작은 칩(옵션이 많은 줄을 최대한 한 줄에 넣을 때).
+ * 여백을 줄인 작은 칩(옵션이 많은 줄을 최대한 한 줄에 넣을 때). 아이콘만
+ * 있는 칩은 label로 이름을 준다. activeClassName은 고른 칸 색을 바꿀 때
+ * (공연 종류 색 등), disabled는 지금 조건에서 고를 것이 없는 칩 — 자리는
+ * 지키고 흐리게만 한다.
  */
 export function FilterChip({
   active,
   onClick,
   compact = false,
+  disabled = false,
+  label,
+  activeClassName,
   children,
 }: {
   active: boolean;
   onClick: () => void;
   compact?: boolean;
+  disabled?: boolean;
+  label?: string;
+  activeClassName?: string;
   children: ReactNode;
 }) {
   return (
     <button
       type="button"
       aria-pressed={active}
+      aria-label={label}
+      title={label}
+      disabled={disabled}
       onClick={onClick}
       className={cn(
         FILTER_CHIP_CLASS,
         compact && "px-1.5",
-        active && ACTIVE_FILTER_CHIP_CLASS,
+        active && (activeClassName ?? ACTIVE_FILTER_CHIP_CLASS),
+        "disabled:pointer-events-none disabled:opacity-30",
       )}
     >
       {children}

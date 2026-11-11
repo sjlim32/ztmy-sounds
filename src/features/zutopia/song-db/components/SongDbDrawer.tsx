@@ -53,6 +53,8 @@ interface SongDbDrawerProps<T> {
   selected: T | null;
   onClose: () => void;
   renderContent: (item: T) => React.ReactNode;
+  /** 항목을 구분하는 값(slug 등) — 바뀌면 내용이 새로 나타나는 애니메이션을 탄다. */
+  contentKey: (item: T) => string;
   /**
    * 스크린 리더 다이얼로그 이름 — 곡/앨범 제목처럼 내용을 알 수 있는 값을
    * 호출부에서 넘겨준다.
@@ -65,6 +67,7 @@ export function SongDbDrawer<T>({
   selected,
   onClose,
   renderContent,
+  contentKey,
   ariaLabel = "상세 정보",
 }: SongDbDrawerProps<T>) {
   const [displayed, setDisplayed] = useState<T | null>(null);
@@ -201,7 +204,16 @@ export function SongDbDrawer<T>({
           isOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
-        {displayed && renderContent(displayed)}
+        {/* 열린 채로 다른 항목을 고르면 내용이 툭 바뀌지 않고 살짝 올라오며
+        바뀐다(key). 닫히는 동안엔 마지막 내용을 그대로 둔다. */}
+        {displayed && (
+          <div
+            key={contentKey(displayed)}
+            className="animate-content-in flex grow flex-col"
+          >
+            {renderContent(displayed)}
+          </div>
+        )}
         {isOpen && (
           <span
             data-focus-sentinel=""
