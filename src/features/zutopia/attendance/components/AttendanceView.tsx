@@ -202,10 +202,19 @@ export function AttendanceView({
     setPickerChoice(false);
   }, [units, today]);
 
+  // 성불·성불 대기 곡 수는 아래 목록 카드 탭에 있어서 여기선 겹치지 않게
+  // 참전 횟수와 성불률(전체 곡 중 들은 곡 비율)만.
+  const songTotal = summary.heard.length + summary.unheard.length;
   const stats = [
-    { label: "참전", value: summary.attendedCount, highlight: false },
-    { label: "성불", value: summary.heard.length, highlight: true },
-    { label: "성불 대기", value: summary.unheard.length, highlight: false },
+    { label: "참전", value: `${summary.attendedCount}회`, highlight: false },
+    {
+      label: "성불률",
+      value:
+        songTotal > 0
+          ? `${Math.round((summary.heard.length / songTotal) * 100)}%`
+          : "0%",
+      highlight: true,
+    },
   ];
 
   return (
@@ -224,7 +233,7 @@ export function AttendanceView({
       >
         <dl
           className={cn(
-            "grid grid-cols-3 py-3",
+            "grid grid-cols-2 py-3",
             ZUTOPIA_SURFACE_CLASS,
             "tablet:flex tablet:gap-6 tablet:border-0 tablet:bg-transparent tablet:p-0 tablet:shadow-none tablet:backdrop-blur-none",
           )}
