@@ -10,7 +10,7 @@ import { DIRECTION_OPTIONS } from "@/features/zutopia/song-db/sort";
 import { AlbumDetailPanel } from "@/features/zutopia/song-db/components/AlbumDetailPanel";
 import { SongDbDrawer } from "@/features/zutopia/song-db/components/SongDbDrawer";
 import {
-  SORT_FILTER_CARD_CLASS,
+  FilterPanel,
   SortFilterBar,
 } from "@/features/zutopia/components/SortFilterBar";
 import type {
@@ -108,12 +108,7 @@ export function AlbumListView({ albums, summary }: AlbumListViewProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className={cn(SORT_FILTER_CARD_CLASS, "relative")}>
-        {summary && (
-          <p className="tablet:absolute tablet:top-3 tablet:right-4 text-sm text-white/50">
-            {summary}
-          </p>
-        )}
+      <FilterPanel summary={summary}>
         <SortFilterBar
           options={SORT_OPTIONS}
           value={groupBy}
@@ -136,7 +131,7 @@ export function AlbumListView({ albums, summary }: AlbumListViewProps) {
             onChange={setCoverVersion}
           />
         </section>
-      </div>
+      </FilterPanel>
 
       {albums.length === 0 ? (
         <p className={cn("text-base text-white/50", "tablet:text-lg")}>

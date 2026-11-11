@@ -26,7 +26,7 @@ import { SongDbDrawer } from "@/features/zutopia/song-db/components/SongDbDrawer
 import { SongDetailPanel } from "@/features/zutopia/song-db/components/SongDetailPanel";
 import { UnreleasedBadge } from "@/features/zutopia/song-db/components/UnreleasedBadge";
 import {
-  SORT_FILTER_CARD_CLASS,
+  FilterPanel,
   SortFilterBar,
 } from "@/features/zutopia/components/SortFilterBar";
 import { FilterChip, FilterRow } from "@/components/FilterChips";
@@ -138,12 +138,7 @@ export function SongListView({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className={cn(SORT_FILTER_CARD_CLASS, "relative")}>
-        {summary && (
-          <p className="tablet:absolute tablet:top-3 tablet:right-4 text-sm text-white/50">
-            {summary}
-          </p>
-        )}
+      <FilterPanel summary={summary}>
         <SortFilterBar
           options={showLastLive ? SORT_OPTIONS_WITH_LAST_LIVE : SORT_OPTIONS}
           value={groupBy}
@@ -169,7 +164,7 @@ export function SongListView({
             마지막 라이브
           </FilterChip>
         </FilterRow>
-      </div>
+      </FilterPanel>
 
       {visibleSongs.length === 0 ? (
         <p className={cn("text-base text-white/50", "tablet:text-lg")}>

@@ -5,13 +5,19 @@ import { ThumbImage } from "@/components/ThumbImage";
 import type { MouseEvent } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { FilterChip, FilterRow } from "@/components/FilterChips";
-import { SORT_FILTER_CARD_CLASS } from "@/features/zutopia/components/SortFilterBar";
+import {
+  FilterPanel,
+  SortFilterBar,
+  type SortFilterOption,
+} from "@/features/zutopia/components/SortFilterBar";
 import { GridIcon } from "@/components/icons/GridIcon";
 import { ListIcon } from "@/components/icons/ListIcon";
 import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
 import { LIVE_TAG_CLASS } from "@/features/zutopia/lives/surface";
-import { useListViewMode } from "@/features/zutopia/lives/useListViewMode";
+import {
+  useListViewMode,
+  type ListViewMode,
+} from "@/features/zutopia/lives/useListViewMode";
 import { posterTransitionName } from "@/features/zutopia/lives/poster-transition";
 import {
   ENTRY_TYPE_DOT,
@@ -39,6 +45,19 @@ const FORMAT_ACTIVE_CLASS: Record<ZutopiaEntryType, string> = {
   concert:
     "border-ztmy-pink/80 bg-ztmy-pink/15 text-white hover:border-ztmy-pink",
 };
+
+const VIEW_OPTIONS: SortFilterOption<ListViewMode>[] = [
+  {
+    value: "card",
+    label: "카드로 보기",
+    icon: <GridIcon className="h-4 w-4" />,
+  },
+  {
+    value: "list",
+    label: "리스트로 보기",
+    icon: <ListIcon className="h-4 w-4" />,
+  },
+];
 
 const ALL_YEAR = "all";
 
@@ -108,8 +127,8 @@ interface EntryGroup {
 }
 
 /**
- * /zutopia/lives 목록 — 형식·연도 필터(카드) + 결과 개수·묶는 기준·보기
- * 방식(카드 아래 도구 막대).
+ * /zutopia/lives 목록 — 곡·앨범 목록과 같은 필터 카드(FilterPanel)에 형식·
+ * 연도·정렬·보기 줄을 쌓고, 오른쪽 위에 결과 개수(+ 필터 초기화).
  * 이전엔 ZutopiaCategoryTabs가 모든 항목을 탭 버튼으로 나열했는데, 투어가
  * 추가되며 항목 수가 계속 늘어날 예정이라 그 방식은 확장성이 없어 제거하고
  * 이 필터 UI로 대체했다([category]/layout.tsx 참고).
@@ -197,6 +216,33 @@ export function LiveListView({
       .map((year) => ({ year, empty: !inFormat.has(year) }));
   }, [entries, formatFilter]);
 
+  const formatOptions = useMemo<SortFilterOption<FormatFilter>[]>(
+    () =>
+      (["all", ...ENTRY_TYPE_ORDER] as const).map((option) => ({
+        value: option,
+        label: option === "all" ? "전체" : ENTRY_TYPE_LABEL[option],
+        count: formatCounts[option],
+        disabled: formatCounts[option] === 0,
+        ...(option !== "all" && {
+          dotClassName: ENTRY_TYPE_DOT[option],
+          activeClassName: FORMAT_ACTIVE_CLASS[option],
+        }),
+      })),
+    [formatCounts],
+  );
+
+  const yearOptions = useMemo<SortFilterOption<string>[]>(
+    () => [
+      { value: ALL_YEAR, label: "전체" },
+      ...years.map(({ year, empty }) => ({
+        value: year,
+        label: year,
+        disabled: empty,
+      })),
+    ],
+    [years],
+  );
+
   const isFiltered = formatFilter !== "all" || yearFilter !== ALL_YEAR;
 
   const filtered = useMemo(
@@ -236,68 +282,14 @@ export function LiveListView({
 
   return (
     <div ref={rootRef} className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3">
-        {/* 필터 카드 — 걸러 내는 조건(형식·연도)만. */}
-        <div className={cn(SORT_FILTER_CARD_CLASS, "w-full")}>
-          <FilterRow role="group" aria-label="형식 필터" label="형식" wrap>
-            {(["all", ...ENTRY_TYPE_ORDER] as const).map((option) => (
-              <FilterChip
-                key={option}
-                active={formatFilter === option}
-                onClick={() => setFormatFilter(option)}
-                disabled={formatCounts[option] === 0 && formatFilter !== option}
-                activeClassName={
-                  option === "all" ? undefined : FORMAT_ACTIVE_CLASS[option]
-                }
-              >
-                {option !== "all" && (
-                  <span
-                    aria-hidden
-                    className={cn(
-                      "h-2 w-2 shrink-0 rounded-full",
-                      ENTRY_TYPE_DOT[option],
-                    )}
-                  />
-                )}
-                {option === "all" ? "전체" : ENTRY_TYPE_LABEL[option]}
-                <span className="ml-0.5 text-xs font-normal text-white/50 tabular-nums">
-                  {formatCounts[option]}
-                </span>
-              </FilterChip>
-            ))}
-          </FilterRow>
-          <div className="h-px bg-white/10" />
-          <FilterRow role="group" aria-label="연도 필터" label="연도" wrap>
-            <FilterChip
-              active={yearFilter === ALL_YEAR}
-              onClick={() => setYearFilter(ALL_YEAR)}
-              compact
-            >
-              전체
-            </FilterChip>
-            {years.map(({ year, empty }) => (
-              <FilterChip
-                key={year}
-                active={yearFilter === year}
-                onClick={() => setYearFilter(year)}
-                disabled={empty && yearFilter !== year}
-                compact
-              >
-                <span className="tabular-nums">{year}</span>
-              </FilterChip>
-            ))}
-          </FilterRow>
-        </div>
-
-        {/* 도구 막대 — 왼쪽은 결과 개수(+ 초기화), 오른쪽은 묶는 기준과 보기
-        방식. 걸러 내는 조건이 아니라 표시 옵션이라 카드 밖에 둔다. */}
-        <div className="flex items-center justify-between gap-3">
-          <p className="flex min-w-0 items-center gap-3 text-sm text-white/60">
-            <span className="whitespace-nowrap">
-              <span className="font-semibold text-white tabular-nums">
-                {filtered.length}
-              </span>
-              개 공연
+      <FilterPanel
+        summary={
+          <>
+            {/* 곡·앨범 목록의 "전체 N곡"·"전체 N개"와 같은 말투. */}
+            <span className="whitespace-nowrap tabular-nums">
+              {isFiltered
+                ? `전체 ${entries.length}개 중 ${filtered.length}개`
+                : `전체 ${entries.length}개`}
             </span>
             {isFiltered && (
               <button
@@ -306,46 +298,42 @@ export function LiveListView({
                   setFormatFilter("all");
                   setYearFilter(ALL_YEAR);
                 }}
-                className="hover:text-ztmy-pink rounded text-sm whitespace-nowrap text-white/50 underline underline-offset-4 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
+                className="hover:text-ztmy-pink rounded whitespace-nowrap text-white/50 underline underline-offset-4 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
               >
                 필터 초기화
               </button>
             )}
-          </p>
-          <div className="flex shrink-0 items-center gap-2">
-            <div role="group" aria-label="묶는 기준" className="flex gap-1">
-              {SORT_OPTIONS.map((option) => (
-                <FilterChip
-                  key={option.value}
-                  active={sortBy === option.value}
-                  onClick={() => setSortBy(option.value)}
-                >
-                  {option.label}
-                </FilterChip>
-              ))}
-            </div>
-            <span aria-hidden className="h-5 w-px bg-white/15" />
-            <div role="group" aria-label="보기 방식" className="flex gap-1">
-              <FilterChip
-                active={viewMode === "card"}
-                onClick={() => setViewMode("card")}
-                label="카드로 보기"
-                compact
-              >
-                <GridIcon className="h-4 w-4" />
-              </FilterChip>
-              <FilterChip
-                active={viewMode === "list"}
-                onClick={() => setViewMode("list")}
-                label="리스트로 보기"
-                compact
-              >
-                <ListIcon className="h-4 w-4" />
-              </FilterChip>
-            </div>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      >
+        <SortFilterBar
+          label="형식"
+          options={formatOptions}
+          value={formatFilter}
+          onChange={setFormatFilter}
+          compact
+        />
+        <SortFilterBar
+          label="연도"
+          options={yearOptions}
+          value={yearFilter}
+          onChange={setYearFilter}
+          compact
+        />
+        <SortFilterBar
+          label="정렬"
+          options={SORT_OPTIONS}
+          value={sortBy}
+          onChange={setSortBy}
+        />
+        <SortFilterBar
+          label="보기"
+          groupLabel="보기 방식"
+          options={VIEW_OPTIONS}
+          value={viewMode}
+          onChange={setViewMode}
+        />
+      </FilterPanel>
 
       {groups.length === 0 ? (
         <p className={cn("text-base text-white/50", "tablet:text-lg")}>

@@ -13,6 +13,7 @@ import {
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { Popover } from "@/components/Popover";
 import { SidePanel } from "@/components/SidePanel";
+import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/components/SortFilterBar";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
 import { useKoreaToday } from "@/lib/use-korea-today";
 import { openExternalUrl } from "@/lib/in-app-browser";
@@ -212,8 +213,22 @@ export function AttendanceView({
       {/* 현황 + 버튼 — 태블릿 이상은 한 줄 막대(왼쪽 숫자, 오른쪽 버튼). 모바일은
           숫자를 따로 카드로 세우고 그 아래에 버튼을 배경 없이 한 줄로 나열한다.
           작은 창은 이 묶음 전체 폭 기준(모바일은 폭만큼 펼침). */}
-      <div className="tablet:flex-row tablet:flex-wrap tablet:items-center tablet:gap-x-5 tablet:rounded-lg tablet:border tablet:border-white/10 tablet:bg-white/5 tablet:px-4 tablet:py-2.5 relative flex flex-col gap-3">
-        <dl className="tablet:flex tablet:gap-6 tablet:border-0 tablet:bg-transparent tablet:p-0 grid grid-cols-3 rounded-lg border border-white/10 bg-white/5 py-3">
+      {/* 면은 곡·공연 목록 필터 카드와 같은 어두운 면(ZUTOPIA_SURFACE_CLASS). z-10은
+          흐림(backdrop) 면끼리 겹칠 때 작은 창이 아래 목록 카드에 가리지 않게. */}
+      <div
+        className={cn(
+          "relative z-10 flex flex-col gap-3",
+          "tablet:flex-row tablet:flex-wrap tablet:items-center tablet:gap-x-5 tablet:px-4 tablet:py-2.5",
+          "tablet:rounded-lg tablet:border tablet:border-white/10 tablet:bg-black/60 tablet:shadow-[0_4px_16px_rgba(0,0,0,0.4)] tablet:backdrop-blur-md",
+        )}
+      >
+        <dl
+          className={cn(
+            "grid grid-cols-3 py-3",
+            ZUTOPIA_SURFACE_CLASS,
+            "tablet:flex tablet:gap-6 tablet:border-0 tablet:bg-transparent tablet:p-0 tablet:shadow-none tablet:backdrop-blur-none",
+          )}
+        >
           {stats.map((stat) => (
             <div
               key={stat.label}
@@ -295,7 +310,7 @@ export function AttendanceView({
 
       {/* 알림 줄 — 앱 안 브라우저 경고, 불러오기 되돌리기, 백업 안내(하나씩) */}
       {inApp ? (
-        <p className="rounded-lg bg-white/5 px-3 py-2.5 text-sm text-white/80">
+        <p className="rounded-lg bg-black/60 px-3 py-2.5 text-sm text-white/80">
           {inApp} 안에서 열린 페이지예요. 여기서 체크한 기록은 {inApp} 안에만
           남아요.{" "}
           {openExternalUrl(
@@ -315,7 +330,7 @@ export function AttendanceView({
       ) : undo ? (
         <p
           role="status"
-          className="rounded-lg bg-white/5 px-3 py-2.5 text-sm text-white/80"
+          className="rounded-lg bg-black/60 px-3 py-2.5 text-sm text-white/80"
         >
           {undo.text}{" "}
           <button
@@ -335,20 +350,19 @@ export function AttendanceView({
       ) : (
         ready &&
         attended.size > 0 && (
-          <p className="text-sm text-white/60">
-            기록은 이 브라우저에만 남아요. 아이폰 Safari는 한동안 들어오지
-            않으면 지울 수 있으니{" "}
+          <p className="inline-flex text-sm text-white/60">
+            참전 기록은 이 브라우저에만 유지됩니다.
             <button
               type="button"
               onClick={() => setPanel("share")}
               className={cn(
-                "rounded text-white/85 underline decoration-white/30 underline-offset-4 hover:text-white",
+                "ml-1 rounded text-white/85 underline decoration-white/30 underline-offset-4 hover:text-white",
                 FOCUS_RING,
               )}
             >
-              공유 링크를 나에게 보내 두세요
+              백업
             </button>
-            . 그 링크로 언제든 되살릴 수 있어요.
+            을 생활화 해주세요.
           </p>
         )
       )}

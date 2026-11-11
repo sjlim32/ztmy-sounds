@@ -57,7 +57,7 @@ export function FilterRow({
  * 여백을 줄인 작은 칩(옵션이 많은 줄을 최대한 한 줄에 넣을 때). 아이콘만
  * 있는 칩은 label로 이름을 준다. activeClassName은 고른 칸 색을 바꿀 때
  * (공연 종류 색 등), disabled는 지금 조건에서 고를 것이 없는 칩 — 자리는
- * 지키고 흐리게만 한다.
+ * 지키고 흐리게만 한다. count는 이름 옆에 작게 붙는 개수(어느 목록이든 같은 모양).
  */
 export function FilterChip({
   active,
@@ -66,6 +66,7 @@ export function FilterChip({
   disabled = false,
   label,
   activeClassName,
+  count,
   children,
 }: {
   active: boolean;
@@ -74,6 +75,7 @@ export function FilterChip({
   disabled?: boolean;
   label?: string;
   activeClassName?: string;
+  count?: number;
   children: ReactNode;
 }) {
   return (
@@ -92,6 +94,11 @@ export function FilterChip({
       )}
     >
       {children}
+      {count != null && (
+        <span className="ml-0.5 text-xs font-normal text-white/50 tabular-nums">
+          {count}
+        </span>
+      )}
     </button>
   );
 }

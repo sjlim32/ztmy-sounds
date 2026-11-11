@@ -1,16 +1,63 @@
 "use client";
 
+import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import { FilterChip, FilterRow } from "@/components/FilterChips";
 
 /**
  * 정렬/필터 줄(SortFilterBar)들을 감싸는 카드 — 곡·앨범·공연 목록이 모두 이걸
- * 써서 안쪽 여백·줄 간격이 같다. 위치(relative 등)만 호출부가 얹는다.
+ * 써서 생김새·여백·줄 간격이 같다(FilterPanel). 배경 그림이 화려해서 옅은 흰
+ * 면으로는 칩이 묻혀, 공연 상세 티켓(LIVE_SURFACE_CLASS)과 같은 어두운 면을 쓴다.
+ * 참전 기록 현황 막대·목록 카드처럼 필터가 아닌 카드도 이 면을 같이 쓴다.
  */
-export const SORT_FILTER_CARD_CLASS =
-  "flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 tablet:px-4 tablet:py-3";
+export const ZUTOPIA_SURFACE_CLASS =
+  "rounded-lg border border-white/10 bg-black/60 shadow-[0_4px_16px_rgba(0,0,0,0.4)] backdrop-blur-md";
+
+/** 필터 카드 = 공통 면(ZUTOPIA_SURFACE_CLASS) + 줄 쌓기·안쪽 여백. */
+export const SORT_FILTER_CARD_CLASS = `${ZUTOPIA_SURFACE_CLASS} flex flex-col gap-2 px-3 py-2.5 tablet:px-4 tablet:py-3`;
+
+/**
+ * 곡·앨범·공연 목록 위 필터 카드 — 안에 SortFilterBar 줄들을 쌓고, summary
+ * (개수 등)는 태블릿 이상에서 오른쪽 위, 모바일에선 맨 위 줄에 둔다.
+ */
+export function FilterPanel({
+  summary,
+  className,
+  children,
+}: {
+  summary?: ReactNode;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className={cn(SORT_FILTER_CARD_CLASS, "relative", className)}>
+      {summary && (
+        <div className="tablet:absolute tablet:top-3 tablet:right-4 flex items-center gap-3 text-sm text-white/60">
+          {summary}
+        </div>
+      )}
+      {children}
+    </div>
+  );
+}
+
+export interface SortFilterOption<T extends string> {
+  value: T;
+  label: string;
+  /** 이 옵션에 해당하는 항목 수 — 이름 옆에 작게 붙인다. */
+  count?: number;
+  /** 이름 앞 색 점(공연 종류 색 등). */
+  dotClassName?: string;
+  /** 고른 칸 색을 바꿀 때(기본은 마젠타). */
+  activeClassName?: string;
+  /** 지금 조건에선 해당 항목이 없는 옵션 — 흐리게 하고 누를 수 없게. */
+  disabled?: boolean;
+  /** 있으면 이름 대신 아이콘만 보이고, 이름은 화면 읽기·툴팁으로 쓴다. */
+  icon?: ReactNode;
+}
 
 interface SortFilterBarProps<T extends string> {
-  options: { value: T; label: string }[];
+  options: SortFilterOption<T>[];
   value: T;
   onChange: (value: T) => void;
   label?: string;
@@ -27,8 +74,7 @@ interface SortFilterBarProps<T extends string> {
  * (FilterRow + FilterChip, 가이드 곡 목록과 같은 칩)이고, 여기선 옵션 목록과
  * 현재 값·변경 콜백만 받는다(곡·앨범 각각 자기 상태를 갖고 서로 공유하지
  * 않음). label로 정렬 기준 외에 순서·형식·연도 같은 다른 줄에도 쓴다. 카드
- * 테두리/배경은 부모가 SORT_FILTER_CARD_CLASS로 감싼다 — 여러 줄이 한 카드에
- * 같이 들어가야 해서.
+ * 테두리/배경은 부모(FilterPanel)가 감싼다 — 여러 줄이 한 카드에 같이 들어가야 해서.
  */
 export function SortFilterBar<T extends string>({
   options,
@@ -50,9 +96,22 @@ export function SortFilterBar<T extends string>({
           key={option.value}
           active={value === option.value}
           onClick={() => onChange(option.value)}
-          compact={compact}
+          compact={compact || !!option.icon}
+          disabled={option.disabled && value !== option.value}
+          activeClassName={option.activeClassName}
+          label={option.icon ? option.label : undefined}
+          count={option.count}
         >
-          {option.label}
+          {option.dotClassName && (
+            <span
+              aria-hidden
+              className={cn(
+                "h-2 w-2 shrink-0 rounded-full",
+                option.dotClassName,
+              )}
+            />
+          )}
+          {option.icon ?? option.label}
         </FilterChip>
       ))}
     </FilterRow>

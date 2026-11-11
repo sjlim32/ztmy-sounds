@@ -302,7 +302,7 @@ export function HorizontalTimeline({
         <div
           role="group"
           aria-label="확대 단계"
-          className="flex items-center gap-1 rounded-lg bg-white/5 p-1"
+          className="flex items-center gap-1 rounded-lg border border-white/10 bg-black/60 p-1 shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
         >
           {ZOOM_ORDER.map((item) => (
             <button
