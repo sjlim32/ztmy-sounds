@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ZutopiaScrollArea } from "@/features/zutopia/components/ZutopiaScrollArea";
+import { ZutopiaNotice } from "@/features/zutopia/components/ZutopiaNotice";
 
 export const metadata: Metadata = {
   title: "즛토피아",
@@ -22,5 +23,11 @@ export default function ZutopiaLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <ZutopiaScrollArea>{children}</ZutopiaScrollArea>;
+  return (
+    <>
+      <ZutopiaScrollArea>{children}</ZutopiaScrollArea>
+      {/* 들어올 때 한 번 띄우는 안내(세트리스트 채우는 중) */}
+      <ZutopiaNotice />
+    </>
+  );
 }

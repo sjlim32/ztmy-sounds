@@ -315,6 +315,11 @@ src/
                              # 예외로 공연 목록은 상세에서 돌아오면(뒤로가기·
                              # 헤더 공연 탭) 필터와 스크롤 위치를 복원한다
                              # (LiveListView — 초기화 뒤에 돌아서 덮어씀).
+      (안내 창)             # components/ZutopiaNotice — layout.tsx가 모든 즛토피아
+                             # 페이지에 둔다. 확인은 24시간, 다시 보지 않기는 계속 숨김 —
+                             # 둘 다 localStorage(키 ztmy-sounds:zutopia-notice에
+                             # { version, until }). 안내 내용을
+                             # 바꾸면 NOTICE_VERSION을 올려 다시 보이게 한다.
       nav.ts                # 헤더의 즛토피아 구역 이동(곡·앨범·공연·참전·연혁·통계) 항목.
                              # 헤더가 클라이언트라 registry.ts를 못 써서 따로
                              # 둔다 — 카테고리를 더하면 여기도 더한다. 곡·앨범
