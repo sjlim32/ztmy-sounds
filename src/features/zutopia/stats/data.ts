@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
 import { getLiveHistory } from "@/features/zutopia/live-history/data";
 import {
@@ -6,7 +7,7 @@ import {
   getSongsWithAlbums,
 } from "@/features/zutopia/song-db/data";
 import { getSongCoverSrc } from "@/features/zutopia/song-db/song-album-grouping";
-import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
+import { isCountableOriginal } from "@/features/zutopia/song-db/song-metadata";
 import { buildStatSections } from "./compute";
 import type { StatSection, StatSong, StatTour } from "./types";
 
@@ -14,7 +15,7 @@ import type { StatSection, StatSong, StatTour } from "./types";
  * 통계 페이지 기록(빌드 때 한 번). 곡은 참전 기록과 같은 기준(원곡·발매곡만 —
  * 라이브 기록은 원곡으로 센다), 앨범 수록곡도 어레인지는 원곡으로 바꿔 센다.
  */
-export async function getStatSections(): Promise<StatSection[]> {
+export const getStatSections = cache(async (): Promise<StatSection[]> => {
   const supabase = createBuildTimeSupabaseClient();
   const [history, songs, albums, toursResult] = await Promise.all([
     getLiveHistory(),
@@ -34,11 +35,7 @@ export async function getStatSections(): Promise<StatSection[]> {
   }
 
   const statSongs: StatSong[] = songs
-    .filter(
-      (song) =>
-        !song.original_song_id &&
-        !parseSongMetadata(song.metadata).isUnreleased,
-    )
+    .filter(isCountableOriginal)
     .map((song) => ({
       id: song.id,
       slug: song.slug,
@@ -79,4 +76,4 @@ export async function getStatSections(): Promise<StatSection[]> {
     })),
     tours,
   });
-}
+});

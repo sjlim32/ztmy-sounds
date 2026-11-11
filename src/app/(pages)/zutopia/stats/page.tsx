@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getStatSections } from "@/features/zutopia/stats/data";
+import { previewSections } from "@/features/zutopia/stats/compute";
 import { StatsView } from "@/features/zutopia/stats/components/StatsView";
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export default async function ZutopiaStatsPage() {
   return (
     <div>
       <h1 className="sr-only">통계</h1>
-      <StatsView sections={sections} />
+      <StatsView sections={previewSections(sections)} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ThumbImage } from "@/components/ThumbImage";
 import { SidePanel } from "@/components/SidePanel";
@@ -9,9 +9,9 @@ import { FOCUS_RING, SOFT_BUTTON_CLASS } from "@/components/button-styles";
 import {
   FilterPanel,
   SortFilterBar,
-  ZUTOPIA_SURFACE_CLASS,
   type SortFilterOption,
 } from "@/features/zutopia/components/SortFilterBar";
+import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
 import type { StatRecord, StatRow, StatSection } from "../types";
 
 type SectionFilter = "all" | StatSection["id"];
@@ -19,15 +19,34 @@ type SectionFilter = "all" | StatSection["id"];
 /** 카드에 1위 아래로 보여 줄 줄 수(2~5위). 나머지는 "자세히 보기" 표에서. */
 const RUNNER_UP_COUNT = 4;
 
+// 전체 순위표 — 빌드 때 만든 /zutopia/stats.json을 처음 열 때 한 번 받는다
+// (페이지엔 기록마다 앞 5줄만 실려 있다). 실패하면 다음에 다시 받는다.
+let tablesPromise: Promise<Record<string, StatRow[]>> | null = null;
+function loadTables() {
+  tablesPromise ??= fetch("/zutopia/stats.json")
+    .then((response) => {
+      if (!response.ok) throw new Error(String(response.status));
+      return response.json() as Promise<Record<string, StatRow[]>>;
+    })
+    .catch((error: unknown) => {
+      tablesPromise = null;
+      throw error;
+    });
+  return tablesPromise;
+}
+
 /**
  * 통계 페이지 — 곡·앨범·공연·장소 구역마다 기록 카드. 카드는 1위를 크게
  * (그림·이름·대표 값·설명), 그 아래 2~5위를 한 줄씩, 맨 아래 "자세히 보기"를
- * 누르면 옆 창(SidePanel)에 전체 순위표가 열린다. 위 필터 카드(곡·공연 목록과
- * 같은 모양)로 구역을 골라 볼 수 있다. 값은 빌드 때 다 계산돼 내려온다(compute.ts).
+ * 누르면 옆 창(SidePanel)에 전체 순위표가 열린다(stats.json에서 받음). 위 필터
+ * 카드(곡·공연 목록과 같은 모양)로 구역을 골라 볼 수 있다. 값은 빌드 때 다
+ * 계산돼 내려온다(compute.ts). 창이 닫히며 미끄러지는 동안에도 마지막 기록을
+ * 그대로 보여 주려고 연 기록(shown)과 열림 여부(open)를 따로 둔다.
  */
 export function StatsView({ sections }: { sections: StatSection[] }) {
   const [filter, setFilter] = useState<SectionFilter>("all");
-  const [openRecord, setOpenRecord] = useState<StatRecord | null>(null);
+  const [shown, setShown] = useState<StatRecord | null>(null);
+  const [open, setOpen] = useState(false);
   const recordCount = sections.reduce(
     (sum, section) => sum + section.records.length,
     0,
@@ -74,7 +93,10 @@ export function StatsView({ sections }: { sections: StatSection[] }) {
                 <li key={record.id} className="min-w-0">
                   <RecordCard
                     record={record}
-                    onOpen={() => setOpenRecord(record)}
+                    onOpen={() => {
+                      setShown(record);
+                      setOpen(true);
+                    }}
                   />
                 </li>
               ))}
@@ -84,12 +106,12 @@ export function StatsView({ sections }: { sections: StatSection[] }) {
       </div>
 
       <SidePanel
-        open={openRecord !== null}
-        title={openRecord?.title ?? ""}
-        subtitle={openRecord?.description}
-        onClose={() => setOpenRecord(null)}
+        open={open}
+        title={shown?.title ?? ""}
+        subtitle={shown?.description}
+        onClose={() => setOpen(false)}
       >
-        {openRecord && <RecordTable record={openRecord} />}
+        {shown && <FullTable key={shown.id} record={shown} />}
       </SidePanel>
     </div>
   );
@@ -103,7 +125,7 @@ function RecordCard({
   onOpen: () => void;
 }) {
   const [leader, ...rest] = record.rows;
-  const coLeaders = record.rows.filter((row) => row.rank === 1).length;
+  const coLeaders = record.leaderCount;
 
   return (
     <article
@@ -126,10 +148,14 @@ function RecordCard({
             />
           )}
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <RowName row={leader} className="text-lg font-bold" />
+            <div className="flex items-start gap-2">
+              {/* 1위 이름은 두 줄까지(공연·투어 이름이 길다), 넘치면 title로 전체 이름 */}
+              <RowName
+                row={leader}
+                className="line-clamp-2 text-lg leading-snug font-bold break-keep whitespace-normal"
+              />
               {coLeaders > 1 && (
-                <span className="shrink-0 rounded bg-white/10 px-1.5 text-xs leading-5 font-semibold text-white/80">
+                <span className="mt-0.5 shrink-0 rounded bg-white/10 px-1.5 text-sm leading-6 font-semibold whitespace-nowrap text-white/80">
                   공동 1위 {coLeaders}
                 </span>
               )}
@@ -170,15 +196,17 @@ function RecordCard({
         </ol>
       )}
 
-      {record.rows.length > 1 && (
+      {record.total > 1 && (
         <button
           type="button"
           onClick={onOpen}
+          aria-haspopup="dialog"
+          aria-label={`${record.title} 전체 순위 보기 (${record.total}개)`}
           className={cn(SOFT_BUTTON_CLASS, "mt-auto self-start")}
         >
           자세히 보기
           <span className="text-white/55 tabular-nums">
-            전체 {record.rows.length}
+            전체 {record.total}
           </span>
         </button>
       )}
@@ -189,10 +217,16 @@ function RecordCard({
 /** 이름 — 상세 페이지가 있으면 링크(목록→상세와 같은 화면 전환). */
 function RowName({ row, className }: { row: StatRow; className?: string }) {
   const base = cn("min-w-0 truncate", className);
-  if (!row.href) return <span className={base}>{row.name}</span>;
+  if (!row.href)
+    return (
+      <span className={base} title={row.name}>
+        {row.name}
+      </span>
+    );
   return (
     <Link
       href={row.href}
+      title={row.name}
       transitionTypes={["nav-forward"]}
       className={cn(
         base,
@@ -205,8 +239,58 @@ function RowName({ row, className }: { row: StatRow; className?: string }) {
   );
 }
 
+/** 전체 순위표를 받아 그린다(받는 동안·실패 안내 포함). */
+function FullTable({ record }: { record: StatRecord }) {
+  const [rows, setRows] = useState<StatRow[] | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    loadTables().then(
+      (tables) => !cancelled && setRows(tables[record.id] ?? record.rows),
+      () => !cancelled && setFailed(true),
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [record, attempt]);
+
+  if (failed)
+    return (
+      <p role="status" className="py-10 text-center text-sm text-white/60">
+        전체 순위를 불러오지 못했어요.{" "}
+        <button
+          type="button"
+          onClick={() => {
+            setFailed(false);
+            setAttempt((value) => value + 1);
+          }}
+          className={cn(
+            "rounded text-white underline decoration-white/40 underline-offset-4",
+            FOCUS_RING,
+          )}
+        >
+          다시 시도
+        </button>
+      </p>
+    );
+  if (!rows)
+    return (
+      <p role="status" className="py-10 text-center text-sm text-white/55">
+        불러오는 중…
+      </p>
+    );
+  return <RecordTable record={record} rows={rows} />;
+}
+
 /** 전체 순위표 — 넓지 않은 화면에선 표만 가로로 넘긴다. 1~3위 순위는 마젠타. */
-function RecordTable({ record }: { record: StatRecord }) {
+function RecordTable({
+  record,
+  rows,
+}: {
+  record: StatRecord;
+  rows: StatRow[];
+}) {
   return (
     <div className="-mx-4 overflow-x-auto px-4">
       <table className="w-full text-sm">
@@ -230,7 +314,7 @@ function RecordTable({ record }: { record: StatRecord }) {
           </tr>
         </thead>
         <tbody>
-          {record.rows.map((row) => (
+          {rows.map((row) => (
             <tr key={row.key} className="border-b border-white/5 align-top">
               <td
                 className={cn(
@@ -255,7 +339,7 @@ function RecordTable({ record }: { record: StatRecord }) {
                       className="block font-medium break-keep whitespace-normal text-white"
                     />
                     {row.sub && (
-                      <span className="block text-xs break-keep text-white/50">
+                      <span className="block text-sm break-keep text-white/50">
                         {row.sub}
                       </span>
                     )}

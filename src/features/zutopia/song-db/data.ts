@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
 import { getGuideHref } from "@/features/zutopia/guide-link";
 import type { Song } from "./types";
@@ -130,7 +131,10 @@ export async function getAlbumsCount(): Promise<number> {
   return count ?? 0;
 }
 
-export async function getSongsWithAlbums(): Promise<SongWithAlbums[]> {
+// 한 페이지 렌더(첫 화면은 검색 인덱스·통계가 같이 부른다) 안에서 한 번만 가공하게 cache.
+export const getSongsWithAlbums = cache(getSongsWithAlbumsUncached);
+
+async function getSongsWithAlbumsUncached(): Promise<SongWithAlbums[]> {
   const supabase = createBuildTimeSupabaseClient();
   const { data, error } = await supabase
     .from("songs")
@@ -170,7 +174,9 @@ export async function getSongsWithAlbums(): Promise<SongWithAlbums[]> {
   });
 }
 
-export async function getAlbumsWithSongs(): Promise<AlbumWithSongs[]> {
+export const getAlbumsWithSongs = cache(getAlbumsWithSongsUncached);
+
+async function getAlbumsWithSongsUncached(): Promise<AlbumWithSongs[]> {
   const supabase = createBuildTimeSupabaseClient();
   const { data, error } = await supabase
     .from("albums")

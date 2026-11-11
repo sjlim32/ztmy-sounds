@@ -26,6 +26,10 @@ export interface StatRecord {
   /** 순위·이름 다음 칸들의 이름(첫 칸이 대표 값) */
   columns: string[];
   rows: StatRow[];
+  /** 전체 줄 수 — 페이지엔 앞 몇 줄만 싣고(previewSections) 전체는 stats.json에서 받는다. */
+  total: number;
+  /** 공동 1위 수(1이면 단독) — 미리보기 줄만으로는 셀 수 없어 따로 둔다. */
+  leaderCount: number;
 }
 
 export interface StatSection {

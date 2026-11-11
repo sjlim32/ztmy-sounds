@@ -25,3 +25,15 @@ export function parseSongMetadata(metadata: Song["metadata"]): SongMetadata {
     isUnreleased: unrelease === "true" || unrelease === true,
   };
 }
+
+/**
+ * 라이브 기록·참전 기록·통계에서 세는 곡 — 원곡이고(어레인지 버전은 원곡으로 센다)
+ * 미공개곡이 아닌 곡. 참전 기록의 "못 들은 곡"과 통계의 참가율이 같은 기준을 쓴다.
+ */
+export function isCountableOriginal(
+  song: Pick<Song, "original_song_id" | "metadata">,
+): boolean {
+  return (
+    !song.original_song_id && !parseSongMetadata(song.metadata).isUnreleased
+  );
+}

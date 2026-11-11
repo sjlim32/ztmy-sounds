@@ -111,10 +111,10 @@ describe("buildStatSections", () => {
     expect(rows[0].cells[0]).toBe("0회");
   });
 
-  test("세트리스트 없는 날은 연속 기록을 끊지 않는다", () => {
+  test("세트리스트를 모르는 공연이 끼면 연속 기록이 끊긴다", () => {
     const rows = record(sections, "song-streak").rows;
     expect(rows[0].key).toBe("a");
-    expect(rows[0].cells[0]).toBe("3회 연속");
+    expect(rows[0].cells[0]).toBe("2회 연속");
   });
 
   test("공연이 가장 많았던 해·공백은 세트리스트 없는 날도 센다", () => {
@@ -144,5 +144,85 @@ describe("페스티벌 회차", () => {
     const [row] = record(sections, "live-festival").rows;
     expect(row.name).toBe("COUNTDOWN JAPAN");
     expect(row.cells).toEqual(["2회", "19/20, 23/24"]);
+  });
+});
+
+describe("모르는 구간(세트리스트 없는 공연·공연일 없는 투어)", () => {
+  const songs = [song("a", "2020-01-01"), song("b", "2022-06-01")];
+  const units = [
+    unit("u1", "2020-03-01", []), // 세트리스트 없음
+    unit("u2", "2021-01-01", ["a"]),
+    unit("u3", "2022-07-01", ["a", "b"]),
+    unit("u4", "2024-01-01", ["a", "b"]),
+  ];
+  const tours = [
+    {
+      id: "t",
+      slug: "t",
+      title: "T",
+      titleKo: "빈 투어",
+      startDate: "2023-01-01",
+      endDate: "2023-03-01",
+      poster: null,
+    },
+  ];
+  const sections = buildStatSections({
+    units,
+    upcoming: [],
+    songs,
+    albums: [],
+    tours,
+  });
+
+  test("발매 후 첫 라이브 전에 모르는 공연이 있으면 데뷔 기록에서 뺀다", () => {
+    const keys = record(sections, "song-fastest-debut").rows.map(
+      (row) => row.key,
+    );
+    expect(keys).toEqual(["b"]);
+    const debutUnits = record(sections, "live-most-debuts").rows.map(
+      (row) => row.key,
+    );
+    expect(debutUnits).toEqual(["u3"]);
+  });
+
+  test("두 라이브 사이에 공연일 없는 투어가 있으면 공백 끝 부활에서 뺀다", () => {
+    const rows = record(sections, "song-comeback").rows;
+    // a: 2021-01-01 → 2022-07-01만 남는다(2022-07 → 2024-01 사이엔 빈 투어).
+    expect(rows.map((row) => [row.key, row.cells[0]])).toEqual([
+      ["a", "546일"],
+    ]);
+  });
+
+  test("공연일 없는 투어 기간은 공연 공백을 끊는다", () => {
+    const rows = record(sections, "live-longest-break").rows;
+    expect(rows[0].cells[0]).toBe("546일");
+    expect(rows.some((row) => row.sub?.includes("빈 투어"))).toBe(true);
+  });
+
+  test("같은 %(정수)면 같은 순위", () => {
+    const rate = buildStatSections({
+      units: Array.from({ length: 30 }, (_, i) =>
+        unit(`r${i}`, `2025-01-${String(i + 1).padStart(2, "0")}`, [
+          "x",
+          ...(i < 29 ? ["y"] : []),
+          ...(i < 28 ? ["z"] : []),
+        ]),
+      ),
+      upcoming: [],
+      songs: [
+        song("x", "2024-01-01"),
+        song("y", "2024-01-01"),
+        song("z", "2024-01-01"),
+      ],
+      albums: [],
+      tours: [],
+    });
+    const rows = record(rate, "song-highest-rate").rows;
+    // 30/30=100%, 29/30=97%, 28/30=93%
+    expect(rows.map((row) => [row.key, row.rank, row.cells[0]])).toEqual([
+      ["x", 1, "100%"],
+      ["y", 2, "97%"],
+      ["z", 3, "93%"],
+    ]);
   });
 });

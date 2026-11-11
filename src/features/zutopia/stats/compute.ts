@@ -1,6 +1,11 @@
 import { diffDays, formatDotDate } from "@/lib/ymd";
-import { splitParenSuffix } from "@/features/zutopia/lives/LiveTicket";
+import { splitParenSuffix } from "@/features/zutopia/lives/split-paren-suffix";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
+import {
+  ENTRY_TYPE_LABEL,
+  ENTRY_TYPE_ORDER,
+  type ZutopiaEntryType,
+} from "@/features/zutopia/types";
 import type {
   StatAlbum,
   StatRecord,
@@ -16,8 +21,13 @@ import type {
  * 세는 기준:
  * - 공연일(LiveUnit) 하나 = 1회. 투어 각 회차·이틀 공연의 각 날을 따로 센다.
  * - 세트리스트가 아직 없는 공연일(songIds가 빈 날)은 곡·공연 기록(횟수·참가율·
- *   연속·첫 곡 등)에서 뺀다 — "안 불렀다"로 세면 기록이 틀어진다. 공연 횟수·
+ *   첫 곡 등)에서 뺀다 — "안 불렀다"로 세면 기록이 틀어진다. 공연 횟수·
  *   장소·공백 같은 기록엔 넣는다.
+ * - "모르는 구간" = 세트리스트 없는 공연일 + 공연일이 하나도 등록되지 않은 투어
+ *   기간. 첫 라이브·라이브 데뷔·첫 공개·공백 끝 부활·연속 기록은 이 구간을 사이에
+ *   두면 단정할 수 없어서, 그런 곡·구간은 빼거나(데뷔·부활) 끊는다(연속).
+ * - 공연일이 없는 투어는 횟수를 셀 수 없어 해마다·장소 기록엔 못 넣고, 공연 공백
+ *   계산에만 "그 기간엔 공연이 있었다"로 넣는다.
  * - 참가율 = 발매일 이후(당일 포함) 세트리스트가 있는 공연일 중 그 곡을 부른 비율.
  *   발매 전에 먼저 부른 날은 횟수엔 넣고 참가율에선 뺀다(100%를 넘지 않게).
  * - 온라인 공연은 도시·공연장·해외 기록에서 뺀다.
@@ -34,12 +44,35 @@ export function buildStatSections(input: {
   const all = [...input.units].sort(byDate);
   const known = all.filter((unit) => unit.songIds.length > 0);
   const songStats = buildSongStats(input.songs, known);
+  const scheduled = new Set(
+    [...all, ...input.upcoming].flatMap((unit) => unit.tourId ?? []),
+  );
+  const lastDate = all.at(-1)?.date ?? "";
+  // 공연일이 하나도 없는 투어의 (지난) 기간
+  const emptyTours = input.tours
+    .filter((tour) => !scheduled.has(tour.id) && tour.startDate <= lastDate)
+    .map((tour) => ({
+      tour,
+      from: tour.startDate,
+      to: minDate(tour.endDate ?? tour.startDate, lastDate),
+    }));
+  const unknown: Span[] = [
+    ...all
+      .filter((unit) => unit.songIds.length === 0)
+      .map((unit) => ({ from: unit.date, to: unit.date })),
+    ...emptyTours,
+  ];
+  const context: Context = { unknown, emptyTourCount: emptyTours.length };
 
-  return [
+  const sections: {
+    id: StatSection["id"];
+    title: string;
+    records: RawRecord[];
+  }[] = [
     {
       id: "songs",
       title: "곡",
-      records: songRecords(songStats, known),
+      records: songRecords(songStats, known, context),
     },
     {
       id: "albums",
@@ -49,20 +82,85 @@ export function buildStatSections(input: {
     {
       id: "lives",
       title: "공연",
-      records: liveRecords(all, known, songStats, input),
+      records: liveRecords(all, known, songStats, input, emptyTours, context),
     },
     {
       id: "places",
       title: "장소",
-      records: placeRecords(all),
+      records: placeRecords(all, context),
     },
   ];
+  return sections.map((section) => ({
+    ...section,
+    records: section.records.map((record) => ({
+      ...record,
+      total: record.rows.length,
+      leaderCount: record.rows.filter((row) => row.rank === 1).length,
+    })),
+  }));
+}
+
+/** 카드에 보이는 줄 수(1위 + 2~5위) — 나머지는 "자세히 보기"에서 stats.json으로. */
+export const PREVIEW_ROW_COUNT = 5;
+
+/**
+ * 페이지에 싣는 미리보기 — 기록마다 앞 PREVIEW_ROW_COUNT줄만, 설명(note)은 1위
+ * 카드에서만 쓰므로 나머지 줄에선 뺀다(전체 표 데이터는 수백 줄이라 따로 받는다).
+ */
+export function previewSections(sections: StatSection[]): StatSection[] {
+  return sections.map((section) => ({
+    ...section,
+    records: section.records.map((record) => ({
+      ...record,
+      rows: record.rows
+        .slice(0, PREVIEW_ROW_COUNT)
+        .map((row, index) => (index === 0 ? row : { ...row, note: null })),
+    })),
+  }));
+}
+
+/** stats.json — 기록 id → 전체 순위 줄. */
+export function fullTables(sections: StatSection[]): Record<string, StatRow[]> {
+  return Object.fromEntries(
+    sections.flatMap((section) =>
+      section.records.map((record) => [record.id, record.rows]),
+    ),
+  );
 }
 
 const byDate = (a: LiveUnit, b: LiveUnit) =>
   a.date.localeCompare(b.date) || (a.dayNumber ?? 0) - (b.dayNumber ?? 0);
 
 // ─── 공통 ──────────────────────────────────────────────────────────────
+
+/** 기록 하나(전체 줄 수 total은 buildStatSections가 마지막에 붙인다) */
+type RawRecord = Omit<StatRecord, "total" | "leaderCount">;
+
+/** 날짜 구간(양 끝 포함, "YYYY-MM-DD") */
+interface Span {
+  from: string;
+  to: string;
+}
+
+interface Context {
+  /** 세트리스트를 모르는 구간 */
+  unknown: Span[];
+  /** 공연일이 하나도 등록되지 않은 (지난) 투어 수 */
+  emptyTourCount: number;
+}
+
+const minDate = (a: string, b: string) => (a < b ? a : b);
+
+/** from과 to 사이(양 끝 제외)에 모르는 구간이 걸치는지. */
+function unknownBetween(context: Context, from: string, to: string) {
+  return context.unknown.some((span) => span.to > from && span.from < to);
+}
+
+/** 공연일이 없는 투어가 있으면 덧붙이는 안내 */
+const emptyTourNote = (context: Context) =>
+  context.emptyTourCount > 0
+    ? ` — 공연일이 아직 등록되지 않은 투어 ${context.emptyTourCount}개는 빠짐`
+    : "";
 
 /**
  * 점수로 정렬하고 순위를 매긴다 — 점수가 같으면 같은 순위(공동). tie는 점수가
@@ -177,7 +275,11 @@ function songRow(song: StatSong, cells: string[], note?: string | null) {
 const byRelease = (a: SongStat, b: SongStat) =>
   a.song.releaseDate.localeCompare(b.song.releaseDate);
 
-function songRecords(stats: SongStat[], known: LiveUnit[]): StatRecord[] {
+function songRecords(
+  stats: SongStat[],
+  known: LiveUnit[],
+  context: Context,
+): RawRecord[] {
   const rate = (stat: SongStat) =>
     stat.eligible > 0 ? stat.playedSinceRelease / stat.eligible : 0;
   const playCells = (stat: SongStat) => [
@@ -188,7 +290,8 @@ function songRecords(stats: SongStat[], known: LiveUnit[]): StatRecord[] {
   ];
   const playNote = (stat: SongStat) =>
     `발매 후 공연 ${stat.eligible}회 중 ${stat.playedSinceRelease}회 · 참가율 ${percent(stat.playedSinceRelease, stat.eligible)}`;
-  const playColumns = ["횟수", "참가율", "첫 라이브", "마지막 라이브"];
+  // 첫 라이브는 세트리스트가 있는 공연 중 처음 — 그 전 공연 기록이 비어 있을 수 있다.
+  const playColumns = ["횟수", "참가율", "확인된 첫 라이브", "마지막 라이브"];
 
   const MIN_ELIGIBLE = 10;
   const played = stats.filter((stat) => stat.played.length > 0);
@@ -197,7 +300,10 @@ function songRecords(stats: SongStat[], known: LiveUnit[]): StatRecord[] {
   const comebacks = played.flatMap((stat) => {
     let best: { from: LiveUnit; to: LiveUnit; gap: number } | null = null;
     for (let i = 1; i < stat.played.length; i++) {
-      const gap = diffDays(stat.played[i - 1].date, stat.played[i].date);
+      const [from, to] = [stat.played[i - 1].date, stat.played[i].date];
+      // 사이에 세트리스트를 모르는 공연이 있으면 그때 불렀을 수도 있다.
+      if (unknownBetween(context, from, to)) continue;
+      const gap = diffDays(from, to);
       if (!best || gap > best.gap)
         best = { from: stat.played[i - 1], to: stat.played[i], gap };
     }
@@ -210,7 +316,12 @@ function songRecords(stats: SongStat[], known: LiveUnit[]): StatRecord[] {
     let best = { length: 0, from: known[0], to: known[0] };
     let length = 0;
     let from = known[0];
+    let previous: LiveUnit | null = null;
     for (const unit of known) {
+      // 사이에 세트리스트를 모르는 공연이 있으면 연속이 끊긴 것으로 본다.
+      if (previous && unknownBetween(context, previous.date, unit.date))
+        length = 0;
+      previous = unit;
       if (set.has(unit.id)) {
         if (length === 0) from = unit;
         length += 1;
@@ -221,11 +332,21 @@ function songRecords(stats: SongStat[], known: LiveUnit[]): StatRecord[] {
   });
 
   // 라이브 데뷔 — 발매일부터 첫 라이브까지(음수면 발매 전 선공개).
-  const debuts = played.map((stat) => ({
-    stat,
-    first: stat.played[0],
-    gap: diffDays(stat.song.releaseDate, stat.played[0].date),
-  }));
+  // 발매일(먼저 부른 날이 더 앞이면 그날)부터 첫 라이브 사이에 세트리스트를 모르는
+  // 공연이 있으면 진짜 첫 라이브인지 알 수 없어 뺀다.
+  const debuts = played
+    .filter((stat) => {
+      const first = stat.played[0].date;
+      const start = minDate(stat.song.releaseDate, first);
+      return !context.unknown.some(
+        (span) => span.to >= start && span.from < first,
+      );
+    })
+    .map((stat) => ({
+      stat,
+      first: stat.played[0],
+      gap: diffDays(stat.song.releaseDate, stat.played[0].date),
+    }));
   const debutText = (gap: number) =>
     gap < 0
       ? `발매 ${days(-gap)} 전`
@@ -275,10 +396,11 @@ function songRecords(stats: SongStat[], known: LiveUnit[]): StatRecord[] {
       id: "song-highest-rate",
       title: "참가율이 가장 높은 곡",
       description: `발매 후 공연일 중 부른 비율(발매 후 공연 ${MIN_ELIGIBLE}회 이상인 곡만)`,
-      columns: ["참가율", "횟수", "첫 라이브", "마지막 라이브"],
+      columns: ["참가율", "횟수", "확인된 첫 라이브", "마지막 라이브"],
       rows: rank(
         stats.filter((stat) => stat.eligible >= MIN_ELIGIBLE),
-        (stat) => Math.round(rate(stat) * 1000),
+        // 화면의 %(정수)와 같은 단위로 순위를 매긴다 — 같은 %면 같은 순위.
+        (stat) => Math.round(rate(stat) * 100),
         "desc",
         (stat) => {
           const [count, pct, first, last] = playCells(stat);
@@ -318,7 +440,8 @@ function songRecords(stats: SongStat[], known: LiveUnit[]): StatRecord[] {
     {
       id: "song-comeback",
       title: "가장 오랜 공백 끝에 돌아온 곡",
-      description: "연이은 두 라이브 사이 간격이 가장 길었던 때",
+      description:
+        "연이은 두 라이브 사이 간격이 가장 길었던 때 — 그 사이 세트리스트를 모르는 공연이 없는 구간만",
       columns: ["공백", "이전 라이브", "돌아온 공연"],
       rows: rank(
         comebacks,
@@ -345,7 +468,7 @@ function songRecords(stats: SongStat[], known: LiveUnit[]): StatRecord[] {
       id: "song-streak",
       title: "가장 오래 연속으로 불린 곡",
       description:
-        "세트리스트가 있는 공연일을 날짜 순으로 볼 때 빠짐없이 부른 최대 횟수",
+        "연이은 공연일마다 빠짐없이 부른 최대 횟수(세트리스트를 모르는 공연이 끼면 끊김)",
       columns: ["연속", "시작", "끝"],
       rows: rank(
         streaks,
@@ -367,7 +490,8 @@ function songRecords(stats: SongStat[], known: LiveUnit[]): StatRecord[] {
     {
       id: "song-fastest-debut",
       title: "가장 빨리 라이브에 오른 곡",
-      description: "발매일부터 첫 라이브까지 — 발매 전에 먼저 부른 곡이 앞",
+      description:
+        "발매일부터 첫 라이브까지(발매 전에 먼저 부른 곡이 앞) — 그 사이 세트리스트를 모르는 공연이 없는 곡만",
       columns: ["첫 라이브까지", "발매일", "첫 라이브"],
       rows: rank(
         debuts,
@@ -380,7 +504,8 @@ function songRecords(stats: SongStat[], known: LiveUnit[]): StatRecord[] {
     {
       id: "song-slowest-debut",
       title: "라이브까지 가장 오래 걸린 곡",
-      description: "발매일부터 첫 라이브까지 가장 오래 걸린 순",
+      description:
+        "발매일부터 첫 라이브까지 가장 오래 걸린 순 — 그 사이 세트리스트를 모르는 공연이 없는 곡만",
       columns: ["첫 라이브까지", "발매일", "첫 라이브"],
       rows: rank(
         debuts,
@@ -435,7 +560,7 @@ function songRecords(stats: SongStat[], known: LiveUnit[]): StatRecord[] {
 
 // ─── 앨범 ──────────────────────────────────────────────────────────────
 
-function albumRecords(albums: StatAlbum[], stats: SongStat[]): StatRecord[] {
+function albumRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
   const bySong = new Map(stats.map((stat) => [stat.song.id, stat]));
   const items = albums
     .map((album) => {
@@ -492,7 +617,7 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): StatRecord[] {
       columns: ["비율", "라이브된 수록곡", "합계"],
       rows: rank(
         items,
-        (item) => Math.round((item.playedCount / item.songCount) * 1000),
+        (item) => Math.round((item.playedCount / item.songCount) * 100),
         "desc",
         (item) =>
           row(
@@ -533,11 +658,11 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): StatRecord[] {
 
 // ─── 공연 ──────────────────────────────────────────────────────────────
 
-const TYPE_LABEL: Record<string, string> = {
-  CONCERT: "콘서트",
-  FESTIVAL: "페스티벌",
-  EVENT: "이벤트",
-};
+/** 공연 목록과 같은 종류 구분 — 투어 소속이면 투어, 페스티벌, 그 밖은 콘서트. */
+function entryTypeOf(unit: LiveUnit): ZutopiaEntryType {
+  if (unit.tourId) return "tour";
+  return unit.type === "FESTIVAL" ? "festival" : "concert";
+}
 
 /**
  * 해마다 이름에 붙는 연도 표기를 뗀 페스티벌 이름 — "FUJI ROCK FESTIVAL '19",
@@ -563,12 +688,20 @@ function liveRecords(
   known: LiveUnit[],
   stats: SongStat[],
   input: { upcoming: LiveUnit[]; tours: StatTour[]; songs: StatSong[] },
-): StatRecord[] {
+  emptyTours: (Span & { tour: StatTour })[],
+  context: Context,
+): RawRecord[] {
   // 그 공연일에 처음 라이브로 부른 곡
   const debutsByUnit = new Map<string, StatSong[]>();
   for (const stat of stats) {
     const first = stat.played[0];
     if (!first) continue;
+    // 발매일부터 그날 사이에 세트리스트를 모르는 공연이 있으면 진짜 첫 공개인지 모른다.
+    const start = minDate(stat.song.releaseDate, first.date);
+    if (
+      context.unknown.some((span) => span.to >= start && span.from < first.date)
+    )
+      continue;
     debutsByUnit.set(first.id, [
       ...(debutsByUnit.get(first.id) ?? []),
       stat.song,
@@ -594,23 +727,37 @@ function liveRecords(
     years.set(year, [...(years.get(year) ?? []), unit]);
   }
   const typeBreakdown = (units: LiveUnit[]) =>
-    Object.entries(TYPE_LABEL)
-      .map(([type, label]) => {
-        const count = units.filter((unit) => unit.type === type).length;
-        return count > 0 ? `${label} ${count}` : null;
-      })
+    ENTRY_TYPE_ORDER.map((type) => {
+      const count = units.filter((unit) => entryTypeOf(unit) === type).length;
+      return count > 0 ? `${ENTRY_TYPE_LABEL[type]} ${count}` : null;
+    })
       .filter(Boolean)
       .join(" · ");
 
-  // 공연 사이 공백 — 날짜가 다른 연이은 두 공연일 사이
-  const dates = all.filter(
-    (unit, index) => index === 0 || unit.date !== all[index - 1].date,
-  );
-  const gaps = dates.slice(1).map((unit, index) => ({
-    from: dates[index],
-    to: unit,
-    gap: diffDays(dates[index].date, unit.date),
-  }));
+  // 공연 사이 공백 — 공연일과 공연일이 없는 투어 기간을 "공연이 있던 때"로 이어
+  // 붙이고, 그 사이 빈 기간을 잰다.
+  const busy = [
+    ...all.map((unit) => ({
+      from: unit.date,
+      to: unit.date,
+      label: unitName(unit),
+    })),
+    ...emptyTours.map((span) => ({ ...span, label: span.tour.titleKo })),
+  ].sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to));
+  const gaps: {
+    from: Span & { label: string };
+    to: Span & { label: string };
+    gap: number;
+  }[] = [];
+  let reach = busy[0];
+  for (const span of busy.slice(1)) {
+    if (span.from > reach.to) {
+      const gap = diffDays(reach.to, span.from);
+      if (gap > 1) gaps.push({ from: reach, to: span, gap });
+      reach = span;
+    } else if (span.to > reach.to)
+      reach = { ...reach, to: span.to, label: span.label };
+  }
 
   // 같은 페스티벌 출연 횟수
   const festivals = new Map<string, LiveUnit[]>();
@@ -633,7 +780,7 @@ function liveRecords(
         (unit) =>
           unitRow(unit, [
             `${unit.songIds.length}곡`,
-            TYPE_LABEL[unit.type] ?? unit.type,
+            ENTRY_TYPE_LABEL[entryTypeOf(unit)],
           ]),
         byDate,
       ),
@@ -641,7 +788,8 @@ function liveRecords(
     {
       id: "live-most-debuts",
       title: "라이브 첫 공개가 가장 많았던 공연",
-      description: "그날 처음으로 라이브에서 부른 곡 수",
+      description:
+        "그날 처음으로 라이브에서 부른 곡 수 — 발매 후 그날까지 세트리스트를 모르는 공연이 없는 곡만",
       columns: ["첫 공개", "곡"],
       rows: rank(
         debutUnits,
@@ -672,8 +820,15 @@ function liveRecords(
             sub: period,
             image: item.tour.poster,
             href: `/zutopia/lives/${item.tour.slug}`,
-            cells: [days(item.span), times(item.shows), period],
-            note: `${period} · ${times(item.shows)} 공연`,
+            cells: [
+              days(item.span),
+              item.shows > 0 ? times(item.shows) : "–",
+              period,
+            ],
+            note:
+              item.shows > 0
+                ? `${period} · ${times(item.shows)} 공연`
+                : `${period} · 공연일 미등록`,
           };
         },
       ),
@@ -681,7 +836,7 @@ function liveRecords(
     {
       id: "live-busiest-year",
       title: "공연이 가장 많았던 해",
-      description: "그해 공연일 수",
+      description: `그해 공연일 수${emptyTourNote(context)}`,
       columns: ["공연", "종류별"],
       rows: rank(
         [...years],
@@ -699,20 +854,21 @@ function liveRecords(
     {
       id: "live-longest-break",
       title: "가장 길었던 공연 공백",
-      description: "연이은 두 공연일 사이 간격",
+      description:
+        "연이은 두 공연 사이 간격(공연일이 아직 없는 투어는 그 기간 내내 공연이 있던 것으로)",
       columns: ["공백", "이전 공연", "다음 공연"],
       rows: rank(
         gaps,
         (item) => item.gap,
         "desc",
         (item) => ({
-          key: `${item.from.id}>${item.to.id}`,
-          name: `${formatDotDate(item.from.date)} → ${formatDotDate(item.to.date)}`,
-          sub: `${unitName(item.from)} → ${unitName(item.to)}`,
+          key: `${item.from.to}>${item.to.from}`,
+          name: `${formatDotDate(item.from.to)} → ${formatDotDate(item.to.from)}`,
+          sub: `${item.from.label} → ${item.to.label}`,
           cells: [
             days(item.gap),
-            `${formatDotDate(item.from.date)} ${unitName(item.from)}`,
-            `${formatDotDate(item.to.date)} ${unitName(item.to)}`,
+            `${formatDotDate(item.from.to)} ${item.from.label}`,
+            `${formatDotDate(item.to.from)} ${item.to.label}`,
           ],
           note: aboutYears(item.gap),
         }),
@@ -760,7 +916,7 @@ export function venueName(venue: string): { key: string; label: string } {
   return { key, label };
 }
 
-function placeRecords(all: LiveUnit[]): StatRecord[] {
+function placeRecords(all: LiveUnit[], context: Context): RawRecord[] {
   const offline = all.filter((unit) => !isOnline(unit));
   const yearsOf = (units: LiveUnit[]) => {
     const first = units[0].date.slice(0, 4);
@@ -795,7 +951,7 @@ function placeRecords(all: LiveUnit[]): StatRecord[] {
     {
       id: "place-city",
       title: "가장 자주 공연한 도시",
-      description: "공연일 기준(온라인 공연 제외)",
+      description: `공연일 기준(온라인 공연 제외)${emptyTourNote(context)}`,
       columns: ["공연", "기간"],
       rows: rank(
         cities,
@@ -813,7 +969,7 @@ function placeRecords(all: LiveUnit[]): StatRecord[] {
     {
       id: "place-venue",
       title: "가장 자주 선 공연장",
-      description: "홀 번호 등 괄호 안 표기가 달라도 같은 공연장은 하나로",
+      description: `홀 번호 등 괄호 안 표기가 달라도 같은 공연장은 하나로${emptyTourNote(context)}`,
       columns: ["공연", "도시", "기간"],
       rows: rank(
         venues,
@@ -838,7 +994,7 @@ function placeRecords(all: LiveUnit[]): StatRecord[] {
     {
       id: "place-overseas",
       title: "해외 공연이 가장 많았던 나라",
-      description: `일본 밖 공연일(해외 공연 총 ${overseasTotal}회)`,
+      description: `일본 밖 공연일(해외 공연 총 ${overseasTotal}회)${emptyTourNote(context)}`,
       columns: ["공연", "도시", "기간"],
       rows: rank(
         countries,
