@@ -123,14 +123,23 @@ export function AttendPicker({
                 <span className="font-mono text-lg font-semibold tracking-wider text-white">
                   {year.year}
                 </span>
-                <span className="text-sm text-white/50">
+                {/* 연도 바로 옆에 그해 체크 수 / 공연일 수(묶음 머리의 3/12와 같은 읽기) */}
+                <span className="text-sm text-white/50 tabular-nums">
+                  {ready && (
+                    <>
+                      <span
+                        className={cn(
+                          "font-semibold",
+                          checked > 0 ? "text-ztmy-magenta" : "text-white/55",
+                        )}
+                      >
+                        {checked}개 체크
+                      </span>
+                      {" / "}
+                    </>
+                  )}
                   공연일 {year.unitIds.length}
                 </span>
-                {ready && checked > 0 && (
-                  <span className="ml-auto text-sm font-medium text-white tabular-nums">
-                    {checked}개 체크
-                  </span>
-                )}
               </button>
             </h3>
             {open && (
