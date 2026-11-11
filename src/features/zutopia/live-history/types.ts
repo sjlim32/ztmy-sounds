@@ -39,6 +39,10 @@ export interface LiveUnit {
   encoreSongIds?: string[];
 }
 
+/** 통계에만 쓰는 공연일 필드 — 클라이언트로 넘길 땐 toClientUnit으로 뺀다. */
+export type StatOnlyUnitField =
+  "venue" | "country" | "openingSongId" | "encoreSongIds";
+
 export interface SongLiveStat {
   count: number;
   lastUnitId: string;

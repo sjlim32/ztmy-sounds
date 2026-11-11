@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { getLiveHistory } from "@/features/zutopia/live-history/data";
+import { toClientUnit } from "@/features/zutopia/live-history/units";
 import { getSongsWithAlbums } from "@/features/zutopia/song-db/data";
 import { getSongCoverSrc } from "@/features/zutopia/song-db/song-album-grouping";
-import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
+import { isCountableOriginal } from "@/features/zutopia/song-db/song-metadata";
 import { AttendanceView } from "@/features/zutopia/attendance/components/AttendanceView";
 import type { AttendanceSong } from "@/features/zutopia/attendance/summarize";
 
@@ -21,11 +22,7 @@ export default async function ZutopiaAttendancePage() {
   // 원곡·발매곡만 — 라이브 기록은 원곡 기준으로 세고, 미공개곡은 "못 들은 곡"에
   // 넣지 않는다.
   const attendanceSongs: AttendanceSong[] = songs
-    .filter(
-      (song) =>
-        !song.original_song_id &&
-        !parseSongMetadata(song.metadata).isUnreleased,
-    )
+    .filter(isCountableOriginal)
     .map((song) => ({
       id: song.id,
       slug: song.slug,
@@ -40,8 +37,8 @@ export default async function ZutopiaAttendancePage() {
     <div>
       <h1 className="sr-only">라이브 참전 기록</h1>
       <AttendanceView
-        units={history.units}
-        upcoming={history.upcoming}
+        units={history.units.map(toClientUnit)}
+        upcoming={history.upcoming.map(toClientUnit)}
         songs={attendanceSongs}
         liveCounts={Object.fromEntries(
           Object.entries(history.statsBySongId).map(([id, stat]) => [

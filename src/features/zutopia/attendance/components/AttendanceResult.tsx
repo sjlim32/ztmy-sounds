@@ -14,7 +14,7 @@ import { Popover } from "@/components/Popover";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
 import { formatDateWithWeekday } from "./date-format";
 import { ExternalLinkIcon } from "@/components/icons/ExternalLinkIcon";
-import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/components/SortFilterBar";
+import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
 import { secondaryTitle } from "@/features/zutopia/song-db/song-title";
 import type {
   AttendanceSong,
@@ -144,8 +144,11 @@ export function AttendanceResult({
             );
           })}
         </div>
-        <div className="tablet:flex-1 flex min-w-0 items-center justify-between gap-3">
-          <p className="truncate text-sm text-white/60">{current.note}</p>
+        {/* 모바일은 설명이 잘리지 않게 버튼을 다음 줄로 넘긴다. */}
+        <div className="tablet:flex-1 tablet:flex-nowrap flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-2">
+          <p className="tablet:truncate min-w-0 text-sm break-keep text-white/60">
+            {current.note}
+          </p>
           <a
             href="/zutopia/songs?lastLive=1"
             target="_blank"

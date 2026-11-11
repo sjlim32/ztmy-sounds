@@ -13,7 +13,7 @@ import {
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { Popover } from "@/components/Popover";
 import { SidePanel } from "@/components/SidePanel";
-import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/components/SortFilterBar";
+import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
 import { useKoreaToday } from "@/lib/use-korea-today";
 import { openExternalUrl } from "@/lib/in-app-browser";
@@ -211,7 +211,11 @@ export function AttendanceView({
       label: "성불률",
       value:
         songTotal > 0
-          ? `${Math.round((summary.heard.length / songTotal) * 100)}%`
+          ? // 내림 — 다 듣기 전엔 100%로, 한 곡이라도 들었으면 0%로 보이지 않게.
+            `${Math.max(
+              summary.heard.length > 0 ? 1 : 0,
+              Math.floor((summary.heard.length / songTotal) * 100),
+            )}%`
           : "0%",
       highlight: true,
     },
@@ -359,13 +363,13 @@ export function AttendanceView({
       ) : (
         ready &&
         attended.size > 0 && (
-          <p className="inline-flex text-sm text-white/60">
-            참전 기록은 이 브라우저에만 유지됩니다.
+          <p className="text-sm text-white/60">
+            참전 기록은 이 브라우저에만 유지됩니다.{" "}
             <button
               type="button"
               onClick={() => setPanel("share")}
               className={cn(
-                "ml-1 rounded text-white/85 underline decoration-white/30 underline-offset-4 hover:text-white",
+                "rounded text-white/85 underline decoration-white/30 underline-offset-4 hover:text-white",
                 FOCUS_RING,
               )}
             >

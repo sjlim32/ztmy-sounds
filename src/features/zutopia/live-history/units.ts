@@ -6,6 +6,7 @@ import type {
   RawSetlistRow,
   RawTour,
   SongLiveStat,
+  StatOnlyUnitField,
 } from "./types";
 
 export { addDays };
@@ -208,4 +209,16 @@ function setlistDetails(
       ...new Set(rows.filter((row) => row.is_encore).map(original)),
     ],
   };
+}
+
+/**
+ * 클라이언트 컴포넌트(참전 기록 등)로 넘길 공연일 — 통계 전용 필드(장소·나라·첫 곡·
+ * 앵콜)를 빼서 페이지 데이터를 줄인다.
+ */
+export function toClientUnit(
+  unit: LiveUnit,
+): Omit<LiveUnit, StatOnlyUnitField> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- 빼려고 꺼낸다
+  const { venue, country, openingSongId, encoreSongIds, ...rest } = unit;
+  return rest;
 }
