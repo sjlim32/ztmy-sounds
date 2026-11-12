@@ -33,7 +33,8 @@ export interface AlbumWithSongs extends Album {
 
 export type AlbumGroupBy = "type" | "year";
 // lastLive: 마지막 라이브 날짜순(디스코그래피 "마지막 라이브" 보기를 켰을 때만).
-export type SongGroupBy = "album" | "year" | "lastLive";
+export type SongGroupBy =
+  "album" | "year" | "lastLive" | "arranger" | "director";
 export type SortDirection = "asc" | "desc";
 
 // 공개곡/미공개곡(metadata.unrelease) 개수 — 즛토피아 첫 화면 카드 표시용.
