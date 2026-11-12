@@ -16,7 +16,7 @@ const song: Song = {
   description: {
     summary: "점프 T I P",
     points: [
-      "마지막 글자에 점프하되, 영상처럼 샤모지를 흔들면서 내려가다가 스프링처럼 JUMP!",
+      "스프링을 연상하면서, 샤모지를 흔들며 몸을 숙이다가 마지막에 JUMP!",
     ],
   },
 
@@ -87,7 +87,7 @@ const song: Song = {
       pronunciation: "모오 **단스** **단스** **단스** 다레모 키즈이테나이",
       translation: "이제 댄스 댄스 댄스 누구도 알지 못해",
       cheer: {
-        text: "박자에 맞춰",
+        text: "",
         tag: "swing",
       },
       accents: [0.8, 1.2, 1.6],
@@ -104,7 +104,7 @@ const song: Song = {
       pronunciation: "모오 **스테이** **스테이** **스테루** 시타즈미 세이기",
       translation: "이제 스테이 스테이 버리는 밑바닥 정의",
       cheer: {
-        text: "박자에 맞춰",
+        text: "",
         tag: "swing",
       },
       accents: [0.8, 1.2, 1.6],

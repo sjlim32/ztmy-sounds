@@ -311,7 +311,7 @@ const song: Song = {
       pronunciation: "아시타니와 모- 와스레테시마우노니。。",
       translation: "내일이면 이제 잊어버릴 텐데..",
       cheer: {
-        tag: "dance",
+        tag: "swing",
         text: "",
       },
       slam: "하제 댄스",
