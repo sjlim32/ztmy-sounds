@@ -46,7 +46,7 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
       supabase
         .from("lives")
         .select(
-          "id, slug, tour_id, title, title_ko, type, start_date, end_date, live_date, region, country, live_venue, icon_image_url, poster_image_url",
+          "id, slug, tour_id, title, title_ko, type, start_date, end_date, live_date, region, country, live_venue, icon_image_url, poster_image_url, metadata",
         )
         .eq("status", "ACTIVE"),
       supabase
@@ -56,7 +56,7 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
       supabase
         .from("setlists")
         .select(
-          "live_id, tour_id, song_id, day_number, track_number, is_encore, songs!inner(status)",
+          "live_id, tour_id, song_id, day_number, show_number, track_number, is_encore, songs!inner(status)",
         )
         .eq("songs.status", "ACTIVE"),
       getOriginalOf(),
@@ -83,15 +83,30 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
   const input = {
     lives: livesResult.data,
     tours: toursResult.data,
-    setlists: setlistsResult.data.map(
-      ({ live_id, tour_id, song_id, day_number, track_number, is_encore }) => ({
+    // 곡이 연결된 행만(커버곡처럼 song_id가 빈 행은 즛토마요 곡 기록이 아니다).
+    setlists: setlistsResult.data.flatMap(
+      ({
         live_id,
         tour_id,
         song_id,
         day_number,
+        show_number,
         track_number,
         is_encore,
-      }),
+      }) =>
+        song_id
+          ? [
+              {
+                live_id,
+                tour_id,
+                song_id,
+                day_number,
+                show_number,
+                track_number,
+                is_encore,
+              },
+            ]
+          : [],
     ),
     originalOf,
   };

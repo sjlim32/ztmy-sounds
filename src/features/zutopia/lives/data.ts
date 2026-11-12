@@ -4,8 +4,11 @@ import { getGuideHref } from "@/features/zutopia/guide-link";
 import type { Json } from "@/lib/supabase/database.types";
 import type { ZutopiaEntry, ZutopiaEntryType } from "@/features/zutopia/types";
 import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
+import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
 import {
+  displayVenue,
   extractKoreanCity,
+  isOnlineText,
   splitRegion,
 } from "@/features/zutopia/lives/region";
 import type { Live, LiveDetail, LiveSetlistEntry, TourDetail } from "./types";
@@ -88,7 +91,7 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
     supabase
       .from("lives")
       .select(
-        "slug, title, title_ko, start_date, end_date, poster_image_url, icon_image_url, type, region, metadata",
+        "slug, title, title_ko, start_date, end_date, poster_image_url, icon_image_url, type, region, live_venue, metadata",
       )
       .eq("status", "ACTIVE")
       .is("tour_id", null),
@@ -123,7 +126,10 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
             thumbnail: live.icon_image_url ?? live.poster_image_url ?? "",
             type: liveEntryType(live.type),
             startDate: live.start_date,
-            city: extractKoreanCity(live.region),
+            // 온라인 공연은 도시 대신 그림 위 "온라인" 태그로(목록 카드).
+            ...(isOnlineText(live.region) || isOnlineText(live.live_venue)
+              ? { online: true }
+              : { city: extractKoreanCity(live.region) }),
             visitOrdinal: parseVisitOrdinal(live.metadata),
           },
         ]
@@ -147,33 +153,77 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
 }
 
 const SETLIST_COLUMNS =
-  "track_number, is_encore, day_number, note, songs!inner(id, slug, title, title_ko, title_en)";
+  "track_number, is_encore, day_number, show_number, note, songs(id, slug, title, title_ko, title_en, metadata)";
 const SETLIST_SELECT = `setlists(${SETLIST_COLUMNS})`;
+
+interface SetlistSong {
+  id: string;
+  slug: string;
+  title: string;
+  title_ko: string;
+  title_en: string;
+  metadata: Json | null;
+  /** 커버곡(즛토마요 곡이 아님) — 곡 행 없이 note.title로 만든 가짜 곡 */
+  isCover?: boolean;
+  /** 커버곡의 원곡 아티스트(note.original_artist) */
+  coverArtist?: string | null;
+}
 
 interface SetlistRow {
   track_number: number;
   is_encore: boolean;
   day_number: number | null;
+  show_number: number | null;
   note: Json | null;
-  songs: {
-    id: string;
-    slug: string;
-    title: string;
-    title_ko: string;
-    title_en: string;
-  };
+  songs: SetlistSong;
 }
 
-function parseSetlistArrange(note: Json | null): string | null {
+/** 조회 결과 그대로 — 곡이 연결되지 않았거나(커버곡) 비활성 곡이면 songs가 null. */
+type FetchedSetlistRow = Omit<SetlistRow, "songs"> & {
+  songs: Omit<SetlistSong, "isCover" | "coverArtist"> | null;
+};
+
+/**
+ * 조회한 세트리스트 행을 화면용으로 맞춘다 — 곡이 연결된 행은 그대로, 곡 없이
+ * note.title이 있는 행(커버곡, note.info "cover")은 그 제목으로 가짜 곡을 만들고,
+ * 둘 다 아니면(비활성 곡 등) 뺀다. 커버곡 id는 "cover:제목"이라 같은 공연 안에서
+ * 다른 곡과 겹치지 않는다. 라이브 기록·통계(live-history)는 곡 행이 있는 것만 센다.
+ */
+function normalizeSetlistRows(rows: FetchedSetlistRow[]): SetlistRow[] {
+  return rows.flatMap((row) => {
+    if (row.songs) return [{ ...row, songs: row.songs }];
+    const title = parseSetlistNote(row.note, "title");
+    if (!title) return [];
+    return [
+      {
+        ...row,
+        songs: {
+          id: `cover:${title}`,
+          slug: "",
+          title,
+          // 한글 제목(note.title_kr) — 없으면 원제 그대로.
+          title_ko: parseSetlistNote(row.note, "title_kr") ?? title,
+          title_en: "",
+          metadata: null,
+          isCover: true,
+          coverArtist: parseSetlistNote(row.note, "original_artist"),
+        },
+      },
+    ];
+  });
+}
+
+/** setlists.note의 글자 칸 하나(arrange·info·variation) — 없거나 비면 null. */
+function parseSetlistNote(
+  note: Json | null,
+  key:
+    "arrange" | "info" | "variation" | "title" | "title_kr" | "original_artist",
+): string | null {
   if (!note || typeof note !== "object" || Array.isArray(note)) return null;
-  if (
-    "arrange" in note &&
-    typeof (note as { arrange?: unknown }).arrange === "string"
-  ) {
-    const arrange = (note as { arrange: string }).arrange.trim();
-    return arrange.length > 0 ? arrange : null;
-  }
-  return null;
+  const value = (note as Record<string, unknown>)[key];
+  if (typeof value !== "string") return null;
+  const text = value.trim();
+  return text.length > 0 ? text : null;
 }
 
 // 본편 먼저, 앙코르 나중, 각각 track_number 오름차순, 동률이면 day_number 오름차순.
@@ -198,7 +248,14 @@ function toSetlist(
       isEncore: entry.is_encore,
       isSelected: isSelected(entry),
       dayNumber: entry.day_number,
-      arrange: parseSetlistArrange(entry.note),
+      showNumber: entry.show_number,
+      showLabel: null,
+      arrange: parseSetlistNote(entry.note, "arrange"),
+      info: parseSetlistNote(entry.note, "info"),
+      variation: parseSetlistNote(entry.note, "variation"),
+      unreleased: parseSongMetadata(entry.songs.metadata).isUnreleased,
+      isCover: !!entry.songs.isCover,
+      coverArtist: entry.songs.coverArtist ?? null,
     }));
 }
 
@@ -304,7 +361,7 @@ export const getLiveBySlug = cache(
     if (!data) return null;
 
     const { setlists, ...live } = data;
-    return { ...live, setlist: toSetlist(setlists) };
+    return { ...live, setlist: toSetlist(normalizeSetlistRows(setlists)) };
   },
 );
 
@@ -370,16 +427,23 @@ export const getTourBySlug = cache(
         city,
         cityOriginal: original,
         region: live.region,
-        venue: live.live_venue,
+        venue: displayVenue(live.live_venue),
         iconImageUrl: live.icon_image_url,
         posterImageUrl: live.poster_image_url,
         additionalImageUrls: live.additional_image_urls ?? [],
-        setlist: mergeTourSetlist(tourSetlist, live.setlists),
+        setlist: mergeTourSetlist(
+          normalizeSetlistRows(tourSetlist),
+          normalizeSetlistRows(live.setlists),
+        ),
       };
     });
 
     // 투어 공통 세트리스트(공연일마다 바뀌는 선택곡 제외) — 상세에서 한 번만
     // 보여주고, 공연일 행엔 그날의 선택곡만 미리 보여준다(TourDateList).
-    return { ...tour, setlist: toSetlist(tourSetlist), dates };
+    return {
+      ...tour,
+      setlist: toSetlist(normalizeSetlistRows(tourSetlist)),
+      dates,
+    };
   },
 );

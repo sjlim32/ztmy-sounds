@@ -11,6 +11,7 @@ import {
   type UnitGroup,
 } from "@/features/zutopia/attendance/picker-groups";
 import { formatDateWithWeekday } from "./date-format";
+import { formatDayShow } from "@/features/zutopia/lives/shows";
 
 function Thumb({ src, size }: { src: string | null; size: "md" | "sm" }) {
   const box = size === "md" ? "size-12" : "size-9";
@@ -273,7 +274,7 @@ function GroupCard({
                     <span className="block truncate text-sm text-white/60">
                       {[
                         unit.city,
-                        unit.dayNumber ? `DAY ${unit.dayNumber}` : null,
+                        formatDayShow(unit.dayNumber, unit.showLabel),
                       ]
                         .filter(Boolean)
                         .join(" · ")}

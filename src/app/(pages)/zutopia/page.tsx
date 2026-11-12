@@ -6,6 +6,7 @@ import { summarizeEntryTypes } from "@/features/zutopia/types";
 import { ZutopiaHubCard } from "@/features/zutopia/components/ZutopiaHubCard";
 import { getSongsCount, getAlbumsCount } from "@/features/zutopia/song-db/data";
 import { getLiveHistory } from "@/features/zutopia/live-history/data";
+import { inPersonUnits } from "@/features/zutopia/live-history/units";
 import { koreaDate } from "@/lib/korea-date";
 import { getZutopiaSearchIndex } from "@/features/zutopia/search/data";
 import { ZutopiaSearch } from "@/features/zutopia/search/components/ZutopiaSearch";
@@ -105,7 +106,8 @@ export default async function ZutopiaHubPage() {
               href="/zutopia/attendance"
               title="라이브 참전 기록"
               description="참전한 라이브 체크하고 들은 곡 모아보기"
-              meta={`공연 ${liveHistory.units.length}회 중 몇 번이나 참가했을까`}
+              // 참전 기록과 같은 기준 — 현장 공연만(온라인 공연 제외).
+              meta={`공연 ${inPersonUnits(liveHistory.units).length}회 중 몇 번이나 참가했을까`}
               imageUrl={ATTENDANCE_CARD_IMAGE}
             />
           </li>

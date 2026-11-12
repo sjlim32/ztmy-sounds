@@ -7,11 +7,12 @@ import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { Setlist, type SetlistSlot } from "@/features/zutopia/lives/Setlist";
 import {
+  LIVE_SECTION_TITLE_SHADOW,
   LIVE_SURFACE_CLASS,
   LIVE_TAG_CLASS,
   LIVE_TAG_TONE,
 } from "@/features/zutopia/lives/surface";
-import { formatDayNumber } from "@/features/zutopia/lives/SongLink";
+import { formatDayShow } from "@/features/zutopia/lives/shows";
 import type {
   LiveSetlistEntry,
   TourDateEntry,
@@ -42,6 +43,43 @@ function formatTourDateLabel(
     return `${start.md}–${end.day}`;
   }
   return `${start.md}–${end.md}`;
+}
+
+/**
+ * "공연 일정" 구역 — 제목 줄(일정 수) + 공연일 목록(TourDateList). 투어 상세와,
+ * 이틀 이상인 단독 공연 상세(DAY별로 나눈 일정, lives/live-days.ts)가 같이 쓴다.
+ * 공연일이 아직 없으면 안내 문구만.
+ */
+export function LiveSchedule({ dates }: { dates: TourDateEntry[] }) {
+  return (
+    <section className="w-full">
+      {/* 카드 밖 제목이라 배경 그림 위에서도 읽히게 글자 그림자 */}
+      <div
+        className={cn(
+          "flex items-baseline justify-between border-b border-white/15 pb-2",
+          "tablet:pb-3",
+          LIVE_SECTION_TITLE_SHADOW,
+        )}
+      >
+        <p
+          className={cn("text-base font-semibold text-white", "tablet:text-lg")}
+        >
+          공연 일정
+        </p>
+        <p className={cn("font-mono text-sm text-white/60")}>
+          {dates.length} dates
+        </p>
+      </div>
+
+      {dates.length > 0 ? (
+        <TourDateList dates={dates} />
+      ) : (
+        <p className={cn("pt-3 text-sm text-white/50", "tablet:text-base")}>
+          세부 공연 일정이 곧 업데이트됩니다.
+        </p>
+      )}
+    </section>
+  );
 }
 
 /**
@@ -132,13 +170,13 @@ export function TourCommonSetlist({
 // 불린 곳(도시 + 일차)을 함께 모으고, 같은 곡·같은 곳은 한 번만, 처음 나온
 // 순서대로.
 //
-// 자리는 공연일 번호가 아니라 "그날 어느 공통 곡 바로 뒤에 불렸는지"로 정한다 —
+// 자리는 공연일 번호가 아니라 "그날 그때까지 부른 공통 곡 중 가장 큰 번호 뒤"로 정한다 —
 // 공통 곡이 공연일마다 다른 번호로 불리면(예: INTENSE 홍콩에선 잔기가 14번)
 // 번호만으로는 앞뒤가 틀어진다. 신베이의 저혈볼트는 미러튠(13) 뒤라 14번 자리,
 // 홍콩의 거짓이 아니야는 잔기(15) 뒤라 15번 다음 자리가 된다.
 // 표시 번호: 그 공통 곡과 다음 공통 곡 사이에 빈 번호가 있으면 그 번호, 없으면
 // "15-1"처럼 앞 공통 곡 번호에 순번을 붙인다.
-function collectSelectedSlots(
+export function collectSelectedSlots(
   common: LiveSetlistEntry[],
   dates: TourDateEntry[],
 ): SetlistSlot[] {
@@ -188,7 +226,10 @@ function collectSelectedSlots(
       for (const entry of ordered) {
         const commonNumber = commonNumberBySong.get(entry.songId);
         if (!entry.isSelected && commonNumber != null) {
-          anchor = commonNumber;
+          // 그날까지 부른 공통 곡 중 가장 큰 번호 — 공통 곡 둘이 날마다 순서만
+          // 바뀌어도(aipega-okinawa DAY 2: 7번 곡 → 6번 곡) 뒤의 선택곡이 앞 자리로
+          // 끌려가지 않게 바로 앞 곡이 아니라 최댓값을 기준으로 한다.
+          anchor = Math.max(anchor, commonNumber);
           continue;
         }
         if (!entry.isSelected) continue;
@@ -209,13 +250,15 @@ function collectSelectedSlots(
         slots.set(label, slot);
         let song = slot.songs.find((item) => item.title === entry.titleKo);
         if (!song) {
-          song = { title: entry.titleKo, places: [] };
+          song = {
+            title: entry.titleKo,
+            places: [],
+            unreleased: entry.unreleased,
+          };
           slot.songs.push(song);
         }
-        const place =
-          entry.dayNumber != null
-            ? `${date.city} ${formatDayNumber(entry.dayNumber)}`
-            : date.city;
+        const dayShow = formatDayShow(entry.dayNumber, entry.showLabel);
+        const place = dayShow ? `${date.city} ${dayShow}` : date.city;
         if (!song.places.includes(place)) song.places.push(place);
       }
     }
@@ -361,6 +404,8 @@ function TourDateRow({
                 weekday={weekdayLabel}
                 year={yearLabel}
                 long={!!end && start.month !== end.month}
+                startTime={date.startTime}
+                openTime={date.openTime}
               />
             </span>
           </>
@@ -371,6 +416,8 @@ function TourDateRow({
               weekday={weekdayLabel}
               year={yearLabel}
               long={!!end && start.month !== end.month}
+              startTime={date.startTime}
+              openTime={date.openTime}
             />
           </span>
         )}
@@ -399,6 +446,19 @@ function TourDateRow({
               {date.cityOriginal}
             </span>
           )}
+          {(date.dayNumber != null || date.showLabel) && (
+            // 세트리스트의 DAY 태그와 같은 색(1일차 분홍, 2일차 보라, 이후 반복)
+            <span
+              className={cn(
+                LIVE_TAG_CLASS,
+                LIVE_TAG_TONE.day[
+                  ((date.dayNumber ?? 1) - 1) % LIVE_TAG_TONE.day.length
+                ],
+              )}
+            >
+              {formatDayShow(date.dayNumber, date.showLabel)}
+            </span>
+          )}
           {isKorea && (
             <span className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.visit)}>
               내한
@@ -410,6 +470,7 @@ function TourDateRow({
         >
           <VenueText venue={date.venue} />
         </span>
+
         {selectedSongs.length > 0 && (
           <span
             className={cn(
@@ -422,7 +483,7 @@ function TourDateRow({
             </span>
             {selectedSongs.map((entry, index) => (
               <span
-                key={`${entry.songId}-${entry.dayNumber ?? "all"}`}
+                key={`${entry.songId}-${entry.dayNumber ?? "all"}-${entry.showNumber ?? "all"}`}
                 className="whitespace-nowrap text-white/80"
               >
                 {entry.titleKo}
@@ -454,12 +515,17 @@ function DateText({
   weekday,
   year,
   long,
+  startTime,
+  openTime,
 }: {
   label: string;
   weekday: string;
   year: string | null;
   /** 달을 넘기는 기간("03.28–04.02")처럼 긴 날짜는 한 단계 작게. */
   long: boolean;
+  /** 같은 날 여러 회차 공연의 시작·개장 시각 "HH:MM" — 요일 아래에(lives.metadata.shows). */
+  startTime?: string;
+  openTime?: string;
 }) {
   return (
     <>
@@ -475,6 +541,16 @@ function DateText({
       <span className="font-mono text-xs font-medium tracking-[0.15em] text-white/70">
         {weekday}
       </span>
+      {startTime && (
+        <span className="mt-0.5 font-mono text-sm font-semibold text-white tabular-nums drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
+          {startTime}
+        </span>
+      )}
+      {openTime && (
+        <span className="font-mono text-xs text-white/60 tabular-nums">
+          OPEN {openTime}
+        </span>
+      )}
     </>
   );
 }

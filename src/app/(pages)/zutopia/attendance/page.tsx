@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { getLiveHistory } from "@/features/zutopia/live-history/data";
-import { toClientUnit } from "@/features/zutopia/live-history/units";
+import {
+  inPersonUnits,
+  toClientUnit,
+} from "@/features/zutopia/live-history/units";
 import { getSongsWithAlbums } from "@/features/zutopia/song-db/data";
 import { getSongCoverSrc } from "@/features/zutopia/song-db/song-album-grouping";
 import { isCountableOriginal } from "@/features/zutopia/song-db/song-metadata";
@@ -37,8 +40,9 @@ export default async function ZutopiaAttendancePage() {
     <div>
       <h1 className="sr-only">라이브 참전 기록</h1>
       <AttendanceView
-        units={history.units.map(toClientUnit)}
-        upcoming={history.upcoming.map(toClientUnit)}
+        // 체크할 공연은 현장 공연만(온라인 공연은 참전 기록에서 뺀다).
+        units={inPersonUnits(history.units).map(toClientUnit)}
+        upcoming={inPersonUnits(history.upcoming).map(toClientUnit)}
         songs={attendanceSongs}
         liveCounts={Object.fromEntries(
           Object.entries(history.statsBySongId).map(([id, stat]) => [

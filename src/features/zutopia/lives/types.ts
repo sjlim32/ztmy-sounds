@@ -17,8 +17,22 @@ export interface LiveSetlistEntry {
   isSelected: boolean;
   // 공연 일차(1: 첫째날, 2: 둘째날, ...). 공통 곡이거나 단일 공연이면 null.
   dayNumber: number | null;
+  // 같은 날 몇 번째 회차(setlists.show_number). 비면 그날 모든 회차.
+  showNumber: number | null;
+  // 회차 이름("昼の部") — 상세 화면에서 회차별로 나눌 때(live-days.ts)만 채운다.
+  showLabel: string | null;
   // 편곡 정보(setlists.note.arrange). 없으면 null.
   arrange: string | null;
+  // 덧붙임 정보(setlists.note.info — "Short ver.", "Live debut" 등). 없으면 null.
+  info: string | null;
+  // 공연 속 코너 이름(setlists.note.variation — 여러 곡이 한 코너로 이어진다). 없으면 null.
+  variation: string | null;
+  // 미공개곡(songs.metadata.unrelease) — 세트리스트에 "미공개" 태그.
+  unreleased: boolean;
+  // 커버곡(note.info "cover" — 곡 행 없이 note.title로 들어간 남의 곡). 제목 앞 [커버송].
+  isCover: boolean;
+  // 커버곡의 원곡 아티스트(note.original_artist) — 제목 아래 줄에.
+  coverArtist: string | null;
 }
 
 export interface LiveDetail extends Live {
@@ -46,6 +60,13 @@ export interface TourDateEntry {
   posterImageUrl: string | null;
   additionalImageUrls: string[];
   setlist: LiveSetlistEntry[];
+  /** 이틀 이상 단독 공연을 날마다 나눴을 때의 일차(1, 2…) — 투어 공연일이면 없음. */
+  dayNumber?: number;
+  /** 같은 날 여러 회차 공연을 나눴을 때의 회차 이름(lives.metadata.shows) */
+  showLabel?: string;
+  /** 그 회차의 개장·개연 시각 "HH:MM"(lives.metadata.shows의 open·start) */
+  openTime?: string;
+  startTime?: string;
 }
 
 export interface TourDetail extends Tour {

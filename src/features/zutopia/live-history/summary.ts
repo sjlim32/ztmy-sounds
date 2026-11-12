@@ -1,4 +1,5 @@
 import { diffDays } from "@/lib/ymd";
+import { formatDayShow } from "@/features/zutopia/lives/shows";
 import type { LiveHistory, LiveUnit } from "./types";
 
 export interface LiveRef {
@@ -19,7 +20,7 @@ export interface SongLiveSummary {
 }
 
 function unitDetail(unit: LiveUnit): string | null {
-  const parts = [unit.city, unit.dayNumber ? `DAY ${unit.dayNumber}` : null];
+  const parts = [unit.city, formatDayShow(unit.dayNumber, unit.showLabel)];
   const detail = parts.filter(Boolean).join(" ");
   return detail || null;
 }

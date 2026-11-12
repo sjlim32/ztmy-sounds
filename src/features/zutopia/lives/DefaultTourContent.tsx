@@ -6,11 +6,10 @@ import { formatLiveDate } from "@/features/zutopia/lives/data";
 import { LiveTicket } from "@/features/zutopia/lives/LiveTicket";
 import { countTourShows } from "@/features/zutopia/lives/tour-shows";
 import {
+  LiveSchedule,
   TourCommonSetlist,
-  TourDateList,
 } from "@/features/zutopia/lives/TourDateList";
 import type { TourDetail } from "@/features/zutopia/lives/types";
-import { LIVE_SECTION_TITLE_SHADOW } from "@/features/zutopia/lives/surface";
 import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
 
 /**
@@ -110,38 +109,7 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
 
       <TourCommonSetlist entries={tour.setlist} dates={tour.dates} />
 
-      <section className="w-full">
-        {/* 카드 밖 제목이라 배경 그림 위에서도 읽히게 글자 그림자 */}
-        <div
-          className={cn(
-            "flex items-baseline justify-between border-b border-white/15 pb-2",
-            "tablet:pb-3",
-            LIVE_SECTION_TITLE_SHADOW,
-          )}
-        >
-          <p
-            className={cn(
-              "text-base font-semibold text-white",
-              "tablet:text-lg",
-            )}
-          >
-            공연 일정
-          </p>
-          <p
-            className={cn("font-mono text-xs text-white/60", "tablet:text-sm")}
-          >
-            {tour.dates.length} dates
-          </p>
-        </div>
-
-        {tour.dates.length > 0 ? (
-          <TourDateList dates={tour.dates} />
-        ) : (
-          <p className={cn("pt-3 text-sm text-white/50", "tablet:text-base")}>
-            세부 공연 일정이 곧 업데이트됩니다.
-          </p>
-        )}
-      </section>
+      <LiveSchedule dates={tour.dates} />
     </div>
   );
 }

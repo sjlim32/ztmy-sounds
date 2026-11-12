@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
 import { cn } from "@/lib/utils";
 
-type Tone = "youtube" | "guide" | "spotify" | "appleMusic";
+type Tone = "youtube" | "guide" | "spotify" | "appleMusic" | "x";
 type Variant = "pill" | "solid";
 
 // variant="pill"(기본, 곡 행 옆 작은 버튼): 면 없이 아이콘에만 그 링크의
@@ -17,6 +17,7 @@ const PILL_TONE_STYLES: Record<Tone, string> = {
     "text-white/60 hover:bg-green-500/15 hover:text-green-400 focus-visible:bg-green-500/15 focus-visible:text-green-400",
   appleMusic:
     "text-white/60 hover:bg-pink-500/15 hover:text-pink-400 focus-visible:bg-pink-500/15 focus-visible:text-pink-400",
+  x: "text-white/60 hover:bg-white/10 hover:text-white focus-visible:bg-white/10 focus-visible:text-white",
 };
 
 // variant="solid": 각 음원 사이트 대표색을 항상 채운 버튼(세트리스트
@@ -25,6 +26,8 @@ const SOLID_TONE_STYLES: Partial<Record<Tone, string>> = {
   youtube: "bg-red-500 text-white hover:bg-red-400",
   spotify: "bg-green-500 text-white hover:bg-green-400",
   appleMusic: "bg-pink-500 text-white hover:bg-pink-400",
+  // X는 대표색이 검정이라 어두운 배경 위에선 흰 면 + 검은 로고로 보이게.
+  x: "bg-white text-black hover:bg-white/85",
 };
 
 const SIZE_STYLES = {

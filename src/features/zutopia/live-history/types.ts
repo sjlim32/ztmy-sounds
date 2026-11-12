@@ -1,4 +1,4 @@
-import type { Database } from "@/lib/supabase/database.types";
+import type { Database, Json } from "@/lib/supabase/database.types";
 
 export type LiveUnitType = Database["public"]["Tables"]["lives"]["Row"]["type"];
 
@@ -21,6 +21,12 @@ export interface LiveUnit {
   tourId: string | null;
   /** 이틀 이상 공연일 때 1부터, 하루 공연·페스티벌이면 null */
   dayNumber: number | null;
+  /** 같은 날 여러 회차 공연(lives.metadata.shows)이면 몇 번째(1부터) — 그 밖엔 없음 */
+  showNumber?: number;
+  /** 회차 이름("昼の部") — showNumber가 있을 때만 */
+  showLabel?: string;
+  /** 온라인 공연(region·live_venue가 "online") — 참전 기록·통계에선 뺀다 */
+  online?: boolean;
   /** `/zutopia/lives/<투어 slug 또는 live slug>`, slug가 없으면 null */
   href: string | null;
   /** 이날 불린 곡(원곡 id, 중복 없음) */
@@ -73,6 +79,8 @@ export interface RawLive {
   poster_image_url: string | null;
   live_venue?: string;
   country?: string;
+  /** 하루 회차 이름(metadata.shows)을 읽으려고 — 없으면 하루 1회 */
+  metadata?: Json | null;
 }
 
 export interface RawTour {
@@ -90,4 +98,6 @@ export interface RawSetlistRow {
   day_number: number | null;
   track_number?: number;
   is_encore?: boolean;
+  /** 같은 날 몇 번째 회차(1부터), 비면 그날 모든 회차 */
+  show_number?: number | null;
 }

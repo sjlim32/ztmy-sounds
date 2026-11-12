@@ -114,3 +114,33 @@ describe("extractCode", () => {
     expect(extractCode("그냥 글자")).toBeNull();
   });
 });
+
+describe("share code — 하루 여러 회차", () => {
+  const L = "3a7a2068-c7f0-48f9-84ed-35b15a2075eb";
+  // 회차를 나누기 전(하루 1회) 공연일
+  const before = [unit(L, "2021-05-15"), unit(L, "2021-05-16")];
+  // 나눈 뒤 — 첫 회차는 같은 키, 둘째 회차는 ":2"
+  const show = (date: string, n: number): LiveUnit => ({
+    ...unit(L, date),
+    id: n === 1 ? `${L}:${date}` : `${L}:${date}:${n}`,
+    showNumber: n,
+    showLabel: n === 1 ? "昼の部" : "夜の部",
+  });
+  const after = [
+    show("2021-05-15", 1),
+    show("2021-05-15", 2),
+    show("2021-05-16", 1),
+    show("2021-05-16", 2),
+  ];
+
+  test("회차를 나누기 전에 만든 코드는 나눈 뒤에도 같은 날(첫 회차)로 풀린다", () => {
+    const code = encodeAttendance(before, new Set([`${L}:2021-05-16`]));
+    expect(decodeAttendance(code, after)).toEqual([`${L}:2021-05-16`]);
+  });
+
+  test("둘째 회차도 왕복한다", () => {
+    const attended = new Set([`${L}:2021-05-15:2`, `${L}:2021-05-16`]);
+    const code = encodeAttendance(after, attended);
+    expect(new Set(decodeAttendance(code, after))).toEqual(attended);
+  });
+});

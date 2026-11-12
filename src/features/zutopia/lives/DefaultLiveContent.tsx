@@ -1,10 +1,16 @@
 import { ViewTransition } from "react";
 import { posterTransitionName } from "@/features/zutopia/lives/poster-transition";
 import { cn } from "@/lib/utils";
+import { displayVenue, isOnlineText } from "@/features/zutopia/lives/region";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { formatLiveDate } from "@/features/zutopia/lives/data";
 import { LiveTicket } from "@/features/zutopia/lives/LiveTicket";
 import { Setlist } from "@/features/zutopia/lives/Setlist";
+import { splitLiveDays } from "@/features/zutopia/lives/live-days";
+import {
+  LiveSchedule,
+  TourCommonSetlist,
+} from "@/features/zutopia/lives/TourDateList";
 import type { LiveDetail } from "@/features/zutopia/lives/types";
 import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
 
@@ -21,6 +27,8 @@ import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
  */
 export function DefaultLiveContent({ live }: { live: LiveDetail }) {
   const visitOrdinal = parseVisitOrdinal(live.metadata);
+  // 이틀 이상(출연일 없음)이면 DAY별로 나눈다 — 하루 공연이면 null.
+  const days = splitLiveDays(live);
   // 대표 그림 — 포스터가 없으면 아이콘(목록 카드 그림)으로 대신한다.
   const heroImageUrl = live.poster_image_url ?? live.icon_image_url;
   // 추가 이미지 묶음 — 맨 앞에 아이콘 이미지(icon_image_url, 목록 카드 그림)를
@@ -106,18 +114,31 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
                 : formatLiveDate(live.start_date),
             mono: true,
           },
-          ...(live.region ? [{ label: "Region", value: live.region }] : []),
+          // 온라인 공연은 Venue 칸에 "온라인 라이브"가 나와서 Region 칸은 뺀다.
+          ...(live.region && !isOnlineText(live.region)
+            ? [{ label: "Region", value: live.region }]
+            : []),
           {
             label: "Venue",
-            value: live.live_venue,
+            value: displayVenue(live.live_venue),
             wide: true,
-            href: live.venue_url,
+            // 온라인 공연은 지도 링크가 없다.
+            href: isOnlineText(live.live_venue) ? null : live.venue_url,
           },
         ]}
         metadata={live.metadata}
+        officialUrl={live.official_url}
       />
 
-      {live.setlist.length > 0 && <Setlist entries={live.setlist} />}
+      {days ? (
+        // 이틀 이상 단독 공연 — 투어 상세와 같은 모양(공통 세트리스트 + DAY별 일정)
+        <>
+          <TourCommonSetlist entries={days.common} dates={days.dates} />
+          <LiveSchedule dates={days.dates} />
+        </>
+      ) : (
+        live.setlist.length > 0 && <Setlist entries={live.setlist} />
+      )}
     </div>
   );
 }

@@ -24,6 +24,8 @@ export const LIVE_TAG_TONE = {
   /** 일차 — 날마다 다른 색(1일차 분홍, 2일차 보라, 이후 반복). */
   day: ["bg-ztmy-pink/30 text-ztmy-pink", "bg-ztmy-purple/45 text-white"],
   encore: "bg-ztmy-sun/15 text-ztmy-sun",
+  /** 미공개곡 — DAY(분홍·보라)·선택곡(하늘)·ENCORE(노랑)와 겹치지 않게 흰 계열. */
+  unreleased: "bg-white/15 text-white",
   /**
    * 내한 — 눈에 띄어야 해서 꽉 찬 면. 홈 화면의 내한(NEXT VISIT) 색과 같은
    * 마젠타(원정은 하늘색). 노랑은 ENCORE에만 쓴다.

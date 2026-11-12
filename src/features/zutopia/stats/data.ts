@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
 import { getLiveHistory } from "@/features/zutopia/live-history/data";
+import { inPersonUnits } from "@/features/zutopia/live-history/units";
 import {
   getAlbumsWithSongs,
   getSongsWithAlbums,
@@ -57,8 +58,9 @@ export const getStatSections = cache(async (): Promise<StatSection[]> => {
   }));
 
   return buildStatSections({
-    units: history.units,
-    upcoming: history.upcoming,
+    // 통계는 현장 공연만 — 온라인 공연은 뺀다.
+    units: inPersonUnits(history.units),
+    upcoming: inPersonUnits(history.upcoming),
     songs: statSongs,
     albums: albums.map((album) => ({
       id: album.id,

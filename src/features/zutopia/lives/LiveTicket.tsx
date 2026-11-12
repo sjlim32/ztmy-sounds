@@ -8,6 +8,9 @@ import {
 import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
 import { AppleMusicIcon } from "@/components/icons/AppleMusicIcon";
 import { SpotifyIcon } from "@/components/icons/SpotifyIcon";
+import { XIcon } from "@/components/icons/XIcon";
+import { ExternalLinkIcon } from "@/components/icons/ExternalLinkIcon";
+import { FOCUS_RING } from "@/components/button-styles";
 import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
 import { MapPinIcon } from "@/components/icons/MapPinIcon";
 import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
@@ -42,7 +45,7 @@ const TICKET_LABEL_CLASS =
 /**
  * 공연/투어 상세 공용 "콘서트 티켓 스텁" — NextEventCard의 모티프(점선
  * 절취선으로 나뉜 칸, accent 그라데이션 띠)를 확장한다. 본 티켓 칸(cells)
- * 아래로 metadata의 variation 한 줄과 음원 링크(LISTEN) 구간을 각각 값이
+ * 아래로 metadata의 variation 한 줄과 공식 사이트(OFFICIAL, lives.official_url), 음원 링크(LISTEN), X 게시물(POST, metadata.twit) 구간을 각각 값이
  * 있을 때만 가로 절취선으로 덧붙인다. 투어는 소속 공연이 아니라 tours
  * 행의 metadata를 넘긴다.
  */
@@ -51,15 +54,18 @@ export function LiveTicket({
   metadata,
   type,
   visitOrdinal = null,
+  officialUrl = null,
 }: {
   cells: TicketCell[];
   metadata: Json | null;
+  /** 공식 사이트(lives.official_url) — 있으면 "Official" 줄에 도메인 링크. */
+  officialUrl?: string | null;
   /** 티켓 맨 위 줄 왼쪽의 공연 종류(CONCERT·FESTIVAL…). */
   type: LiveBadgeType;
   /** 내한 공연이면 몇 번째인지 — 맨 위 줄 오른쪽 태그. */
   visitOrdinal?: number | null;
 }) {
-  const { variation, spotify, youtubeMusic, appleMusic } =
+  const { variation, spotify, youtubeMusic, appleMusic, twit } =
     parseStreamingMetadata(metadata);
   const hasStreamingLinks = spotify || youtubeMusic || appleMusic;
 
@@ -123,6 +129,33 @@ export function LiveTicket({
         </>
       )}
 
+      {officialUrl && (
+        <>
+          <div className="border-ztmy-purple/40 border-t border-dashed" />
+          <div
+            className={cn(
+              "flex items-center justify-between gap-3 p-3",
+              "tablet:p-6",
+            )}
+          >
+            <p className={cn("shrink-0", TICKET_LABEL_CLASS)}>Official</p>
+            <a
+              href={officialUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(
+                "inline-flex min-w-0 items-center gap-1.5 rounded text-sm text-white underline decoration-white/35 underline-offset-4 transition-colors hover:decoration-white",
+                "tablet:text-base",
+                FOCUS_RING,
+              )}
+            >
+              <span className="truncate">{siteLabel(officialUrl)}</span>
+              <ExternalLinkIcon className="size-3.5 shrink-0 text-white/60" />
+            </a>
+          </div>
+        </>
+      )}
+
       {hasStreamingLinks && (
         <>
           <div className="border-ztmy-purple/40 border-t border-dashed" />
@@ -168,8 +201,39 @@ export function LiveTicket({
           </div>
         </>
       )}
+
+      {twit && (
+        <>
+          <div className="border-ztmy-purple/40 border-t border-dashed" />
+          <div
+            className={cn(
+              "flex items-center justify-between gap-3 p-3",
+              "tablet:p-6",
+            )}
+          >
+            <p className={TICKET_LABEL_CLASS}>Post</p>
+            <IconLinkButton
+              href={twit}
+              icon={XIcon}
+              label="X에서 공연 게시물 보기"
+              tone="x"
+              variant="solid"
+              size="md"
+            />
+          </div>
+        </>
+      )}
     </div>
   );
+}
+
+/** 공식 사이트 주소 → 보여 줄 이름(도메인, www. 뺌). 주소가 이상하면 그대로. */
+function siteLabel(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
 }
 
 function TicketCellView({

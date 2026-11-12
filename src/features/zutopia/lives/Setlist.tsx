@@ -5,7 +5,11 @@ import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { SongLink } from "@/features/zutopia/lives/SongLink";
 import { secondaryTitle } from "@/features/zutopia/song-db/song-title";
-import { LIVE_SURFACE_CLASS } from "@/features/zutopia/lives/surface";
+import {
+  LIVE_SURFACE_CLASS,
+  LIVE_TAG_CLASS,
+  LIVE_TAG_TONE,
+} from "@/features/zutopia/lives/surface";
 import type { LiveSetlistEntry } from "@/features/zutopia/lives/types";
 
 /**
@@ -19,7 +23,7 @@ export interface SetlistSlot {
   /** 번호 칸 표시("14", "15-1"). */
   label: string;
   isEncore: boolean;
-  songs: { title: string; places: string[] }[];
+  songs: { title: string; places: string[]; unreleased: boolean }[];
 }
 
 type SetlistRow =
@@ -104,18 +108,37 @@ export function Setlist({
           {rows.map((row) =>
             row.kind === "song" ? (
               <li
-                key={`${row.entry.trackNumber}-${row.entry.dayNumber ?? "all"}-${row.entry.songId}`}
+                key={`${row.entry.trackNumber}-${row.entry.dayNumber ?? "all"}-${row.entry.showNumber ?? "all"}-${row.entry.songId}`}
               >
                 <SongLink
                   href={row.entry.guideHref}
                   index={row.entry.trackNumber}
                   dayNumber={row.entry.dayNumber}
+                  showLabel={row.entry.showLabel}
                   arrange={row.entry.arrange}
-                  subtitle={secondaryTitle(row.entry)}
+                  info={row.entry.info}
+                  variation={row.entry.variation}
+                  unreleased={row.entry.unreleased}
+                  cover={row.entry.isCover}
+                  // 커버곡은 제목 하나뿐이라 둘째 줄에 원곡 아티스트를.
+                  subtitle={
+                    row.entry.isCover
+                      ? row.entry.coverArtist
+                        ? `원곡 ${row.entry.coverArtist}`
+                        : null
+                      : secondaryTitle(row.entry)
+                  }
                   encore={row.entry.isEncore}
                   selected={row.entry.isSelected}
                 >
                   {row.entry.title}
+                  {/* 커버곡은 한글 제목이 아래 줄이 아니라 제목 오른쪽 괄호에 */}
+                  {row.entry.isCover &&
+                    row.entry.titleKo !== row.entry.title && (
+                      <span className="ml-1.5 font-normal text-white/70">
+                        ({row.entry.titleKo})
+                      </span>
+                    )}
                 </SongLink>
               </li>
             ) : (
@@ -127,12 +150,29 @@ export function Setlist({
                   indexLabel={row.slot.label}
                   encore={row.slot.isEncore}
                   selected
+                  // 곡이 하나뿐인 자리면 "미공개"도 오른쪽 태그 자리에(선택곡과 나란히).
+                  unreleased={
+                    row.slot.songs.length === 1 && row.slot.songs[0].unreleased
+                  }
                   wrapTitle
                 >
                   <span className="flex flex-col gap-1 py-0.5">
                     {row.slot.songs.map((song) => (
                       <span key={song.title} className="flex flex-col">
-                        <span>{song.title}</span>
+                        <span className="flex flex-wrap items-center gap-1.5">
+                          {song.title}
+                          {/* 여러 곡이 들어간 자리는 곡마다 이름 옆에 */}
+                          {song.unreleased && row.slot.songs.length > 1 && (
+                            <span
+                              className={cn(
+                                LIVE_TAG_CLASS,
+                                LIVE_TAG_TONE.unreleased,
+                              )}
+                            >
+                              미공개
+                            </span>
+                          )}
+                        </span>
                         <span
                           className={cn(
                             "text-xs font-normal text-white/60",

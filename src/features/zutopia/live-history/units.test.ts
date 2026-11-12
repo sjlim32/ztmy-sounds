@@ -4,6 +4,7 @@ import {
   buildLiveUnits,
   buildSongLiveStats,
   buildUpcomingUnits,
+  inPersonUnits,
 } from "@/features/zutopia/live-history/units";
 import type {
   RawLive,
@@ -344,5 +345,74 @@ describe("오프닝·앵콜 곡(통계용)", () => {
     const [unit] = build([live({ id: "L" })], [row("a", { live_id: "L" })]);
     expect(unit.openingSongId).toBeUndefined();
     expect(unit.encoreSongIds).toBeUndefined();
+  });
+});
+
+describe("하루 여러 회차(metadata.shows)", () => {
+  const twoShows = live({
+    id: "L",
+    start_date: "2021-05-15",
+    end_date: "2021-05-16",
+    metadata: { shows: ["昼の部", "夜の部"] },
+  });
+  const rows: RawSetlistRow[] = [
+    { ...row("all", { live_id: "L" }, 1), show_number: null },
+    { ...row("day", { live_id: "L" }, 1), show_number: 1 },
+    { ...row("night", { live_id: "L" }, 1), show_number: 2 },
+  ];
+
+  test("날짜 × 회차로 나누고, 첫 회차 키는 예전과 같다", () => {
+    const units = build([twoShows], rows);
+    expect(
+      units.map((unit) => [
+        unit.id,
+        unit.dayNumber,
+        unit.showNumber,
+        unit.showLabel,
+      ]),
+    ).toEqual([
+      ["L:2021-05-16", 2, 1, "昼の部"],
+      ["L:2021-05-16:2", 2, 2, "夜の部"],
+      ["L:2021-05-15", 1, 1, "昼の部"],
+      ["L:2021-05-15:2", 1, 2, "夜の部"],
+    ]);
+  });
+
+  test("회차가 비어 있는 행은 그날 모든 회차, 회차가 있으면 그 회차만", () => {
+    const units = build([twoShows], rows);
+    const day1 = units.filter((unit) => unit.dayNumber === 1);
+    expect(day1.map((unit) => unit.songIds)).toEqual([
+      ["all", "day"],
+      ["all", "night"],
+    ]);
+  });
+
+  test("회차가 1개뿐이면 지금처럼 하루 1회", () => {
+    const units = build(
+      [live({ id: "S", metadata: { shows: ["only"] } })],
+      [row("a", { live_id: "S" })],
+    );
+    expect(units.map((unit) => [unit.id, unit.showNumber])).toEqual([
+      ["S:2024-06-15", undefined],
+    ]);
+  });
+});
+
+describe("온라인 공연", () => {
+  test("region·live_venue가 online이면 online 표시, inPersonUnits에서 빠진다", () => {
+    const units = build(
+      [
+        live({ id: "ON", region: "online", start_date: "2020-08-06" }),
+        live({ id: "ON2", live_venue: "Online", start_date: "2020-11-07" }),
+        live({ id: "OFF", start_date: "2021-05-15" }),
+      ],
+      [],
+    );
+    expect(units.map((unit) => [unit.liveId, unit.online])).toEqual([
+      ["OFF", undefined],
+      ["ON2", true],
+      ["ON", true],
+    ]);
+    expect(inPersonUnits(units).map((unit) => unit.liveId)).toEqual(["OFF"]);
   });
 });

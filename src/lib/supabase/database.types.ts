@@ -314,34 +314,37 @@ export interface Database {
           id: string;
           live_id: string | null;
           tour_id: string | null;
-          song_id: string;
+          song_id: string | null;
           track_number: number;
           is_encore: boolean;
           note: Json | null;
           updated_at: string;
           day_number: number | null;
+          show_number: number | null;
         };
         Insert: {
           id?: string;
           live_id?: string | null;
           tour_id?: string | null;
-          song_id: string;
+          song_id?: string | null;
           track_number: number;
           is_encore?: boolean;
           note?: Json | null;
           updated_at?: string;
           day_number?: number | null;
+          show_number?: number | null;
         };
         Update: {
           id?: string;
           live_id?: string | null;
           tour_id?: string | null;
-          song_id?: string;
+          song_id?: string | null;
           track_number?: number;
           is_encore?: boolean;
           note?: Json | null;
           updated_at?: string;
           day_number?: number | null;
+          show_number?: number | null;
         };
         Relationships: [
           {

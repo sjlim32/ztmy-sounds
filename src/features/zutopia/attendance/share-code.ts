@@ -6,7 +6,8 @@ import type { LiveUnit } from "@/features/zutopia/live-history/types";
  * 0번 비트 = 첫날). 8일 넘는 공연은 같은 ID 블록을 이어 붙여 9~16일째, 17~24일째…
  * (같은 ID가 나온 순서 = 몇째 8일 묶음)를 담는다 — 8일 이하 공연은 예전과 똑같다. 공연 목록의 순번이 아니라 공연 ID로 가리켜서, 나중에
  * 지난 공연이 추가되거나 순서가 바뀌어도 이미 퍼진 코드가 깨지지 않는다.
- * 지금 데이터에 없는 공연은 읽을 때 버린다.
+ * 지금 데이터에 없는 공연은 읽을 때 버린다. 같은 날 여러 회차 공연은 첫 회차들이 날짜
+ * 순으로 앞 비트, 둘째 회차부터가 그 뒤 비트(회차를 나누기 전 코드와 호환).
  */
 const PREFIX = "ZT1";
 const BYTES_PER_LIVE = 5;
@@ -23,8 +24,16 @@ function unitsByLive(units: LiveUnit[]): Map<string, LiveUnit[]> {
     list.push(unit);
     map.set(unit.liveId, list);
   }
+  // 첫 회차(하루 1회 공연은 전부)를 날짜순으로 앞에, 같은 날 둘째 회차부터는 그 뒤에
+  // 붙인다 — 회차를 나누기 전에 만든 코드의 비트 자리가 그대로 같은 날을 가리키게.
+  const extra = (unit: LiveUnit) => ((unit.showNumber ?? 1) > 1 ? 1 : 0);
   for (const list of map.values())
-    list.sort((a, b) => a.date.localeCompare(b.date));
+    list.sort(
+      (a, b) =>
+        extra(a) - extra(b) ||
+        a.date.localeCompare(b.date) ||
+        (a.showNumber ?? 1) - (b.showNumber ?? 1),
+    );
   return map;
 }
 

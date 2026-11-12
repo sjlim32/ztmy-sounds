@@ -13,6 +13,7 @@ import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { Popover } from "@/components/Popover";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
 import { formatDateWithWeekday } from "./date-format";
+import { formatDayShow } from "@/features/zutopia/lives/shows";
 import { ExternalLinkIcon } from "@/components/icons/ExternalLinkIcon";
 import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
 import { secondaryTitle } from "@/features/zutopia/song-db/song-title";
@@ -324,12 +325,12 @@ function SongRow({
                 </span>
                 <span className="pc:whitespace-nowrap block text-sm break-keep text-white/90">
                   {unit.titleKo ?? unit.title}
-                  {(unit.city || unit.dayNumber) && (
+                  {(unit.city || unit.dayNumber || unit.showLabel) && (
                     <span className="text-white/50">
                       {" · "}
                       {[
                         unit.city,
-                        unit.dayNumber ? `DAY ${unit.dayNumber}` : null,
+                        formatDayShow(unit.dayNumber, unit.showLabel),
                       ]
                         .filter(Boolean)
                         .join(" ")}

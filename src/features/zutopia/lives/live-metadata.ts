@@ -5,6 +5,8 @@ export interface LiveStreamingLinks {
   spotify?: string;
   youtubeMusic?: string;
   appleMusic?: string;
+  /** 공연 관련 X(트위터) 게시물 주소 — metadata.twit */
+  twit?: string;
 }
 
 /**
@@ -28,5 +30,6 @@ export function parseStreamingMetadata(
     spotify: asString(m.spotify),
     youtubeMusic: asString(m.youtube_music),
     appleMusic: asString(m.apple_music),
+    twit: asString(m.twit),
   };
 }

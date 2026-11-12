@@ -1,5 +1,9 @@
 import { addDays, diffDays } from "@/lib/ymd";
-import { extractKoreanCity } from "@/features/zutopia/lives/region";
+import {
+  extractKoreanCity,
+  isOnlineText,
+} from "@/features/zutopia/lives/region";
+import { showsForDay } from "@/features/zutopia/lives/shows";
 import type {
   LiveUnit,
   RawLive,
@@ -55,6 +59,10 @@ function buildAllUnits(input: {
         live.poster_image_url ??
         tour?.poster_image_url ??
         null,
+      // 온라인 공연(region·live_venue가 "online") — 참전 기록·통계에선 뺀다(inPersonUnits).
+      ...((isOnlineText(live.region) || isOnlineText(live.live_venue)) && {
+        online: true,
+      }),
       groupImageUrl: tour
         ? (tour.poster_image_url ??
           live.icon_image_url ??
@@ -62,16 +70,20 @@ function buildAllUnits(input: {
           null)
         : (live.icon_image_url ?? live.poster_image_url ?? null),
     };
-    // day = null(하루 공연)이면 DAY 번호가 붙은 자기 행도 전부 센다.
-    const rowsFor = (day: number | null) => [
+    // day = null(하루 공연)이면 DAY 번호가 붙은 자기 행도 전부 센다. 회차(show)도
+    // 같은 규칙 — show_number가 빈 행은 그날 모든 회차에 부른 곡.
+    const rowsFor = (day: number | null, show: number | null) => [
       ...common,
       ...own.filter(
         (row) =>
-          day === null || row.day_number == null || row.day_number === day,
+          (day === null || row.day_number == null || row.day_number === day) &&
+          (show === null ||
+            row.show_number == null ||
+            row.show_number === show),
       ),
     ];
-    const unitFields = (day: number | null) => {
-      const rows = rowsFor(day);
+    const unitFields = (day: number | null, show: number | null) => {
+      const rows = rowsFor(day, show);
       return {
         songIds: uniqueSongIds(rows, originalOf),
         ...setlistDetails(rows, originalOf),
@@ -80,32 +92,56 @@ function buildAllUnits(input: {
       };
     };
 
+    // 하루 회차(metadata.shows · 그날 세트리스트의 show_number 중 큰 쪽, 2회 이상일
+    // 때만) — 날마다 회차 수만큼 단위를 만든다. 첫 회차 id는 예전과 같은
+    // "공연id:날짜"라 이미 저장된 체크가 그대로 첫 회차가 된다.
+    const pushDay = (date: string, dayNumber: number | null) => {
+      const shows = showsForDay(
+        live.metadata,
+        dayNumber ?? 1,
+        own
+          .filter(
+            (row) =>
+              dayNumber === null ||
+              row.day_number == null ||
+              row.day_number === dayNumber,
+          )
+          .map((row) => row.show_number),
+      );
+      if (shows.length === 0) {
+        units.push({
+          ...base,
+          id: `${live.id}:${date}`,
+          date,
+          dayNumber,
+          ...unitFields(dayNumber, null),
+        });
+        return;
+      }
+      shows.forEach(({ show, label }) => {
+        units.push({
+          ...base,
+          id: show === 1 ? `${live.id}:${date}` : `${live.id}:${date}:${show}`,
+          date,
+          dayNumber,
+          showNumber: show,
+          showLabel: label,
+          ...unitFields(dayNumber, show),
+        });
+      });
+    };
+
     // 페스티벌, 그리고 live_date(즛토마요가 실제로 선 날)가 있는 공연은 그날 하루.
     if (live.type === "FESTIVAL" || live.live_date) {
-      const date = (live.live_date ?? live.start_date).slice(0, 10);
-      units.push({
-        ...base,
-        id: `${live.id}:${date}`,
-        date,
-        dayNumber: null,
-        ...unitFields(null),
-      });
+      pushDay((live.live_date ?? live.start_date).slice(0, 10), null);
       continue;
     }
 
     const start = live.start_date.slice(0, 10);
     const end = (live.end_date ?? live.start_date).slice(0, 10);
     const days = Math.max(1, daysInclusive(start, end));
-    for (let n = 1; n <= days; n++) {
-      const date = addDays(start, n - 1);
-      units.push({
-        ...base,
-        id: `${live.id}:${date}`,
-        date,
-        dayNumber: days > 1 ? n : null,
-        ...unitFields(days > 1 ? n : null),
-      });
-    }
+    for (let n = 1; n <= days; n++)
+      pushDay(addDays(start, n - 1), days > 1 ? n : null);
   }
 
   return units;
@@ -131,7 +167,9 @@ export function buildLiveUnits(input: BuildInput, today: string): LiveUnit[] {
     .filter((unit) => unit.date <= today)
     .sort(
       (a, b) =>
-        b.date.localeCompare(a.date) || (a.dayNumber ?? 0) - (b.dayNumber ?? 0),
+        b.date.localeCompare(a.date) ||
+        (a.dayNumber ?? 0) - (b.dayNumber ?? 0) ||
+        (a.showNumber ?? 0) - (b.showNumber ?? 0),
     );
 }
 
@@ -147,7 +185,9 @@ export function buildUpcomingUnits(
     .filter((unit) => unit.date > today)
     .sort(
       (a, b) =>
-        a.date.localeCompare(b.date) || (a.dayNumber ?? 0) - (b.dayNumber ?? 0),
+        a.date.localeCompare(b.date) ||
+        (a.dayNumber ?? 0) - (b.dayNumber ?? 0) ||
+        (a.showNumber ?? 0) - (b.showNumber ?? 0),
     );
 }
 
@@ -221,4 +261,14 @@ export function toClientUnit(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- 빼려고 꺼낸다
   const { venue, country, openingSongId, encoreSongIds, ...rest } = unit;
   return rest;
+}
+
+/**
+ * 현장 공연만 — 온라인 공연(unit.online)을 뺀다. 참전 기록(체크할 공연)과 통계가
+ * 쓴다. 곡별 라이브 횟수·마지막 라이브·활동 연혁은 온라인 공연도 센다.
+ */
+export function inPersonUnits<T extends Pick<LiveUnit, "online">>(
+  units: T[],
+): T[] {
+  return units.filter((unit) => !unit.online);
 }

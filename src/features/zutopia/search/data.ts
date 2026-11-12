@@ -54,7 +54,8 @@ async function getSetlistLinks(): Promise<{
       : row.live_id
         ? entrySlugByLiveId.get(row.live_id)
         : undefined;
-    if (!slug) continue;
+    // 곡이 연결되지 않은 행(커버곡)은 검색의 "그 곡을 부른 공연"에 넣지 않는다.
+    if (!slug || !row.song_id) continue;
     const ids = songIdsBySlug.get(slug) ?? new Set<string>();
     ids.add(row.song_id);
     songIdsBySlug.set(slug, ids);

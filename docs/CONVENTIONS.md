@@ -236,8 +236,9 @@ src/
                              # 카드), 리스트 보기는 작은 썸네일 + 오른쪽 태그 한 줄.
                              # 필터는 곡·앨범과 같은 FilterPanel + SortFilterBar
                              # 줄(형식·연도·정렬·보기). 형식 칩은 종류 색 점·개수,
-                             # 고르면 종류 색, 해당 없는 칩은 disabled. 개수와
-                             # 필터 초기화는 카드 오른쪽 위(summary).
+                             # 고르면 종류 색, 해당 없는 칩은 disabled. 필터를 건
+                             # 동안만 카드 오른쪽 위(summary)에 필터 초기화 — 곡·
+                             # 앨범·공연·통계 모두 합계 개수는 따로 두지 않는다.
                              # 연혁(종류 켜고 끄기)도 같은 FilterPanel. 참전 기록의
                              # 성불/성불 대기는 필터가 아니라 목록 카드 머리의 두
                              # 칸 탭(이름 + 큰 숫자, 정렬 설명·마지막 라이브 버튼).
@@ -258,6 +259,46 @@ src/
                              # posterTransitionName으로 이어진다. 스타일은
                              # globals.css(transform·opacity만, 동작 줄이기면 끔).
                              # 필터 결과·드로어 내용은 key + .animate-content-in.
+                             # 하루 여러 회차: 날마다 회차 수 = lives.metadata.shows에
+                             # 적힌 회차 · 그날 세트리스트 show_number 중 큰 쪽(2회
+                             # 이상일 때만, 이름 없으면 "N회차"). metadata.shows는 이름
+                             # 배열(매일 같음) 또는 [{day, show, label, show_open, show_start}]
+                             # (날마다 다르게, 시각 show_open·show_start "HH:MM") — lives/shows.ts.
+                             # setlists.show_number는 1부터, 비면 그날 모든 회차. 공연일 = 날짜 × 회차, 체크 키는 첫 회차 "id:날짜",
+                             # 둘째부터 "id:날짜:2"(예전 체크 유지). 공유 코드는 첫
+                             # 회차들이 앞 비트, 둘째 회차부터 그 뒤(예전 코드 호환).
+                             # 표기는 lives/shows.ts의 formatDayShow("DAY 1 昼の部").
+                             # 세트리스트 메모 setlists.note: arrange(편곡)·info(덧붙임,
+                             # "Short ver.")는 곡 아래 한 줄(" · "로 이음) — info가
+                             # "Live debut"면 대신 제목 앞 마젠타 "[첫 공개]",
+                             # info에 "cover"가 들어가면 제목 앞 하늘색 "[커버송]".
+                             # 커버곡 행은 song_id 없이 note.title·title_kr(제목 오른쪽 괄호)·original_artist —
+                             # lives/data.ts normalizeSetlistRows가 가짜 곡(id
+                             # "cover:제목")으로 바꾸고, 라이브 기록·통계·검색은 곡이
+                             # 연결된 행만 센다.
+                             # variation(코너 이름)은 같은 줄 맨 앞에 값 그대로 + " ver.".
+                             # 미공개곡(songs.metadata.unrelease)은 "미공개" 태그
+                             # (LIVE_TAG_TONE.unreleased, 흰 계열 — DAY·선택곡·
+                             # ENCORE 색과 겹치지 않게).
+                             # 이틀 이상 단독 공연(투어·페스티벌·출연일 있는 공연
+                             # 제외)은 live-days.ts의 splitLiveDays로 투어 상세와
+                             # 같은 모양 — 모든 날 부른 곡 = 공통 세트리스트
+                             # (TourCommonSetlist, 번호는 첫날), 날마다 공연 일정 한
+                             # 줄(LiveSchedule, DAY 태그), 그날만 부른 곡은 선택곡.
+                             # 온라인 공연(region·live_venue = "online")은 lives/region.ts의
+                             # ONLINE_LABEL("온라인 라이브")로 — splitRegion·displayVenue가
+                             # 바꿔 주고, 티켓은 Region 칸·지도 링크를 뺀다. 공연 목록
+                             # 카드는 도시 글자 없이 그림 위 해(sun) 색 "온라인" 태그(entry.online) —
+                             # 종류 태그(콘서트·페스티벌) 대신. 목록 필터 "온라인: 제외" 칩.
+                             # 필터 카드는 거르기(형식·연도·온라인 — 결과 수가 바뀜,
+                             # 필터 초기화 대상)와 보여주기(정렬·보기)를 선으로 나눈다. 공연일(LiveUnit.online)은 live-history의
+                             # inPersonUnits로 걸러 참전 기록·통계엔 현장 공연만 —
+                             # 곡별 라이브 횟수·마지막 라이브·연혁은 온라인도 센다.
+                             # 티켓 Official 줄 = lives.official_url(도메인 링크, 새 탭 —
+                             # tours엔 컬럼 없음).
+                             # 티켓 metadata: variation(Variation 줄), spotify·
+                             # youtube_music·apple_music(Listen 줄), twit(Post 줄, X
+                             # 아이콘 — 흰 면 + 검은 로고) — live-metadata.ts.
                              # 티켓 장소(Venue) 칸은 날짜·지역 아래 전체 폭 한 줄
                              # (줄바꿈 없음), lives.venue_url이 있으면 지도 링크.
                              # 공연별 수동 콘텐츠가 필요하면 lives/<슬러그>/
@@ -339,8 +380,8 @@ src/
                              # 메인이면 없음.
                              # 즛토피아 본문엔 제목·설명·뒤로가기를 두지 않고
                              # 화면에 안 보이는 h1(sr-only)만 둔다(상세 페이지는
-                             # 자기 제목이 h1). 곡·앨범 개수는 정렬 카드 오른쪽
-                             # 위(summary). 모바일은
+                             # 자기 제목이 h1). 목록 합계 개수는 두지 않는다.
+                             # 모바일은
                              # 상단 바(MobileHeader) 아래 한 줄로 내비게이션만.
                              # 페이지 이름은 site-pages.ts 한 곳에서 — 모바일 상단
                              # 바도 가운데에 같은 이름(로고는 메인에서만, 출처
@@ -565,7 +606,9 @@ src/
     `FilterChip`을 씁니다. 칩 모양은 `FILTER_CHIP_CLASS`, 고른 칸은 `ACTIVE_FILTER_CHIP_CLASS` — 작은 칸 +
     1px 테두리, 고르면 마젠타로 옅게 칠함. 모바일은 칩이 넘치면 그 줄만 가로
     스크롤, `wrap`(SortFilterBar는 `compact`)이면 작은 칩 + 줄바꿈(공연 연도).
-    켜고 끄는 옵션(미공개곡 제외)도 체크박스 대신 같은 칩.
+    켜고 끄는 옵션(마지막 라이브)도 체크박스 대신 같은 칩. 여러 값 중 하나를
+    고르는 건 켜고 끄는 칩 대신 한 줄(SortFilterBar) — 곡 목록 "곡: 전체 ·
+    발매곡 · 미공개곡"(개수 포함, 미공개곡이 있을 때만).
   - 헤더 탭(공연 정보 탭, 즛토피아 곡·앨범·공연): `HEADER_TAB_CLASS`, 고른 칸은
     `ACTIVE_HEADER_TAB_CLASS` — 면 없이 글자 색 + 마젠타 밑줄, 헤더 높이를 꽉 채움
   - 링크(다른 페이지·구역으로 이동하는 글자 버튼): `LINK_BUTTON_CLASS` — 투명 면 + 2px

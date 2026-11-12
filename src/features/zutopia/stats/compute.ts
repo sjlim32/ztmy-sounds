@@ -1,5 +1,7 @@
 import { diffDays, formatDotDate } from "@/lib/ymd";
 import { splitParenSuffix } from "@/features/zutopia/lives/split-paren-suffix";
+import { isOnlineText, ONLINE_LABEL } from "@/features/zutopia/lives/region";
+import { formatDayShow } from "@/features/zutopia/lives/shows";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
 import {
   ENTRY_TYPE_LABEL,
@@ -129,7 +131,9 @@ export function fullTables(sections: StatSection[]): Record<string, StatRow[]> {
 }
 
 const byDate = (a: LiveUnit, b: LiveUnit) =>
-  a.date.localeCompare(b.date) || (a.dayNumber ?? 0) - (b.dayNumber ?? 0);
+  a.date.localeCompare(b.date) ||
+  (a.dayNumber ?? 0) - (b.dayNumber ?? 0) ||
+  (a.showNumber ?? 0) - (b.showNumber ?? 0);
 
 // ─── 공통 ──────────────────────────────────────────────────────────────
 
@@ -204,7 +208,7 @@ function unitName(unit: LiveUnit) {
 function unitSub(unit: LiveUnit) {
   return [
     formatDotDate(unit.date),
-    [unit.city, unit.dayNumber ? `DAY ${unit.dayNumber}` : null]
+    [unit.city, formatDayShow(unit.dayNumber, unit.showLabel)]
       .filter(Boolean)
       .join(" "),
   ]
@@ -226,8 +230,9 @@ function unitRow(unit: LiveUnit, cells: string[], note?: string | null) {
 
 function isOnline(unit: LiveUnit) {
   return (
-    unit.city.toLowerCase() === "online" ||
-    unit.venue?.toLowerCase() === "online"
+    unit.city === ONLINE_LABEL ||
+    isOnlineText(unit.city) ||
+    isOnlineText(unit.venue)
   );
 }
 
