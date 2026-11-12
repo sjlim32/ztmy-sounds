@@ -52,3 +52,40 @@ describe("groupSongs lastLive", () => {
     ]);
   });
 });
+
+describe("groupSongs 편곡·MV 감독", () => {
+  const withPeople = (
+    id: string,
+    date: string,
+    arranger: string[] | null,
+    movie_director: string[] | null = null,
+  ) => ({ ...song(id, date), arranger, movie_director }) as SongWithAlbums;
+  const songs = [
+    withPeople("a", "2020-01-01", ["X", "Y"]),
+    withPeople("b", "2019-01-01", ["X"]),
+    withPeople("c", "2021-01-01", null),
+    withPeople("d", "2018-01-01", ["Y"], ["D"]),
+  ];
+
+  test("사람마다 묶고(여럿이면 각자), 곡 많은 순·발매일 순, 정보 없음은 맨 뒤", () => {
+    const groups = groupSongs(songs, "arranger", "asc");
+    expect(groups.map((g) => [g.label, g.songs.map((s) => s.id)])).toEqual([
+      ["X", ["b", "a"]],
+      ["Y", ["d", "a"]],
+      ["정보 없음", ["c"]],
+    ]);
+  });
+
+  test("MV 감독도 같은 방식", () => {
+    const groups = groupSongs(songs, "director", "asc");
+    expect(groups.map((g) => [g.label, g.songs.length])).toEqual([
+      ["D", 1],
+      ["정보 없음", 3],
+    ]);
+  });
+
+  test("내림차순이어도 정보 없음은 맨 뒤", () => {
+    const groups = groupSongs(songs, "arranger", "desc");
+    expect(groups.at(-1)?.label).toBe("정보 없음");
+  });
+});

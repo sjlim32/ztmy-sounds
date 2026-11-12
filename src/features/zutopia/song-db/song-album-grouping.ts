@@ -97,6 +97,54 @@ function isAlbumTypeKey(
  * 그룹 내부 순서를 통째로 뒤집는다 — groupBy와 무관한 공용 옵션이라
  * 그룹핑 로직에 분기를 늘리지 않고 후처리로 뺐다(아래 groupAlbums 동일).
  */
+const NO_PEOPLE_KEY = "정보 없음";
+
+/**
+ * 편곡·MV 감독별 묶음 — 사람마다 한 묶음(여럿이 맡은 곡은 각자 묶음에 다
+ * 들어간다), 곡이 많은 사람부터(같으면 이름순), 묶음 안은 발매일순. 정보가
+ * 없는 곡은 맨 뒤 "정보 없음".
+ */
+function groupByPeople(
+  songs: SongWithAlbums[],
+  peopleOf: (song: SongWithAlbums) => string[],
+): SongGroup[] {
+  const byPerson = new Map<string, SongWithAlbums[]>();
+  const none: SongWithAlbums[] = [];
+  for (const song of songs) {
+    const people = [
+      ...new Set(
+        peopleOf(song)
+          .map((name) => name.trim())
+          .filter(Boolean),
+      ),
+    ];
+    if (people.length === 0) none.push(song);
+    for (const person of people) {
+      const bucket = byPerson.get(person);
+      if (bucket) bucket.push(song);
+      else byPerson.set(person, [song]);
+    }
+  }
+  const byRelease = (a: SongWithAlbums, b: SongWithAlbums) =>
+    a.release_date.localeCompare(b.release_date);
+  const groups: SongGroup[] = [...byPerson.entries()]
+    .sort(([a, x], [b, y]) => y.length - x.length || a.localeCompare(b, "ko"))
+    .map(([person, list]) => ({
+      key: `person:${person}`,
+      label: person,
+      album: null,
+      songs: [...list].sort(byRelease),
+    }));
+  if (none.length > 0)
+    groups.push({
+      key: NO_PEOPLE_KEY,
+      label: NO_PEOPLE_KEY,
+      album: null,
+      songs: [...none].sort(byRelease),
+    });
+  return groups;
+}
+
 export function groupSongs(
   songs: SongWithAlbums[],
   groupBy: SongGroupBy,
@@ -116,7 +164,13 @@ export function groupSongs(
 
   let groups: SongGroup[];
 
-  if (groupBy === "year") {
+  if (groupBy === "arranger" || groupBy === "director") {
+    groups = groupByPeople(
+      songs,
+      (song) =>
+        (groupBy === "arranger" ? song.arranger : song.movie_director) ?? [],
+    );
+  } else if (groupBy === "year") {
     const byYear = new Map<string, SongWithAlbums[]>();
     for (const song of songs) {
       const year = songYear(song);
@@ -176,12 +230,17 @@ export function groupSongs(
     }
   }
 
-  return applySortDirection(
+  const sorted = applySortDirection(
     groups,
     direction,
     (group) => group.songs,
     (group, songs) => ({ ...group, songs }),
   );
+  // "정보 없음"은 순서와 상관없이 맨 뒤.
+  return [
+    ...sorted.filter((group) => group.key !== NO_PEOPLE_KEY),
+    ...sorted.filter((group) => group.key === NO_PEOPLE_KEY),
+  ];
 }
 
 /**
