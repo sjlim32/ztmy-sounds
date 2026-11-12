@@ -6,7 +6,6 @@ import {
   getOriginalOf,
 } from "@/features/zutopia/live-history/data";
 import { toSongLiveSummaries } from "@/features/zutopia/live-history/summary";
-import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
 import { SongListView } from "@/features/zutopia/song-db/components/SongListView";
 
 export const metadata: Metadata = {
@@ -26,11 +25,6 @@ export default async function ZutopiaSongsPage() {
     originalOf,
   );
 
-  const unreleased = songs.filter(
-    (song) => parseSongMetadata(song.metadata).isUnreleased,
-  ).length;
-  const released = songs.length - unreleased;
-
   // 페이지 이름·곡·앨범 사이 이동은 헤더(SiteHeader)가 맡아서, 본문엔 화면에
   // 안 보이는 제목(h1)만 둔다(화면 읽기·검색 노출용).
   return (
@@ -40,13 +34,7 @@ export default async function ZutopiaSongsPage() {
       으로 들고 있어서(SongListView 주석 참고), 정적 export 빌드
       요구사항대로 Suspense로 감싸야 한다. */}
       <Suspense fallback={null}>
-        <SongListView
-          songs={songs}
-          liveSummaries={liveSummaries}
-          summary={`전체 ${released}곡${
-            unreleased > 0 ? ` · 미공개 ${unreleased}곡` : ""
-          }`}
-        />
+        <SongListView songs={songs} liveSummaries={liveSummaries} />
       </Suspense>
     </div>
   );

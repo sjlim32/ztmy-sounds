@@ -20,7 +20,7 @@ export default async function ZutopiaAlbumsPage() {
       으로 들고 있어서(AlbumListView 주석 참고), 정적 export 빌드
       요구사항대로 Suspense로 감싸야 한다. */}
       <Suspense fallback={null}>
-        <AlbumListView albums={albums} summary={`전체 ${albums.length}개`} />
+        <AlbumListView albums={albums} />
       </Suspense>
     </div>
   );

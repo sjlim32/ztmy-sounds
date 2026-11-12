@@ -28,6 +28,7 @@ import { UnreleasedBadge } from "@/features/zutopia/song-db/components/Unrelease
 import {
   FilterPanel,
   SortFilterBar,
+  type SortFilterOption,
 } from "@/features/zutopia/components/SortFilterBar";
 import { FilterChip, FilterRow } from "@/components/FilterChips";
 import type {
@@ -38,8 +39,6 @@ import type {
 
 interface SongListViewProps {
   songs: SongWithAlbums[];
-  /** 정렬 카드 오른쪽 위에 작게 보여줄 개수 문구(예: "전체 75곡 · 미공개 5곡"). */
-  summary?: string;
   /** 곡 id → 마지막 라이브 요약(라이브 기록 없는 곡은 키 없음). */
   liveSummaries: Record<string, SongLiveSummary>;
 }
@@ -61,6 +60,8 @@ function formatDateShort(date: string): string {
   return `${year.slice(2)}.${month}.${day}`;
 }
 
+type ReleaseFilter = "all" | "released" | "unreleased";
+
 const SORT_OPTIONS: { value: SongGroupBy; label: string }[] = [
   { value: "album", label: "앨범" },
   { value: "year", label: "발매일" },
@@ -78,22 +79,34 @@ const LAST_LIVE_PARAM = "lastLive";
 // HTML과 첫 렌더가 어긋나지 않도록 그동안은 일수를 생략한다(useKoreaToday).
 const useToday = useKoreaToday;
 
-export function SongListView({
-  songs,
-  summary,
-  liveSummaries,
-}: SongListViewProps) {
+export function SongListView({ songs, liveSummaries }: SongListViewProps) {
   const [chosenGroupBy, setGroupBy] = useState<SongGroupBy>("album");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-  const [hideUnreleased, setHideUnreleased] = useState(false);
-  const hasUnreleased = songs.some(
+  // 곡 범위 — 전체 / 발매곡만 / 미공개곡만(예전 "미공개곡 제외" 칩을 한 줄로 합침).
+  const [releaseFilter, setReleaseFilter] = useState<ReleaseFilter>("all");
+  const unreleasedCount = songs.filter(
     (song) => parseSongMetadata(song.metadata).isUnreleased,
-  );
-  // 드로어 선택 조회는 전체 songs로 한다 — 필터를 켜도 URL로 열린 미공개곡
+  ).length;
+  const hasUnreleased = unreleasedCount > 0;
+  const releaseOptions: SortFilterOption<ReleaseFilter>[] = [
+    { value: "all", label: "전체", count: songs.length },
+    {
+      value: "released",
+      label: "발매곡",
+      count: songs.length - unreleasedCount,
+    },
+    { value: "unreleased", label: "미공개곡", count: unreleasedCount },
+  ];
+  // 드로어 선택 조회는 전체 songs로 한다 — 필터를 바꿔도 URL로 열린 곡의
   // 드로어가 갑자기 닫히지 않게.
-  const visibleSongs = hideUnreleased
-    ? songs.filter((song) => !parseSongMetadata(song.metadata).isUnreleased)
-    : songs;
+  const visibleSongs =
+    releaseFilter === "all"
+      ? songs
+      : songs.filter(
+          (song) =>
+            parseSongMetadata(song.metadata).isUnreleased ===
+            (releaseFilter === "unreleased"),
+        );
 
   /**
    * 드로어 열림 상태를 로컬 state가 아니라 URL 쿼리스트링(?song=&album=)
@@ -138,7 +151,7 @@ export function SongListView({
 
   return (
     <div className="flex flex-col gap-6">
-      <FilterPanel summary={summary}>
+      <FilterPanel>
         <SortFilterBar
           options={showLastLive ? SORT_OPTIONS_WITH_LAST_LIVE : SORT_OPTIONS}
           value={groupBy}
@@ -150,16 +163,17 @@ export function SongListView({
           value={sortDirection}
           onChange={setSortDirection}
         />
-        {/* 다른 줄과 같은 필터 칩 — 누를 때마다 켜고 끈다. */}
+        {hasUnreleased && (
+          <SortFilterBar
+            label="곡"
+            groupLabel="곡 범위 고르기"
+            options={releaseOptions}
+            value={releaseFilter}
+            onChange={setReleaseFilter}
+          />
+        )}
+        {/* 켜고 끄는 칩 — 누를 때마다 바뀐다. */}
         <FilterRow label="보기">
-          {hasUnreleased && (
-            <FilterChip
-              active={hideUnreleased}
-              onClick={() => setHideUnreleased(!hideUnreleased)}
-            >
-              미공개곡 제외
-            </FilterChip>
-          )}
           <FilterChip active={showLastLive} onClick={toggleLastLive}>
             마지막 라이브
           </FilterChip>
@@ -173,7 +187,7 @@ export function SongListView({
       ) : (
         // 정렬·보기를 바꾸면 key가 바뀌어 새 결과가 살짝 올라오며 나타난다.
         <div
-          key={`${groupBy}-${sortDirection}-${hideUnreleased}-${showLastLive}`}
+          key={`${groupBy}-${sortDirection}-${releaseFilter}-${showLastLive}`}
           className="animate-content-in flex flex-col gap-8"
         >
           {groupSongs(visibleSongs, groupBy, sortDirection, liveSummaries).map(
