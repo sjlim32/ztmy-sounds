@@ -65,7 +65,7 @@ export function StatsView({ sections }: { sections: StatSection[] }) {
 
   return (
     <div className="flex flex-col gap-8">
-      <FilterPanel summary={<span>지난 공연 기준 · 기록 {recordCount}개</span>}>
+      <FilterPanel>
         <SortFilterBar
           label="구역"
           groupLabel="통계 구역 고르기"

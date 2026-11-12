@@ -10,6 +10,7 @@ import {
   SortFilterBar,
   type SortFilterOption,
 } from "@/features/zutopia/components/SortFilterBar";
+import { FilterChip, FilterRow } from "@/components/FilterChips";
 import { GridIcon } from "@/components/icons/GridIcon";
 import { ListIcon } from "@/components/icons/ListIcon";
 import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
@@ -81,6 +82,7 @@ interface ListSnapshot {
   sortBy: SortBy;
   formatFilter: FormatFilter;
   yearFilter: string;
+  hideOnline?: boolean;
   scrollTop: number;
 }
 
@@ -156,7 +158,19 @@ export function LiveListView({
   const [yearFilter, setYearFilter] = useState(
     initialSnapshot?.yearFilter ?? ALL_YEAR,
   );
+  // 온라인 공연 빼고 보기 — 켜면 형식·연도 개수와 결과 모두 온라인 공연을 뺀다.
+  const [hideOnline, setHideOnline] = useState(
+    initialSnapshot?.hideOnline ?? false,
+  );
   const [viewMode, setViewMode] = useListViewMode();
+  const onlineCount = useMemo(
+    () => entries.filter((entry) => entry.online).length,
+    [entries],
+  );
+  const pool = useMemo(
+    () => (hideOnline ? entries.filter((entry) => !entry.online) : entries),
+    [entries, hideOnline],
+  );
 
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -180,6 +194,7 @@ export function LiveListView({
       sortBy,
       formatFilter,
       yearFilter,
+      hideOnline,
       scrollTop: rootRef.current?.closest("main")?.scrollTop ?? 0,
     });
   };
@@ -192,13 +207,13 @@ export function LiveListView({
       festival: 0,
       concert: 0,
     };
-    for (const entry of entries) {
+    for (const entry of pool) {
       if (yearFilter !== ALL_YEAR && entryYear(entry) !== yearFilter) continue;
       counts.all++;
       if (entry.type) counts[entry.type]++;
     }
     return counts;
-  }, [entries, yearFilter]);
+  }, [pool, yearFilter]);
 
   // 연도 칩 — 고른 형식에 해당 공연이 없는 해는 흐리게(누를 수 없게).
   const years = useMemo(() => {
@@ -208,13 +223,16 @@ export function LiveListView({
       const year = entryYear(entry);
       if (!year) continue;
       all.add(year);
-      if (formatFilter === "all" || entry.type === formatFilter)
+      if (
+        (formatFilter === "all" || entry.type === formatFilter) &&
+        !(hideOnline && entry.online)
+      )
         inFormat.add(year);
     }
     return [...all]
       .sort((a, b) => b.localeCompare(a))
       .map((year) => ({ year, empty: !inFormat.has(year) }));
-  }, [entries, formatFilter]);
+  }, [entries, formatFilter, hideOnline]);
 
   const formatOptions = useMemo<SortFilterOption<FormatFilter>[]>(
     () =>
@@ -243,16 +261,17 @@ export function LiveListView({
     [years],
   );
 
-  const isFiltered = formatFilter !== "all" || yearFilter !== ALL_YEAR;
+  const isFiltered =
+    formatFilter !== "all" || yearFilter !== ALL_YEAR || hideOnline;
 
   const filtered = useMemo(
     () =>
-      entries.filter(
+      pool.filter(
         (entry) =>
           (formatFilter === "all" || entry.type === formatFilter) &&
           (yearFilter === ALL_YEAR || entryYear(entry) === yearFilter),
       ),
-    [entries, formatFilter, yearFilter],
+    [pool, formatFilter, yearFilter],
   );
 
   const groups = useMemo<EntryGroup[]>(() => {
@@ -283,27 +302,21 @@ export function LiveListView({
   return (
     <div ref={rootRef} className="flex flex-col gap-6">
       <FilterPanel
+        // 필터를 건 동안만 오른쪽 위에 "필터 초기화"(개수 표시는 두지 않는다).
         summary={
-          <>
-            {/* 곡·앨범 목록의 "전체 N곡"·"전체 N개"와 같은 말투. */}
-            <span className="whitespace-nowrap tabular-nums">
-              {isFiltered
-                ? `전체 ${entries.length}개 중 ${filtered.length}개`
-                : `전체 ${entries.length}개`}
-            </span>
-            {isFiltered && (
-              <button
-                type="button"
-                onClick={() => {
-                  setFormatFilter("all");
-                  setYearFilter(ALL_YEAR);
-                }}
-                className="hover:text-ztmy-pink rounded whitespace-nowrap text-white/50 underline underline-offset-4 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
-              >
-                필터 초기화
-              </button>
-            )}
-          </>
+          isFiltered ? (
+            <button
+              type="button"
+              onClick={() => {
+                setFormatFilter("all");
+                setYearFilter(ALL_YEAR);
+                setHideOnline(false);
+              }}
+              className="hover:text-ztmy-pink rounded whitespace-nowrap text-white/50 underline underline-offset-4 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
+            >
+              필터 초기화
+            </button>
+          ) : undefined
         }
       >
         <SortFilterBar
@@ -320,19 +333,40 @@ export function LiveListView({
           onChange={setYearFilter}
           compact
         />
-        <SortFilterBar
-          label="정렬"
-          options={SORT_OPTIONS}
-          value={sortBy}
-          onChange={setSortBy}
-        />
-        <SortFilterBar
-          label="보기"
-          groupLabel="보기 방식"
-          options={VIEW_OPTIONS}
-          value={viewMode}
-          onChange={setViewMode}
-        />
+        {onlineCount > 0 && (
+          // 켜고 끄는 칩 — 누르면 온라인 공연을 결과에서 뺀다(형식·연도 개수도).
+          <FilterRow label="온라인" role="group" aria-label="온라인 공연 필터">
+            <FilterChip
+              active={hideOnline}
+              onClick={() => setHideOnline(!hideOnline)}
+              count={onlineCount}
+            >
+              제외
+            </FilterChip>
+          </FilterRow>
+        )}
+        {/* 여기까지는 "무엇을 보여 줄지"(결과 수가 바뀌는 필터, 필터 초기화 대상),
+            아래는 "어떻게 보여 줄지"(정렬·보기 방식) — 선으로 나누고 태블릿
+            이상에선 한 줄에 나란히. */}
+        <div
+          role="group"
+          aria-label="정렬과 보기 방식"
+          className="tablet:flex-row tablet:flex-wrap tablet:gap-x-8 mt-1 flex flex-col gap-2 border-t border-white/10 pt-3"
+        >
+          <SortFilterBar
+            label="정렬"
+            options={SORT_OPTIONS}
+            value={sortBy}
+            onChange={setSortBy}
+          />
+          <SortFilterBar
+            label="보기"
+            groupLabel="보기 방식"
+            options={VIEW_OPTIONS}
+            value={viewMode}
+            onChange={setViewMode}
+          />
+        </div>
       </FilterPanel>
 
       {groups.length === 0 ? (
@@ -343,7 +377,7 @@ export function LiveListView({
         // 그룹 사이는 카드 사이보다 훨씬 넓게 띄워, 연도가 바뀌는 지점이 바로 보이게 한다.
         // 필터·묶음·보기를 바꾸면 key가 바뀌어 새 결과가 살짝 올라오며 나타난다.
         <div
-          key={`${formatFilter}-${yearFilter}-${sortBy}-${viewMode}`}
+          key={`${formatFilter}-${yearFilter}-${hideOnline}-${sortBy}-${viewMode}`}
           className={cn(
             "animate-content-in flex flex-col gap-10",
             "tablet:gap-14",
@@ -438,6 +472,20 @@ function EntryTypeTag({
   );
 }
 
+/**
+ * 온라인 공연 태그 — 종류(투어 하늘·페스티벌 보라·콘서트 분홍)·내한(마젠타)과 겹치지
+ * 않게 해(sun) 색 면. 온라인 공연은 종류 태그(콘서트·페스티벌) 대신 이것만 단다.
+ */
+function OnlineTag({ className }: { className?: string }) {
+  return (
+    <span
+      className={cn(LIVE_TAG_CLASS, "bg-ztmy-sun text-black/85", className)}
+    >
+      온라인
+    </span>
+  );
+}
+
 /** 카드 보기 한 장 — 포스터가 주인공, 글자는 그 아래 세 줄. */
 function LiveCard({ entry, href, onClick }: LiveItemProps) {
   return (
@@ -485,13 +533,16 @@ function LiveCard({ entry, href, onClick }: LiveItemProps) {
         줄("콘서트 · 두 번째 내한")과 같은 순서. 종류 태그는 면
         전체가 종류 색이라 색만으로 바로 구분된다. 호버하면 포스터가
         온전히 보이게 태그를 숨긴다. */}
-          {(entry.type || entry.visitOrdinal != null) && (
+          {(entry.type || entry.visitOrdinal != null || entry.online) && (
             <div className="absolute top-2 left-2 flex flex-wrap gap-1 transition-opacity duration-200 group-hover:opacity-0">
-              {entry.type && (
+              {entry.type && !entry.online && (
                 <EntryTypeTag
                   type={entry.type}
                   className="shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
                 />
+              )}
+              {entry.online && (
+                <OnlineTag className="shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
               )}
               {entry.visitOrdinal != null && (
                 <VisitBadge
@@ -599,9 +650,10 @@ function LiveRow({ entry, href, onClick }: LiveItemProps) {
         </span>
       </div>
 
-      {(entry.type || entry.visitOrdinal != null) && (
+      {(entry.type || entry.visitOrdinal != null || entry.online) && (
         <div className="flex shrink-0 flex-col items-end gap-1">
-          {entry.type && <EntryTypeTag type={entry.type} />}
+          {entry.type && !entry.online && <EntryTypeTag type={entry.type} />}
+          {entry.online && <OnlineTag />}
           {entry.visitOrdinal != null && (
             <VisitBadge ordinal={entry.visitOrdinal} />
           )}

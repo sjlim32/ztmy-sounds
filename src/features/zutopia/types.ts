@@ -50,6 +50,8 @@ export interface ZutopiaEntry {
   city?: string;
   // 내한 공연이면 몇 번째 내한인지(metadata.visited) — 목록 카드 강조용.
   visitOrdinal?: number | null;
+  // 온라인 공연(region·live_venue가 "online") — 도시 대신 그림 위 "온라인" 태그.
+  online?: boolean;
 }
 
 export interface ZutopiaCategory {
