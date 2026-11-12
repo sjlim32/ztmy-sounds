@@ -27,10 +27,10 @@ import { SongDetailPanel } from "@/features/zutopia/song-db/components/SongDetai
 import { UnreleasedBadge } from "@/features/zutopia/song-db/components/UnreleasedBadge";
 import {
   FilterPanel,
+  FilterToggleRow,
   SortFilterBar,
   type SortFilterOption,
 } from "@/features/zutopia/components/SortFilterBar";
-import { FilterChip, FilterRow } from "@/components/FilterChips";
 import type {
   SongGroupBy,
   SongWithAlbums,
@@ -65,6 +65,9 @@ type ReleaseFilter = "all" | "released" | "unreleased";
 const SORT_OPTIONS: { value: SongGroupBy; label: string }[] = [
   { value: "album", label: "앨범" },
   { value: "year", label: "발매일" },
+  // 편곡(songs.arranger)·MV 감독(songs.movie_director)별 묶음 — 사람마다 한 묶음.
+  { value: "arranger", label: "편곡" },
+  { value: "director", label: "MV 감독" },
 ];
 // "마지막 라이브" 보기를 켰을 때만 정렬 옵션에 붙는다.
 const SORT_OPTIONS_WITH_LAST_LIVE: { value: SongGroupBy; label: string }[] = [
@@ -84,29 +87,36 @@ export function SongListView({ songs, liveSummaries }: SongListViewProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   // 곡 범위 — 전체 / 발매곡만 / 미공개곡만(예전 "미공개곡 제외" 칩을 한 줄로 합침).
   const [releaseFilter, setReleaseFilter] = useState<ReleaseFilter>("all");
-  const unreleasedCount = songs.filter(
+  // MV 있는 곡만(songs.music_video_url) — 켜면 곡 범위 개수도 MV 있는 곡만 센다.
+  const [mvOnly, setMvOnly] = useState(false);
+  const hasMv = (song: SongWithAlbums) => !!song.music_video_url?.trim();
+  const pool = mvOnly ? songs.filter(hasMv) : songs;
+  const isReleaseMatch = (song: SongWithAlbums) =>
+    releaseFilter === "all" ||
+    parseSongMetadata(song.metadata).isUnreleased ===
+      (releaseFilter === "unreleased");
+  const mvCount = songs.filter(
+    (song) => hasMv(song) && isReleaseMatch(song),
+  ).length;
+  const unreleasedCount = pool.filter(
     (song) => parseSongMetadata(song.metadata).isUnreleased,
   ).length;
-  const hasUnreleased = unreleasedCount > 0;
+  // 줄을 보일지는 전체 곡 기준 — MV 필터를 켜도 고른 범위 줄이 사라지지 않게.
+  const hasUnreleased = songs.some(
+    (song) => parseSongMetadata(song.metadata).isUnreleased,
+  );
   const releaseOptions: SortFilterOption<ReleaseFilter>[] = [
-    { value: "all", label: "전체", count: songs.length },
+    { value: "all", label: "전체", count: pool.length },
     {
       value: "released",
       label: "발매곡",
-      count: songs.length - unreleasedCount,
+      count: pool.length - unreleasedCount,
     },
     { value: "unreleased", label: "미공개곡", count: unreleasedCount },
   ];
   // 드로어 선택 조회는 전체 songs로 한다 — 필터를 바꿔도 URL로 열린 곡의
   // 드로어가 갑자기 닫히지 않게.
-  const visibleSongs =
-    releaseFilter === "all"
-      ? songs
-      : songs.filter(
-          (song) =>
-            parseSongMetadata(song.metadata).isUnreleased ===
-            (releaseFilter === "unreleased"),
-        );
+  const visibleSongs = pool.filter(isReleaseMatch);
 
   /**
    * 드로어 열림 상태를 로컬 state가 아니라 URL 쿼리스트링(?song=&album=)
@@ -147,38 +157,74 @@ export function SongListView({ songs, liveSummaries }: SongListViewProps) {
       scroll: false,
     });
   };
-  const showDateColumn = groupBy === "year";
+  // 앨범 묶음이 아니면 발매일을 줄마다 보여 준다(연도·편곡·MV 감독).
+  const isPeopleGroup = groupBy === "arranger" || groupBy === "director";
+  const showDateColumn = groupBy === "year" || isPeopleGroup;
 
   return (
     <div className="flex flex-col gap-6">
-      <FilterPanel>
-        <SortFilterBar
-          options={showLastLive ? SORT_OPTIONS_WITH_LAST_LIVE : SORT_OPTIONS}
-          value={groupBy}
-          onChange={setGroupBy}
-        />
-        <SortFilterBar
-          label="순서"
-          options={DIRECTION_OPTIONS}
-          value={sortDirection}
-          onChange={setSortDirection}
-        />
-        {hasUnreleased && (
-          <SortFilterBar
-            label="곡"
-            groupLabel="곡 범위 고르기"
-            options={releaseOptions}
-            value={releaseFilter}
-            onChange={setReleaseFilter}
-          />
-        )}
-        {/* 켜고 끄는 칩 — 누를 때마다 바뀐다. */}
-        <FilterRow label="보기">
-          <FilterChip active={showLastLive} onClick={toggleLastLive}>
-            마지막 라이브
-          </FilterChip>
-        </FilterRow>
-      </FilterPanel>
+      <FilterPanel
+        onReset={
+          releaseFilter !== "all" || mvOnly
+            ? () => {
+                setReleaseFilter("all");
+                setMvOnly(false);
+              }
+            : undefined
+        }
+        filters={
+          <>
+            {hasUnreleased && (
+              <SortFilterBar
+                label="곡"
+                groupLabel="곡 범위 고르기"
+                options={releaseOptions}
+                value={releaseFilter}
+                onChange={setReleaseFilter}
+              />
+            )}
+            <FilterToggleRow
+              label="MV"
+              toggles={[
+                {
+                  label: "있는 곡만",
+                  active: mvOnly,
+                  onToggle: () => setMvOnly(!mvOnly),
+                  count: mvCount,
+                },
+              ]}
+            />
+          </>
+        }
+        display={
+          <>
+            <SortFilterBar
+              options={
+                showLastLive ? SORT_OPTIONS_WITH_LAST_LIVE : SORT_OPTIONS
+              }
+              value={groupBy}
+              onChange={setGroupBy}
+            />
+            <SortFilterBar
+              label="순서"
+              options={DIRECTION_OPTIONS}
+              value={sortDirection}
+              onChange={setSortDirection}
+            />
+            {/* 결과는 그대로, 줄마다 마지막 라이브를 덧붙여 보여 주는 보기 옵션 */}
+            <FilterToggleRow
+              label="보기"
+              toggles={[
+                {
+                  label: "마지막 라이브",
+                  active: showLastLive,
+                  onToggle: toggleLastLive,
+                },
+              ]}
+            />
+          </>
+        }
+      />
 
       {visibleSongs.length === 0 ? (
         <p className={cn("text-base text-white/50", "tablet:text-lg")}>
@@ -187,7 +233,7 @@ export function SongListView({ songs, liveSummaries }: SongListViewProps) {
       ) : (
         // 정렬·보기를 바꾸면 key가 바뀌어 새 결과가 살짝 올라오며 나타난다.
         <div
-          key={`${groupBy}-${sortDirection}-${releaseFilter}-${showLastLive}`}
+          key={`${groupBy}-${sortDirection}-${releaseFilter}-${mvOnly}-${showLastLive}`}
           className="animate-content-in flex flex-col gap-8"
         >
           {groupSongs(visibleSongs, groupBy, sortDirection, liveSummaries).map(
@@ -210,6 +256,11 @@ export function SongListView({ songs, liveSummaries }: SongListViewProps) {
                         >
                           {group.label}
                         </p>
+                        {isPeopleGroup && (
+                          <span className="shrink-0 font-mono text-sm text-white/70 tabular-nums">
+                            {group.songs.length}곡
+                          </span>
+                        )}
                         {group.album && (
                           <span
                             className={cn(

@@ -13,27 +13,101 @@ import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
 const SORT_FILTER_CARD_CLASS = `${ZUTOPIA_SURFACE_CLASS} flex flex-col gap-2 px-3 py-2.5 tablet:px-4 tablet:py-3`;
 
 /**
- * 목록 위 필터 카드 — 안에 SortFilterBar 줄들을 쌓고, summary
- * (개수 등)는 태블릿 이상에서 오른쪽 위, 모바일에선 맨 위 줄에 둔다.
+ * 목록 위 필터 카드 — 곡·앨범·공연 목록이 같은 틀을 쓴다(통계·연혁은 children만).
+ *
+ * - filters: "무엇을 보여 줄지" 줄들(결과 수가 바뀌는 필터 — 형식·연도·곡 범위·
+ *   온라인·MV 등). 위에 쌓는다.
+ * - display: "어떻게 보여 줄지" 줄들(정렬·순서·보기 방식·커버 등 — 결과는 그대로).
+ *   filters 아래 선을 긋고, 태블릿 이상에선 한 줄에 나란히.
+ * - onReset: 필터를 건 동안 넘기면 오른쪽 위(모바일은 맨 위)에 "필터 초기화".
+ * - summary: 그 밖에 오른쪽 위에 둘 짧은 안내(연혁의 "내가 간 공연 N회" 등).
+ * - children: 예전 방식(구역 나눔 없이 줄만) — filters와 같은 자리.
+ *
+ * 새 필터·보기 옵션은 해당 구역에 줄(SortFilterBar·FilterToggleRow) 하나만 더하면
+ * 같은 모양·자리로 들어간다.
  */
 export function FilterPanel({
   summary,
+  onReset,
+  filters,
+  display,
   className,
   children,
 }: {
   summary?: ReactNode;
+  onReset?: () => void;
+  filters?: ReactNode;
+  display?: ReactNode;
   className?: string;
-  children: ReactNode;
+  children?: ReactNode;
 }) {
+  const top = filters ?? children;
   return (
     <div className={cn(SORT_FILTER_CARD_CLASS, "relative", className)}>
-      {summary && (
+      {(summary || onReset) && (
         <div className="tablet:absolute tablet:top-3 tablet:right-4 flex items-center gap-3 text-sm text-white/60">
           {summary}
+          {onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="hover:text-ztmy-pink rounded whitespace-nowrap text-white/50 underline underline-offset-4 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
+            >
+              필터 초기화
+            </button>
+          )}
         </div>
       )}
-      {children}
+      {top && (
+        <div role="group" aria-label="필터" className="flex flex-col gap-2">
+          {top}
+        </div>
+      )}
+      {display && (
+        <div
+          role="group"
+          aria-label="정렬과 보기 방식"
+          className={cn(
+            "tablet:flex-row tablet:flex-wrap tablet:gap-x-8 flex flex-col gap-2",
+            top && "mt-1 border-t border-white/10 pt-3",
+          )}
+        >
+          {display}
+        </div>
+      )}
     </div>
+  );
+}
+
+/**
+ * 켜고 끄는 칩 줄 — "온라인: 제외", "MV: 있는 곡만", "보기: 마지막 라이브"처럼
+ * 하나씩 누를 때마다 바뀌는 칩들. 칩마다 개수를 붙일 수 있다.
+ */
+export function FilterToggleRow({
+  label,
+  toggles,
+}: {
+  label: string;
+  toggles: {
+    label: string;
+    active: boolean;
+    onToggle: () => void;
+    count?: number;
+  }[];
+}) {
+  return (
+    <FilterRow label={label} role="group" aria-label={`${label} 필터`}>
+      {toggles.map((toggle) => (
+        <FilterChip
+          key={toggle.label}
+          active={toggle.active}
+          onClick={toggle.onToggle}
+          count={toggle.count}
+        >
+          {toggle.label}
+        </FilterChip>
+      ))}
+    </FilterRow>
   );
 }
 
