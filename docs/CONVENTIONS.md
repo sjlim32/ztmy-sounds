@@ -305,8 +305,18 @@ src/
                              # content.mdx를 만들어 [slug]/page.tsx의
                              # CONTENT_BY_KEY에 등록한다(선택 사항).
       song-db/              # 곡/앨범 DB 조회·정렬·표시 로직 (Supabase 소스)
+                             # 곡 목록 정렬: 앨범·발매일·편곡(arranger)·MV 감독
+                             # (movie_director) — 사람별 묶음은 groupSongs의 groupByPeople
+                             # (여럿이면 각자 묶음, 곡 많은 순, "정보 없음" 맨 뒤).
+                             # 필터 "MV: 있는 곡만"(music_video_url) 켜고 끄는 칩.
                              # 목록 위 정렬/필터 카드는 모두 components/SortFilterBar.tsx의
-                             # FilterPanel(안쪽 여백 통일). 줄 모양은 공용
+                             # FilterPanel — filters(무엇을: 결과 수가 바뀌는 줄) / display
+                             # (어떻게: 정렬·순서·보기·커버) 두 구역을 같은 자리·모양으로
+                             # (사이에 선, display는 태블릿 이상 한 줄), onReset을 넘기면
+                             # 필터를 건 동안 오른쪽 위 "필터 초기화". 켜고 끄는 칩 줄은
+                             # FilterToggleRow. 새 옵션은 맞는 구역에 줄 하나만 더한다.
+                             # 공연: 형식·연도·온라인 / 정렬·보기, 곡: 곡·MV / 정렬·순서·
+                             # 보기, 앨범: (없음) / 정렬·순서·앨범 커버. 줄 모양은 공용
                              # FilterRow/FilterChip. "원곡·발매곡" 판별은
                              # song-metadata.ts의 isCountableOriginal 하나
                              # (참전·통계가 같은 기준).

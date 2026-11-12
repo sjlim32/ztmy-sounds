@@ -7,10 +7,10 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
   FilterPanel,
+  FilterToggleRow,
   SortFilterBar,
   type SortFilterOption,
 } from "@/features/zutopia/components/SortFilterBar";
-import { FilterChip, FilterRow } from "@/components/FilterChips";
 import { GridIcon } from "@/components/icons/GridIcon";
 import { ListIcon } from "@/components/icons/ListIcon";
 import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
@@ -302,72 +302,65 @@ export function LiveListView({
   return (
     <div ref={rootRef} className="flex flex-col gap-6">
       <FilterPanel
-        // 필터를 건 동안만 오른쪽 위에 "필터 초기화"(개수 표시는 두지 않는다).
-        summary={
-          isFiltered ? (
-            <button
-              type="button"
-              onClick={() => {
+        onReset={
+          isFiltered
+            ? () => {
                 setFormatFilter("all");
                 setYearFilter(ALL_YEAR);
                 setHideOnline(false);
-              }}
-              className="hover:text-ztmy-pink rounded whitespace-nowrap text-white/50 underline underline-offset-4 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
-            >
-              필터 초기화
-            </button>
-          ) : undefined
+              }
+            : undefined
         }
-      >
-        <SortFilterBar
-          label="형식"
-          options={formatOptions}
-          value={formatFilter}
-          onChange={setFormatFilter}
-          compact
-        />
-        <SortFilterBar
-          label="연도"
-          options={yearOptions}
-          value={yearFilter}
-          onChange={setYearFilter}
-          compact
-        />
-        {onlineCount > 0 && (
-          // 켜고 끄는 칩 — 누르면 온라인 공연을 결과에서 뺀다(형식·연도 개수도).
-          <FilterRow label="온라인" role="group" aria-label="온라인 공연 필터">
-            <FilterChip
-              active={hideOnline}
-              onClick={() => setHideOnline(!hideOnline)}
-              count={onlineCount}
-            >
-              제외
-            </FilterChip>
-          </FilterRow>
-        )}
-        {/* 여기까지는 "무엇을 보여 줄지"(결과 수가 바뀌는 필터, 필터 초기화 대상),
-            아래는 "어떻게 보여 줄지"(정렬·보기 방식) — 선으로 나누고 태블릿
-            이상에선 한 줄에 나란히. */}
-        <div
-          role="group"
-          aria-label="정렬과 보기 방식"
-          className="tablet:flex-row tablet:flex-wrap tablet:gap-x-8 mt-1 flex flex-col gap-2 border-t border-white/10 pt-3"
-        >
-          <SortFilterBar
-            label="정렬"
-            options={SORT_OPTIONS}
-            value={sortBy}
-            onChange={setSortBy}
-          />
-          <SortFilterBar
-            label="보기"
-            groupLabel="보기 방식"
-            options={VIEW_OPTIONS}
-            value={viewMode}
-            onChange={setViewMode}
-          />
-        </div>
-      </FilterPanel>
+        filters={
+          <>
+            <SortFilterBar
+              label="형식"
+              options={formatOptions}
+              value={formatFilter}
+              onChange={setFormatFilter}
+              compact
+            />
+            <SortFilterBar
+              label="연도"
+              options={yearOptions}
+              value={yearFilter}
+              onChange={setYearFilter}
+              compact
+            />
+            {onlineCount > 0 && (
+              // 누르면 온라인 공연을 결과에서 뺀다(형식·연도 개수도).
+              <FilterToggleRow
+                label="온라인"
+                toggles={[
+                  {
+                    label: "제외",
+                    active: hideOnline,
+                    onToggle: () => setHideOnline(!hideOnline),
+                    count: onlineCount,
+                  },
+                ]}
+              />
+            )}
+          </>
+        }
+        display={
+          <>
+            <SortFilterBar
+              label="정렬"
+              options={SORT_OPTIONS}
+              value={sortBy}
+              onChange={setSortBy}
+            />
+            <SortFilterBar
+              label="보기"
+              groupLabel="보기 방식"
+              options={VIEW_OPTIONS}
+              value={viewMode}
+              onChange={setViewMode}
+            />
+          </>
+        }
+      />
 
       {groups.length === 0 ? (
         <p className={cn("text-base text-white/50", "tablet:text-lg")}>

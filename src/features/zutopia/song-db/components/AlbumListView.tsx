@@ -106,30 +106,30 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <FilterPanel>
-        <SortFilterBar
-          options={SORT_OPTIONS}
-          value={groupBy}
-          onChange={setGroupBy}
-        />
-
-        <section
-          className={cn("flex flex-row flex-wrap gap-2", "tablet:gap-4")}
-        >
-          <SortFilterBar
-            label="순서"
-            options={DIRECTION_OPTIONS}
-            value={sortDirection}
-            onChange={setSortDirection}
-          />
-          <SortFilterBar
-            label="앨범 커버"
-            options={COVER_VERSION_OPTIONS}
-            value={coverVersion}
-            onChange={setCoverVersion}
-          />
-        </section>
-      </FilterPanel>
+      {/* 앨범은 거를 것 없이 보여 주는 방식(정렬·순서·커버)만 — 곡·공연과 같은 자리. */}
+      <FilterPanel
+        display={
+          <>
+            <SortFilterBar
+              options={SORT_OPTIONS}
+              value={groupBy}
+              onChange={setGroupBy}
+            />
+            <SortFilterBar
+              label="순서"
+              options={DIRECTION_OPTIONS}
+              value={sortDirection}
+              onChange={setSortDirection}
+            />
+            <SortFilterBar
+              label="앨범 커버"
+              options={COVER_VERSION_OPTIONS}
+              value={coverVersion}
+              onChange={setCoverVersion}
+            />
+          </>
+        }
+      />
 
       {albums.length === 0 ? (
         <p className={cn("text-base text-white/50", "tablet:text-lg")}>
