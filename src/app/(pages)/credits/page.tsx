@@ -32,6 +32,16 @@ const CREDITS: Credit[] = [
     description: "커서 원본 링크",
     url: "https://ko-fi.com/s/22841fd8b0",
   },
+  {
+    role: "공연 · 세트리스트 정보",
+    name: "setlist.fm",
+    nameUrl: "https://www.setlist.fm/search?query=zutomayo",
+  },
+  {
+    role: "공연 · 세트리스트 정보",
+    name: "LiveFans",
+    nameUrl: "https://www.livefans.jp/artists/122716",
+  },
 ];
 
 export default function CreditsPage() {
