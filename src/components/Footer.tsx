@@ -128,10 +128,7 @@ export function Footer({ inline = false }: { inline?: boolean } = {}) {
         </div>
       </div>
 
-      <Script
-        src="https://tally.so/widgets/embed.js"
-        strategy="afterInteractive"
-      />
+      <Script src="https://tally.so/widgets/embed.js" strategy="lazyOnload" />
     </footer>
   );
 }

@@ -42,7 +42,11 @@
 ## 프로젝트 로그
 
 <details>
-<summary>전체 로그 보기 (26.08.20 ~ 26.11.12)</summary>
+<summary>전체 로그 보기 (26.08.20 ~ 26.11.13)</summary>
+
+### 26.11.13
+
+- 홈 공연 패널의 일정·링크 창을 열 때 불러오기(ConcertQuickPanelDialog로 분리), Tally 피드백 위젯은 페이지가 다 뜬 뒤(lazyOnload) 불러오기
 
 ### 26.11.12
 
