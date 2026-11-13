@@ -8,7 +8,7 @@ export const SITE_NAME = `${ARTIST.name.kr} FAN PAGE`;
 export const SITE_BRAND = "ZTMY SOUNDS";
 
 /** 메인 화면 로고 아래 한 줄 소개. */
-export const SITE_TAGLINE = "계속 한밤 중이면 좋을텐데 팬페이지";
+export const SITE_TAGLINE = "계속 한밤중이면 좋을텐데 팬페이지";
 
 export const SITE_DESCRIPTION = `일본 밴드 ${ARTIST.name.jp}(${ARTIST.name.en})의 비공식 팬페이지입니다. 공식 응원도구인 샤모지를 활용한 응원 가이드, 음원 DB·공연 아카이브 등 다양한 정보를 제공합니다.`;
 
