@@ -32,7 +32,12 @@ import type {
  *   계산에만 "그 기간엔 공연이 있었다"로 넣는다.
  * - 참가율 = 발매일 이후(당일 포함) 세트리스트가 있는 공연일 중 그 곡을 부른 비율.
  *   발매 전에 먼저 부른 날은 횟수엔 넣고 참가율에선 뺀다(100%를 넘지 않게).
- * - 온라인 공연은 도시·공연장·해외 기록에서 뺀다.
+ * - 온라인 공연은 처음부터 넣지 않는다(stats/data.ts가 현장 공연만 넘긴다). 장소
+ *   기록의 isOnline은 혹시 섞여 들어와도 도시·공연장에 "온라인"이 잡히지 않게 하는
+ *   안전장치.
+ * - 기록 설명(description)은 화면에 그대로 나간다 — 세는 기준이 바뀌면 같이 고친다.
+ *   공연일이 없는 투어 안내는 그런 투어가 있을 때만 붙는다(emptyTourNote 등).
+ *   "모르는 구간"으로 빼거나 끊는 규칙은 계산엔 그대로 두되 설명엔 적지 않는다.
  */
 export function buildStatSections(input: {
   /** 지난 공연일(buildLiveUnits 결과, 순서 무관) */
@@ -172,10 +177,16 @@ function unknownBetween(context: Context, from: string, to: string) {
   return context.unknown.some((span) => span.to > from && span.from < to);
 }
 
-/** 공연일이 없는 투어가 있으면 덧붙이는 안내 */
+/** 공연일이 없는 투어가 있으면 덧붙이는 안내(횟수를 셀 수 없어 빠진다) — 없으면 빈 문자열. */
 const emptyTourNote = (context: Context) =>
   context.emptyTourCount > 0
     ? ` — 공연일이 아직 등록되지 않은 투어 ${context.emptyTourCount}개는 빠짐`
+    : "";
+
+/** 공연 공백용 — 공연일이 없는 투어는 그 기간 내내 공연이 있던 것으로 본다. 없으면 빈 문자열. */
+const emptyTourBreakNote = (context: Context) =>
+  context.emptyTourCount > 0
+    ? `(공연일이 아직 등록되지 않은 투어 ${context.emptyTourCount}개는 그 기간 내내 공연이 있던 것으로)`
     : "";
 
 /**
@@ -306,7 +317,7 @@ function songRecords(
     stat.played.at(-1) ? formatDotDate(stat.played.at(-1)!.date) : "–",
   ];
   const playNote = (stat: SongStat) =>
-    `발매 후 공연 ${stat.eligible}회 중 ${stat.playedSinceRelease}회 · 참가율 ${percent(stat.playedSinceRelease, stat.eligible)}`;
+    `발매 후 공연일 ${stat.eligible}회 중 ${stat.playedSinceRelease}회 · 참가율 ${percent(stat.playedSinceRelease, stat.eligible)}`;
   // 첫 라이브는 세트리스트가 있는 공연 중 처음 — 그 전 공연 기록이 비어 있을 수 있다.
   const playColumns = ["횟수", "참가율", "확인된 첫 라이브", "마지막 라이브"];
 
@@ -399,7 +410,7 @@ function songRecords(
       id: "song-most-played",
       title: "라이브에서 가장 많이 불린 곡",
       description:
-        "공연일 기준 횟수. 참가율은 발매 후 세트리스트가 있는 공연일 중 부른 비율",
+        "세트리스트가 있는 공연일 중 부른 횟수 · 참가율은 발매 후 그런 공연일 중 부른 비율",
       columns: playColumns,
       rows: rank(
         played,
@@ -412,7 +423,7 @@ function songRecords(
     {
       id: "song-highest-rate",
       title: "참가율이 가장 높은 곡",
-      description: `발매 후 공연일 중 부른 비율(발매 후 공연 ${MIN_ELIGIBLE}회 이상인 곡만)`,
+      description: `발매 후 세트리스트가 있는 공연일 중 부른 비율(그런 공연일이 ${MIN_ELIGIBLE}회 이상인 곡만)`,
       columns: ["참가율", "횟수", "확인된 첫 라이브", "마지막 라이브"],
       rows: rank(
         stats.filter((stat) => stat.eligible >= MIN_ELIGIBLE),
@@ -430,8 +441,8 @@ function songRecords(
       id: "song-least-played",
       title: "라이브에서 가장 적게 불린 곡",
       description:
-        "발매 후 공연이 있었던 곡 중 횟수가 적은 순(같으면 기다린 공연이 많은 곡 먼저)",
-      columns: ["횟수", "발매 후 공연", "참가율", "마지막 라이브"],
+        "발매 후 세트리스트가 있는 공연일이 있는 곡 중 횟수가 적은 순(같으면 발매 후 공연일이 많은 곡 먼저)",
+      columns: ["횟수", "발매 후 공연일", "참가율", "마지막 라이브"],
       rows: rank(
         stats.filter((stat) => stat.eligible > 0),
         (stat) => stat.played.length,
@@ -448,7 +459,7 @@ function songRecords(
                 : "없음",
             ],
             stat.played.length === 0
-              ? `발매 후 공연 ${stat.eligible}회 동안 한 번도 안 불림`
+              ? `발매 후 공연일 ${stat.eligible}회 동안 한 번도 안 불림`
               : playNote(stat),
           ),
         (a, b) => b.eligible - a.eligible,
@@ -457,8 +468,7 @@ function songRecords(
     {
       id: "song-comeback",
       title: "가장 오랜 공백 끝에 돌아온 곡",
-      description:
-        "연이은 두 라이브 사이 간격이 가장 길었던 때 — 그 사이 세트리스트를 모르는 공연이 없는 구간만",
+      description: "곡마다 연이어 부른 두 공연일 사이가 가장 길었던 때",
       columns: ["공백", "이전 라이브", "돌아온 공연"],
       rows: rank(
         comebacks,
@@ -484,8 +494,7 @@ function songRecords(
     {
       id: "song-streak",
       title: "가장 오래 연속으로 불린 곡",
-      description:
-        "연이은 공연일마다 빠짐없이 부른 최대 횟수(세트리스트를 모르는 공연이 끼면 끊김)",
+      description: "연이은 공연일마다 빠짐없이 부른 최대 횟수",
       columns: ["연속", "시작", "끝"],
       rows: rank(
         streaks,
@@ -507,8 +516,7 @@ function songRecords(
     {
       id: "song-fastest-debut",
       title: "가장 빨리 라이브에 오른 곡",
-      description:
-        "발매일부터 첫 라이브까지(발매 전에 먼저 부른 곡이 앞) — 그 사이 세트리스트를 모르는 공연이 없는 곡만",
+      description: "발매일부터 첫 라이브까지(발매 전에 먼저 부른 곡이 앞)",
       columns: ["첫 라이브까지", "발매일", "첫 라이브"],
       rows: rank(
         debuts,
@@ -521,8 +529,7 @@ function songRecords(
     {
       id: "song-slowest-debut",
       title: "라이브까지 가장 오래 걸린 곡",
-      description:
-        "발매일부터 첫 라이브까지 가장 오래 걸린 순 — 그 사이 세트리스트를 모르는 공연이 없는 곡만",
+      description: "발매일부터 첫 라이브까지 가장 오래 걸린 순",
       columns: ["첫 라이브까지", "발매일", "첫 라이브"],
       rows: rank(
         debuts,
@@ -551,7 +558,7 @@ function songRecords(
           songRow(
             item.stat.song,
             [times(item.count), percent(item.count, withOpening.length)],
-            `첫 곡을 아는 공연 ${withOpening.length}회 중 ${percent(item.count, withOpening.length)}`,
+            `첫 곡을 아는 공연일 ${withOpening.length}회 중 ${percent(item.count, withOpening.length)}`,
           ),
       ),
     },
@@ -568,7 +575,7 @@ function songRecords(
           songRow(
             item.stat.song,
             [times(item.count), percent(item.count, withEncore.length)],
-            `앵콜이 있었던 공연 ${withEncore.length}회 중 ${percent(item.count, withEncore.length)}`,
+            `앵콜이 있었던 공연일 ${withEncore.length}회 중 ${percent(item.count, withEncore.length)}`,
           ),
       ),
     },
@@ -609,7 +616,7 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
     {
       id: "album-most-played",
       title: "라이브에서 가장 많이 불린 앨범",
-      description: "수록곡 라이브 횟수 합계",
+      description: "수록곡 라이브 횟수 합계(세트리스트가 있는 공연일 기준)",
       columns: ["합계", "라이브된 수록곡", "비율"],
       rows: rank(
         items,
@@ -815,8 +822,7 @@ function liveRecords(
     {
       id: "live-most-debuts",
       title: "라이브 첫 공개가 가장 많았던 공연",
-      description:
-        "그날 처음으로 라이브에서 부른 곡 수 — 발매 후 그날까지 세트리스트를 모르는 공연이 없는 곡만",
+      description: "그날 처음 라이브에서 부른 곡 수",
       columns: ["첫 공개", "곡"],
       rows: rank(
         debutUnits,
@@ -833,7 +839,7 @@ function liveRecords(
     {
       id: "live-longest-tour",
       title: "가장 긴 투어",
-      description: "첫 공연부터 마지막 공연까지 기간(공연 횟수는 예정 포함)",
+      description: "투어 첫날부터 마지막 날까지 기간(공연 횟수는 예정 포함)",
       columns: ["기간", "공연 횟수", "일정"],
       rows: rank(
         tours,
@@ -881,8 +887,7 @@ function liveRecords(
     {
       id: "live-longest-break",
       title: "가장 길었던 공연 공백",
-      description:
-        "연이은 두 공연 사이 간격(공연일이 아직 없는 투어는 그 기간 내내 공연이 있던 것으로)",
+      description: `연이은 두 공연일 사이 간격${emptyTourBreakNote(context)}`,
       columns: ["공백", "이전 공연", "다음 공연"],
       rows: rank(
         gaps,

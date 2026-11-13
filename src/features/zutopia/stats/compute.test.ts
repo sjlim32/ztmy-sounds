@@ -199,6 +199,42 @@ describe("모르는 구간(세트리스트 없는 공연·공연일 없는 투�
     expect(rows.some((row) => row.sub?.includes("빈 투어"))).toBe(true);
   });
 
+  test("공연일이 전부 취소된 투어는 공연일 없는 투어로 세지 않는다", () => {
+    const canceled = buildStatSections({
+      units,
+      upcoming: [],
+      songs,
+      albums: [],
+      tours,
+      canceledTourIds: ["t"],
+    });
+    expect(record(canceled, "live-longest-break").description).toBe(
+      "연이은 두 공연일 사이 간격",
+    );
+    expect(
+      record(canceled, "live-longest-tour").rows.map((row) => row.key),
+    ).toEqual([]);
+  });
+
+  test("공연일 없는 투어 안내는 그런 투어가 있을 때만 설명에 붙는다", () => {
+    expect(record(sections, "live-longest-break").description).toContain(
+      "투어 1개",
+    );
+    const noEmpty = buildStatSections({
+      units,
+      upcoming: [],
+      songs,
+      albums: [],
+      tours: [],
+    });
+    expect(record(noEmpty, "live-longest-break").description).toBe(
+      "연이은 두 공연일 사이 간격",
+    );
+    expect(record(noEmpty, "live-busiest-year").description).toBe(
+      "그해 공연일 수",
+    );
+  });
+
   test("같은 %(정수)면 같은 순위", () => {
     const rate = buildStatSections({
       units: Array.from({ length: 30 }, (_, i) =>
