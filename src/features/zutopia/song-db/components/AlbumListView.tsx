@@ -265,7 +265,6 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
             showBookCover={showBookCover}
             galleryIndex={galleryIndex}
             onGalleryIndexChange={setGalleryIndex}
-            onClose={closeDrawer}
           />
         )}
       />

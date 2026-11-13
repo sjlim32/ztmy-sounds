@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { CloseIcon } from "@/components/icons/CloseIcon";
 import { SiteLink } from "@/components/SiteLink";
+import { ThumbImage } from "@/components/ThumbImage";
 
 export type ThumbnailCrop = "center" | "top" | "bottom";
 
@@ -51,6 +52,14 @@ interface ZoomableImageProps {
   caption?: string;
   sourceHref?: string;
   sourceLabel?: string;
+  /** 첫 화면에 보이는 이미지면 "eager" (기본값: 화면에 가까워질 때 받는 "lazy") */
+  loading?: "lazy" | "eager";
+  /**
+   * 평소 보이는 이미지를 Cloudflare 변환으로 줄인다(확대 창은 원본). 원본이 보이는
+   * 크기보다 훨씬 클 때만 켠다 — 원본이 이미 작으면 다시 압축한 쪽이 더 커진다
+   * (quality=90, 예: 공지 그림 94KB → 136KB).
+   */
+  resized?: boolean;
 }
 
 /**
@@ -68,6 +77,8 @@ export function ZoomableImage({
   caption,
   sourceHref,
   sourceLabel,
+  loading = "lazy",
+  resized = false,
 }: ZoomableImageProps) {
   const [isOpen, setOpen] = useState(false);
   const [isZoomedIn, setZoomedIn] = useState(false);
@@ -99,6 +110,23 @@ export function ZoomableImage({
     cropThumbnail = true;
   }
 
+  // 폭만 지정하면 그 폭, 높이만 지정하면 폭을 알 수 없어 높이의 2배(가로 그림 여유).
+  const thumbnailDisplayWidth = cropThumbnail
+    ? Math.max(resolvedThumbnailWidth ?? 0, resolvedThumbnailHeight ?? 0)
+    : (resolvedThumbnailWidth ?? (resolvedThumbnailHeight ?? 0) * 2);
+
+  const thumbnailProps = {
+    width: resolvedThumbnailWidth,
+    height: resolvedThumbnailHeight,
+    style: { width: resolvedThumbnailWidth, height: resolvedThumbnailHeight },
+    className: cn(
+      "max-tablet:h-auto! max-tablet:w-full! rounded-lg",
+      cropThumbnail
+        ? cn("object-cover", THUMBNAIL_CROP_CLASS[thumbnailCrop])
+        : "h-auto w-auto",
+    ),
+  };
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -121,23 +149,28 @@ export function ZoomableImage({
         onClick={() => setOpen(true)}
         className="inline-block cursor-zoom-in rounded-lg"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element -- width/height 중 하나만 있을 때도 자연스러운 비율로 보여야 해서 next/image의 필수 width/height 제약을 피함 */}
-        <img
-          src={src}
-          alt={alt}
-          width={resolvedThumbnailWidth}
-          height={resolvedThumbnailHeight}
-          style={{
-            width: resolvedThumbnailWidth,
-            height: resolvedThumbnailHeight,
-          }}
-          className={cn(
-            "max-tablet:h-auto! max-tablet:w-full! rounded-lg",
-            cropThumbnail
-              ? cn("object-cover", THUMBNAIL_CROP_CLASS[thumbnailCrop])
-              : "h-auto w-auto",
-          )}
-        />
+        {resized ? (
+          // 휴대폰에선 화면 폭 가득(max-tablet:w-full)이라 화면 폭에 맞는 후보를
+          // 고르게 한다. 크롭(object-cover)하면 가로로 긴 그림은 칸보다 넓게
+          // 그려지므로 긴 변 기준.
+          <ThumbImage
+            src={src}
+            alt={alt}
+            displayWidth={thumbnailDisplayWidth}
+            // 폭을 모르면(높이만 지정) srcset을 붙이지 않는다 — 폭이 auto일 때 w 값과
+            // 실제 받은 폭(원본보다 키우지 않음)이 달라 그림이 작게 그려진다.
+            sizes={
+              resolvedThumbnailWidth !== undefined
+                ? `(max-width: 49.99rem) 100vw, ${thumbnailDisplayWidth}px`
+                : undefined
+            }
+            loading={loading}
+            {...thumbnailProps}
+          />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element -- width/height 중 하나만 있을 때도 자연스러운 비율로 보여야 해서 next/image의 필수 width/height 제약을 피함
+          <img src={src} alt={alt} loading={loading} {...thumbnailProps} />
+        )}
       </button>
 
       {isOpen &&

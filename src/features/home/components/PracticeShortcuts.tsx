@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useLastSongId } from "@/features/guide/lib/last-song";
 import { LIST_ITEM_CLASS, NAV_BUTTON_CLASS } from "@/components/button-styles";
 import { PlayIcon } from "@/components/icons/PlayIcon";
+import { ThumbImage } from "@/components/ThumbImage";
 
 export interface PracticeSong {
   id: string;
@@ -144,11 +145,9 @@ function CoverRow({
     >
       <span className="relative shrink-0">
         {song.cover ? (
-          // eslint-disable-next-line @next/next/no-img-element -- 외부(곡 DB) 이미지라 크기를 미리 알 수 없고, output: export라 최적화도 안 된다
-          <img
+          <ThumbImage
             src={song.cover}
-            alt=""
-            loading="lazy"
+            displayWidth={40}
             className="h-10 w-10 rounded-md object-cover shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
           />
         ) : (

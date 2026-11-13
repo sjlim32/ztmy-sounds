@@ -18,6 +18,8 @@ interface BackLinkProps {
   showLabel?: boolean;
   className?: string;
   iconClassName?: string;
+  /** href로 이동하는 링크를 누를 때 먼저 불린다(preventDefault로 이동을 대신할 수 있음). */
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
 // HomeLink와 같은 이동 버튼 스타일(button-styles.ts NAV_BUTTON_CLASS)로 사이트
@@ -34,6 +36,7 @@ export function BackLink({
   showLabel = true,
   className,
   iconClassName,
+  onClick,
 }: BackLinkProps) {
   const router = useRouter();
   const icon = (
@@ -52,7 +55,12 @@ export function BackLink({
 
   if (href) {
     return (
-      <Link href={href} aria-label={label} className={resolvedClassName}>
+      <Link
+        href={href}
+        aria-label={label}
+        className={resolvedClassName}
+        onClick={onClick}
+      >
         {icon}
         {showLabel && label}
       </Link>

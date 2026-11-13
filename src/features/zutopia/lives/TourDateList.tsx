@@ -301,9 +301,11 @@ function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
       )}
     >
       {date.posterImageUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        // 화면 폭별로 줄인 포스터(srcset) — 원본보다 큰 후보는 원본 크기로 온다.
+        <ThumbImage
           src={date.posterImageUrl}
+          displayWidth={800}
+          sizes={"(max-width: 49.99rem) 100vw, 800px"}
           alt={`${date.date} ${date.venue} 포스터`}
           loading="lazy"
           className="max-h-[50vh] max-w-full self-center rounded-lg object-contain"

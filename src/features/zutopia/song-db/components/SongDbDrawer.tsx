@@ -9,6 +9,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
+import { DrawerCloseButton } from "@/features/zutopia/song-db/components/DrawerCloseButton";
 
 const noopSubscribe = () => () => {};
 
@@ -204,6 +205,14 @@ export function SongDbDrawer<T>({
           isOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
+        {/* 닫기 버튼은 내용 위에 겹쳐 오른쪽 위에 붙어 있는다(sticky + 높이 0이라
+            내용을 밀어내지 않음) — 스크롤해도 늘 같은 자리. */}
+        <div className="pointer-events-none sticky top-0 z-10 flex h-0 justify-end">
+          <div className="pointer-events-auto mt-3 mr-3">
+            <DrawerCloseButton onClick={onClose} />
+          </div>
+        </div>
+
         {/* 열린 채로 다른 항목을 고르면 내용이 툭 바뀌지 않고 살짝 올라오며
         바뀐다(key). 닫히는 동안엔 마지막 내용을 그대로 둔다. */}
         {displayed && (

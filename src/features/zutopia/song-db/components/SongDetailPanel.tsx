@@ -7,7 +7,6 @@ import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ALBUM_TYPE_SHORT_LABEL } from "@/features/zutopia/song-db/labels";
 import { getSongCoverSrc } from "@/features/zutopia/song-db/song-album-grouping";
 import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
-import { DrawerCloseButton } from "@/features/zutopia/song-db/components/DrawerCloseButton";
 import { UnreleasedBadge } from "@/features/zutopia/song-db/components/UnreleasedBadge";
 import {
   formatDaysAgo,
@@ -27,7 +26,6 @@ import type {
 export function SongDetailPanel({
   song,
   contextAlbumSlug,
-  onClose,
   liveSummary,
   today,
 }: SongDetailPanelProps) {
@@ -45,9 +43,11 @@ export function SongDetailPanel({
         )}
       >
         {coverSrc ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          // 보이는 크기(PC 약 370px)의 2배로 줄인 커버 — 원본이 그보다 작으면 원본 그대로 온다.
+          <ThumbImage
             src={coverSrc}
+            displayWidth={400}
+            loading="eager"
             alt={song.title}
             className="aspect-square h-6/7 max-h-full w-auto bg-black/40 object-contain"
           />
@@ -80,8 +80,6 @@ export function SongDetailPanel({
               {song.title_en}
             </p>
           </div>
-
-          <DrawerCloseButton onClick={onClose} />
         </div>
 
         <DetailTable
@@ -346,7 +344,6 @@ function LiveRecord({
 interface SongDetailPanelProps {
   song: SongWithAlbums;
   contextAlbumSlug: string | null;
-  onClose: () => void;
   liveSummary: SongLiveSummary | undefined;
   /** 보는 날("YYYY-MM-DD"). 하이드레이션 전엔 null — "N일 전"을 생략한다. */
   today: string | null;

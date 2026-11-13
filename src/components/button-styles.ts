@@ -35,13 +35,19 @@ export const LINK_BUTTON_CLASS = `inline-flex items-center gap-1.5 rounded-lg bo
 /** 동작(모바일 설치 배너의 "추가"처럼 눌러서 실행): 사이트 대표색 단색 면. */
 export const ACTION_BUTTON_CLASS = `bg-ztmy-magenta hover:bg-ztmy-magenta/85 inline-flex items-center justify-center gap-1.5 rounded-lg font-semibold text-white transition-colors ${FOCUS_RING}`;
 
-/** 닫기처럼 테두리 없는 아이콘 버튼: 평소엔 글자색만, hover 때 옅은 면. */
 /**
  * 테두리·면 없는 글자 버튼(가이드 상세 영상 위 버튼 줄처럼 콘텐츠 옆에서
  * 눈에 덜 띄어야 하는 곳): 평소엔 흐린 글자, 마우스를 올리면 옅은 면.
  */
 export const GHOST_BUTTON_CLASS = `inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium whitespace-nowrap text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:pointer-events-none disabled:opacity-35 ${FOCUS_RING}`;
+/** 닫기처럼 테두리 없는 아이콘 버튼: 평소엔 글자색만, hover 때 옅은 면. */
 export const GHOST_ICON_BUTTON_CLASS = `inline-flex items-center justify-center rounded-lg text-white/60 transition-colors hover:bg-white/10 hover:text-white ${FOCUS_RING}`;
+
+/**
+ * 그림 위에 떠 있는 아이콘 버튼(곡·앨범 드로어 닫기처럼 커버 그림 위에 겹치는 곳):
+ * 테두리 없는 아이콘 버튼에 어두운 면을 깔아 밝은 그림 위에서도 보이게 한다.
+ */
+export const OVERLAY_ICON_BUTTON_CLASS = `inline-flex items-center justify-center rounded-lg bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80 ${FOCUS_RING}`;
 
 /** 목록의 한 줄(가이드 곡 목록·곡 목록 드로어): 고른 줄은 한쪽 막대 대신 줄 전체를 옅게 칠한다. */
 export const LIST_ITEM_CLASS = `rounded-lg transition-colors hover:bg-white/10 ${FOCUS_RING}`;

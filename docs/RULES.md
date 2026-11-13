@@ -8,6 +8,14 @@
 - `@serwist/next`가 아니라 `@serwist/turbopack`을 씁니다. 이 프로젝트는 Turbopack으로
   빌드되는데, `@serwist/next`의 서비스워커 빌드는 webpack 전용이라 Turbopack에서는 아무
   경고 없이 서비스워커를 생성하지 못합니다.
+- 서비스워커 미리 받기(precache) 목록은 `src/app/(pwa)/serwist/[path]/route.ts`의 `globPatterns`로
+  정합니다. 기본값은 `public/` 전체라 첫 접속 직후 가이드·공연 이미지 약 7MB를 페이지와 같은 회선으로
+  받아 모바일 첫 로딩을 느리게 했습니다. 빌드 결과물과 화면 틀(배경·커서·아이콘·로고)만 미리 받고,
+  나머지 이미지는 처음 볼 때 `runtimeCaching`이 캐시합니다 — 큰 이미지를 `public/`에 새로 둘 때
+  이 목록에 넣지 마세요(오프라인에선 한 번 본 이미지만 보입니다).
+- `public/_headers`가 `/_next/static/*`(이름에 내용 해시가 붙은 JS·CSS·폰트)을 1년 `immutable`로
+  캐시합니다. 해시가 없는 파일을 이 경로에 두지 마세요. `/serwist/sw.js`는 `no-cache` — 배포한 새
+  서비스워커가 바로 닿게 합니다.
 - `@next/mdx`는 App Router에서 `src/mdx-components.tsx`(`useMDXComponents` export)가
   없으면 동작하지 않습니다.
 - 유튜브 플레이어는 `(pages)/guide/layout.tsx`에 한 번만 마운트됩니다. 곡 간 이동 시
@@ -86,20 +94,39 @@
   - 851MkPOP에는 가나·ASCII와 소스의 `jp: "…"` 글자만, LINE Seed KR에는 KS X
     1001 한글과 `src/`에 등장하는 한글만 들어 있습니다(한글 외 글리프는 전부
     유지). 그 밖의 글자는 시스템 폰트로 보입니다.
+  - LINE Seed KR은 굵기마다 두 조각입니다. 기본 조각(`-core`, 약 90KB)은 라틴·문장 부호·
+    CJK 기호·가나와 `src/`·`EXTRA_CORE`의 글자만 담아 미리 받고, 나머지 조각(`-rest`)은
+    남은 KS X 1001 음절·기호를 담아 그 글자가 화면에 나올 때만 받습니다. 나머지 조각의
+    @font-face는 스크립트가 `src/fonts/subset/line-seed-kr-rest.css`로 만들고(정확한
+    `unicode-range` = 후보 블록 − 기본 조각 글자, 한자 U+3400–9FFF 제외), `DeferredFonts`가
+    첫 화면 뒤에 불러옵니다. 범위에 기본 조각 글자가 걸리면 기본 조각을 받는 동안 브라우저가
+    나머지 조각까지 받기 시작하고, 한자가 걸리면 일본어 제목 때문에 받게 되니 손으로
+    넓히지 마세요. 빌드 결과에 나머지 조각 범위의 글자(한글·기호, 예: ♡ （ ）)가 있으면 `postbuild`가
+    경고로 알려 주니 `EXTRA_CORE`에 추가하세요.
+  - 글꼴 목록 순서는 기본 조각 → `"LINE Seed KR Rest"` → 기본 조각의 대체 글꼴(next/font가
+    만드는 `local(Arial)`)입니다(`layout.tsx`의 `--font-line-seed-kr-stack`). 대체 글꼴이
+    나머지 조각보다 앞이면 나머지 조각의 그리스·키릴 문자·기호(™ ↑ ≤ 등)를 Arial이
+    가로챕니다.
   - 그래서 `pnpm build`가 끝에 `out/`을 검사해(`postbuild`), `font-mkpop` 클래스
     요소의 글자나 한글 중 서브셋에 없는 것이 있으면 빌드를 실패시키고 고칠 곳을
     알려 줍니다 — 다른 형태로 선언한 제목, 제목이 아닌 텍스트에 쓴 `font-mkpop`,
-    Supabase에서 온 드문 음절(→ 스크립트의 `EXTRA_HANGUL`)이 여기서 걸립니다.
+    Supabase에서 온 드문 음절(→ 스크립트의 `EXTRA_CORE`)이 여기서 걸립니다.
     `next build`를 직접 실행하면 이 검사를 건너뛰니 배포는 `pnpm pages:deploy`로
     하세요.
   - Thin(100) 굵기는 로드하지 않습니다 — `font-thin`은 Regular로 보입니다.
 - LINE Seed KR은 세로 높이 값이 폰트 안의 표마다 달라서(hhea 1050/274 vs typo 750/250 +
   줄 간격 324, typo 우선 표시 켜짐) Mac은 hhea를, Windows는 typo를 씁니다 — 그대로 두면
   Windows에서만 한글이 줄 안에서 약 0.14em 위로 떠서 배지·버튼 글자가 위로 치우칩니다.
-  `layout.tsx`의 `localFont` `declarations`로 Mac 값(ascent 105% / descent 27.4% / gap
-  0%)에 고정해 두었으니 지우지 마세요. 폰트 파일을 바꾸면 이 값도 새 파일의 hhea로
+  `layout.tsx`의 `localFont` `declarations`(기본 조각)와 `subset-fonts.mjs`가 만드는 나머지
+  조각 CSS 양쪽에 Mac 값(ascent 105% / descent 27.4% / gap 0%)으로 고정해 두었으니 지우지
+  마세요(한쪽만 바꾸면 같은 줄에서 두 조각 글자 높이가 어긋남). 폰트 파일을 바꾸면 이 값도 새 파일의 hhea로
   다시 맞춥니다. (LINE Seed JP·IBM Plex Mono·RocknRoll One·851MkPOP은 두 OS가 같은 값을
   써서 해당 없음.)
+- LINE Seed JP(fontsource, 일본어 한자용)는 루트 레이아웃에서 import하지 않고
+  `DeferredFonts`가 첫 화면 뒤에 동적 import합니다 — @font-face 248개(압축 약 70KB)가
+  모든 페이지의 화면 그리기를 막았기 때문입니다. RocknRoll One도 쓰는 곳
+  (`features/zutopia/lives/rocknroll-font.ts`)에서만 불러옵니다. 전역 폰트를 새로 넣을 땐
+  그 CSS가 모든 페이지의 첫 CSS에 실린다는 점을 생각하세요.
 - R2 이미지(`assets.ztmy-sounds.fans`)는 Supabase에 든 주소 그대로 씁니다. 참전 기록 이미지
   만들기(html-to-image → canvas)는 다른 출처 이미지를 fetch로 읽으므로, **R2 버킷의 CORS
   규칙**(GET/HEAD, 사이트 주소·`http://localhost:3000` 허용)이 있어야 합니다. 규칙이 빠지면
@@ -109,9 +136,23 @@
     전역 `cacheBust`는 글꼴 주소까지 바꿔 캐시를 못 쓰게 하니 쓰지 않습니다.
   - 글꼴은 `buildFontEmbedCss`로 이미지 글자에 필요한 서브셋 woff2만 넘깁니다(안 넘기면
     LINE Seed JP 서브셋 전부, 약 10MB).
-  - 작은 자리(목록 커버·연혁 카드·공연 체크 목록 등)는 `ThumbImage`(`src/components/ThumbImage.tsx`)로
-    Cloudflare 이미지 변환 주소(`/cdn-cgi/image/width=…,format=auto/…`, `src/lib/thumb.ts`)를 씁니다.
+  - 작은 자리(목록 커버·연혁 카드·공연 체크 목록·`ZoomableImageGroup` 썸네일 줄과 확대 보기 미리보기 등)는 `ThumbImage`(`src/components/ThumbImage.tsx`)로
+    Cloudflare 이미지 변환 주소(`/cdn-cgi/image/width=…,quality=90,format=auto/…`, `src/lib/thumb.ts`)를 씁니다.
     ztmy-sounds.fans 존의 Images → Transformations가 켜져 있어야 하고(무료 한 달 서로 다른 변환
-    5,000개), 실패하면 원본 주소로 돌아갑니다. 크게 보이는 상세 이미지와 이미지 만들기 커버는 원본.
+    5,000개), 실패하면 원본 주소로 돌아갑니다(React가 붙기 전에 실패한 것도 붙는 순간 확인).
+    곡·앨범 상세 커버(보이는 폭 400의 2배)와 공연·투어·일정 포스터(화면 폭별 srcset, `sizes`
+    `(max-width: 49.99rem) 100vw, 800px`)도 줄인 주소를 씁니다 — q90에서 커버 표본 합계 약 12%, 포스터 표본
+    합계 8~29% 작음(원본보다 큰 후보는 Cloudflare가 원본 크기로 줌). 확대 창·이미지 만들기 커버는 원본.
+  - 사이트 안 `public/assets/` 이미지(`/assets/…`)도 같은 존이라 `thumbSrc`가 `/cdn-cgi/image/…/assets/…`로
+    바꿉니다(예: 홈 공연 포스터 575KB → 약 38KB). 개발 서버엔 `/cdn-cgi/`가 없어 한 번 실패한 뒤 원본으로 보입니다.
+  - 변환은 `quality=90`입니다. 95는 눈에 띄는 화질 차이 없이 avif가 90보다 1.5~1.8배 커서(후지록 포스터
+    800px 66KB → 115KB, 원본 117KB와 거의 같음) 90으로 낮췄습니다. 그래도 **원본과 비슷한 크기로 요청하면
+    원본보다 커집니다**(페스티벌 공지 94KB → 800px 136KB). 그래서 변환은
+    원본이 보이는 크기보다 훨씬 클 때만 씁니다 — 목록 썸네일, 그리고 `ZoomableImage`의 `resized`를
+    켠 이미지(`/info`의 키비주얼(맨 위·프롤로그)·지도·공식 일정표: 화면 폭별 srcset, 확대 창은
+    원본, 폭을 지정한 썸네일만 — 높이만 주면 srcset 없이 한 장). 원본이 작은
+    이미지(공지 그림, 일정 번역본)는 원본 그대로 둡니다.
+  - 움직이는 webp(응원 가이드 동작 그림)는 Cloudflare가 변환하지 않고 원본을 그대로 줍니다. 이미
+    손실 압축된 파일이라 다시 인코딩해도 커지기만 해서(haze 803KB → 939KB 이상) 손대지 않았습니다.
   - 예전엔 Pages Function 프록시(`/r2/*`)로 같은 출처를 만들었지만, 이미지 요청마다 Function이
     실행되어 무료 한도(하루 10만 요청)를 넘으면 사이트 전체 이미지가 깨질 수 있어 없앴습니다.

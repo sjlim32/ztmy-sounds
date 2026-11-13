@@ -344,7 +344,6 @@ function SongRow({
                 {unit.href ? (
                   <Link
                     href={unit.href}
-                    transitionTypes={["nav-forward"]}
                     className={cn(
                       "block rounded-md px-2 py-1.5 transition-colors hover:bg-white/10",
                       FOCUS_RING,
