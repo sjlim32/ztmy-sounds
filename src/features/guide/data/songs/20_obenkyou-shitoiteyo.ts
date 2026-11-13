@@ -260,7 +260,7 @@ const song: Song = {
       pronunciation: "**^카와카나이야^** 사무가리나 키세츠니",
       translation: "마르지 않아 추운 계절에",
       cheer: {
-        text: '"카와카나이야" 떼창',
+        text: "",
         tag: "call",
       },
       slam: '"카와카나이야" 떼창',
@@ -277,7 +277,7 @@ const song: Song = {
       pronunciation: "**^야키야키다^** 오시츠부사레루 무테키메",
       translation: "안절부절 못하지 짓눌리는 무적을",
       cheer: {
-        text: '"야키야키다" 떼창',
+        text: "",
         tag: "call",
       },
       slam: '"야키야키다" 떼창',
@@ -294,7 +294,7 @@ const song: Song = {
       pronunciation: "**^카와카나이야^** 츠요가리나 키세츠니",
       translation: "마르지 않아 허세 떠는 계절에",
       cheer: {
-        text: '"카와카나이야" 떼창',
+        text: "",
         tag: "call",
       },
       slam: '"카와카나이야" 떼창',
@@ -311,7 +311,7 @@ const song: Song = {
       pronunciation: "**^양키-양키-다^** 겐죠-이지노 무테키메",
       translation: "양키 양키야 변하지 않는 무적을",
       cheer: {
-        text: '"양키-양키-다" 떼창',
+        text: "",
         tag: "call",
       },
       slam: '"양키-양키-다" 떼창',
@@ -598,23 +598,25 @@ const song: Song = {
     {
       time: "4:21.1",
       original: "BE BE BE BE BE 勉",
-      pronunciation: "**^BE BE BE BE BE 벤^**",
+      pronunciation: "**^BE** **BE** **BE** **BE** **BE** **벤^**",
       translation: "",
       cheer: {
-        text: "박자에 맞춰서",
+        text: "박자에 맞추기",
         tag: "swing",
       },
+      accents: [0, 0.5, 0.9, 1.2, 1.4, 1.6],
       slam: "떼창",
     },
     {
       time: "4:28.3",
       original: "BE BE BE BE BE 勉",
-      pronunciation: "**^BE BE BE BE BE 벤^**",
+      pronunciation: "**^BE** **BE** **BE** **BE** **BE** **벤^**",
       translation: "",
       cheer: {
-        text: "박자에 맞춰서",
+        text: "",
         tag: "swing",
       },
+      accents: [0, 0.5, 0.9, 1.2, 1.4, 1.6],
       slam: "떼창",
     },
     {

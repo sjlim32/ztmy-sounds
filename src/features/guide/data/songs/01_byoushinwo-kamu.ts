@@ -87,12 +87,13 @@ const song: Song = {
     {
       time: "1:02.5",
       original: "白昼夢の中で ガンガン砕いた",
-      pronunciation: "하쿠츄-무노 나카데 **간간** 쿠다이타",
+      pronunciation: "하쿠츄-무노 나카데 **간** **간** 쿠다이타",
       translation: "백일몽 속에서 땅땅 부쉈어",
       cheer: {
         text: "",
         tag: "swing",
       },
+      accents: [2.4, 2.8],
     },
     {
       time: "1:06.5",
@@ -215,12 +216,13 @@ const song: Song = {
     {
       time: "2:18.5",
       original: "白昼夢の中で ガンガン砕いた",
-      pronunciation: "하쿠츄-무노 나카데 **간간** 쿠다이타",
+      pronunciation: "하쿠츄-무노 나카데 **간** **간** 쿠다이타",
       translation: "백일몽 속에서 땅땅 부쉈어",
       cheer: {
         text: "",
         tag: "swing",
       },
+      accents: [2.2, 2.6],
     },
     {
       time: "2:22.5",
@@ -353,7 +355,7 @@ const song: Song = {
         text: "민나데 (다같이)",
         tag: "clap",
       },
-      accents: [3.0, 3.3, 3.55, 4.0, 4.3, 4.55, 5.0, 5.4, 5.8],
+      accents: [2.8, 3.2, 3.5, 4.0, 4.3, 4.5, 4.9, 5.4, 5.8],
     },
     {
       time: "3:48",

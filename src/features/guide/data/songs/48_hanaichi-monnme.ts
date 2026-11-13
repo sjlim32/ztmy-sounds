@@ -74,7 +74,7 @@ const song: Song = {
       pronunciation: "나니카 데키소오나 요후카시",
       translation: "무언가 할 수 있을 것 같은 한밤중에",
       cheer: {
-        text: "샤모지를 머리 위로 원을 그리며 빙글빙글 돌리기 (이후 반복)",
+        text: "머리 위로 원을 그리며 빙글빙글 돌리기 (반복)",
         tag: "swing",
       },
     },
@@ -220,7 +220,7 @@ const song: Song = {
       pronunciation: "나니카 데키소오나 요후카시",
       translation: "무언가 할 수 있을 것 같은 한밤중에",
       cheer: {
-        text: "샤모지를 머리 위로 원을 그리며 빙글빙글 돌리기 (이후 반복)",
+        text: "머리 위로 원을 그리며 빙글빙글 돌리기 (반복)",
         tag: "swing",
       },
     },
@@ -342,7 +342,7 @@ const song: Song = {
       pronunciation: "와라와레탓테 헤코무케도",
       translation: "비웃음당하면 우울해지지만",
       cheer: {
-        text: "샤모지를 머리 위로 원을 그리며 빙글빙글 돌리기 (이후 반복)",
+        text: "머리 위로 원을 그리며 빙글빙글 돌리기 (반복)",
         tag: "swing",
       },
     },

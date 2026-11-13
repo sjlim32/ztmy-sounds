@@ -54,12 +54,13 @@ const song: Song = {
     {
       time: "1:04",
       original: "赤い瞳が ぼやける音",
-      pronunciation: "아카이 히토미가 보야케루 오토  **『꽥 꽥』**",
+      pronunciation: "아카이 히토미가 보야케루 오토  『**꽥** **꽥**』",
       translation: "붉은 눈동자가 희미해지는 소리 『꽥 꽥』",
       cheer: {
         text: "",
         tag: "swing",
       },
+      accents: [3.1, 3.45],
     },
     {
       time: "1:07.8",
@@ -70,12 +71,13 @@ const song: Song = {
     {
       time: "1:12",
       original: "深い昼寝の温度に慣れてくの？",
-      pronunciation: "후카이 히루네노 온도니 나레테쿠노 **『꽥 꽥』**",
+      pronunciation: "후카이 히루네노 온도니 나레테쿠노 『**꽥** **꽥**』",
       translation: "깊은 낮잠의 온도에 익숙해져 가는 거야? 『꽥 꽥』",
       cheer: {
         text: "",
         tag: "swing",
       },
+      accents: [2.9, 3.3],
     },
     {
       time: "1:15.8",
@@ -245,12 +247,13 @@ const song: Song = {
     {
       time: "2:30.6",
       original: "悪いこと してなくても",
-      pronunciation: "와루이 코토 시테나쿠테모 **『꽥 꽥』**",
+      pronunciation: "와루이 코토 시테나쿠테모 『**꽥** **꽥**』",
       translation: "나쁜 짓 하지 않아도 『꽥 꽥』",
       cheer: {
         text: "",
         tag: "swing",
       },
+      accents: [3.1, 3.5],
     },
     {
       time: "2:34.3",
@@ -261,12 +264,13 @@ const song: Song = {
     {
       time: "2:38.5",
       original: "青い風声鶴唳 押し込んで",
-      pronunciation: "아오이 후세이카쿠레이 오시콘데 **『꽥 꽥』**",
+      pronunciation: "아오이 후세이카쿠레이 오시콘데 『**꽥** **꽥**』",
       translation: "푸른 풍성학려에 밀어넣어 『꽥 꽥』",
       cheer: {
         text: "",
         tag: "swing",
       },
+      accents: [3.1, 3.4],
     },
     {
       time: "2:42.1",

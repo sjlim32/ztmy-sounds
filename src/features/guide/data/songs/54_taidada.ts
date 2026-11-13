@@ -185,6 +185,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [0.7],
     },
     {
       time: "1:07.25",
@@ -195,6 +196,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [0.6],
     },
     {
       time: "1:08.1",
@@ -205,6 +207,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [0.6],
     },
     {
       time: "1:11.5",
@@ -437,6 +440,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [0.7],
     },
     {
       time: "2:25.48",
@@ -447,6 +451,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [0.6],
     },
     {
       time: "2:26.34",
@@ -457,6 +462,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [0.6],
     },
     {
       time: "2:30",
@@ -565,6 +571,7 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [0.7],
     },
     {
       time: "3:19",
@@ -575,16 +582,18 @@ const song: Song = {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [0.6],
     },
     {
       time: "3:19.77",
       original: "感情ない時こそ 問い質すんだよ",
-      pronunciation: "칸조**오**나이 토키코소 토이타다슨다요",
+      pronunciation: "칸조오**나이** 토키코소 토이타다슨다요",
       translation: "감정이 없을 때일수록 따지는 거야",
       cheer: {
         text: "JUMP !",
         tag: "swing",
       },
+      accents: [0.6],
     },
     {
       time: "3:23.2",

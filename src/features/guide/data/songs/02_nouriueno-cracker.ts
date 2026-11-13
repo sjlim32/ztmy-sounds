@@ -175,23 +175,25 @@ const song: Song = {
     {
       time: "1:22.8",
       original: "Don’t stop 脳裏上に",
-      pronunciation: "**^Don’t stop^** 노우리 우에니",
+      pronunciation: "^Don’t **stop^** 노우리 우에니",
       translation: "Don’t stop 뇌리 위에",
       cheer: {
         text: '"Don\'t"에 내리고, "stop"에 점프',
         tag: "swing",
       },
+      accents: [0.6],
       slam: "점프 (Don't stop)",
     },
     {
       time: "1:25.3",
       original: "置いていたクラッカー打ち鳴らして笑おう",
-      pronunciation: "오이테이타 쿠랏카- 우치나라시테 **^와라오우^**",
+      pronunciation: "오이테이타 쿠랏카- 우치나라시테 ^와라**오우^**",
       translation: "놓아 두었던 크래커 쏘아 올리면서 웃자",
       cheer: {
         text: '"와라"에 내리고, "오우"에 점프',
         tag: "swing",
       },
+      accents: [4.6],
       slam: "점프 (와라오우)",
     },
     {
@@ -304,23 +306,25 @@ const song: Song = {
     {
       time: "2:42",
       original: "Don’t stop 脳裏上に",
-      pronunciation: "**^Don’t stop^** 노우리 우에니",
+      pronunciation: "^Don’t **stop^** 노우리 우에니",
       translation: "Don’t stop 뇌리 위에",
       cheer: {
         text: '"Don\'t"에 내리고, "stop"에 점프',
         tag: "swing",
       },
+      accents: [0.6],
       slam: "점프 (Don't stop)",
     },
     {
       time: "2:44",
       original: "置いていたクラッカー打ち鳴らして笑おう",
-      pronunciation: "오이테이타 쿠랏카- 우치나라시테 **^와라오우^**",
+      pronunciation: "오이테이타 쿠랏카- 우치나라시테 ^와라**오우^**",
       translation: "놓아 두었던 크래커 쏘아 올리면서 웃자",
       cheer: {
         text: '"와라"에 내리고, "오우"에 점프',
         tag: "swing",
       },
+      accents: [4.6],
       slam: "점프 (와라오우)",
     },
     {
@@ -400,27 +404,29 @@ const song: Song = {
     {
       time: "3:55",
       original: "Don’t stop 脳裏上に",
-      pronunciation: "**^Don’t stop^** 노우리 우에니",
+      pronunciation: "^Don’t **stop^** 노우리 우에니",
       translation: "Don’t stop 뇌리 위에",
       cheer: {
         text: '"Don\'t"에 내리고, "stop"에 점프',
         tag: "swing",
       },
+      accents: [0.4],
       slam: "점프 (Don't stop)",
     },
     {
       time: "3:58",
       original: "置いていたクラッカー打ち鳴らして笑おう",
-      pronunciation: "오이테이타 쿠랏카- 우치나라시테 **^와라오우^**",
+      pronunciation: "오이테이타 쿠랏카- 우치나라시테 ^와라**오우^**",
       translation: "놓아 두었던 크래커 쏘아 올리면서 웃자",
       cheer: {
         text: '"와라"에 내리고, "오우"에 점프',
         tag: "swing",
       },
+      accents: [3.7],
       slam: "점프 (와라오우)",
     },
     {
-      time: "4:02",
+      time: "4:02.2",
       original: "ぼんやりと月を透かしてみたり",
       pronunciation: "본야리토 츠키오 스카시테 미타리",
       translation: "멍하니 달을 꿰뚫어 보거나",

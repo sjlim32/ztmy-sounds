@@ -41,8 +41,8 @@ const song: Song = {
     },
     {
       time: "0:13",
-      original: "3 2 1",
-      pronunciation: "",
+      original: "",
+      pronunciation: "3 2 1",
       translation: "",
     },
     {
@@ -67,8 +67,8 @@ const song: Song = {
     },
     {
       time: "0:20.6",
-      original: "3 2 1",
-      pronunciation: "",
+      original: "",
+      pronunciation: "3 2 1",
       translation: "",
       cheer: {
         text: "",
@@ -97,8 +97,8 @@ const song: Song = {
     },
     {
       time: "0:28",
-      original: "3 2 1",
-      pronunciation: "",
+      original: "",
+      pronunciation: "3 2 1",
       translation: "",
       cheer: {
         text: "",
@@ -190,25 +190,25 @@ const song: Song = {
     },
     {
       time: "1:07.3",
-      original: "何処へも行けないこんな",
-      pronunciation: "도코에모 이케나이 콘나",
-      translation: "어디로든 갈 수 없는 이런",
-    },
-    {
-      time: "1:09.2",
-      original: "夜更けも ずっと光り続けてる",
-      pronunciation: "요후케모 즛토 히카리 츠즈케테루",
-      translation: "깊은밤에도 계속 빛나고있어",
-    },
-    {
-      time: "1:14.1",
-      original: "神秘的なミラーチューン yey",
-      pronunciation: "심피테키나 미라츈 **yey**",
-      translation: "신비한 미러튠 yey",
+      original: "何処へも行けないこんな 夜更けも ずっと yey",
+      pronunciation: "도코에모 이케나이 콘나 요후케모 즛토 **yey**",
+      translation: "어디로든 갈 수 없는 이런 깊은밤에도 yey",
       cheer: {
         text: "",
         tag: "swing",
       },
+    },
+    {
+      time: "1:11",
+      original: "光り続けてる",
+      pronunciation: "히카리 츠즈케테루 ",
+      translation: "계속 빛나고있어",
+    },
+    {
+      time: "1:14.1",
+      original: "神秘的なミラーチューン yey",
+      pronunciation: "심피테키나 미라츈 yey",
+      translation: "신비한 미러튠 yey",
     },
     {
       time: "1:18.1",
@@ -520,7 +520,7 @@ const song: Song = {
       pronunciation: "**ye** **ye** **ye** **yey~** level up**",
       translation: "",
       cheer: {
-        text: "박자에 맞춰",
+        text: "",
         tag: "swing",
       },
       accents: [0.25, 0.65, 0.9, 1.2],

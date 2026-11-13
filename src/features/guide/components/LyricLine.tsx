@@ -151,6 +151,18 @@ function LyricLineComponent({
     visibleTags,
   );
   const emphasisScope = getEmphasisScope(lineTag);
+  // 박수 타이밍(accents)은 발음 줄의 ✋에 먼저 대응하고, 발음 줄에 ✋가 없으면
+  // 응원 설명의 ✋에 대응한다(✋ 박수를 응원 설명에만 적은 줄).
+  const pronunciationHasClap = hasClap(line.pronunciation);
+  const cheerHasClap = !!cheerText && cheerText.includes(CLAP);
+  const lineStart = parseTimestamp(line.time);
+  const cheerClap: ClapTiming | undefined = cheerHasClap
+    ? {
+        lineStart,
+        times: pronunciationHasClap ? NO_CLAPS : (line.accents ?? NO_CLAPS),
+        isActive,
+      }
+    : undefined;
   // ♫ 하나만 있는 간주(전주/간주/후주)는 구분선 + 음표 이모지로만 표현한다.
   // 밴드 소개·악기 이름처럼 글자가 있는 간주는 기존 모양 그대로.
   const isMusicBreak =
@@ -162,7 +174,7 @@ function LyricLineComponent({
   const content = isMusicBreak ? (
     <>
       <MusicBreak tag={lineTag} isActive={isActive} />
-      <CheerText text={cheerText} tag={lineTag} />
+      <CheerText text={cheerText} tag={lineTag} clap={cheerClap} />
     </>
   ) : (
     <>
@@ -172,7 +184,12 @@ function LyricLineComponent({
           <CallIcon name={lineTag} size={20} className="mr-0" />
         </p>
       )}
-      <CheerText text={cheerText} tag={lineTag} showIcon={!!line.interlude} />
+      <CheerText
+        text={cheerText}
+        tag={lineTag}
+        showIcon={!!line.interlude}
+        clap={cheerClap}
+      />
       <OriginalText text={line.original} tag={lineTag} scope={emphasisScope} />
       <PronunciationText
         text={line.pronunciation}
@@ -181,15 +198,16 @@ function LyricLineComponent({
         // 박수(✋)는 따라 부르는 발음 줄에 적는다. 타이밍(accents)이 없어도
         // ClapText로 그려서 ✋ 사이 간격 표기(공백 / 슬래시)를 같은 규칙으로 보여준다.
         clap={{
-          lineStart: parseTimestamp(line.time),
+          lineStart,
           times: line.accents ?? NO_CLAPS,
           isActive,
         }}
-        // ✋가 없는 응원 줄(흔들기 등)의 강조 타이밍 — 박자 아이콘 줄 + 아이콘 동작
+        // ✋가 없는 응원 줄(흔들기 등)의 강조 타이밍 — 박자 아이콘 줄 + 아이콘 동작.
+        // 응원 설명에 ✋를 적은 줄은 그 ✋가 타이밍을 쓴다(cheerClap).
         accent={
-          lineTag && line.accents && !hasClap(line.pronunciation)
+          lineTag && line.accents && !pronunciationHasClap && !cheerHasClap
             ? {
-                lineStart: parseTimestamp(line.time),
+                lineStart,
                 accents: line.accents,
                 isActive,
                 tag: lineTag,
@@ -507,13 +525,27 @@ function CheerText({
   text,
   tag,
   showIcon,
+  clap,
 }: {
   text?: string;
   tag?: CallTag;
   /** 왼쪽 아이콘 칸이 없는 줄(간주)에서만 배지 안에 아이콘을 넣는다 */
   showIcon?: boolean;
+  /**
+   * 응원 설명 속 ✋ — 발음 줄과 같은 ClapText로 그린다(간격 표기, 타이밍이 있으면
+   * 하나씩 튀고 줄 배경이 울림). 발음 줄에 ✋가 있는 줄이면 타이밍은 비어 있다.
+   */
+  clap?: ClapTiming;
 }) {
   if (!text) return null;
+  const parts = renderTextParts(
+    text,
+    "cheer",
+    undefined,
+    undefined,
+    false,
+    clap ? { clap, clapStart: 0, emphasisStart: 0 } : undefined,
+  );
 
   if (!tag) {
     return (
@@ -521,7 +553,7 @@ function CheerText({
         data-role="cheer"
         className="text-sm leading-relaxed font-bold text-[silver]"
       >
-        {renderTextParts(text, "cheer")}
+        {parts}
       </p>
     );
   }
@@ -536,7 +568,7 @@ function CheerText({
         style={{ color: CALL_TAG_COLOR[tag] }}
       >
         {showIcon && <CallIcon name={tag} size={18} className="mr-0" />}
-        <span>{renderTextParts(text, "cheer")}</span>
+        <span>{parts}</span>
       </span>
     </p>
   );

@@ -112,7 +112,7 @@ const song: Song = {
       translation: "키라 킬러",
       swingGif: true,
       cheer: {
-        text: "V자로 흔들기 반복",
+        text: "머리 위로 V자 그리기(반복)",
         tag: "swing",
       },
     },
@@ -380,7 +380,7 @@ const song: Song = {
       translation: "반짝반짝",
       swingGif: true,
       cheer: {
-        text: "V자로 흔들기 반복",
+        text: "머리 위로 V자 그리기(반복)",
         tag: "swing",
       },
     },
@@ -534,7 +534,7 @@ const song: Song = {
       translation: "기라기라",
       swingGif: true,
       cheer: {
-        text: "V자로 흔들기 반복",
+        text: "머리 위로 V자 그리기(반복)",
         tag: "swing",
       },
     },

@@ -116,6 +116,7 @@ const song: Song = {
       pronunciation: "^3, 2, 1^",
       translation: "",
       slam: "",
+      interlude: true,
     },
     {
       time: "1:12.8",
@@ -286,6 +287,7 @@ const song: Song = {
       pronunciation: "^3, 2, 1^",
       translation: "",
       slam: "",
+      interlude: true,
     },
     {
       time: "2:35.1",
