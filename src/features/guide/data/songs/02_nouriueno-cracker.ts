@@ -136,7 +136,7 @@ const song: Song = {
       pronunciation: "나사케나이 호도노 아메 후라시나가라 카에루요 **^쟈-네^**",
       translation: "한심할 정도로 비를 뿌리며 돌아갈게 안녕",
       cheer: {
-        text: '"쟈-네"에 샤모지 흔들며 인사',
+        text: "샤모지 좌우로 흔들기(인사)",
         tag: "swing",
       },
       slam: "인사 (쟈-네)",
@@ -178,7 +178,7 @@ const song: Song = {
       pronunciation: "**^Don’t stop^** 노우리 우에니",
       translation: "Don’t stop 뇌리 위에",
       cheer: {
-        text: '"Don\'t"에 내리고, "stop"에 점프하듯 올리기',
+        text: '"Don\'t"에 내리고, "stop"에 점프',
         tag: "swing",
       },
       slam: "점프 (Don't stop)",
@@ -189,7 +189,7 @@ const song: Song = {
       pronunciation: "오이테이타 쿠랏카- 우치나라시테 **^와라오우^**",
       translation: "놓아 두었던 크래커 쏘아 올리면서 웃자",
       cheer: {
-        text: '"와라" 에 내리고, "오우"에 점프하듯 올리기',
+        text: '"와라"에 내리고, "오우"에 점프',
         tag: "swing",
       },
       slam: "점프 (와라오우)",
@@ -272,7 +272,7 @@ const song: Song = {
       pronunciation: "나사케나이 호도노 아메 후라시나가라 카에루요 **^쟈-네^**",
       translation: "한심할 정도로 비를 뿌리며 돌아갈게 안녕",
       cheer: {
-        text: '"쟈-네"에 샤모지 흔들며 인사',
+        text: "샤모지 좌우로 흔들기(인사)",
         tag: "swing",
       },
       slam: "인사 (쟈-네)",
@@ -307,7 +307,7 @@ const song: Song = {
       pronunciation: "**^Don’t stop^** 노우리 우에니",
       translation: "Don’t stop 뇌리 위에",
       cheer: {
-        text: '"Don\'t"에 내리고, "stop"에 점프하듯 올리기',
+        text: '"Don\'t"에 내리고, "stop"에 점프',
         tag: "swing",
       },
       slam: "점프 (Don't stop)",
@@ -318,7 +318,7 @@ const song: Song = {
       pronunciation: "오이테이타 쿠랏카- 우치나라시테 **^와라오우^**",
       translation: "놓아 두었던 크래커 쏘아 올리면서 웃자",
       cheer: {
-        text: '"와라" 에 내리고, "오우"에 점프하듯 올리기',
+        text: '"와라"에 내리고, "오우"에 점프',
         tag: "swing",
       },
       slam: "점프 (와라오우)",
@@ -403,7 +403,7 @@ const song: Song = {
       pronunciation: "**^Don’t stop^** 노우리 우에니",
       translation: "Don’t stop 뇌리 위에",
       cheer: {
-        text: '"Don\'t"에 내리고, "stop"에 점프하듯 올리기',
+        text: '"Don\'t"에 내리고, "stop"에 점프',
         tag: "swing",
       },
       slam: "점프 (Don't stop)",
@@ -414,7 +414,7 @@ const song: Song = {
       pronunciation: "오이테이타 쿠랏카- 우치나라시테 **^와라오우^**",
       translation: "놓아 두었던 크래커 쏘아 올리면서 웃자",
       cheer: {
-        text: '"와라" 에 내리고, "오우"에 점프하듯 올리기',
+        text: '"와라"에 내리고, "오우"에 점프',
         tag: "swing",
       },
       slam: "점프 (와라오우)",
