@@ -172,7 +172,18 @@ src/
       content/              # 공지 MDX 프로즈
     zutopia/                 # 즛토피아 허브: 카테고리→항목 2단 구조(registry.ts) +
                              # 곡/앨범 DB(song-db/) + 지난 공연 DB(lives/) — 전부
-                             # Supabase 기반(아래 "곡 데이터" 참고)
+                             # Supabase 기반(아래 "곡 데이터" 참고).
+                             # 첫 화면 카드는 두 묶음을 세로로: 아카이브(디스코
+                             # 그래피·공연·활동 연혁·통계·블루레이·콜라보) /
+                             # 플레이그라운드(라이브 참전 기록·퀴즈·퀴즈 통계).
+                             # 한 줄 모바일·태블릿 2장, PC 4장 고정. 준비 중 카드는
+                             # ZutopiaHubCard에 href={null}(콜라보는 지금 공식
+                             # 사이트 콜라보 페이지로 연결). 카드엔 제목 + 한 줄
+                             # 정보(meta, 넘치면 말줄임)만 — 모바일 카드 폭(약
+                             # 150px)에 들어가게 짧게 쓴다.
+                             # 통계·참전 기록 맨 위엔 늘 보이는 "데이터 추가 중!"
+                             # 안내(components/DataInProgressNotice) — 세트리스트를
+                             # 다 채우면 두 페이지에서 뺀다.
       guide-link.ts          # 응원 가이드(/guide/[songId]) 존재 여부 조회 —
                              # song-db와 lives가 공유
       lives/                # 지난 공연 데이터(data.ts, Supabase 기반) + 공용
@@ -189,7 +200,12 @@ src/
                              # 방식 — 포스터는 크게, 아이콘(포스터와 다를 때)·추가
                              # 이미지는 작은 목록. 행은 썸네일 중심 — 왼쪽에
                              # 아이콘(없으면 포스터)을 3:4로 크게, 날짜는 그림
-                             # 아래쪽에 얹고, 그림이 없으면 같은 폭의 날짜 칸. 행 안엔 그날의 선택곡이 미리 보이고, 공통
+                             # 아래쪽에 얹고, 그림이 없으면 같은 폭의 날짜 칸.
+                             # 취소된 공연(lives.status = 'CANCELED')은 투어 일정과
+                             # 공연 목록(getCanceledLiveEntries, 목록 화면만)에
+                             # 회색 + 빨간 취소선(lives/surface.ts CANCELED_TEXT_CLASS)
+                             # + "공연 취소" 태그로, 누를 수 없다. 상세·사이트맵·
+                             # 검색·참전·통계는 ACTIVE만, 공연 수에서도 뺀다. 행 안엔 그날의 선택곡이 미리 보이고, 공통
                              # 곡은 위 "투어 공통 세트리스트"(TourCommonSetlist,
                              # TourDetail.setlist)에 한 번만 둔다 — 처음엔 펼침,
                              # 제목 줄로 접기. 공연일마다 다른 곡이 들어가는
@@ -227,7 +243,8 @@ src/
                              # 공연 종류는 투어(tours)·페스티벌(FESTIVAL)·콘서트
                              # (그 밖의 모든 lives.type) 세 가지 — types.ts의
                              # ZutopiaEntryType/ENTRY_TYPE_DOT을 목록 필터·카드·
-                             # 허브 요약·티켓 배지가 같이 쓴다(투어 하늘, 페스티벌
+                             # 통계·티켓 배지가 같이 쓴다(허브 카드 요약만 투어 /
+                             # 그 밖 공연 두 덩어리로 센다)(투어 하늘, 페스티벌
                              # 보라, 콘서트 분홍). 목록 카드는 그림 왼쪽 위에 종류
                              # 태그(종류 색으로 꽉 찬 면) → 내한 태그 순으로 얹고,
                              # 그림 아래 글자는 원제·한글 제목·날짜·도시 세 줄.
@@ -293,7 +310,8 @@ src/
                              # 필터 카드는 거르기(형식·연도·온라인 — 결과 수가 바뀜,
                              # 필터 초기화 대상)와 보여주기(정렬·보기)를 선으로 나눈다. 공연일(LiveUnit.online)은 live-history의
                              # inPersonUnits로 걸러 참전 기록·통계엔 현장 공연만 —
-                             # 곡별 라이브 횟수·마지막 라이브·연혁은 온라인도 센다.
+                             # 곡별 라이브 횟수·마지막 라이브는 온라인도 세고, 연혁은
+                             # 온라인 공연을 그리되 공연 횟수엔 넣지 않는다.
                              # 티켓 Official 줄 = lives.official_url(도메인 링크, 새 탭 —
                              # tours엔 컬럼 없음).
                              # 티켓 metadata: variation(Variation 줄), spotify·
@@ -308,18 +326,27 @@ src/
                              # 곡 목록 정렬: 앨범·발매일·편곡(arranger)·MV 감독
                              # (movie_director) — 사람별 묶음은 groupSongs의 groupByPeople
                              # (여럿이면 각자 묶음, 곡 많은 순, "정보 없음" 맨 뒤).
-                             # 필터 "MV: 있는 곡만"(music_video_url) 켜고 끄는 칩.
+                             # 필터 "MV: 있는 곡만"(music_video_url) 켜고 끄는 칩,
+                             # "협업: 협업곡 빼기"(metadata.collab — 피처링·트리뷰트·
+                             # 타이업 등 직접 발표하지 않은 곡, 기본은 보여 주고
+                             # 목록·상세에 "협업" 칩, 상세 표에 출처 문구).
                              # 목록 위 정렬/필터 카드는 모두 components/SortFilterBar.tsx의
                              # FilterPanel — filters(무엇을: 결과 수가 바뀌는 줄) / display
                              # (어떻게: 정렬·순서·보기·커버) 두 구역을 같은 자리·모양으로
                              # (사이에 선, display는 태블릿 이상 한 줄), onReset을 넘기면
                              # 필터를 건 동안 오른쪽 위 "필터 초기화". 켜고 끄는 칩 줄은
                              # FilterToggleRow. 새 옵션은 맞는 구역에 줄 하나만 더한다.
-                             # 공연: 형식·연도·온라인 / 정렬·보기, 곡: 곡·MV / 정렬·순서·
+                             # 공연: 형식·연도·온라인 / 정렬·보기, 곡: 곡·MV·협업 / 정렬·순서·
                              # 보기, 앨범: (없음) / 정렬·순서·앨범 커버. 줄 모양은 공용
                              # FilterRow/FilterChip. "원곡·발매곡" 판별은
                              # song-metadata.ts의 isCountableOriginal 하나
-                             # (참전·통계가 같은 기준).
+                             # (통계 곡 기록 — 어레인지·미공개·협업곡 제외).
+                             # 참전 기록은 협업곡을 들은 곡엔 넣고 "못 들은 곡"엔
+                             # 안 넣는다(AttendanceSong.collab). 첫 화면 곡 수는
+                             # 미공개곡만 뺀 수(협업곡·어레인지 포함,
+                             # getReleasedSongCount), 연혁엔 협업곡을 "협업" 태그로
+                             # 남긴다. 어레인지 버전은 원곡의 collab을 물려받는다
+                             # (song-db/data.ts resolveDisplaySong).
       stats/                # 통계(/zutopia/stats). data.ts가 빌드 때 공연일
                              # (getLiveHistory)·곡·앨범·투어를 모아 compute.ts
                              # (순수 함수·테스트)로 기록을 다 계산하고, 화면
@@ -365,7 +392,9 @@ src/
                              # 항상 맨 위로 되돌린다(쿼리만 바뀌는 드로어는 제외).
                              # 예외로 공연 목록은 상세에서 돌아오면(뒤로가기·
                              # 헤더 공연 탭) 필터와 스크롤 위치를 복원한다
-                             # (LiveListView — 초기화 뒤에 돌아서 덮어씀).
+                             # (LiveListView — 초기화 뒤에 돌아서 덮어씀). 상세에서
+                             # 새로고침해 목록이 전체 로드로 열려도, 첫 화면을
+                             # 그린 뒤 저장값을 적용해 복원한다.
       (안내 창)             # components/ZutopiaNotice — layout.tsx가 모든 즛토피아
                              # 페이지에 둔다. 확인은 24시간, 다시 보지 않기는 계속 숨김 —
                              # 둘 다 localStorage(키 ztmy-sounds:zutopia-notice에
@@ -555,6 +584,10 @@ src/
 - 세로 축(모바일)도 연·월·주 세 단계입니다(주 단계는 카드 사이 빈칸 0.6px/일, 최소 8px·최대
   160px). 처음 스크롤은 바깥 main의 scrollTop만 바꿉니다(scrollIntoView 금지 — body가 움직임).
 - 예정 공연은 `getLiveHistory().upcoming`(집계에 안 들어감)으로 받아 연혁에만 "예정"으로 그립니다.
+- 공연 **횟수**는 통계와 같은 기준입니다 — 공연일 하나당 1, 그 공연일 날짜의 해, 온라인·예정
+  제외(`TimelineEvent.showDates` → `showsByYear`·`liveSummary`). 투어는 축 위에 시작일의
+  일정 하나로 그리지만, 해를 넘기는 투어의 공연일은 해마다 나뉘어 세집니다. 곡·앨범과 공연
+  "일정" 수(`countByYear`·`KindCounts`, 투어·페스티벌 하나 = 1)는 시작일의 해 기준입니다.
 - 화면 높이 측정은 `PageScrollBody`의 `data-page-body`·`data-page-footer` 표시로 찾습니다.
 - 앨범과 **같은 날** 발매로 들어간 수록곡은 앨범 일정 하나로 합칩니다. 곡 `release_date`가
   앨범과 하루라도 다르면 따로 그려지니, 데이터의 발매일을 맞춰 두세요.
