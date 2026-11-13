@@ -7,6 +7,7 @@ import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { Setlist, type SetlistSlot } from "@/features/zutopia/lives/Setlist";
 import {
+  CANCELED_TEXT_CLASS,
   LIVE_SECTION_TITLE_SHADOW,
   LIVE_SURFACE_CLASS,
   LIVE_TAG_CLASS,
@@ -66,8 +67,9 @@ export function LiveSchedule({ dates }: { dates: TourDateEntry[] }) {
         >
           공연 일정
         </p>
+        {/* 취소된 공연일은 세지 않는다(일정엔 취소선으로 남는다). */}
         <p className={cn("font-mono text-sm text-white/60")}>
-          {dates.length} dates
+          {dates.filter((date) => !date.canceled).length} dates
         </p>
       </div>
 
@@ -367,22 +369,16 @@ function TourDateRow({
       : start.year
     : null;
   const weekdayLabel = end ? `${start.weekday}–${end.weekday}` : start.weekday;
+  // 취소된 공연일 — 회색·빨간 취소선, 펼칠 세트리스트가 없어 누를 수 없다.
+  const canceled = !!date.canceled;
+  const rowClass = cn(
+    "group flex w-full items-stretch overflow-hidden rounded-lg border text-left transition-colors",
+    // 배경 그림 위에서도 읽히게 어두운 면 + 흐림(LIVE_SURFACE_CLASS).
+    LIVE_SURFACE_CLASS,
+  );
 
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-expanded={isOpen}
-      aria-controls={panelId}
-      className={cn(
-        "group flex w-full items-stretch overflow-hidden rounded-lg border text-left transition-colors",
-        // 배경 그림 위에서도 읽히게 어두운 면 + 흐림(LIVE_SURFACE_CLASS).
-        LIVE_SURFACE_CLASS,
-        isOpen
-          ? "border-ztmy-pink/60 bg-black/70"
-          : "hover:border-white/25 hover:bg-black/65",
-      )}
-    >
+  const content = (
+    <>
       {/* 왼쪽 썸네일 칸 — 그림이 있으면 3:4로 크게 + 아래에 날짜, 없으면 날짜 칸. */}
       <span
         className={cn(
@@ -396,7 +392,12 @@ function TourDateRow({
             <ThumbImage
               src={thumbnail}
               displayWidth={320}
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className={cn(
+                "absolute inset-0 h-full w-full object-cover",
+                canceled
+                  ? "opacity-40 grayscale"
+                  : "transition-transform duration-300 group-hover:scale-105",
+              )}
             />
             {/* 그림 위 날짜가 읽히게 아래에서 위로 어두워지는 막 */}
             <span className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/85 to-transparent" />
@@ -408,6 +409,7 @@ function TourDateRow({
                 long={!!end && start.month !== end.month}
                 startTime={date.startTime}
                 openTime={date.openTime}
+                canceled={canceled}
               />
             </span>
           </>
@@ -420,6 +422,7 @@ function TourDateRow({
               long={!!end && start.month !== end.month}
               startTime={date.startTime}
               openTime={date.openTime}
+              canceled={canceled}
             />
           </span>
         )}
@@ -436,16 +439,29 @@ function TourDateRow({
             className={cn(
               "text-base font-semibold transition-colors",
               "tablet:text-xl",
-              isOpen
-                ? "text-ztmy-pink"
-                : "group-hover:text-ztmy-pink text-white",
+              canceled
+                ? CANCELED_TEXT_CLASS
+                : isOpen
+                  ? "text-ztmy-pink"
+                  : "group-hover:text-ztmy-pink text-white",
             )}
           >
             {date.city}
           </span>
           {date.cityOriginal && (
-            <span className={cn("text-xs text-white/55", "tablet:text-sm")}>
+            <span
+              className={cn(
+                "text-xs",
+                "tablet:text-sm",
+                canceled ? CANCELED_TEXT_CLASS : "text-white/55",
+              )}
+            >
               {date.cityOriginal}
+            </span>
+          )}
+          {canceled && (
+            <span className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.canceled)}>
+              공연 취소
             </span>
           )}
           {(date.dayNumber != null || date.showLabel) && (
@@ -456,19 +472,30 @@ function TourDateRow({
                 LIVE_TAG_TONE.day[
                   ((date.dayNumber ?? 1) - 1) % LIVE_TAG_TONE.day.length
                 ],
+                canceled && "opacity-50",
               )}
             >
               {formatDayShow(date.dayNumber, date.showLabel)}
             </span>
           )}
           {isKorea && (
-            <span className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.visit)}>
+            <span
+              className={cn(
+                LIVE_TAG_CLASS,
+                LIVE_TAG_TONE.visit,
+                canceled && "opacity-50",
+              )}
+            >
               내한
             </span>
           )}
         </span>
         <span
-          className={cn("truncate text-sm text-white/75", "tablet:text-base")}
+          className={cn(
+            "truncate text-sm",
+            "tablet:text-base",
+            canceled ? CANCELED_TEXT_CLASS : "text-white/75",
+          )}
         >
           <VenueText venue={date.venue} />
         </span>
@@ -499,14 +526,36 @@ function TourDateRow({
         )}
       </span>
 
-      <span className="flex shrink-0 items-center pr-3">
-        <ChevronLeftIcon
-          className={cn(
-            "h-3.5 w-3.5 text-white/30 transition-[transform,color] group-hover:text-white/70",
-            isOpen ? "rotate-90" : "-rotate-90",
-          )}
-        />
-      </span>
+      {!canceled && (
+        <span className="flex shrink-0 items-center pr-3">
+          <ChevronLeftIcon
+            className={cn(
+              "h-3.5 w-3.5 text-white/30 transition-[transform,color] group-hover:text-white/70",
+              isOpen ? "rotate-90" : "-rotate-90",
+            )}
+          />
+        </span>
+      )}
+    </>
+  );
+
+  if (canceled) {
+    return <div className={rowClass}>{content}</div>;
+  }
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-expanded={isOpen}
+      aria-controls={panelId}
+      className={cn(
+        rowClass,
+        isOpen
+          ? "border-ztmy-pink/60 bg-black/70"
+          : "hover:border-white/25 hover:bg-black/65",
+      )}
+    >
+      {content}
     </button>
   );
 }
@@ -519,6 +568,7 @@ function DateText({
   long,
   startTime,
   openTime,
+  canceled = false,
 }: {
   label: string;
   weekday: string;
@@ -528,28 +578,55 @@ function DateText({
   /** 같은 날 여러 회차 공연의 시작·개장 시각 "HH:MM" — 요일 아래에(lives.metadata.shows). */
   startTime?: string;
   openTime?: string;
+  /** 취소된 공연일 — 날짜·요일을 회색·빨간 취소선으로. */
+  canceled?: boolean;
 }) {
   return (
     <>
-      {year && <span className="font-mono text-xs text-white/60">{year}</span>}
+      {year && (
+        <span
+          className={cn(
+            "font-mono text-xs",
+            canceled ? CANCELED_TEXT_CLASS : "text-white/60",
+          )}
+        >
+          {year}
+        </span>
+      )}
       <span
         className={cn(
-          "text-center font-mono font-bold tracking-tight whitespace-nowrap text-white tabular-nums drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]",
+          "text-center font-mono font-bold tracking-tight whitespace-nowrap tabular-nums drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]",
           long ? "tablet:text-sm text-xs" : "tablet:text-base text-sm",
+          canceled ? CANCELED_TEXT_CLASS : "text-white",
         )}
       >
         {label}
       </span>
-      <span className="font-mono text-xs font-medium tracking-[0.15em] text-white/70">
+      <span
+        className={cn(
+          "font-mono text-xs font-medium tracking-[0.15em]",
+          canceled ? CANCELED_TEXT_CLASS : "text-white/70",
+        )}
+      >
         {weekday}
       </span>
       {startTime && (
-        <span className="mt-0.5 font-mono text-sm font-semibold text-white tabular-nums drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
+        <span
+          className={cn(
+            "mt-0.5 font-mono text-sm font-semibold tabular-nums drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]",
+            canceled ? CANCELED_TEXT_CLASS : "text-white",
+          )}
+        >
           {startTime}
         </span>
       )}
       {openTime && (
-        <span className="font-mono text-xs text-white/60 tabular-nums">
+        <span
+          className={cn(
+            "font-mono text-xs tabular-nums",
+            canceled ? CANCELED_TEXT_CLASS : "text-white/60",
+          )}
+        >
           OPEN {openTime}
         </span>
       )}

@@ -102,12 +102,13 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
                 : formatLiveDate(tour.start_date),
             mono: true,
           },
-          // 공연일 데이터가 있으면 총 공연 횟수(이틀 공연은 2회)
-          ...(tour.dates.length > 0
+          // 취소되지 않은 공연일이 있으면 총 공연 횟수(이틀 공연은 2회)
+          ...(tour.dates.some((date) => !date.canceled)
             ? [
                 {
                   label: "Total Shows",
-                  value: `${countTourShows(tour.dates)}회`,
+                  // 취소된 공연일은 빼고 센다.
+                  value: `${countTourShows(tour.dates.filter((date) => !date.canceled))}회`,
                   mono: true,
                 },
               ]

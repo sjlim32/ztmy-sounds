@@ -31,4 +31,14 @@ export const LIVE_TAG_TONE = {
    * 마젠타(원정은 하늘색). 노랑은 ENCORE에만 쓴다.
    */
   visit: "bg-ztmy-magenta text-white",
+  /** 공연 취소 — 취소선과 같은 빨강. */
+  canceled: "bg-red-500/20 text-red-400",
 } as const;
+
+/**
+ * 취소된 공연(lives.status = 'CANCELED')의 글자 — 회색 + 빨간 취소선. 공연 목록
+ * 카드·행과 투어 공연일 행이 같이 쓴다. 취소선은 화면 읽기에 안 읽히니 "공연 취소"
+ * 태그(LIVE_TAG_TONE.canceled)를 함께 단다.
+ */
+export const CANCELED_TEXT_CLASS =
+  "text-white/40 line-through decoration-red-500 decoration-2";

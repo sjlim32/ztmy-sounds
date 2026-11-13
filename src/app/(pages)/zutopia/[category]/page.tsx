@@ -6,6 +6,7 @@ import {
   getZutopiaCategory,
 } from "@/features/zutopia/registry";
 import { LiveListView } from "@/features/zutopia/lives/components/LiveListView";
+import { getCanceledLiveEntries } from "@/features/zutopia/lives/data";
 import type { ZutopiaCategory } from "@/features/zutopia/types";
 
 export function generateStaticParams() {
@@ -43,7 +44,20 @@ async function CategoryContent({ category }: { category: ZutopiaCategory }) {
   // 되고, 지금은 이 분기 하나로 충분하다(카테고리가 하나뿐이라 범용 플러그인
   // 구조를 미리 만들지 않는다).
   if (category.slug === "lives") {
-    return <LiveListView categorySlug={category.slug} entries={entries} />;
+    // 취소된 단독 공연은 목록 화면에만 회색·취소선으로 끼운다(누를 수 없음) —
+    // 상세 페이지·사이트맵·검색이 같이 쓰는 getEntries엔 넣지 않는다.
+    // slug가 겹치는 취소 공연(연기 전 날짜 등)은 빼서 목록의 key·포스터 전환
+    // 이름이 겹치지 않게 한다 — 같은 slug는 첫 항목 하나만.
+    const seen = new Set(entries.map((entry) => entry.slug));
+    const canceled = (await getCanceledLiveEntries()).filter((entry) => {
+      if (seen.has(entry.slug)) return false;
+      seen.add(entry.slug);
+      return true;
+    });
+    const withCanceled = [...entries, ...canceled].sort((a, b) =>
+      (b.startDate ?? "").localeCompare(a.startDate ?? ""),
+    );
+    return <LiveListView categorySlug={category.slug} entries={withCanceled} />;
   }
 
   return (

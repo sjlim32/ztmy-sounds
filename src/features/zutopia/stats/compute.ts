@@ -39,6 +39,12 @@ export function buildStatSections(input: {
   units: LiveUnit[];
   /** 예정 공연일 — 투어 공연 수에만 쓴다 */
   upcoming: LiveUnit[];
+  /**
+   * 취소된 공연일(lives.status = 'CANCELED')이 있는 투어 id. 공연일이 전부 취소된
+   * 투어는 "공연일이 아직 등록되지 않은 투어"가 아니라 공연이 없던 투어라, 모르는
+   * 구간·공연 공백·가장 긴 투어에서 뺀다.
+   */
+  canceledTourIds?: string[];
   songs: StatSong[];
   albums: StatAlbum[];
   tours: StatTour[];
@@ -50,9 +56,15 @@ export function buildStatSections(input: {
     [...all, ...input.upcoming].flatMap((unit) => unit.tourId ?? []),
   );
   const lastDate = all.at(-1)?.date ?? "";
-  // 공연일이 하나도 없는 투어의 (지난) 기간
+  const canceledTours = new Set(input.canceledTourIds ?? []);
+  // 공연일이 하나도 없는 투어의 (지난) 기간 — 공연일이 전부 취소된 투어는 뺀다.
   const emptyTours = input.tours
-    .filter((tour) => !scheduled.has(tour.id) && tour.startDate <= lastDate)
+    .filter(
+      (tour) =>
+        !scheduled.has(tour.id) &&
+        !canceledTours.has(tour.id) &&
+        tour.startDate <= lastDate,
+    )
     .map((tour) => ({
       tour,
       from: tour.startDate,
@@ -692,7 +704,12 @@ function liveRecords(
   all: LiveUnit[],
   known: LiveUnit[],
   stats: SongStat[],
-  input: { upcoming: LiveUnit[]; tours: StatTour[]; songs: StatSong[] },
+  input: {
+    upcoming: LiveUnit[];
+    tours: StatTour[];
+    songs: StatSong[];
+    canceledTourIds?: string[];
+  },
   emptyTours: (Span & { tour: StatTour })[],
   context: Context,
 ): RawRecord[] {
@@ -719,11 +736,16 @@ function liveRecords(
   for (const unit of [...all, ...input.upcoming])
     if (unit.tourId)
       showsByTour.set(unit.tourId, (showsByTour.get(unit.tourId) ?? 0) + 1);
-  const tours = input.tours.map((tour) => ({
-    tour,
-    span: diffDays(tour.startDate, tour.endDate ?? tour.startDate) + 1,
-    shows: showsByTour.get(tour.id) ?? 0,
-  }));
+  // 공연일이 전부 취소된 투어(남은 공연 0회 + 취소된 공연일 있음)는 열리지 않은
+  // 투어라 가장 긴 투어에서 뺀다.
+  const canceledTours = new Set(input.canceledTourIds ?? []);
+  const tours = input.tours
+    .map((tour) => ({
+      tour,
+      span: diffDays(tour.startDate, tour.endDate ?? tour.startDate) + 1,
+      shows: showsByTour.get(tour.id) ?? 0,
+    }))
+    .filter((item) => item.shows > 0 || !canceledTours.has(item.tour.id));
 
   // 해마다 공연 횟수
   const years = new Map<string, LiveUnit[]>();

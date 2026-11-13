@@ -19,17 +19,30 @@ import type { StatSection, StatSong, StatTour } from "./types";
  */
 export const getStatSections = cache(async (): Promise<StatSection[]> => {
   const supabase = createBuildTimeSupabaseClient();
-  const [history, songs, albums, toursResult] = await Promise.all([
-    getLiveHistory(),
-    getSongsWithAlbums(),
-    getAlbumsWithSongs(),
-    supabase
-      .from("tours")
-      .select(
-        "id, slug, title, title_ko, start_date, end_date, poster_image_url",
-      )
-      .eq("status", "ACTIVE"),
-  ]);
+  const [history, songs, albums, toursResult, canceledResult] =
+    await Promise.all([
+      getLiveHistory(),
+      getSongsWithAlbums(),
+      getAlbumsWithSongs(),
+      supabase
+        .from("tours")
+        .select(
+          "id, slug, title, title_ko, start_date, end_date, poster_image_url",
+        )
+        .eq("status", "ACTIVE"),
+      // 취소된 공연일이 있는 투어 — 공연일이 전부 취소된 투어를 "공연일 미등록"으로
+      // 잘못 세지 않게(compute.ts canceledTourIds).
+      supabase
+        .from("lives")
+        .select("tour_id")
+        .eq("status", "CANCELED")
+        .not("tour_id", "is", null),
+    ]);
+  if (canceledResult.error) {
+    throw new Error(
+      `취소된 공연을 가져오지 못했습니다: ${canceledResult.error.message}`,
+    );
+  }
   if (toursResult.error) {
     throw new Error(
       `투어 목록을 가져오지 못했습니다: ${toursResult.error.message}`,
@@ -62,6 +75,7 @@ export const getStatSections = cache(async (): Promise<StatSection[]> => {
     // 통계는 현장 공연만 — 온라인 공연은 뺀다.
     units: inPersonUnits(history.units),
     upcoming: inPersonUnits(history.upcoming),
+    canceledTourIds: canceledResult.data.flatMap((row) => row.tour_id ?? []),
     songs: statSongs,
     albums: albums.map((album) => ({
       id: album.id,

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, ViewTransition } from "react";
 import { ThumbImage } from "@/components/ThumbImage";
-import type { MouseEvent } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
@@ -14,7 +14,11 @@ import {
 import { GridIcon } from "@/components/icons/GridIcon";
 import { ListIcon } from "@/components/icons/ListIcon";
 import { VisitBadge } from "@/features/zutopia/lives/VisitBadge";
-import { LIVE_TAG_CLASS } from "@/features/zutopia/lives/surface";
+import {
+  CANCELED_TEXT_CLASS,
+  LIVE_TAG_CLASS,
+  LIVE_TAG_TONE,
+} from "@/features/zutopia/lives/surface";
 import {
   useListViewMode,
   type ListViewMode,
@@ -502,10 +506,42 @@ function OnlineTag({ className }: { className?: string }) {
   );
 }
 
+/** 공연 취소 태그 — 취소선과 같은 빨강(화면 읽기는 취소선을 못 읽어 글자로도 알린다). */
+function CanceledTag({ className }: { className?: string }) {
+  return (
+    <span className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.canceled, className)}>
+      공연 취소
+    </span>
+  );
+}
+
+/**
+ * 목록 항목의 바깥 — 보통은 상세로 가는 링크, 취소된 공연(entry.canceled)은
+ * 상세 페이지가 없어 누를 수 없는 칸.
+ */
+function ItemShell({
+  entry,
+  href,
+  onClick,
+  className,
+  children,
+}: LiveItemProps & { className: string; children: ReactNode }) {
+  if (entry.canceled) {
+    return <div className={className}>{children}</div>;
+  }
+  return (
+    <Link href={href} onClick={onClick} className={className}>
+      {children}
+    </Link>
+  );
+}
+
 /** 카드 보기 한 장 — 포스터가 주인공, 글자는 그 아래 세 줄. */
 function LiveCard({ entry, href, onClick }: LiveItemProps) {
+  const canceled = !!entry.canceled;
   return (
-    <Link
+    <ItemShell
+      entry={entry}
       href={href}
       onClick={onClick}
       className="group flex flex-col gap-2 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
@@ -538,7 +574,12 @@ function LiveCard({ entry, href, onClick }: LiveItemProps) {
                 src={entry.thumbnail}
                 displayWidth={360}
                 alt={entry.name}
-                className="relative h-full w-full object-contain transition-opacity group-hover:opacity-80"
+                className={cn(
+                  "relative h-full w-full object-contain",
+                  canceled
+                    ? "opacity-40 grayscale"
+                    : "transition-opacity group-hover:opacity-80",
+                )}
               />
             </>
           ) : (
@@ -548,8 +589,20 @@ function LiveCard({ entry, href, onClick }: LiveItemProps) {
         줄("콘서트 · 두 번째 내한")과 같은 순서. 종류 태그는 면
         전체가 종류 색이라 색만으로 바로 구분된다. 호버하면 포스터가
         온전히 보이게 태그를 숨긴다. */}
-          {(entry.type || entry.visitOrdinal != null || entry.online) && (
-            <div className="absolute top-2 left-2 flex flex-wrap gap-1 transition-opacity duration-200 group-hover:opacity-0">
+          {(entry.type ||
+            entry.visitOrdinal != null ||
+            entry.online ||
+            canceled) && (
+            <div
+              className={cn(
+                "absolute top-2 left-2 flex flex-wrap gap-1",
+                !canceled &&
+                  "transition-opacity duration-200 group-hover:opacity-0",
+              )}
+            >
+              {canceled && (
+                <CanceledTag className="shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+              )}
               {entry.type && !entry.online && (
                 <EntryTypeTag
                   type={entry.type}
@@ -575,39 +628,67 @@ function LiveCard({ entry, href, onClick }: LiveItemProps) {
       <div className="flex min-w-0 flex-col gap-0.5 px-0.5">
         <span
           className={cn(
-            "group-hover:text-ztmy-pink truncate text-xs font-semibold text-white transition-colors",
+            "truncate text-xs font-semibold transition-colors",
             "tablet:text-sm",
+            canceled
+              ? CANCELED_TEXT_CLASS
+              : "group-hover:text-ztmy-pink text-white",
           )}
         >
           {entry.name}
         </span>
         {entry.label !== entry.name && (
           <span
-            className={cn("truncate text-xs text-white/70", "tablet:text-sm")}
+            className={cn(
+              "truncate text-xs",
+              "tablet:text-sm",
+              canceled ? CANCELED_TEXT_CLASS : "text-white/70",
+            )}
           >
             {entry.label}
           </span>
         )}
         {/* 날짜는 숫자 폭을 맞춰 또렷하게, 도시는 자리가 모자라면
         먼저 줄어든다. */}
-        <span
-          className={cn(
-            "flex min-w-0 items-center gap-1.5 text-xs text-white/55",
-            "tablet:text-sm",
-          )}
-        >
-          <span className="shrink-0 font-medium whitespace-nowrap text-white/85 tabular-nums">
-            {entry.date}
-          </span>
-          {entry.city && (
-            <>
-              <span className="text-white/30">·</span>
-              <span className="truncate">{entry.city}</span>
-            </>
-          )}
-        </span>
+        <EntryDateLine entry={entry} className="tablet:text-sm text-xs" />
       </div>
-    </Link>
+    </ItemShell>
+  );
+}
+
+/** 날짜 · 도시 줄 — 카드·행 공용. 취소된 공연은 회색·빨간 취소선. */
+function EntryDateLine({
+  entry,
+  className,
+}: {
+  entry: ZutopiaEntry;
+  className: string;
+}) {
+  const canceled = !!entry.canceled;
+  return (
+    <span
+      className={cn(
+        "flex min-w-0 items-center gap-1.5 text-white/55",
+        className,
+      )}
+    >
+      <span
+        className={cn(
+          "shrink-0 font-medium whitespace-nowrap tabular-nums",
+          canceled ? CANCELED_TEXT_CLASS : "text-white/85",
+        )}
+      >
+        {entry.date}
+      </span>
+      {entry.city && (
+        <>
+          <span className="text-white/30">·</span>
+          <span className={cn("truncate", canceled && CANCELED_TEXT_CLASS)}>
+            {entry.city}
+          </span>
+        </>
+      )}
+    </span>
   );
 }
 
@@ -616,12 +697,15 @@ function LiveCard({ entry, href, onClick }: LiveItemProps) {
  * 공연을 빠르게 훑는 용도라 포스터는 작게만 둔다.
  */
 function LiveRow({ entry, href, onClick }: LiveItemProps) {
+  const canceled = !!entry.canceled;
   return (
-    <Link
+    <ItemShell
+      entry={entry}
       href={href}
       onClick={onClick}
       className={cn(
-        "group flex items-center gap-3 rounded-lg border bg-white/5 p-2 transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+        "group flex items-center gap-3 rounded-lg border bg-white/5 p-2 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+        !canceled && "hover:bg-white/10",
         // 내한 공연은 카드 보기와 같이 마젠타 테두리로 표시한다.
         entry.visitOrdinal != null ? "border-ztmy-magenta" : "border-white/10",
       )}
@@ -636,7 +720,10 @@ function LiveRow({ entry, href, onClick }: LiveItemProps) {
             <ThumbImage
               src={entry.thumbnail}
               displayWidth={56}
-              className="h-full w-full object-cover"
+              className={cn(
+                "h-full w-full object-cover",
+                canceled && "opacity-40 grayscale",
+              )}
             />
           ) : (
             <div className="h-full w-full bg-white/5" />
@@ -645,27 +732,35 @@ function LiveRow({ entry, href, onClick }: LiveItemProps) {
       </ViewTransition>
 
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="group-hover:text-ztmy-pink truncate text-sm font-semibold text-white transition-colors">
+        <span
+          className={cn(
+            "truncate text-sm font-semibold transition-colors",
+            canceled
+              ? CANCELED_TEXT_CLASS
+              : "group-hover:text-ztmy-pink text-white",
+          )}
+        >
           {entry.name}
         </span>
         {entry.label !== entry.name && (
-          <span className="truncate text-xs text-white/70">{entry.label}</span>
-        )}
-        <span className="flex min-w-0 items-center gap-1.5 text-xs text-white/55">
-          <span className="shrink-0 font-medium whitespace-nowrap text-white/85 tabular-nums">
-            {entry.date}
+          <span
+            className={cn(
+              "truncate text-xs",
+              canceled ? CANCELED_TEXT_CLASS : "text-white/70",
+            )}
+          >
+            {entry.label}
           </span>
-          {entry.city && (
-            <>
-              <span className="text-white/30">·</span>
-              <span className="truncate">{entry.city}</span>
-            </>
-          )}
-        </span>
+        )}
+        <EntryDateLine entry={entry} className="text-xs" />
       </div>
 
-      {(entry.type || entry.visitOrdinal != null || entry.online) && (
+      {(entry.type ||
+        entry.visitOrdinal != null ||
+        entry.online ||
+        canceled) && (
         <div className="flex shrink-0 flex-col items-end gap-1">
+          {canceled && <CanceledTag />}
           {entry.type && !entry.online && <EntryTypeTag type={entry.type} />}
           {entry.online && <OnlineTag />}
           {entry.visitOrdinal != null && (
@@ -673,6 +768,6 @@ function LiveRow({ entry, href, onClick }: LiveItemProps) {
           )}
         </div>
       )}
-    </Link>
+    </ItemShell>
   );
 }

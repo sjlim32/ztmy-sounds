@@ -52,6 +52,8 @@ export interface ZutopiaEntry {
   visitOrdinal?: number | null;
   // 온라인 공연(region·live_venue가 "online") — 도시 대신 그림 위 "온라인" 태그.
   online?: boolean;
+  // 취소된 공연(lives.status = 'CANCELED') — 목록에 회색·취소선으로, 누를 수 없다.
+  canceled?: boolean;
 }
 
 export interface ZutopiaCategory {

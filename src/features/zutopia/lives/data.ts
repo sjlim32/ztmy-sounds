@@ -71,6 +71,86 @@ function liveEntryType(type: Live["type"]): ZutopiaEntryType {
   return type === "FESTIVAL" ? "festival" : "concert";
 }
 
+const LIVE_ENTRY_COLUMNS =
+  "slug, title, title_ko, start_date, end_date, poster_image_url, icon_image_url, type, region, live_venue, metadata";
+
+type LiveEntryRow = Pick<
+  Live,
+  | "slug"
+  | "title"
+  | "title_ko"
+  | "start_date"
+  | "end_date"
+  | "poster_image_url"
+  | "icon_image_url"
+  | "type"
+  | "region"
+  | "live_venue"
+  | "metadata"
+>;
+
+/** 어느 투어에도 안 묶인 공연 행 → 목록 항목(투어 slug와 같은 행은 투어 소속이라 뺀다). */
+function toStandaloneLiveEntries(
+  lives: LiveEntryRow[],
+  tourSlugs: Set<string | null>,
+  extra?: Partial<ZutopiaEntry>,
+): ZutopiaEntry[] {
+  return lives.flatMap((live) =>
+    live.slug && !tourSlugs.has(live.slug)
+      ? [
+          {
+            slug: live.slug,
+            label: live.title_ko ?? live.title,
+            name: live.title,
+            date: formatEntryDateRange(live.start_date, live.end_date),
+            thumbnail: live.icon_image_url ?? live.poster_image_url ?? "",
+            type: liveEntryType(live.type),
+            startDate: live.start_date,
+            // 온라인 공연은 도시 대신 그림 위 "온라인" 태그로(목록 카드).
+            ...(isOnlineText(live.region) || isOnlineText(live.live_venue)
+              ? { online: true }
+              : { city: extractKoreanCity(live.region) }),
+            visitOrdinal: parseVisitOrdinal(live.metadata),
+            ...extra,
+          },
+        ]
+      : [],
+  );
+}
+
+/**
+ * 취소된 단독 공연(lives.status = 'CANCELED', 투어 소속 아님) — 공연 목록 화면에만
+ * 회색·취소선으로 보여 주고 누를 수 없다. 상세 페이지·사이트맵·검색·참전 기록·
+ * 통계는 getLiveEntries(ACTIVE만)를 그대로 써서 취소 공연이 끼지 않는다. 투어
+ * 소속 취소 공연일은 투어 상세 일정(getTourBySlug)에서 같은 모양으로 보인다.
+ */
+export async function getCanceledLiveEntries(): Promise<ZutopiaEntry[]> {
+  const supabase = createBuildTimeSupabaseClient();
+  const [livesResult, toursResult] = await Promise.all([
+    supabase
+      .from("lives")
+      .select(LIVE_ENTRY_COLUMNS)
+      .eq("status", "CANCELED")
+      .is("tour_id", null),
+    supabase.from("tours").select("slug").eq("status", "ACTIVE"),
+  ]);
+  if (livesResult.error) {
+    throw new Error(
+      `취소된 공연 목록을 가져오지 못했습니다: ${livesResult.error.message}`,
+    );
+  }
+  if (toursResult.error) {
+    throw new Error(
+      `투어 목록을 가져오지 못했습니다: ${toursResult.error.message}`,
+    );
+  }
+  return toStandaloneLiveEntries(
+    livesResult.data,
+    new Set(toursResult.data.map((tour) => tour.slug)),
+    { canceled: true },
+  );
+}
+
 /**
  * 허브/카테고리 목록 카드용 — 두 출처를 하나의 목록으로 합친다.
  *
@@ -90,9 +170,7 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
   const [livesResult, toursResult] = await Promise.all([
     supabase
       .from("lives")
-      .select(
-        "slug, title, title_ko, start_date, end_date, poster_image_url, icon_image_url, type, region, live_venue, metadata",
-      )
+      .select(LIVE_ENTRY_COLUMNS)
       .eq("status", "ACTIVE")
       .is("tour_id", null),
     supabase
@@ -115,26 +193,7 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
   }
 
   const tourSlugs = new Set(toursResult.data.map((tour) => tour.slug));
-  const liveEntries: ZutopiaEntry[] = livesResult.data.flatMap((live) =>
-    live.slug && !tourSlugs.has(live.slug)
-      ? [
-          {
-            slug: live.slug,
-            label: live.title_ko ?? live.title,
-            name: live.title,
-            date: formatEntryDateRange(live.start_date, live.end_date),
-            thumbnail: live.icon_image_url ?? live.poster_image_url ?? "",
-            type: liveEntryType(live.type),
-            startDate: live.start_date,
-            // 온라인 공연은 도시 대신 그림 위 "온라인" 태그로(목록 카드).
-            ...(isOnlineText(live.region) || isOnlineText(live.live_venue)
-              ? { online: true }
-              : { city: extractKoreanCity(live.region) }),
-            visitOrdinal: parseVisitOrdinal(live.metadata),
-          },
-        ]
-      : [],
-  );
+  const liveEntries = toStandaloneLiveEntries(livesResult.data, tourSlugs);
 
   const tourEntries: ZutopiaEntry[] = toursResult.data.map((tour) => ({
     slug: tour.slug,
@@ -403,10 +462,11 @@ export const getTourBySlug = cache(
     const { data: lives, error: livesError } = await supabase
       .from("lives")
       .select(
-        `id, start_date, end_date, country, region, live_venue, icon_image_url, poster_image_url, additional_image_urls, ${SETLIST_SELECT}`,
+        `id, start_date, end_date, country, region, live_venue, icon_image_url, poster_image_url, additional_image_urls, status, ${SETLIST_SELECT}`,
       )
       .or(tourDateFilter(tour))
-      .eq("status", "ACTIVE")
+      // 취소된 공연일도 일정엔 회색·취소선으로 남긴다(누를 수 없음, TourDateList).
+      .in("status", ["ACTIVE", "CANCELED"])
       .eq("setlists.songs.status", "ACTIVE")
       .order("start_date", { ascending: true });
 
@@ -418,6 +478,7 @@ export const getTourBySlug = cache(
 
     const dates = lives.map((live) => {
       const { city, original } = splitRegion(live.region);
+      const canceled = live.status === "CANCELED";
       return {
         id: live.id,
         date: formatLiveDateRange(live.start_date, live.end_date),
@@ -431,10 +492,14 @@ export const getTourBySlug = cache(
         iconImageUrl: live.icon_image_url,
         posterImageUrl: live.poster_image_url,
         additionalImageUrls: live.additional_image_urls ?? [],
-        setlist: mergeTourSetlist(
-          normalizeSetlistRows(tourSetlist),
-          normalizeSetlistRows(live.setlists),
-        ),
+        canceled,
+        // 취소된 공연일엔 투어 공통 세트리스트도 얹지 않는다(불린 곡이 없다).
+        setlist: canceled
+          ? []
+          : mergeTourSetlist(
+              normalizeSetlistRows(tourSetlist),
+              normalizeSetlistRows(live.setlists),
+            ),
       };
     });
 

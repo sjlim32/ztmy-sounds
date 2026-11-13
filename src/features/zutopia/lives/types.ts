@@ -60,6 +60,8 @@ export interface TourDateEntry {
   posterImageUrl: string | null;
   additionalImageUrls: string[];
   setlist: LiveSetlistEntry[];
+  /** 취소된 공연일(lives.status = 'CANCELED') — 일정에 회색·취소선, 펼칠 수 없다. */
+  canceled?: boolean;
   /** 이틀 이상 단독 공연을 날마다 나눴을 때의 일차(1, 2…) — 투어 공연일이면 없음. */
   dayNumber?: number;
   /** 같은 날 여러 회차 공연을 나눴을 때의 회차 이름(lives.metadata.shows) */

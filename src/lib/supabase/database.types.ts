@@ -8,6 +8,8 @@ export type Json =
 
 type AlbumType = "FULL" | "MINI" | "EP";
 type RowStatus = "ACTIVE" | "PENDING" | "HIDDEN" | "DELETED";
+// lives만 취소된 공연(CANCELED)을 허용한다 — 20261114000000_add_live_canceled_status.sql
+type LiveStatus = RowStatus | "CANCELED";
 type LiveType = "FESTIVAL" | "CONCERT" | "EVENT";
 
 export interface Database {
@@ -202,7 +204,7 @@ export interface Database {
           additional_image_urls: string[] | null;
           official_url: string | null;
           metadata: Json | null;
-          status: RowStatus;
+          status: LiveStatus;
           created_at: string;
           updated_at: string;
         };
@@ -227,7 +229,7 @@ export interface Database {
           additional_image_urls?: string[] | null;
           official_url?: string | null;
           metadata?: Json | null;
-          status?: RowStatus;
+          status?: LiveStatus;
           created_at?: string;
           updated_at?: string;
         };
@@ -252,7 +254,7 @@ export interface Database {
           additional_image_urls?: string[] | null;
           official_url?: string | null;
           metadata?: Json | null;
-          status?: RowStatus;
+          status?: LiveStatus;
           created_at?: string;
           updated_at?: string;
         };
