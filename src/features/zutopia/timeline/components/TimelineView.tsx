@@ -50,7 +50,8 @@ export function TimelineView({ events }: { events: TimelineEvent[] }) {
   }, [events, attended, ready]);
 
   const lives = useMemo(() => liveSummary(events), [events]);
-  // 곡·앨범은 일정 수, 공연은 총 공연 횟수(지난 공연일: 투어 공연일 + 그 밖 공연일)
+  // 곡·앨범은 일정 수, 공연은 총 공연 횟수(지난 현장 공연일 — 온라인 제외: 투어
+  // 공연일 + 그 밖 공연일)
   const counts = useMemo(() => {
     const result: Record<TimelineKind, number> = {
       song: 0,

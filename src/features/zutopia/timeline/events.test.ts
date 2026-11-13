@@ -7,7 +7,7 @@ import {
   countByYear,
   latestDate,
   liveSummary,
-  totalShows,
+  showsByYear,
   type TimelineEvent,
 } from "@/features/zutopia/timeline/events";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
@@ -50,8 +50,7 @@ function ev(id: string, date: string, endDate: string | null = null) {
     tag: null,
     upcoming: false,
     liveGroup: null,
-    shows: 0,
-    upcomingShows: 0,
+    showDates: [],
   } satisfies TimelineEvent;
 }
 
@@ -350,16 +349,16 @@ describe("공연 묶음과 횟수", () => {
 
   test("투어·단독 콘서트는 단콘, 공연일 수를 지난/예정으로 나눠 센다", () => {
     const tour = events.find((e) => e.id === "live:tour")!;
-    expect(tour).toMatchObject({
-      liveGroup: "concert",
-      tag: "단콘",
-      shows: 2,
-      upcomingShows: 1,
-    });
+    expect(tour).toMatchObject({ liveGroup: "concert", tag: "단콘" });
+    expect(tour.showDates).toEqual([
+      { date: "2026-02-28", upcoming: false },
+      { date: "2026-03-01", upcoming: false },
+      { date: "2026-12-01", upcoming: true },
+    ]);
     expect(events.find((e) => e.id === "live:solo")).toMatchObject({
       liveGroup: "concert",
-      shows: 2,
     });
+    expect(events.find((e) => e.id === "live:solo")?.showDates).toHaveLength(2);
     expect(events.find((e) => e.id === "live:fes")?.tag).toBe("페스티벌");
     expect(events.find((e) => e.id === "live:ev")?.tag).toBe("이벤트");
   });
@@ -376,23 +375,31 @@ describe("공연 묶음과 횟수", () => {
 });
 
 describe("해 요약 공연 수", () => {
+  const online = { ...unit("on", "2025-06-01", null, "EVENT"), online: true };
   const events = buildTimelineEvents({
     songs: [],
     albums: [],
     units: [
-      unit("t2", "2026-03-01", "tour"),
-      unit("t1", "2026-02-28", "tour"),
-      unit("fes", "2026-08-01", null, "FESTIVAL"),
+      // 해를 넘기는 투어 — 공연일마다 자기 해에 들어가야 한다.
+      unit("t1", "2024-12-20", "tour"),
+      unit("t2", "2025-01-10", "tour"),
+      unit("t3", "2025-02-01", "tour"),
+      unit("fes", "2025-08-01", null, "FESTIVAL"),
+      online,
     ],
-    upcomingUnits: [unit("t3", "2026-12-01", "tour")],
+    upcomingUnits: [unit("t4", "2026-12-01", "tour2")],
     today: "2026-11-05",
   });
 
-  test("총 공연 횟수는 공연일 수(예정 포함)", () => {
-    expect(totalShows(events)).toBe(4);
+  test("공연일 하나당 1, 그 공연일 날짜의 해 — 온라인·예정 제외(통계와 같은 기준)", () => {
+    expect(showsByYear(events)).toEqual({ "2024": 1, "2025": 3 });
   });
 
-  test("곡·앨범과 같은 줄의 공연 수는 투어·페스티벌·이벤트 하나당 1", () => {
-    expect(countByYear(events)["2026"].live).toBe(2);
+  test("총 공연 횟수도 온라인 공연은 빼고 센다", () => {
+    expect(liveSummary(events)).toMatchObject({ total: 4, upcoming: 1 });
+  });
+
+  test("곡·앨범과 같은 줄의 일정 수는 시작일의 해 기준", () => {
+    expect(countByYear(events)["2024"].live).toBe(1);
   });
 });

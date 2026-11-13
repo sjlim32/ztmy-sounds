@@ -110,7 +110,7 @@ export function EventCard({
   );
 }
 
-/** 종류별 수 한 줄("● 곡 8 ■ 앨범 1 ■ 공연 3"), 0인 종류는 뺀다. */
+/** 종류별 수 한 줄("● 곡 8 ■ 앨범 1 ■ 공연 일정 3"), 0인 종류는 뺀다. */
 export function KindCounts({
   events,
   className,
@@ -119,13 +119,14 @@ export function KindCounts({
   className?: string;
 }) {
   const counts = { song: 0, album: 0, live: 0 };
-  // 공연도 하나당 1(투어·페스티벌·이벤트 하나 = 1). 공연일 수는 해 요약 맨 위에.
+  // 공연도 하나당 1(투어·페스티벌·이벤트 하나 = 1) — 공연일 수("총 공연 N회")와
+  // 헷갈리지 않게 "공연 일정"이라 부른다.
   for (const event of events) counts[event.kind] += 1;
   const items = (
     [
       ["song", "곡"],
       ["album", "앨범"],
-      ["live", "단콘"],
+      ["live", "공연 일정"],
     ] as const
   ).filter(([kind]) => counts[kind] > 0);
   return (

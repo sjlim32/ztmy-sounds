@@ -27,9 +27,12 @@ export interface TimelineEvent {
   upcoming: boolean;
   /** 공연 묶음 — 투어·단독 콘서트는 단콘(concert), 그 밖은 페스티벌·이벤트. 공연이 아니면 null. */
   liveGroup: LiveGroup | null;
-  /** 공연이면 지난 공연일 수 / 예정 공연일 수 */
-  shows: number;
-  upcomingShows: number;
+  /**
+   * 공연이면 이 일정에 속한 현장 공연일(온라인 공연 제외)의 날짜와 예정 여부.
+   * 공연 횟수는 전부 이걸로 센다 — 통계와 같은 기준(공연일 하나당 1, 그 공연일
+   * 날짜의 해, 온라인 제외). 해를 넘기는 투어도 공연일마다 자기 해에 들어간다.
+   */
+  showDates: { date: string; upcoming: boolean }[];
 }
 
 export type LiveGroup = "concert" | "festival" | "event";
@@ -125,8 +128,7 @@ export function buildTimelineEvents(input: {
       tag: song.collab ? "협업" : null,
       upcoming: isFuture(date),
       liveGroup: null,
-      shows: 0,
-      upcomingShows: 0,
+      showDates: [],
     });
   }
 
@@ -144,8 +146,7 @@ export function buildTimelineEvents(input: {
       tag: album.typeLabel,
       upcoming: isFuture(album.releaseDate.slice(0, 10)),
       liveGroup: null,
-      shows: 0,
-      upcomingShows: 0,
+      showDates: [],
     });
   }
 
@@ -179,8 +180,10 @@ export function buildTimelineEvents(input: {
       tag: LIVE_GROUP_LABEL[liveGroupOf(all[0])],
       upcoming: past.length === 0,
       liveGroup: liveGroupOf(all[0]),
-      shows: past.length,
-      upcomingShows: all.length - past.length,
+      showDates: all
+        .filter((unit) => !unit.online)
+        .map((unit) => ({ date: unit.date, upcoming: !past.includes(unit) }))
+        .sort((a, b) => a.date.localeCompare(b.date)),
     });
   }
 
@@ -254,7 +257,10 @@ export function timelineRange(
   };
 }
 
-/** 해마다 종류별 일정 수(시작일의 해 기준, 투어·페스티벌·이벤트 하나당 1) — 모바일 해 머리 표기용. */
+/**
+ * 해마다 종류별 일정 수(시작일의 해 기준, 투어·페스티벌 하나 = 1). 화면의 공연
+ * 횟수는 이 live 값이 아니라 showsByYear(공연일 수)를 쓴다.
+ */
 export function countByYear(
   events: TimelineEvent[],
 ): Record<string, Record<TimelineKind, number>> {
@@ -262,9 +268,24 @@ export function countByYear(
   for (const event of events) {
     const year = event.date.slice(0, 4);
     result[year] ??= { song: 0, album: 0, live: 0 };
-    // 공연도 하나당 1(투어 하나·페스티벌 하나 = 1) — 공연일 수는 totalShows.
     result[year][event.kind] += 1;
   }
+  return result;
+}
+
+/**
+ * 해마다 지난 현장 공연일 수 — 통계 "공연이 가장 많았던 해"와 같은 기준(공연일
+ * 하나당 1, 그 공연일 날짜의 해, 온라인·예정 제외). 해를 넘기는 투어(2024-10 ~
+ * 2025-05)도 공연일마다 자기 해에 나뉘어 들어간다.
+ */
+export function showsByYear(events: TimelineEvent[]): Record<string, number> {
+  const result: Record<string, number> = {};
+  for (const event of events)
+    for (const show of event.showDates) {
+      if (show.upcoming) continue;
+      const year = show.date.slice(0, 4);
+      result[year] = (result[year] ?? 0) + 1;
+    }
   return result;
 }
 
@@ -279,8 +300,8 @@ export function latestDate(events: TimelineEvent[]): string | null {
 }
 
 /**
- * 공연 횟수 요약 — 총 공연 횟수(지난 공연일: 투어 공연일 + 그 밖 공연일)와 묶음별
- * (단콘 = 투어 + 단독 콘서트, 페스티벌, 이벤트), 예정 공연일 수.
+ * 공연 횟수 요약 — 총 공연 횟수(지난 현장 공연일: 투어 공연일 + 그 밖 공연일,
+ * 온라인 제외)와 묶음별(단콘 = 투어 + 단독 콘서트, 페스티벌, 이벤트), 예정 공연일 수.
  */
 export function liveSummary(events: TimelineEvent[]): {
   total: number;
@@ -292,18 +313,14 @@ export function liveSummary(events: TimelineEvent[]): {
   const result = { total: 0, concert: 0, festival: 0, event: 0, upcoming: 0 };
   for (const event of events) {
     if (!event.liveGroup) continue;
-    result.total += event.shows;
-    result[event.liveGroup] += event.shows;
-    result.upcoming += event.upcomingShows;
+    for (const show of event.showDates) {
+      if (show.upcoming) {
+        result.upcoming += 1;
+        continue;
+      }
+      result.total += 1;
+      result[event.liveGroup] += 1;
+    }
   }
   return result;
-}
-
-/** 공연일 수 합계(예정 포함) — 해 요약 맨 위 "총 공연 N회". */
-export function totalShows(events: TimelineEvent[]): number {
-  return events.reduce(
-    (sum, event) =>
-      event.kind === "live" ? sum + event.shows + event.upcomingShows : sum,
-    0,
-  );
 }

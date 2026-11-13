@@ -265,7 +265,8 @@ export function toClientUnit(
 
 /**
  * 현장 공연만 — 온라인 공연(unit.online)을 뺀다. 참전 기록(체크할 공연)과 통계가
- * 쓴다. 곡별 라이브 횟수·마지막 라이브·활동 연혁은 온라인 공연도 센다.
+ * 쓴다. 곡별 라이브 횟수·마지막 라이브는 온라인 공연도 세고, 활동 연혁은 온라인
+ * 공연을 그리되 공연 횟수엔 넣지 않는다(timeline/events.ts showDates).
  */
 export function inPersonUnits<T extends Pick<LiveUnit, "online">>(
   units: T[],

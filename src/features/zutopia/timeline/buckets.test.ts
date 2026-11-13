@@ -29,8 +29,7 @@ function ev(
     tag: null,
     upcoming: false,
     liveGroup: null,
-    shows: 0,
-    upcomingShows: 0,
+    showDates: [],
   };
 }
 

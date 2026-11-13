@@ -15,6 +15,7 @@ import {
 } from "@/features/zutopia/timeline/zoom";
 import {
   countByYear,
+  showsByYear,
   dateToOffset,
   type TimelineEvent,
 } from "@/features/zutopia/timeline/events";
@@ -74,6 +75,8 @@ export function VerticalTimeline({
     return [...groups.entries()];
   }, [events]);
   const counts = useMemo(() => countByYear(events), [events]);
+  // 해 머리의 공연 수 — 일정 수가 아니라 현장 공연일 수(통계와 같은 기준).
+  const shows = useMemo(() => showsByYear(events), [events]);
 
   const main = () => rootRef.current?.closest("main") ?? null;
 
@@ -162,14 +165,15 @@ export function VerticalTimeline({
               {year}
             </span>
             <span className="text-sm text-white/55">
-              곡 {counts[year].song} · 앨범 {counts[year].album} · 단콘{" "}
-              {counts[year].live}
+              곡 {counts[year].song} · 앨범 {counts[year].album} · 공연{" "}
+              {shows[year] ?? 0}회
             </span>
           </h2>
           {level === "year" && (
             <div className="py-3">
               <YearSummaryCard
                 events={list}
+                shows={shows[year] ?? 0}
                 attended={list.some((event) => attendedCounts.has(event.id))}
                 onOpen={() => openAt(year)}
               />

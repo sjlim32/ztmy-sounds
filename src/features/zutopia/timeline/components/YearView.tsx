@@ -1,4 +1,5 @@
 import { bucketEvents } from "@/features/zutopia/timeline/buckets";
+import { showsByYear } from "@/features/zutopia/timeline/events";
 import type { TimelineEvent } from "@/features/zutopia/timeline/events";
 import { YearSummaryCard } from "./summary-cards";
 
@@ -26,6 +27,7 @@ export function YearView({
   const buckets = new Map(
     bucketEvents(events, "year").map((bucket) => [bucket.key, bucket]),
   );
+  const shows = showsByYear(events);
   return (
     <>
       {years.map((year) => {
@@ -38,13 +40,15 @@ export function YearView({
             className="absolute flex items-center px-2"
             style={{ left, width, top, height }}
           >
-            {list.length === 0 ? (
+            {/* 그 해에 시작한 일정이 없어도 앞 해에서 넘어온 투어 공연일이 있으면 요약을 그린다. */}
+            {list.length === 0 && !shows[year] ? (
               <p className="w-full text-center text-sm text-white/55">
                 일정 없음
               </p>
             ) : (
               <YearSummaryCard
                 events={list}
+                shows={shows[year] ?? 0}
                 attended={list.some((event) => attendedCounts.has(event.id))}
                 onOpen={() => onOpen(`${year}-07-01`)}
                 className="max-h-full"

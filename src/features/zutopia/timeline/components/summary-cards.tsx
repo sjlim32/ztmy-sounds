@@ -4,10 +4,7 @@ import {
   clusterThumbs,
   pickHighlights,
 } from "@/features/zutopia/timeline/buckets";
-import {
-  totalShows,
-  type TimelineEvent,
-} from "@/features/zutopia/timeline/events";
+import { type TimelineEvent } from "@/features/zutopia/timeline/events";
 import { EventThumb } from "./EventThumb";
 import {
   ATTENDED_CLASS,
@@ -26,18 +23,23 @@ import { KindCounts } from "./parts";
  */
 export function YearSummaryCard({
   events,
+  shows,
   attended,
   onOpen,
   className,
 }: {
   events: TimelineEvent[];
+  /**
+   * 그 해 지난 현장 공연일 수(showsByYear) — 그 해에 시작한 일정만이 아니라 앞 해에
+   * 시작해 넘어온 투어의 공연일도 들어가서 events로는 셀 수 없어 따로 받는다.
+   */
+  shows: number;
   attended: boolean;
   onOpen: () => void;
   className?: string;
 }) {
   const highlights = pickHighlights(events, 4);
   const names = events.filter((event) => event.kind !== "song");
-  const shows = totalShows(events);
   return (
     <button
       type="button"
@@ -50,7 +52,7 @@ export function YearSummaryCard({
         className,
       )}
     >
-      {/* 맨 위: 그 해 총 공연 횟수(공연일 수) */}
+      {/* 맨 위: 그 해 총 공연 횟수(현장 공연일 수, 통계와 같은 기준) */}
       {shows > 0 && (
         <span className="text-base font-semibold text-white">
           총 공연 <span className="text-ztmy-pink tabular-nums">{shows}</span>회
