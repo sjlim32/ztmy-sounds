@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
 import { getGuideHref } from "@/features/zutopia/guide-link";
+import { parseSongMetadata } from "./song-metadata";
 import type { Song } from "./types";
 import type { AlbumWithSongs, SongCounts, SongWithAlbums } from "./types";
 
@@ -16,6 +17,7 @@ type OriginalSongRef = Pick<
   | "streaming_urls"
   | "arranger"
   | "movie_director"
+  | "metadata"
 >;
 
 /**
@@ -42,7 +44,7 @@ async function fetchOriginalsById(
   const { data, error } = await supabase
     .from("songs")
     .select(
-      "id, slug, title, title_ko, title_en, cover_image_url, music_video_url, streaming_urls, arranger, movie_director",
+      "id, slug, title, title_ko, title_en, cover_image_url, music_video_url, streaming_urls, arranger, movie_director, metadata",
     )
     .in("id", ids);
 
@@ -77,8 +79,22 @@ function resolveDisplaySong<T extends Song>(
   if (!original) return { ...song, guideHref };
 
   const suffix = song.version_name ? ` (${song.version_name})` : "";
+  // 원곡이 협업곡이면 어레인지 버전도 협업곡으로 보이게 collab을 물려준다(자기
+  // metadata에 이미 있으면 그대로) — 곡 목록의 "협업" 칩·"협업곡 빼기" 필터용.
+  const originalCollab = parseSongMetadata(original.metadata).collab;
+  const ownMetadata =
+    song.metadata &&
+    typeof song.metadata === "object" &&
+    !Array.isArray(song.metadata)
+      ? song.metadata
+      : {};
+  const metadata =
+    originalCollab && !parseSongMetadata(song.metadata).collab
+      ? { ...ownMetadata, collab: originalCollab }
+      : song.metadata;
   return {
     ...song,
+    metadata,
     title: `${original.title}${suffix}`,
     title_ko: `${original.title_ko}${suffix}`,
     title_en: original.title_en,

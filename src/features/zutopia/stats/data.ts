@@ -13,8 +13,9 @@ import { buildStatSections } from "./compute";
 import type { StatSection, StatSong, StatTour } from "./types";
 
 /**
- * 통계 페이지 기록(빌드 때 한 번). 곡은 참전 기록과 같은 기준(원곡·발매곡만 —
- * 라이브 기록은 원곡으로 센다), 앨범 수록곡도 어레인지는 원곡으로 바꿔 센다.
+ * 통계 페이지 기록(빌드 때 한 번). 곡은 isCountableOriginal — 원곡·발매곡만이고
+ * 협업곡도 뺀다(참전 기록은 들은 협업곡을 넣는 것과 다름). 라이브 기록은 원곡으로
+ * 세고, 앨범 수록곡도 어레인지는 원곡으로 바꿔 센다.
  */
 export const getStatSections = cache(async (): Promise<StatSection[]> => {
   const supabase = createBuildTimeSupabaseClient();

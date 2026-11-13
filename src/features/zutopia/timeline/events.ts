@@ -21,7 +21,7 @@ export interface TimelineEvent {
   newSongCount: number;
   /** 카드 그림 — 곡·앨범 커버, 공연(투어) 대표 그림. */
   imageUrl: string | null;
-  /** 앨범 구분 표기("정규 4집"). 그 밖엔 null. */
+  /** 분류 표기 — 앨범 "정규 4집", 공연 묶음(단콘·페스티벌·이벤트), 협업곡 "협업". 그 밖엔 null. */
   tag: string | null;
   /** 아직 오지 않은 일정(예정 공연·발매 예정). 흐리게 + "예정". */
   upcoming: boolean;
@@ -52,6 +52,8 @@ export interface TimelineSongInput {
   titleKo: string | null;
   releaseDate: string;
   unreleased: boolean;
+  /** 협업곡(metadata.collab) — 일정에 "협업" 태그를 단다. */
+  collab: boolean;
   /** 이 곡이 실린 앨범 ID. */
   albumIds: string[];
   coverSrc: string | null;
@@ -120,7 +122,7 @@ export function buildTimelineEvents(input: {
       unitIds: [],
       newSongCount: 0,
       imageUrl: song.coverSrc,
-      tag: null,
+      tag: song.collab ? "협업" : null,
       upcoming: isFuture(date),
       liveGroup: null,
       shows: 0,

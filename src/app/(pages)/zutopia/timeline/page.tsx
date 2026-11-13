@@ -25,19 +25,24 @@ export default async function ZutopiaTimelinePage() {
   ]);
 
   // 원곡만 — 편곡·버전 곡은 원곡과 같은 노래라 연혁에선 원곡 발매만 남긴다.
+  // 협업곡은 활동 이력이라 남기고 "협업" 태그로 구분한다.
   const events = buildTimelineEvents({
     songs: songs
       .filter((song) => !song.original_song_id)
-      .map((song) => ({
-        id: song.id,
-        slug: song.slug,
-        title: song.title,
-        titleKo: song.title_ko,
-        releaseDate: song.release_date,
-        unreleased: parseSongMetadata(song.metadata).isUnreleased,
-        albumIds: song.albums.map((album) => album.id),
-        coverSrc: getSongCoverSrc(song),
-      })),
+      .map((song) => {
+        const { isUnreleased, collab } = parseSongMetadata(song.metadata);
+        return {
+          id: song.id,
+          slug: song.slug,
+          title: song.title,
+          titleKo: song.title_ko,
+          releaseDate: song.release_date,
+          unreleased: isUnreleased,
+          collab: collab !== null,
+          albumIds: song.albums.map((album) => album.id),
+          coverSrc: getSongCoverSrc(song),
+        };
+      }),
     albums: albums.map((album) => ({
       id: album.id,
       slug: album.slug,

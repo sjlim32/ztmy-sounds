@@ -48,6 +48,18 @@ const units = [
 ];
 
 describe("summarizeAttendance", () => {
+  test("협업곡은 들었으면 들은 곡에, 못 들었으면 못 들은 곡에 넣지 않는다", () => {
+    const collabHeard = { ...song("c1", "2020-01-01"), collab: true };
+    const collabUnheard = { ...song("c2", "2020-01-01"), collab: true };
+    const result = summarizeAttendance(
+      [unit("D:2026-01-01", "2026-01-01", ["c1"])],
+      new Set(["D:2026-01-01"]),
+      [collabHeard, collabUnheard, song("s9", "2019-01-01")],
+    );
+    expect(result.heard.map((s) => s.id)).toEqual(["c1"]);
+    expect(result.unheard.map((s) => s.id)).toEqual(["s9"]);
+  });
+
   test("체크 없으면 빈 결과, 못 들은 곡은 발매일 순 전부", () => {
     expect(summarizeAttendance(units, new Set(), songs)).toEqual({
       attendedCount: 0,

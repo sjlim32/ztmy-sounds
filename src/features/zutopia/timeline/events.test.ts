@@ -67,6 +67,7 @@ const song = (
   titleKo: `${id}-ko`,
   releaseDate,
   unreleased,
+  collab: false,
   albumIds,
   coverSrc: `${id}.webp`,
 });
@@ -140,6 +141,21 @@ describe("buildTimelineEvents", () => {
       imageUrl: "al.webp",
       tag: "미니 1집",
     });
+  });
+
+  test('협업곡은 남기고 "협업" 태그, 다른 곡은 태그 없음', () => {
+    const events = buildTimelineEvents({
+      songs: [
+        song("s1", "2018-06-04"),
+        { ...song("c", "2021-05-31"), collab: true },
+      ],
+      albums: [],
+      units: [],
+    });
+    expect(events.map((e) => [e.id, e.tag])).toEqual([
+      ["song:s1", null],
+      ["song:c", "협업"],
+    ]);
   });
 
   test("날짜순, 같은 날은 앨범 → 곡 → 공연", () => {

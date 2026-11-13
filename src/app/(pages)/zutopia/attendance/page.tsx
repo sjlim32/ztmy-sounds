@@ -6,7 +6,7 @@ import {
 } from "@/features/zutopia/live-history/units";
 import { getSongsWithAlbums } from "@/features/zutopia/song-db/data";
 import { getSongCoverSrc } from "@/features/zutopia/song-db/song-album-grouping";
-import { isCountableOriginal } from "@/features/zutopia/song-db/song-metadata";
+import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
 import { AttendanceView } from "@/features/zutopia/attendance/components/AttendanceView";
 import type { AttendanceSong } from "@/features/zutopia/attendance/summarize";
 
@@ -22,10 +22,15 @@ export default async function ZutopiaAttendancePage() {
     getSongsWithAlbums(),
   ]);
 
-  // 원곡·발매곡만 — 라이브 기록은 원곡 기준으로 세고, 미공개곡은 "못 들은 곡"에
-  // 넣지 않는다.
+  // 원곡·발매곡만 — 라이브 기록은 원곡 기준으로 세고, 미공개곡은 넣지 않는다.
+  // 협업곡은 넣되 collab 표시를 달아, 들었으면 들은 곡에만 들어가고 "못 들은 곡"엔
+  // 들어가지 않게 한다(summarizeAttendance).
   const attendanceSongs: AttendanceSong[] = songs
-    .filter(isCountableOriginal)
+    .filter(
+      (song) =>
+        !song.original_song_id &&
+        !parseSongMetadata(song.metadata).isUnreleased,
+    )
     .map((song) => ({
       id: song.id,
       slug: song.slug,
@@ -34,6 +39,7 @@ export default async function ZutopiaAttendancePage() {
       titleEn: song.title_en,
       releaseDate: song.release_date,
       coverSrc: getSongCoverSrc(song),
+      ...(parseSongMetadata(song.metadata).collab && { collab: true }),
     }));
 
   return (

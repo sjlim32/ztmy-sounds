@@ -203,8 +203,11 @@ export function AttendanceView({
   }, [units, today]);
 
   // 성불·성불 대기 곡 수는 아래 목록 카드 탭에 있어서 여기선 겹치지 않게
-  // 참전 횟수와 성불률(전체 곡 중 들은 곡 비율)만.
-  const songTotal = summary.heard.length + summary.unheard.length;
+  // 참전 횟수와 성불률(전체 곡 중 들은 곡 비율)만. 협업곡은 들은 곡 목록엔 들어가도
+  // 성불률엔 넣지 않는다 — 못 들은 곡에 없으니 분자·분모 모두 빼야 사람마다 기준이
+  // 같다.
+  const heardCount = summary.heard.filter((song) => !song.collab).length;
+  const songTotal = heardCount + summary.unheard.length;
   const stats = [
     { label: "참전", value: `${summary.attendedCount}회`, highlight: false },
     {
@@ -213,8 +216,8 @@ export function AttendanceView({
         songTotal > 0
           ? // 내림 — 다 듣기 전엔 100%로, 한 곡이라도 들었으면 0%로 보이지 않게.
             `${Math.max(
-              summary.heard.length > 0 ? 1 : 0,
-              Math.floor((summary.heard.length / songTotal) * 100),
+              heardCount > 0 ? 1 : 0,
+              Math.floor((heardCount / songTotal) * 100),
             )}%`
           : "0%",
       highlight: true,

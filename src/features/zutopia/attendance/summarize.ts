@@ -1,6 +1,6 @@
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
 
-/** 참전 기록·이미지에 쓰는 곡 정보 — 원곡·발매곡만(페이지에서 거른다). */
+/** 참전 기록·이미지에 쓰는 곡 정보 — 원곡·발매곡만(페이지에서 거른다, 협업곡 포함). */
 export interface AttendanceSong {
   id: string;
   slug: string;
@@ -10,6 +10,11 @@ export interface AttendanceSong {
   /** "YYYY-MM-DD" */
   releaseDate: string;
   coverSrc: string | null;
+  /**
+   * 협업곡(songs.metadata.collab) — 라이브에서 들었으면 들은 곡에 넣고, 못 들었으면
+   * "못 들은 곡"에 넣지 않는다(라이브에서 부를 것으로 기대하는 곡이 아니라서).
+   */
+  collab?: boolean;
 }
 
 export interface HeardSong extends AttendanceSong {
@@ -59,7 +64,9 @@ export function summarizeAttendance(
       return { ...song, count: unitIds.length, unitIds };
     })
     .sort((a, b) => b.count - a.count || byRelease(a, b));
-  const unheard = songs.filter((song) => !heardIn.has(song.id)).sort(byRelease);
+  const unheard = songs
+    .filter((song) => !heardIn.has(song.id) && !song.collab)
+    .sort(byRelease);
 
   const dates = checked.map((unit) => unit.date).sort();
   return {

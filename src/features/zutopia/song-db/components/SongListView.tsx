@@ -24,7 +24,10 @@ import { secondaryTitle } from "@/features/zutopia/song-db/song-title";
 import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 import { SongDbDrawer } from "@/features/zutopia/song-db/components/SongDbDrawer";
 import { SongDetailPanel } from "@/features/zutopia/song-db/components/SongDetailPanel";
-import { UnreleasedBadge } from "@/features/zutopia/song-db/components/UnreleasedBadge";
+import {
+  CollabBadge,
+  UnreleasedBadge,
+} from "@/features/zutopia/song-db/components/SongBadges";
 import {
   FilterPanel,
   FilterToggleRow,
@@ -89,15 +92,27 @@ export function SongListView({ songs, liveSummaries }: SongListViewProps) {
   const [releaseFilter, setReleaseFilter] = useState<ReleaseFilter>("all");
   // MV 있는 곡만(songs.music_video_url) — 켜면 곡 범위 개수도 MV 있는 곡만 센다.
   const [mvOnly, setMvOnly] = useState(false);
+  // 협업곡(metadata.collab) 빼기 — 기본은 보여 준다. 켜면 다른 줄 개수도 협업곡을 뺀다.
+  const [hideCollab, setHideCollab] = useState(false);
   const hasMv = (song: SongWithAlbums) => !!song.music_video_url?.trim();
-  const pool = mvOnly ? songs.filter(hasMv) : songs;
+  const isCollab = (song: SongWithAlbums) =>
+    parseSongMetadata(song.metadata).collab !== null;
+  const isMvMatch = (song: SongWithAlbums) => !mvOnly || hasMv(song);
+  const isCollabMatch = (song: SongWithAlbums) =>
+    !hideCollab || !isCollab(song);
+  const pool = songs.filter((song) => isMvMatch(song) && isCollabMatch(song));
   const isReleaseMatch = (song: SongWithAlbums) =>
     releaseFilter === "all" ||
     parseSongMetadata(song.metadata).isUnreleased ===
       (releaseFilter === "unreleased");
+  // 칩 개수 = 그 칩을 켰을 때 보이는 곡 수(나머지 필터는 지금 상태 그대로).
   const mvCount = songs.filter(
-    (song) => hasMv(song) && isReleaseMatch(song),
+    (song) => hasMv(song) && isCollabMatch(song) && isReleaseMatch(song),
   ).length;
+  const nonCollabCount = songs.filter(
+    (song) => !isCollab(song) && isMvMatch(song) && isReleaseMatch(song),
+  ).length;
+  const hasCollab = songs.some(isCollab);
   const unreleasedCount = pool.filter(
     (song) => parseSongMetadata(song.metadata).isUnreleased,
   ).length;
@@ -165,10 +180,11 @@ export function SongListView({ songs, liveSummaries }: SongListViewProps) {
     <div className="flex flex-col gap-6">
       <FilterPanel
         onReset={
-          releaseFilter !== "all" || mvOnly
+          releaseFilter !== "all" || mvOnly || hideCollab
             ? () => {
                 setReleaseFilter("all");
                 setMvOnly(false);
+                setHideCollab(false);
               }
             : undefined
         }
@@ -194,6 +210,19 @@ export function SongListView({ songs, liveSummaries }: SongListViewProps) {
                 },
               ]}
             />
+            {hasCollab && (
+              <FilterToggleRow
+                label="협업"
+                toggles={[
+                  {
+                    label: "협업곡 빼기",
+                    active: hideCollab,
+                    onToggle: () => setHideCollab(!hideCollab),
+                    count: nonCollabCount,
+                  },
+                ]}
+              />
+            )}
           </>
         }
         display={
@@ -228,12 +257,14 @@ export function SongListView({ songs, liveSummaries }: SongListViewProps) {
 
       {visibleSongs.length === 0 ? (
         <p className={cn("text-base text-white/50", "tablet:text-lg")}>
-          아직 등록된 곡이 없습니다.
+          {releaseFilter !== "all" || mvOnly || hideCollab
+            ? "조건에 맞는 곡이 없습니다."
+            : "아직 등록된 곡이 없습니다."}
         </p>
       ) : (
         // 정렬·보기를 바꾸면 key가 바뀌어 새 결과가 살짝 올라오며 나타난다.
         <div
-          key={`${groupBy}-${sortDirection}-${releaseFilter}-${mvOnly}-${showLastLive}`}
+          key={`${groupBy}-${sortDirection}-${releaseFilter}-${mvOnly}-${hideCollab}-${showLastLive}`}
           className="animate-content-in flex flex-col gap-8"
         >
           {groupSongs(visibleSongs, groupBy, sortDirection, liveSummaries).map(
@@ -354,7 +385,9 @@ export function SongListView({ songs, liveSummaries }: SongListViewProps) {
                         }
                       };
                       const hasIcons = song.music_video_url || song.guideHref;
-                      const { isUnreleased } = parseSongMetadata(song.metadata);
+                      const { isUnreleased, collab } = parseSongMetadata(
+                        song.metadata,
+                      );
                       const liveSummary = liveSummaries[song.id];
 
                       return (
@@ -408,6 +441,7 @@ export function SongListView({ songs, liveSummaries }: SongListViewProps) {
                                     {song.title}
                                   </span>
                                   {isUnreleased && <UnreleasedBadge />}
+                                  {collab && <CollabBadge />}
                                 </span>
                                 {/* 세트리스트와 같은 둘째 줄 — "한국어 · 영어", 길면 영어 쪽부터 잘린다. */}
                                 <span

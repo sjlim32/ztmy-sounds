@@ -7,7 +7,10 @@ import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ALBUM_TYPE_SHORT_LABEL } from "@/features/zutopia/song-db/labels";
 import { getSongCoverSrc } from "@/features/zutopia/song-db/song-album-grouping";
 import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
-import { UnreleasedBadge } from "@/features/zutopia/song-db/components/UnreleasedBadge";
+import {
+  CollabBadge,
+  UnreleasedBadge,
+} from "@/features/zutopia/song-db/components/SongBadges";
 import {
   formatDaysAgo,
   type LiveRef,
@@ -32,7 +35,9 @@ export function SongDetailPanel({
   const coverSrc = getSongCoverSrc(song);
   const hasArranger = (song.arranger?.length ?? 0) > 0;
   const hasMovieDirector = (song.movie_director?.length ?? 0) > 0;
-  const { description, isUnreleased } = parseSongMetadata(song.metadata);
+  const { description, isUnreleased, collab } = parseSongMetadata(
+    song.metadata,
+  );
 
   return (
     <>
@@ -70,6 +75,7 @@ export function SongDetailPanel({
                 {song.title}
               </p>
               {isUnreleased && <UnreleasedBadge />}
+              {collab && <CollabBadge />}
             </div>
             <p
               className={cn("mt-0.5 text-base text-white/80", "tablet:text-lg")}
@@ -86,6 +92,8 @@ export function SongDetailPanel({
           className="mt-3"
           rows={[
             { label: "발매일", value: formatDotDate(song.release_date) },
+            // 협업곡의 출처(참여한 앨범·원곡 아티스트·타이업 등).
+            ...(collab ? [{ label: "협업", value: collab }] : []),
             ...(hasArranger
               ? [{ label: "편곡", value: song.arranger!.join(", ") }]
               : []),
