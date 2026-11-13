@@ -227,7 +227,6 @@ function RowName({ row, className }: { row: StatRow; className?: string }) {
     <Link
       href={row.href}
       title={row.name}
-      transitionTypes={["nav-forward"]}
       className={cn(
         base,
         "rounded-sm transition-colors hover:text-white hover:underline hover:decoration-white/40 hover:underline-offset-4",

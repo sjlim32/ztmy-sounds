@@ -8,6 +8,7 @@ import { formatEventDate, type Event } from "@/data/event";
 import type { TourPerformanceItem } from "@/data/tour-performances";
 import type { Remaining } from "@/features/home/lib/countdown";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
+import { ThumbImage } from "@/components/ThumbImage";
 import { Countdown } from "@/features/home/components/Countdown";
 
 // 티켓 스텁 상단 띠 색(내한/원정).
@@ -257,11 +258,11 @@ function BoardingTicket({
       <div className="flex gap-3">
         <PosterLink className="block shrink-0 self-start">
           {event.tourImg !== "" ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            // 원본 포스터는 수백 KB인데 화면엔 최대 96px 폭(pc:w-24)으로만 보인다.
+            <ThumbImage
               src={event.tourImg}
+              displayWidth={96}
               alt={event.tourName}
-              loading="lazy"
               className={cn(
                 "aspect-3/4 w-20 object-cover shadow-[0_2px_10px_rgba(0,0,0,0.55)] ring-1 ring-white/15 transition-opacity hover:opacity-80",
                 "pc:w-24",

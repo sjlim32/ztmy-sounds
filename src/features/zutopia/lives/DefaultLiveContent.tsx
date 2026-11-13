@@ -1,3 +1,4 @@
+import { ThumbImage } from "@/components/ThumbImage";
 import { ViewTransition } from "react";
 import { posterTransitionName } from "@/features/zutopia/lives/poster-transition";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,7 @@ import {
 } from "@/features/zutopia/lives/TourDateList";
 import type { LiveDetail } from "@/features/zutopia/lives/types";
 import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
+import { rocknrollOne } from "@/features/zutopia/lives/rocknroll-font";
 
 /**
  * CONTENT_BY_KEY에 이 공연 전용 콘텐츠가 없을 때 쓰는 기본 상세 뷰 —
@@ -63,9 +65,12 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
           share="morph"
           default="none"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          {/* 화면 폭별로 줄인 포스터(srcset) — 원본보다 큰 후보는 원본 크기로 온다. */}
+          <ThumbImage
             src={heroImageUrl}
+            displayWidth={800}
+            sizes={"(max-width: 49.99rem) 100vw, 800px"}
+            loading="eager"
             alt={live.title}
             className={cn(
               "max-h-[60vh] max-w-full rounded-lg object-contain",
@@ -87,7 +92,11 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
 
       <div className="flex flex-col items-center text-center">
         <h1
-          className={cn("font-rocknroll text-xl text-white", "tablet:text-3xl")}
+          className={cn(
+            rocknrollOne.className,
+            "text-xl text-white",
+            "tablet:text-3xl",
+          )}
         >
           {live.title_ko ?? live.title}
         </h1>

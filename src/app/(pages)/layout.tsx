@@ -1,11 +1,11 @@
+import type { CSSProperties } from "react";
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono, RocknRoll_One } from "next/font/google";
+import { IBM_Plex_Mono } from "next/font/google";
 import localFont from "next/font/local";
-import "@fontsource/line-seed-jp/400.css";
-import "@fontsource/line-seed-jp/700.css";
 import { SerwistProvider } from "@serwist/turbopack/react";
 import { BodyScrollGuard } from "@/components/BodyScrollGuard";
 import { CustomCursor } from "@/components/CustomCursor";
+import { DeferredFonts } from "@/components/DeferredFonts";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { GuideDimOverlay } from "@/components/GuideDimOverlay";
 import { InstallPromptBanner } from "@/components/InstallPromptBanner";
@@ -19,40 +19,42 @@ import "../globals.css";
 
 // 로컬 폰트는 원본이 아니라 scripts/subset-fonts.mjs가 만든 서브셋을 씁니다 —
 // 원본을 그대로 preload하면 첫 로딩 전송량 대부분을 폰트가 차지합니다.
+// LINE Seed KR은 두 조각입니다: 사이트 글자만 든 기본 조각(굵기당 약 90KB)은 여기서
+// 미리 받고, 나머지 KS X 1001 음절·기호 조각은 subset-fonts.mjs가 만든 CSS
+// (정확한 unicode-range)를 DeferredFonts가 첫 화면 뒤에 불러와 그 글자가 나올 때만 받습니다.
+// 이 폰트는 세로 높이 값이 표마다 달라서(hhea 1050/274, typo 750/250 + 줄
+// 간격 324, typo 우선 표시 켜짐) Mac은 hhea를, Windows는 typo를 써서 같은
+// 줄 안에서 Windows 글자만 약 0.14em 위로 떴다(배지·버튼 글자가 위로 치우침).
+// Mac 값으로 고정해 두 OS가 같게 그린다(나머지 조각 CSS에도 같은 값).
 const lineSeedKR = localFont({
   src: [
     {
-      path: "../../fonts/subset/LINESeedKR-Rg.woff2",
+      path: "../../fonts/subset/LINESeedKR-Rg-core.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../../fonts/subset/LINESeedKR-Rg.woff2",
+      path: "../../fonts/subset/LINESeedKR-Rg-core.woff2",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../../fonts/subset/LINESeedKR-Bd.woff2",
+      path: "../../fonts/subset/LINESeedKR-Bd-core.woff2",
       weight: "600",
       style: "normal",
     },
     {
-      path: "../../fonts/subset/LINESeedKR-Bd.woff2",
+      path: "../../fonts/subset/LINESeedKR-Bd-core.woff2",
       weight: "700",
       style: "normal",
     },
     {
-      path: "../../fonts/subset/LINESeedKR-Bd.woff2",
+      path: "../../fonts/subset/LINESeedKR-Bd-core.woff2",
       weight: "800",
       style: "normal",
     },
   ],
-  variable: "--font-line-seed-kr",
   display: "swap",
-  // 이 폰트는 세로 높이 값이 표마다 달라서(hhea 1050/274, typo 750/250 + 줄
-  // 간격 324, typo 우선 표시 켜짐) Mac은 hhea를, Windows는 typo를 써서 같은
-  // 줄 안에서 Windows 글자만 약 0.14em 위로 떴다(배지·버튼 글자가 위로 치우침).
-  // Mac 값으로 고정해 두 OS가 같게 그린다.
   declarations: [
     { prop: "ascent-override", value: "105%" },
     { prop: "descent-override", value: "27.4%" },
@@ -60,15 +62,21 @@ const lineSeedKR = localFont({
   ],
 });
 
+// 글꼴 목록: 기본 조각 → 나머지 조각 → 기본 조각의 대체 글꼴(local(Arial), 글꼴을
+// 받는 동안 줄 높이를 맞춰 화면 흔들림을 줄임). 대체 글꼴이 나머지 조각보다 앞이면
+// 나머지 조각의 그리스·키릴 문자·기호(™ ↑ ≤ 등)를 Arial이 가로챈다. globals.css의
+// --font-sans가 이 변수를 쓴다.
+const [lineSeedKRFamily, ...lineSeedKRFallbacks] =
+  lineSeedKR.style.fontFamily.split(",");
+const lineSeedKRStack = [
+  lineSeedKRFamily,
+  '"LINE Seed KR Rest"',
+  ...lineSeedKRFallbacks,
+].join(",");
+
 const plexMono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
   weight: ["400", "500", "600", "700"],
-  subsets: ["latin"],
-});
-
-const rocknrollOne = RocknRoll_One({
-  variable: "--font-rocknroll-one",
-  weight: "400",
   subsets: ["latin"],
 });
 
@@ -149,7 +157,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       // 우리 코드가 만든 불일치가 아니라서 이 요소의 속성 경고만 끈다(자식
       // 요소에는 적용되지 않는다).
       suppressHydrationWarning
-      className={`${lineSeedKR.variable} ${plexMono.variable} ${rocknrollOne.variable} ${mkpop.variable} bg-background h-full antialiased`}
+      style={{ "--font-line-seed-kr-stack": lineSeedKRStack } as CSSProperties}
+      className={`${plexMono.variable} ${mkpop.variable} bg-background h-full antialiased`}
     >
       <body className="flex h-dvh flex-col overflow-hidden">
         <script
@@ -159,6 +168,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
         <GoogleAnalytics />
+        <DeferredFonts />
         <BodyScrollGuard />
         <CustomCursor />
         <GuideDimOverlay />

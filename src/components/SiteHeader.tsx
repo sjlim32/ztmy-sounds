@@ -11,10 +11,29 @@ import {
   GHOST_ICON_BUTTON_CLASS,
 } from "@/components/button-styles";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
-import { findSitePage } from "@/components/site-pages";
-import { InfoTabs } from "@/features/info/components/InfoTabs";
-import { ZutopiaHeaderNav } from "@/features/zutopia/components/ZutopiaHeaderNav";
-import { ZutopiaSearchButton } from "@/features/zutopia/search/components/ZutopiaSearchButton";
+import { findSitePage, getParentPage } from "@/components/site-pages";
+
+// 하위 페이지 전용 내비게이션·검색 버튼 — 메인(/)과 출처(/credits)에선
+// SiteHeader가 null을 반환하므로 초기 홈 번들에 실리지 않게 분리한다.
+// 서버 렌더는 그대로 둔다(ssr: false면 하위 페이지 HTML에 탭이 빠져, 첫 접속 때
+// JS가 받아질 때까지 헤더가 비었다가 탭이 튀어나온다).
+const InfoTabs = dynamic(() =>
+  import("@/features/info/components/InfoTabs").then(
+    (module) => module.InfoTabs,
+  ),
+);
+
+const ZutopiaHeaderNav = dynamic(() =>
+  import("@/features/zutopia/components/ZutopiaHeaderNav").then(
+    (module) => module.ZutopiaHeaderNav,
+  ),
+);
+
+const ZutopiaSearchButton = dynamic(() =>
+  import("@/features/zutopia/search/components/ZutopiaSearchButton").then(
+    (module) => module.ZutopiaSearchButton,
+  ),
+);
 
 // 통합 검색 창 — 즛토피아 하위 페이지에서만 그리므로 가이드·공연 정보 등 다른 페이지
 // 번들에 넣지 않게 따로 불러온다.
@@ -49,7 +68,7 @@ export function SiteHeader() {
   if (!page || page.headerless) return null;
 
   const navKind = getPageNavKind(pathname);
-  const back = getBackTarget(pathname);
+  const back = getParentPage(pathname);
 
   return (
     <>
@@ -87,7 +106,6 @@ export function SiteHeader() {
                 {back && (
                   <Link
                     href={back.href}
-                    transitionTypes={["nav-back"]}
                     aria-label={back.label}
                     title={back.label}
                     className={cn(GHOST_ICON_BUTTON_CLASS, "group h-8 w-8")}
@@ -97,7 +115,6 @@ export function SiteHeader() {
                 )}
                 <Link
                   href={page.href}
-                  transitionTypes={["nav-back"]}
                   aria-current={pathname === page.href ? "page" : undefined}
                   className={cn(
                     "rounded-md text-base font-semibold whitespace-nowrap text-white transition-colors hover:text-white/70",
@@ -148,30 +165,6 @@ export function SiteHeader() {
  * calc(94vh-4rem)) — 바꾸면 거기도 같이 바꾼다.
  */
 const SITE_HEADER_HEIGHT_CLASS = "tablet:h-16";
-
-/**
- * 헤더 페이지 이름 앞 뒤로가기 — 브라우저 기록이 아니라 주소를 한 단계 올라간다
- * (링크로 바로 들어와도 엉뚱한 곳으로 가지 않게). 공연 상세 → 공연 목록,
- * 곡·앨범·공연 목록 → ZUTOPIA 첫 화면, 가이드·슬램 곡 상세 → 곡 목록. 한 단계
- * 위가 메인(/)이면 로고와 같은 일이라 두지 않는다.
- */
-function getBackTarget(
-  pathname: string,
-): { href: string; label: string } | null {
-  const segments = pathname.split("/").filter(Boolean);
-  segments.pop();
-  if (segments.length === 0) return null;
-  const href = `/${segments.join("/")}`;
-  return { href, label: BACK_LABELS[href] ?? "이전 단계로 돌아가기" };
-}
-
-/** 뒤로가기 설명(마우스를 올리면 뜨는 문구·화면 읽기용) — 가는 곳 기준. */
-const BACK_LABELS: Record<string, string> = {
-  "/zutopia": "ZUTOPIA로 돌아가기",
-  "/zutopia/lives": "공연 목록으로 돌아가기",
-  "/guide": "응원 가이드 곡 목록으로 돌아가기",
-  "/slam": "슬램 가이드 곡 목록으로 돌아가기",
-};
 
 type PageNavKind = "info" | "zutopia";
 

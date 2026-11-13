@@ -75,8 +75,9 @@ function entryYear(entry: ZutopiaEntry): string | null {
  * effect), 이 복원은 그 뒤(passive effect)에 돌아서 공연 목록만 예외가 된다.
  *
  * 복귀 경로가 둘이라 popstate 감지가 아니라 "저장 → 다음 마운트에서 한 번
- * 소비" 방식을 쓴다: MO 헤더 뒤로가기는 router.back()(popstate)이지만 PC
- * 헤더의 "공연" 탭(ZutopiaHeaderNav)은 목록으로 가는 일반 Link(push)라서다.
+ * 소비" 방식을 쓴다: 브라우저 뒤로가기(그리고 바로 전이 목록일 때의 MO 헤더
+ * 뒤로가기)는 router.back()(popstate)이지만, PC·MO 헤더 뒤로가기(getParentPage)와
+ * PC 헤더의 "공연" 탭(ZutopiaHeaderNav)은 목록으로 가는 일반 Link(push)라서다.
  */
 interface ListSnapshot {
   sortBy: SortBy;
@@ -485,7 +486,6 @@ function LiveCard({ entry, href, onClick }: LiveItemProps) {
     <Link
       href={href}
       onClick={onClick}
-      transitionTypes={["nav-forward"]}
       className="group flex flex-col gap-2 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
     >
       {/* 상세 페이지 포스터와 같은 이름 — 상세로 갈 때 이 그림이 그 자리로 이어지며 커진다. */}
@@ -598,7 +598,6 @@ function LiveRow({ entry, href, onClick }: LiveItemProps) {
     <Link
       href={href}
       onClick={onClick}
-      transitionTypes={["nav-forward"]}
       className={cn(
         "group flex items-center gap-3 rounded-lg border bg-white/5 p-2 transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
         // 내한 공연은 카드 보기와 같이 마젠타 테두리로 표시한다.

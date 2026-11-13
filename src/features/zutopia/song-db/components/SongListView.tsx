@@ -512,7 +512,6 @@ export function SongListView({ songs, liveSummaries }: SongListViewProps) {
           <SongDetailPanel
             song={song}
             contextAlbumSlug={contextAlbumSlug}
-            onClose={closeDrawer}
             liveSummary={liveSummaries[song.id]}
             today={today}
           />

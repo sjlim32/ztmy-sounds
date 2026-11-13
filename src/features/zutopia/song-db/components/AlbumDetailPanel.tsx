@@ -4,12 +4,12 @@ import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
+import { ThumbImage } from "@/components/ThumbImage";
 import {
   ZoomableImageGroup,
   type ZoomableImageGroupItem,
 } from "@/components/ZoomableImageGroup";
 import { ALBUM_TYPE_SHORT_LABEL } from "@/features/zutopia/song-db/labels";
-import { DrawerCloseButton } from "@/features/zutopia/song-db/components/DrawerCloseButton";
 import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 import type { AlbumWithSongs } from "@/features/zutopia/song-db/types";
 
@@ -22,7 +22,6 @@ export function AlbumDetailPanel({
   showBookCover,
   galleryIndex,
   onGalleryIndexChange,
-  onClose,
 }: AlbumDetailPanelProps) {
   const dragStartXRef = useRef<number | null>(null);
   /**
@@ -85,9 +84,11 @@ export function AlbumDetailPanel({
                   aria-label={`${galleryImages[galleryIndex].alt} — 크게 보기`}
                   className="flex h-full w-full cursor-zoom-in items-center justify-center"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  {/* 보이는 크기(PC 약 350px)의 2배로 줄인 그림 — 확대 창은 원본. */}
+                  <ThumbImage
                     src={galleryImages[galleryIndex].src}
+                    displayWidth={400}
+                    loading="eager"
                     alt={galleryImages[galleryIndex].alt}
                     draggable={false}
                     className="aspect-square h-4/5 max-h-full w-auto object-contain"
@@ -134,10 +135,11 @@ export function AlbumDetailPanel({
                         aria-label={`다음 이미지로 이동: ${previewImage.alt}`}
                         className="h-8 w-8 overflow-hidden rounded opacity-80 ring-1 ring-white/50 transition-opacity hover:opacity-100"
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                        <ThumbImage
                           src={previewImage.src}
                           alt={previewImage.alt}
+                          displayWidth={32}
+                          loading="eager"
                           className="h-full w-full object-cover"
                         />
                       </button>
@@ -177,8 +179,6 @@ export function AlbumDetailPanel({
               {album.release_date}
             </p>
           </div>
-
-          <DrawerCloseButton onClick={onClose} />
         </div>
 
         <ul className="mt-4 flex flex-col gap-1">
@@ -259,7 +259,6 @@ interface AlbumDetailPanelProps {
    */
   galleryIndex: number;
   onGalleryIndexChange: Dispatch<SetStateAction<number>>;
-  onClose: () => void;
 }
 
 function getAlbumImageSource(album: AlbumWithSongs): string | null {

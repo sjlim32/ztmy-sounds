@@ -3,7 +3,6 @@
 import { Fragment } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { ThumbImage } from "@/components/ThumbImage";
 import { cn } from "@/lib/utils";
 import { LIST_ITEM_CLASS } from "@/components/button-styles";
@@ -185,15 +184,9 @@ function ResultRow({
   reason?: string | null;
 }) {
   const showEnglish = !!englishTitle && englishTitle !== title;
-  const pathname = usePathname();
-
   return (
     <Link
       href={href}
-      // 지금 페이지에서 쿼리만 바뀌는 이동(곡 목록 → 곡 드로어)은 본문을 밀지 않는다.
-      transitionTypes={
-        href.split("?")[0] === pathname ? undefined : ["nav-forward"]
-      }
       onClick={onNavigate}
       className={cn(LIST_ITEM_CLASS, "flex items-center gap-3 px-2 py-2")}
     >

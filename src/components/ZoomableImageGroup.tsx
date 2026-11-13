@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { CloseIcon } from "@/components/icons/CloseIcon";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { SiteLink } from "@/components/SiteLink";
+import { ThumbImage } from "@/components/ThumbImage";
 import {
   THUMBNAIL_CROP_CLASS,
   DEFAULT_THUMBNAIL_SIZE,
@@ -128,6 +129,11 @@ export function ZoomableImageGroup({
     cropThumbnail = true;
   }
 
+  // 크롭(object-cover) 시 가로·세로 비율이 큰 이미지도 짧은 변이 흐려지지 않도록
+  // 긴 변의 2배를 넘긴다(thumbSrc가 내부에서 다시 2배 곱해 최종 4배 폭으로 요청).
+  const thumbnailRequestWidth =
+    2 * Math.max(resolvedThumbnailWidth ?? 0, resolvedThumbnailHeight ?? 0);
+
   const isOpen = openIndex !== null;
 
   useEffect(() => {
@@ -206,10 +212,13 @@ export function ZoomableImageGroup({
             }}
             className="inline-block cursor-zoom-in rounded-lg"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element -- width/height 중 하나만 있을 때도 자연스러운 비율로 보여야 해서 next/image의 필수 width/height 제약을 피함 */}
-            <img
+            {/* 원본(포스터·지도 수백 KB) 대신 줄인 이미지 — 크롭(object-cover)하면
+                가로로 긴 그림은 칸보다 넓게 그려지므로 긴 변의 4배 폭으로 받는다(위 thumbnailRequestWidth). */}
+            <ThumbImage
               src={image.src}
               alt={image.alt}
+              displayWidth={thumbnailRequestWidth}
+              loading="eager"
               width={resolvedThumbnailWidth}
               height={resolvedThumbnailHeight}
               style={{
@@ -395,10 +404,11 @@ export function ZoomableImageGroup({
                         aria-label={`다음 이미지로 이동: ${previewImage.alt}`}
                         className="overflow-hidden rounded-md opacity-60 ring-1 ring-white/20 transition-opacity hover:opacity-100"
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                        <ThumbImage
                           src={previewImage.src}
                           alt={previewImage.alt}
+                          displayWidth={56}
+                          loading="eager"
                           className="h-14 w-14 object-cover"
                         />
                       </button>

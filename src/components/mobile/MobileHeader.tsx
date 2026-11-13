@@ -1,13 +1,14 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { BackLink } from "@/components/BackLink";
 import { HomeLink } from "@/components/HomeLink";
 import { ShareButton } from "@/components/ShareButton";
 import { LOGO } from "@/lib/seo";
-import { findSitePage } from "@/components/site-pages";
+import { findSitePage, getParentPage } from "@/components/site-pages";
 import { HEADER_TITLE_TRANSITION } from "@/components/mobile/header-title-transition";
 
 /**
@@ -16,7 +17,8 @@ import { HEADER_TITLE_TRANSITION } from "@/components/mobile/header-title-transi
  * 가이드·슬램 곡 상세에서만 비워 두고, 그 자리에 가이드 화면이 곡 제목
  * (MobileSongTitle)을 겹쳐 그린다(곡 데이터는 가사까지 들어 있어 이 전역
  * 헤더에서 불러오지 않는다). 메인(/)에서는 우측 공유만, 그 외 페이지에서는
- * 좌측 뒤로가기(브라우저 히스토리 back) + 우측 메인 바로가기 버튼을 보여줍니다.
+ * 좌측 뒤로가기(한 단계 위 페이지로 — getParentPage, 위가 메인인 최상위 페이지엔
+ * 없음 — 오른쪽 메인 버튼과 같은 곳이라) + 우측 메인 바로가기 버튼을 보여줍니다.
  * 곡 상세(가이드·슬램)에선 그 곡 주소를 공유할 수 있게 우측에 공유를 더합니다.
  */
 export function MobileHeader() {
@@ -24,6 +26,42 @@ export function MobileHeader() {
   const isHome = pathname === "/";
   const isSongDetail = /^\/(guide|slam)\/[^/]+/.test(pathname);
   const pageLabel = isHome ? null : findSitePage(pathname)?.label;
+  // 브라우저 기록이 아니라 한 단계 위 페이지로(PC 헤더와 같은 규칙).
+  const back = getParentPage(pathname);
+
+  const router = useRouter();
+
+  // 바로 전에 보던 페이지 — 그게 한 단계 위 페이지면 새로 이동(push)하지 않고 기록을
+  // 한 칸 되돌린다. 안 그러면 목록 → 상세 → (뒤로) 목록이 기록에 세 칸으로 쌓여,
+  // 이어서 기기의 뒤로 동작을 하면 방금 나온 상세로 다시 들어간다. 기기의 뒤로·앞으로
+  // (popstate)로 온 페이지는 바로 앞 기록이 무엇인지 알 수 없어 따지지 않는다 —
+  // 그때 기록을 되돌리면 사이트 밖으로 나갈 수 있다. 누르는 순간에만 쓰는 값이라
+  // 렌더에 쓰지 않고 ref에 둔다.
+  const visitRef = useRef({
+    current: pathname,
+    previous: null as string | null,
+    popped: false,
+  });
+  useEffect(() => {
+    const onPopState = () => {
+      visitRef.current.popped = true;
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+  useEffect(() => {
+    const visit = visitRef.current;
+    if (visit.current === pathname) return;
+    visit.previous = visit.popped ? null : visit.current;
+    visit.current = pathname;
+    visit.popped = false;
+  }, [pathname]);
+  const handleBack = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (back && visitRef.current.previous === back.href) {
+      event.preventDefault();
+      router.back();
+    }
+  };
 
   return (
     // 루트 레이아웃에서 body/상위 컨테이너가 전부 스크롤되지 않는 구조라
@@ -41,11 +79,14 @@ export function MobileHeader() {
     <>
       <div aria-hidden className="tablet:hidden h-12 shrink-0" />
       <header className="tablet:hidden fixed inset-x-0 top-0 z-30 flex h-12 items-center justify-center border-b border-white/10 bg-black/60 px-4 backdrop-blur-md">
-        {!isHome && (
+        {/* 상단 바 안 버튼은 테두리 없이 면만 — 바 자체가 경계 역할을 한다. */}
+        {back && (
           <BackLink
-            label="뒤로가기"
+            href={back.href}
+            onClick={handleBack}
+            label={back.label}
             showLabel={false}
-            className="absolute top-1/2 left-2 -translate-y-1/2"
+            className="absolute top-1/2 left-2 -translate-y-1/2 border-0"
             iconClassName="h-5 w-5"
           />
         )}
@@ -73,15 +114,21 @@ export function MobileHeader() {
             aria-hidden
             width={LOGO.width}
             height={LOGO.height}
+            preload
             className="h-10 w-auto [filter:drop-shadow(1px_0_0_#fff)_drop-shadow(-1px_0_0_#fff)_drop-shadow(0_1px_0_#fff)_drop-shadow(0_-1px_0_#fff)]"
           />
         )}
 
         <div className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-1.5">
           {(isHome || isSongDetail) && (
-            <ShareButton tooltipClassName="top-full bottom-auto mt-2 mb-0" />
+            <ShareButton
+              className="border-0"
+              tooltipClassName="top-full bottom-auto mt-2 mb-0"
+            />
           )}
-          {!isHome && <HomeLink label="메인으로" showLabel={false} />}
+          {!isHome && (
+            <HomeLink label="메인으로" showLabel={false} className="border-0" />
+          )}
         </div>
       </header>
     </>

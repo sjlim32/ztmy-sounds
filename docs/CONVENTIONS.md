@@ -251,13 +251,13 @@ src/
                              # 목록 카드·통계 카드가 같이 쓴다.
                              # 공연 상세는 PC에서 max-w-4xl(목록 1440px과 폭 차이
                              # 완화).
-                             # 화면 전환: ZutopiaScrollArea의 <main>을 ViewTransition
-                             # (zutopia-main)으로 감싸고, 링크의 transitionTypes
-                             # (nav-forward·nav-back·nav-fade)로 방향을 정한다 —
-                             # 헤더 탭은 탭 순서, 허브 카드·목록→상세는 forward,
-                             # 헤더 뒤로가기는 back. 공연 그림↔상세 포스터는
-                             # posterTransitionName으로 이어진다. 스타일은
-                             # globals.css(transform·opacity만, 동작 줄이기면 끔).
+                             # 화면 전환: 다른 페이지와 같이 내용이 서서히 나타난다
+                             # (ZutopiaScrollArea가 경로가 바뀔 때마다 EntranceFade의
+                             # replayKey를 바꿈). 공연 목록↔상세(isPosterHop)만 키를
+                             # 그대로 둬서 건너뛰고(상세→상세는 페이드), 그 사이엔 공연
+                             # 그림↔상세 포스터가 posterTransitionName(View
+                             # Transition share="morph")으로 이어진다. 스타일은
+                             # globals.css(.morph, 동작 줄이기면 끔).
                              # 필터 결과·드로어 내용은 key + .animate-content-in.
                              # 하루 여러 회차: 날마다 회차 수 = lives.metadata.shows에
                              # 적힌 회차 · 그날 세트리스트 show_number 중 큰 쪽(2회
@@ -387,7 +387,11 @@ src/
                              # 면·테두리 없는 아이콘(GHOST_ICON_BUTTON_CLASS).
                              # 주소를 한 단계 위로(공연 상세 → 공연 목록, 목록 →
                              # ZUTOPIA, 가이드·슬램 곡 상세 → 곡 목록). 위가
-                             # 메인이면 없음.
+                             # 메인이면 없음. 이 규칙(site-pages.ts의
+                             # getParentPage)을 모바일 상단 바(MobileHeader)의
+                             # 뒤로가기도 같이 쓴다 — 브라우저 기록이 아니라 한
+                             # 단계 위로(바로 전 페이지가 그 위 페이지면 기록을
+                             # 한 칸 되돌림), 위가 메인인 최상위 페이지엔 없음.
                              # 즛토피아 본문엔 제목·설명·뒤로가기를 두지 않고
                              # 화면에 안 보이는 h1(sr-only)만 둔다(상세 페이지는
                              # 자기 제목이 h1). 목록 합계 개수는 두지 않는다.
@@ -707,8 +711,9 @@ src/
 
 - 메인에서 들어올 때 내용이 서서히 나타나게 하려면 `src/components/EntranceFade.tsx`로
   감쌉니다(/info, /zutopia). /guide의 패널과 같은 훅(`src/lib/use-entrance-visible.ts`)을
-  써서 배경이 어두워지는 타이밍과 맞습니다. 하위 페이지를 오갈 때 다시 재생되지
-  않게 하려면 페이지가 아니라 레이아웃 쪽에 둡니다.
+  써서 배경이 어두워지는 타이밍과 맞습니다. 레이아웃에 두면 하위 페이지를 오갈 땐
+  다시 재생되지 않고, `replayKey`(보통 경로)를 주면 그 값이 바뀔 때마다 다시 재생됩니다
+  (/zutopia — 내용을 다시 마운트하지 않음). 움직임 줄이기 설정이면 바로 보입니다.
 
 ## PWA 설치 프롬프트
 

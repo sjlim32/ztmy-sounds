@@ -21,10 +21,9 @@
   --color-ztmy-sky: var(--ztmy-sky);
   --color-ztmy-sun: var(--ztmy-sun);
   --font-sans:
-    var(--font-line-seed-kr), "LINE Seed JP", ui-sans-serif, system-ui,
+    var(--font-line-seed-kr-stack), "LINE Seed JP", ui-sans-serif, system-ui,
     sans-serif;
   --font-mono: var(--font-plex-mono);
-  --font-rocknroll: var(--font-rocknroll-one);
   --font-mkpop: var(--font-mkpop-101);
 }
 
@@ -355,13 +354,9 @@ html.custom-cursor-active .custom-cursor {
 }
 
 /*
- * 화면 전환(View Transitions) — 즛토피아 본문(zutopia-main)만 움직이고 헤더 등
- * 나머지는 그대로 둔다. 방향은 링크의 transitionTypes로 정한다:
- * nav-forward(왼쪽으로 밀림 — 탭 오른쪽·상세로), nav-back(오른쪽으로 — 탭
- * 왼쪽·목록으로), nav-fade(제자리 크로스페이드). 타입 없는 이동(브라우저 뒤로
- * 가기, 드로어용 ?song= 주소 바꾸기)은 움직이지 않는다. 공연 포스터는 목록과
+ * 화면 전환(View Transitions) — 페이지 이동 자체는 움직이지 않고(즛토피아도
+ * 다른 페이지처럼 EntranceFade로 내용이 서서히 나타난다), 공연 포스터만 목록과
  * 상세의 같은 이름(live-poster-…)끼리 이어지며 커진다(.morph).
- * transform·opacity만 움직여 가볍게 유지한다.
  */
 ::view-transition {
   pointer-events: none;
@@ -372,55 +367,9 @@ html.custom-cursor-active .custom-cursor {
 ::view-transition-new(root) {
   animation: none;
 }
-::view-transition-old(.nav-forward) {
-  --vt-slide: -48px;
-  animation:
-    140ms ease-in both vt-fade reverse,
-    320ms ease-in-out both vt-slide reverse;
-}
-::view-transition-new(.nav-forward) {
-  --vt-slide: 48px;
-  animation:
-    200ms ease-out 120ms both vt-fade,
-    320ms ease-in-out both vt-slide;
-}
-::view-transition-old(.nav-back) {
-  --vt-slide: 48px;
-  animation:
-    140ms ease-in both vt-fade reverse,
-    320ms ease-in-out both vt-slide reverse;
-}
-::view-transition-new(.nav-back) {
-  --vt-slide: -48px;
-  animation:
-    200ms ease-out 120ms both vt-fade,
-    320ms ease-in-out both vt-slide;
-}
-::view-transition-old(.nav-fade) {
-  animation: 140ms ease-in both vt-fade reverse;
-}
-::view-transition-new(.nav-fade) {
-  animation: 200ms ease-out 100ms both vt-fade;
-}
 ::view-transition-group(.morph) {
   animation-duration: 380ms;
   animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
-}
-@keyframes vt-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes vt-slide {
-  from {
-    translate: var(--vt-slide);
-  }
-  to {
-    translate: 0;
-  }
 }
 
 /* 필터를 바꾸거나 드로어 내용이 바뀔 때 새 내용이 살짝 올라오며 나타난다. */

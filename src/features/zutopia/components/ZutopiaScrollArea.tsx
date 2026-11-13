@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, ViewTransition } from "react";
+import { useLayoutEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { EntranceFade } from "@/components/EntranceFade";
@@ -18,9 +18,33 @@ import { useScrollFadeMask } from "@/lib/use-scroll-fade-mask";
 // 아래 <main>의 id이자 ScrollToTopButton이 스크롤을 지켜볼 대상.
 const ZUTOPIA_SCROLL_CONTAINER_ID = "zutopia-scroll-container";
 
+/**
+ * 공연 목록 ↔ 공연 상세 이동인지 — 그 사이엔 포스터가 목록 칸에서 상세 자리로
+ * 이어지며 커지는 효과(View Transition, LiveListView·DefaultLiveContent·
+ * DefaultTourContent의 share="morph")가 있어, 내용을 다시 숨기면 포스터가 자리
+ * 잡은 뒤 사라졌다 다시 나타난다. 상세 → 다른 상세는 해당 없음(페이드).
+ */
+function isPosterHop(from: string, to: string): boolean {
+  const LIST = "/zutopia/lives";
+  return (
+    (from === LIST && to.startsWith(`${LIST}/`)) ||
+    (to === LIST && from.startsWith(`${LIST}/`))
+  );
+}
+
 export function ZutopiaScrollArea({ children }: { children: ReactNode }) {
   const scrollRef = useScrollFadeMask<HTMLElement>();
   const pathname = usePathname();
+
+  // 하위 페이지로 옮길 때마다 내용이 다시 서서히 나타난다(다른 페이지와 같은 전환,
+  // EntranceFade). 공연 목록 ↔ 상세만 키를 그대로 둬서 건너뛴다(isPosterHop).
+  const [fade, setFade] = useState({ path: pathname, key: pathname });
+  if (fade.path !== pathname) {
+    setFade({
+      path: pathname,
+      key: isPosterHop(fade.path, pathname) ? fade.key : pathname,
+    });
+  }
 
   // 이 스크롤 박스는 ZUTOPIA 안의 모든 페이지(첫 화면·곡·앨범·공연·상세)가
   // 같이 써서, 페이지를 옮겨도 이전 스크롤 위치가 남는다 — 경로가 바뀔 때마다
@@ -39,41 +63,27 @@ export function ZutopiaScrollArea({ children }: { children: ReactNode }) {
           아니라 스크롤 내용에 붙어 같이 올라가 버린다. */}
       <ScrollToTopButton containerId={ZUTOPIA_SCROLL_CONTAINER_ID} />
 
-      {/* 페이지 이동 때 이 스크롤 박스만 통째로 움직인다(globals.css의
-          nav-forward·nav-back·nav-fade). 레이아웃은 남아 있으니 enter/exit가
-          아니라 update로 받는다. 타입 없는 이동(드로어 열기 등)은 그대로. */}
-      <ViewTransition
-        name="zutopia-main"
-        update={{
-          "nav-forward": "nav-forward",
-          "nav-back": "nav-back",
-          "nav-fade": "nav-fade",
-          default: "none",
-        }}
-        default="none"
+      <main
+        id={ZUTOPIA_SCROLL_CONTAINER_ID}
+        ref={scrollRef}
+        className={cn(
+          "min-h-0 w-full flex-1 overflow-y-auto scroll-smooth",
+          "scrollbar-thin [scrollbar-color:transparent_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
+          "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
+        )}
       >
-        <main
-          id={ZUTOPIA_SCROLL_CONTAINER_ID}
-          ref={scrollRef}
-          className={cn(
-            "min-h-0 w-full flex-1 overflow-y-auto scroll-smooth",
-            "scrollbar-thin [scrollbar-color:transparent_transparent] hover:[scrollbar-color:rgba(255,255,255,0.3)_transparent]",
-            "[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-white/30",
+        <PageScrollBody
+          innerClassName={cn(
+            "mx-auto w-full px-3 pt-6 pb-10",
+            "tablet:max-w-4xl tablet:px-6 tablet:pt-10 tablet:pb-16",
+            // PC는 즛토피아 전체를 최대 1440px까지 넓게 — 목록은 열을 늘리고,
+            // 줄글 위주 상세(공연 상세 등)는 각자 좁은 폭으로 가운데 둔다.
+            "pc:max-w-[90rem] pc:px-10",
           )}
         >
-          <PageScrollBody
-            innerClassName={cn(
-              "mx-auto w-full px-3 pt-6 pb-10",
-              "tablet:max-w-4xl tablet:px-6 tablet:pt-10 tablet:pb-16",
-              // PC는 즛토피아 전체를 최대 1440px까지 넓게 — 목록은 열을 늘리고,
-              // 줄글 위주 상세(공연 상세 등)는 각자 좁은 폭으로 가운데 둔다.
-              "pc:max-w-[90rem] pc:px-10",
-            )}
-          >
-            <EntranceFade>{children}</EntranceFade>
-          </PageScrollBody>
-        </main>
-      </ViewTransition>
+          <EntranceFade replayKey={fade.key}>{children}</EntranceFade>
+        </PageScrollBody>
+      </main>
     </>
   );
 }

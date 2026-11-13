@@ -27,6 +27,8 @@ export const sections = groupImagesBySection(
     alt={INFORMATION.name}
     thumbnailWidth={320}
     thumbnailCrop="top"
+    loading="eager"
+    resized
   />
 </div>
 
@@ -68,6 +70,7 @@ export const sections = groupImagesBySection(
             alt={sections["schedule"][0].name}
             thumbnailWidth={1000}
             thumbnailCrop="top"
+            resized
           />
         </div>
 
@@ -105,6 +108,7 @@ export const sections = groupImagesBySection(
               alt={sections["schedule"][2].name}
               thumbnailWidth={500}
               thumbnailCrop="top"
+              resized
             />
           </div>
         </div>
@@ -141,6 +145,7 @@ export const sections = groupImagesBySection(
             alt={sections["map"][0].name}
             thumbnailWidth={1000}
             thumbnailCrop="top"
+            resized
           />
         </div>
 
@@ -235,6 +240,7 @@ export const sections = groupImagesBySection(
           alt={sections["prologue"][0].name}
           thumbnailWidth={600}
           thumbnailCrop="top"
+          resized
         />
       </div>
     </TabSection>
