@@ -1,7 +1,7 @@
 /**
  * 공연 목록의 종류 — 투어(tours 테이블), 페스티벌(lives.type FESTIVAL), 콘서트
- * (그 밖의 모든 lives.type: CONCERT·EVENT…). 목록 필터·카드 표시·허브 요약이
- * 모두 이 세 가지를 쓴다.
+ * (그 밖의 모든 lives.type: CONCERT·EVENT…). 목록 필터·카드 표시·통계가 이 세
+ * 가지를 쓴다(허브 카드 요약만 투어 / 그 밖 공연 두 덩어리로 센다).
  */
 export type ZutopiaEntryType = "tour" | "festival" | "concert";
 
@@ -38,7 +38,7 @@ export interface ZutopiaEntry {
   name: string;
   date: string;
   thumbnail: string;
-  // 허브 카드 메타 문구("N개의 콘서트, N개의 페스티벌")를 만드는 데만 쓴다.
+  // 공연 종류 — 목록 필터·카드 태그·허브 카드 요약("투어 N · 공연 M")이 쓴다.
   // 나중에 이 카테고리처럼 나뉘지 않는 대분류가 생기면 생략해도 된다.
   type?: ZutopiaEntryType;
   // 연도 추출·정렬용 원본 ISO 날짜("YYYY-MM-DD"). `date`는 이미
@@ -67,21 +67,20 @@ export interface ZutopiaCategory {
   getEntries: () => Promise<ZutopiaEntry[]>;
 }
 
-// 허브 카드 메타 문구를 만든다. entries에 type이 하나라도 있으면 타입별
-// 개수로("N개의 콘서트, N개의 페스티벌"), 없으면("굿즈" 같은 나중 카테고리)
-// 기존처럼 "N개 항목"으로 돌아간다.
+// 허브 카드 메타 문구를 만든다 — 모바일 카드 한 줄에 들어가게 짧게. type이
+// 하나라도 있으면 투어와 그 밖의 공연(페스티벌·콘서트)으로 나눠 세고("투어 13
+// · 공연 42", 투어는 공연일이 여럿이어도 하나), 없으면("굿즈" 같은 나중
+// 카테고리) "N개 항목"으로 돌아간다.
 export function summarizeEntryTypes(entries: ZutopiaEntry[]): string {
-  const counts = new Map<ZutopiaEntryType, number>();
-  for (const entry of entries) {
-    if (!entry.type) continue;
-    counts.set(entry.type, (counts.get(entry.type) ?? 0) + 1);
-  }
-
-  if (counts.size === 0) {
+  const typed = entries.filter((entry) => entry.type);
+  if (typed.length === 0) {
     return `${entries.length}개 항목`;
   }
-
-  return ENTRY_TYPE_ORDER.filter((type) => counts.has(type))
-    .map((type) => `${counts.get(type)} ${ENTRY_TYPE_LABEL[type]}`)
+  const tours = typed.filter((entry) => entry.type === "tour").length;
+  return [
+    tours > 0 && `${ENTRY_TYPE_LABEL.tour} ${tours}`,
+    typed.length > tours && `공연 ${typed.length - tours}`,
+  ]
+    .filter(Boolean)
     .join(" · ");
 }

@@ -2,8 +2,8 @@ import { cache } from "react";
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
 import { getGuideHref } from "@/features/zutopia/guide-link";
 import { parseSongMetadata } from "./song-metadata";
-import type { Song } from "./types";
-import type { AlbumWithSongs, SongCounts, SongWithAlbums } from "./types";
+import type { Album, Song } from "./types";
+import type { AlbumWithSongs, SongWithAlbums } from "./types";
 
 type OriginalSongRef = Pick<
   Song,
@@ -104,47 +104,46 @@ function resolveDisplaySong<T extends Song>(
 
 // 즛토피아 첫 화면 카드에 개수만 보여줄 때 쓴다 — get*WithAlbums/get*WithSongs
 // 전체를(모든 앨범/곡 정보를 다대다로 조인해서) 불러오는 건 개수 하나 얻자고
-// 이 기능에서 가장 비싼 쿼리를 한 번 더 실행하는 것과 같아서, count-only
-// 쿼리(head: true라 실제 행 데이터는 아예 안 옴)로 대체한다.
-// 미공개곡(metadata.unrelease)은 공개곡 수에서 빼고 따로 센다 —
-// song-metadata.ts의 parseSongMetadata와 같은 기준("true" 문자열/불리언,
-// ->>로 꺼내면 둘 다 텍스트 "true"가 된다).
-export async function getSongsCount(): Promise<SongCounts> {
+// 이 기능에서 가장 비싼 쿼리를 한 번 더 실행하는 것과 같아서, 조인 없이
+// metadata 칸 하나만 받는다.
+// 미공개곡(metadata.unrelease)을 뺀 곡 수(협업곡·어레인지 버전은 넣는다 — 곡 목록
+// "발매곡" 개수와 같은 기준). 판별 기준을 SQL로 한 번 더 쓰지 않도록 metadata 칸만
+// 받아 song-metadata.ts의 parseSongMetadata로 센다(곡 수가 적어 부담 없음).
+export async function getReleasedSongCount(): Promise<number> {
   const supabase = createBuildTimeSupabaseClient();
-  const [total, unreleased] = await Promise.all([
-    supabase
-      .from("songs")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "ACTIVE"),
-    supabase
-      .from("songs")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "ACTIVE")
-      .eq("metadata->>unrelease", "true"),
-  ]);
+  const { data, error } = await supabase
+    .from("songs")
+    .select("metadata")
+    .eq("status", "ACTIVE");
 
-  const error = total.error ?? unreleased.error;
   if (error) {
     throw new Error(`곡 개수를 가져오지 못했습니다: ${error.message}`);
   }
-  const unreleasedCount = unreleased.count ?? 0;
-  return {
-    released: (total.count ?? 0) - unreleasedCount,
-    unreleased: unreleasedCount,
-  };
+  return data.filter(
+    ({ metadata }) => !parseSongMetadata(metadata).isUnreleased,
+  ).length;
 }
 
-export async function getAlbumsCount(): Promise<number> {
+/** 앨범 종류(정규·미니·EP)별 개수 — 첫 화면 카드는 종류를 나눠 보여 준다. */
+export async function getAlbumCounts(): Promise<
+  Record<Album["album_type"], number>
+> {
   const supabase = createBuildTimeSupabaseClient();
-  const { count, error } = await supabase
+  const { data, error } = await supabase
     .from("albums")
-    .select("*", { count: "exact", head: true })
+    .select("album_type")
     .eq("status", "ACTIVE");
 
   if (error) {
     throw new Error(`앨범 개수를 가져오지 못했습니다: ${error.message}`);
   }
-  return count ?? 0;
+  const counts: Record<Album["album_type"], number> = {
+    FULL: 0,
+    MINI: 0,
+    EP: 0,
+  };
+  for (const { album_type } of data) counts[album_type] += 1;
+  return counts;
 }
 
 // 한 페이지 렌더(첫 화면은 검색 인덱스·통계가 같이 부른다) 안에서 한 번만 가공하게 cache.
