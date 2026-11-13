@@ -128,8 +128,9 @@ export default async function ZutopiaHubPage() {
             </li>
             <li>
               <ZutopiaHubCard
-                href={"https://zutomayo.net/collabo/"}
+                href="https://zutomayo.net/collabo/"
                 title="콜라보"
+                imageUrl="/assets/zutopia/components/collabo.webp"
               />
             </li>
           </HubSection>

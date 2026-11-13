@@ -2,7 +2,10 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 interface ZutopiaHubCardProps {
-  /** null이면 아직 열리지 않은 카드 — 누를 수 없고 "준비 중" 칩을 단다. */
+  /**
+   * null이면 아직 열리지 않은 카드 — 누를 수 없고 "준비 중" 칩을 단다.
+   * http(s)로 시작하는 바깥 주소면 새 창으로 연다.
+   */
   href: string | null;
   title: string;
   /** 제목 아래 한 줄 정보 — 넘치면 말줄임. 모바일 카드 폭(약 150px)에 들어가게 짧게. */
@@ -81,15 +84,29 @@ export function ZutopiaHubCard({
     return <div className={baseClass}>{content}</div>;
   }
 
+  const linkClass = cn(
+    baseClass,
+    "transition-[transform,box-shadow,border-color] duration-300 ease-out motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+    "hover:border-ztmy-magenta/60 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(225,71,191,0.25)]",
+  );
+
+  // 바깥 사이트(공식 콜라보 페이지 등)는 즛토피아를 떠나지 않게 새 창으로.
+  if (/^https?:\/\//.test(href)) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={linkClass}
+      >
+        {content}
+        <span className="sr-only">(새 창에서 열림)</span>
+      </a>
+    );
+  }
+
   return (
-    <Link
-      href={href}
-      className={cn(
-        baseClass,
-        "transition-[transform,box-shadow,border-color] duration-300 ease-out motion-reduce:transition-none motion-reduce:hover:translate-y-0",
-        "hover:border-ztmy-magenta/60 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(225,71,191,0.25)]",
-      )}
-    >
+    <Link href={href} className={linkClass}>
       {content}
     </Link>
   );
