@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getStatSections } from "@/features/zutopia/stats/data";
 import { previewSections } from "@/features/zutopia/stats/compute";
 import { StatsView } from "@/features/zutopia/stats/components/StatsView";
+import { DataInProgressNotice } from "@/features/zutopia/components/DataInProgressNotice";
 
 export const metadata: Metadata = {
   title: "통계",
@@ -12,8 +13,9 @@ export const metadata: Metadata = {
 export default async function ZutopiaStatsPage() {
   const sections = await getStatSections();
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       <h1 className="sr-only">통계</h1>
+      <DataInProgressNotice />
       <StatsView sections={previewSections(sections)} />
     </div>
   );

@@ -6,6 +6,7 @@ import {
 } from "@/features/zutopia/live-history/units";
 import { getSongsWithAlbums } from "@/features/zutopia/song-db/data";
 import { getSongCoverSrc } from "@/features/zutopia/song-db/song-album-grouping";
+import { DataInProgressNotice } from "@/features/zutopia/components/DataInProgressNotice";
 import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
 import { AttendanceView } from "@/features/zutopia/attendance/components/AttendanceView";
 import type { AttendanceSong } from "@/features/zutopia/attendance/summarize";
@@ -43,8 +44,9 @@ export default async function ZutopiaAttendancePage() {
     }));
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       <h1 className="sr-only">라이브 참전 기록</h1>
+      <DataInProgressNotice />
       <AttendanceView
         // 체크할 공연은 현장 공연만(온라인 공연은 참전 기록에서 뺀다).
         units={inPersonUnits(history.units).map(toClientUnit)}
