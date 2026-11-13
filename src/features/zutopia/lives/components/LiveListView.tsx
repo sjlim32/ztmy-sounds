@@ -92,13 +92,14 @@ function snapshotKey(categorySlug: string) {
 }
 
 // 이 모듈이 브라우저에서 한 번이라도 마운트됐는지. 첫 마운트는 정적
-// export HTML의 hydration일 수 있어(첫 렌더가 서버 HTML과 같아야 함) 저장값을
-// 쓰지 않는다 — 스냅샷은 목록에서 항목을 클릭해야만 생기므로, 실제로 복원할
-// 상황(클라이언트 이동으로 목록 재마운트)에서는 이미 true다.
+// export HTML의 hydration일 수 있어(첫 렌더가 서버 HTML과 같아야 함) 첫
+// 렌더엔 저장값을 쓰지 않고, 마운트 effect에서 뒤늦게 적용한다 — 상세에서
+// 새로고침한 뒤 뒤로 오거나, 모바일 브라우저가 탭을 다시 불러와 목록이 전체
+// 로드로 열리는 경우. 클라이언트 이동으로 목록이 다시 마운트될 땐 이미 true라
+// 첫 렌더부터 저장값으로 그린다.
 let hasMountedOnClient = false;
 
 function readSnapshot(categorySlug: string): ListSnapshot | null {
-  if (!hasMountedOnClient) return null;
   try {
     const raw = sessionStorage.getItem(snapshotKey(categorySlug));
     return raw ? (JSON.parse(raw) as ListSnapshot) : null;
@@ -149,7 +150,9 @@ export function LiveListView({
 }) {
   // useState 초기값은 StrictMode에서 두 번 호출될 수 있어 읽기만 하고,
   // 한 번만 소비되도록 지우는 건 아래 마운트 effect에서 한다.
-  const [initialSnapshot] = useState(() => readSnapshot(categorySlug));
+  const [initialSnapshot] = useState(() =>
+    hasMountedOnClient ? readSnapshot(categorySlug) : null,
+  );
   const [sortBy, setSortBy] = useState<SortBy>(
     initialSnapshot?.sortBy ?? "year",
   );
@@ -174,18 +177,37 @@ export function LiveListView({
   );
 
   const rootRef = useRef<HTMLDivElement>(null);
+  // 복원할 스크롤 위치 — 필터를 적용한 목록이 그려진 뒤에 스크롤한다.
+  const [pendingScrollTop, setPendingScrollTop] = useState(
+    initialSnapshot?.scrollTop ?? null,
+  );
+
+  useEffect(() => {
+    const isHydration = !hasMountedOnClient;
+    hasMountedOnClient = true;
+    const late = isHydration ? readSnapshot(categorySlug) : null;
+    clearSnapshot(categorySlug);
+    if (!late) return;
+    /* eslint-disable react-hooks/set-state-in-effect -- 정적 HTML과 첫 렌더를 맞춘 뒤에만 브라우저 저장값을 적용할 수 있다. */
+    setSortBy(late.sortBy);
+    setFormatFilter(late.formatFilter);
+    setYearFilter(late.yearFilter);
+    setHideOnline(late.hideOnline ?? false);
+    setPendingScrollTop(late.scrollTop);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [categorySlug]);
 
   // passive effect라 ZutopiaScrollArea의 "경로가 바뀌면 맨 위로"(layout
   // effect)보다 늦게 돌아 덮어쓰이지 않는다. <main>의 scroll-smooth 때문에
   // instant를 명시한다.
   useEffect(() => {
-    hasMountedOnClient = true;
-    clearSnapshot(categorySlug);
-    if (!initialSnapshot) return;
+    if (pendingScrollTop === null) return;
     rootRef.current
       ?.closest("main")
-      ?.scrollTo({ top: initialSnapshot.scrollTop, behavior: "instant" });
-  }, [categorySlug, initialSnapshot]);
+      ?.scrollTo({ top: pendingScrollTop, behavior: "instant" });
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- 한 번 스크롤한 뒤 비운다.
+    setPendingScrollTop(null);
+  }, [pendingScrollTop]);
 
   const handleEntryClick = (event: MouseEvent<HTMLAnchorElement>) => {
     // 새 탭/창으로 여는 클릭은 이 탭이 목록을 떠나지 않으니 저장하지 않는다.
