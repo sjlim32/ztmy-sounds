@@ -234,7 +234,8 @@ function LyricLineComponent({
   ) : (
     <div
       className={cn(
-        "grid grid-cols-[1.375rem_minmax(0,1fr)] gap-x-2 [&>*]:col-start-2",
+        // 모바일은 가사 한 줄이 덜 넘치도록 아이콘 칸과 본문 사이를 좁게(4px).
+        "grid grid-cols-[1.375rem_minmax(0,1fr)] gap-x-1 [&>*]:col-start-2",
         // 태블릿 이상은 아이콘(28px) 둘레에 여백을 둬서 본문과 더 띄운다.
         "tablet:grid-cols-[2.25rem_minmax(0,1fr)] tablet:gap-x-3",
       )}
@@ -269,7 +270,8 @@ function LyricLineComponent({
         lineClick && "cursor-pointer",
         line.interlude
           ? cn("px-5 text-center", isMusicBreak ? "my-2 py-3" : "my-4 py-6")
-          : "py-3 pr-5 pl-4 text-left",
+          : // 모바일은 좌우 여백을 12px로 줄여 가사가 한 줄에 더 들어가게 한다.
+            "tablet:pr-5 tablet:pl-4 px-3 py-3 text-left",
         // 재생 중인 줄: 테두리 없이 옅은 배경 + 흰 글자. 응원 줄은 그 응원
         // 색, 아니면 보라. 재생 중이 아닌 줄은 LyricsView가 글자를 흐리게
         // 해서 차이를 키운다. 글자 굵기는 바꾸지 않는다 — 굵어지면 글자 폭이
@@ -374,8 +376,8 @@ function MusicBreak({ tag, isActive }: { tag?: CallTag; isActive: boolean }) {
 
 /****** 왼쪽 아이콘 칸 ******/
 // 같은 태그가 이어지는 구간을 줄 높이 전체에 걸친 응원 색 세로선으로 잇는다.
-// 칸 위치(왼쪽 16px = 줄의 pl-4, 폭 모바일 22px / 태블릿 이상 36px)는 위
-// 그리드의 아이콘 칸과 같아야 한다.
+// 칸 위치(왼쪽 = 줄의 왼쪽 여백 — 모바일 12px / 태블릿 이상 16px, 폭 모바일
+// 22px / 태블릿 이상 36px)는 위 그리드의 아이콘 칸과 같아야 한다.
 function RunLine({
   tag,
   position,
@@ -401,8 +403,8 @@ function RunLine({
     <span
       aria-hidden
       className={cn(
-        "pointer-events-none absolute inset-y-0 left-4 w-5.5",
-        "tablet:w-9",
+        "pointer-events-none absolute inset-y-0 left-3 w-5.5",
+        "tablet:left-4 tablet:w-9",
       )}
     >
       {segments.map((segment) => (
@@ -643,7 +645,13 @@ function PronunciationText({
     !!emphasisColor && !!scope && !hasEmphasis(plainText, scope);
 
   return (
-    <p data-role="pronunciation" className="wide:text-xl pc:text-lg text-base">
+    <p
+      data-role="pronunciation"
+      // 모바일은 한 단계 작게(14px) — 한 줄에 더 들어가 줄바꿈이 덜 생긴다. 넘치는 줄은
+      // 거의 발음 줄이라 원문·응원 설명은 그대로 둔다. 작아진 만큼 줄 높이는 기본(20px)보다
+      // 넉넉히(24px) 줘서 덜 빽빽하게.
+      className="wide:text-xl pc:text-lg tablet:text-base text-sm/6"
+    >
       {highlightWholeLine ? (
         <strong {...emphasisProps(emphasisColor, true)}>{content}</strong>
       ) : (

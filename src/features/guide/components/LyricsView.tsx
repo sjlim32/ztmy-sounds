@@ -177,7 +177,9 @@ export function LyricsView({
           // 전부 또렷하게 두고, 재생 중엔 지금 줄이 확 드러나게.
           // (:has 대신 data-playing — :has는 줄이 바뀔 때마다 모든 줄의
           // 스타일을 다시 계산해서, 마침 시작되는 자동 스크롤의 프레임을 빼먹게 한다)
-          "[&[data-playing]>li:not([data-active])]:text-white/55",
+          // 모바일은 가사 글자가 작아서 덜 흐리게(다음 줄을 미리 읽기 쉽게).
+          "[&[data-playing]>li:not([data-active])]:text-white/65",
+          "tablet:[&[data-playing]>li:not([data-active])]:text-white/55",
           "tablet:bottom-12 tablet:pt-5 tablet:pb-7",
           // 사라질 땐 트랜지션 없이 즉시, 나타날 때만 fade-in — 그래야 곡이
           // 빠르게 연달아 바뀌어도 이미 교체된 다음 곡 내용이 fade-out
