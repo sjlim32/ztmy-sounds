@@ -598,6 +598,9 @@ src/
   (목록 페이지), tour_id 없이 slug로만 묶인 공연일의 삭제·이동.
 - `updated_at`을 직접 넣어도 트리거가 `now()`로 덮어씁니다 — 과거 시각으로 고치려면
   `alter table ... disable trigger set_updated_at` → 수정 → `enable`.
+- 이미지 주소 칸(`lives.poster_image_url`·`icon_image_url`, `tours.poster_image_url`)은 없으면 NULL —
+  빈 문자열은 check 제약이 막습니다(`20261118020000_image_url_not_empty.sql`). 빈 문자열은 코드의 대체
+  순서(포스터 → 아이콘 → 기본 이미지)를 건너뛰게 만듭니다.
 - 트리거가 행 전체를 비교(`old.* is distinct from new.*`)하므로 이 세 테이블엔 `json`(등호 연산자가
   없는 타입) 대신 `jsonb`만 씁니다 — `json` 컬럼을 넣으면 그 테이블의 모든 UPDATE가 실패합니다.
 
