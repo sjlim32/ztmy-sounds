@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { SITE_NAME } from "@/lib/seo";
 import { ZutopiaScrollArea } from "@/features/zutopia/components/ZutopiaScrollArea";
 import { ZutopiaNotice } from "@/features/zutopia/components/ZutopiaNotice";
 
 export const metadata: Metadata = {
-  title: "즛토피아",
+  // 문자열 title만 두면 그 아래 페이지에 루트의 "%s | 사이트명"이 이어지지 않아("공연"만
+  // 나옴) 템플릿을 다시 건다(title.template은 바로 아래 세그먼트까지만 닿음).
+  title: { default: "즛토피아", template: `%s | ${SITE_NAME}` },
   description: "즛토마요 팬을 위한 아카이브입니다.",
 };
 

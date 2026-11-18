@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getZutopiaCategory } from "@/features/zutopia/registry";
+import { SITE_NAME } from "@/lib/seo";
 
 export async function generateMetadata(
   props: LayoutProps<"/zutopia/[category]">,
@@ -10,7 +11,8 @@ export async function generateMetadata(
   if (!category) return {};
 
   return {
-    title: category.label,
+    // 상세 페이지("제목 | 공연")에도 사이트명이 붙게 템플릿을 다시 건다(zutopia/layout.tsx 참고).
+    title: { default: category.label, template: `%s | ${SITE_NAME}` },
     description: category.description,
   };
 }
