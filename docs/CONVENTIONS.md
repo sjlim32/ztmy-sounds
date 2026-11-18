@@ -475,6 +475,8 @@ src/
                              # 제목 템플릿(title.template)은 바로 아래 세그먼트까지만
                              # 닿아, 문자열 title을 가진 레이아웃(zutopia, [category])은
                              # 템플릿을 다시 건다 — 안 그러면 하위 페이지에 사이트명이 빠짐
+                             # 루트 openGraph엔 url을 넣지 않는다(물려받은 페이지 공유가
+                             # 첫 화면 주소로 묶임) — 주소가 필요한 페이지가 직접 넣는다
     structured-data.ts       # JSON-LD. <script>에는 serializeJsonLd로 넣는다("<" 이스케이프)
     use-install-prompt.ts    # PWA beforeinstallprompt/appinstalled 공용 훅
                              # (아래 "PWA 설치 프롬프트" 참고)

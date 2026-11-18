@@ -129,10 +129,11 @@ export const metadata: Metadata = {
     "ACAね",
     "즛토마요",
   ],
+  // url은 넣지 않는다 — 하위 페이지가 openGraph를 따로 안 넣으면 이 값을 그대로 물려받아
+  // 목록 페이지 공유가 첫 화면 주소로 묶인다. 없으면 공유 서비스가 실제 주소를 쓴다.
   openGraph: {
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    url: SITE_URL,
     siteName: SITE_NAME,
     ...BASE_OPEN_GRAPH,
     images: [{ ...DEFAULT_OG_IMAGE, alt: SITE_NAME }],
