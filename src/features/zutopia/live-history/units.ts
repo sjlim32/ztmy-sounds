@@ -1,7 +1,7 @@
 import { addDays, diffDays } from "@/lib/ymd";
 import {
   extractKoreanCity,
-  isOnlineText,
+  isOnlineLive,
 } from "@/features/zutopia/lives/region";
 import { showsForDay } from "@/features/zutopia/lives/shows";
 import type {
@@ -60,7 +60,7 @@ function buildAllUnits(input: {
         tour?.poster_image_url ??
         null,
       // 온라인 공연(region·live_venue가 "online") — 참전 기록·통계에선 뺀다(inPersonUnits).
-      ...((isOnlineText(live.region) || isOnlineText(live.live_venue)) && {
+      ...(isOnlineLive(live) && {
         online: true,
       }),
       groupImageUrl: tour
@@ -157,7 +157,7 @@ type BuildInput = Parameters<typeof buildAllUnits>[0];
  * - CONCERT/EVENT: start_date~end_date 하루마다 단위 하나. DAY N의 곡 =
  *   (투어 공통 곡) + 이 행의 day_number 없는 곡 + day_number = N인 곡.
  *   day_number 없이 이틀짜리로 등록된 행은 양일 같은 세트리스트로 본다.
- * - 투어 소속: tour_id 일치 또는 slug가 투어 slug와 같은 행(lives/data.ts의
+ * - 투어 소속: tour_id 일치 또는 slug가 투어 slug와 같은 행(lives/tour-dates.ts의
  *   tourDateFilter와 같은 기준). 제목·링크는 투어 것을 쓴다.
  * - 곡 id는 어레인지 버전이면 원곡 id로 바꾸고, 같은 날 같은 곡은 한 번만 센다.
  * - today보다 뒤의 단위는 뺀다(예정 공연일은 buildUpcomingUnits).

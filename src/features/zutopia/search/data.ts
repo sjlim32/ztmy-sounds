@@ -14,7 +14,7 @@ import type {
  * 곡 id → 그 곡을 부른 공연 목록 항목(slug)을 잇기 위해 세트리스트 전체를
  * 가볍게(id만) 읽는다. 공연 목록 항목은 단독 공연(lives.slug)이거나 투어
  * (tours.slug)인데, 투어 소속 공연일은 자기 목록 항목이 없어서 그 투어로
- * 묶는다 — lives/data.ts의 tourDateFilter와 같은 기준(tour_id가 있거나
+ * 묶는다 — lives/tour-dates.ts의 tourDateFilter와 같은 기준(tour_id가 있거나
  * slug가 투어 slug와 같은 행).
  */
 async function getSetlistLinks(): Promise<{

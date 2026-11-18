@@ -8,9 +8,11 @@ import { parseSongMetadata } from "@/features/zutopia/song-db/song-metadata";
 import {
   displayVenue,
   extractKoreanCity,
-  isOnlineText,
+  isOnlineLive,
   splitRegion,
 } from "@/features/zutopia/lives/region";
+import { computeLastModified } from "@/features/zutopia/lives/last-modified";
+import { tourDateFilter } from "@/features/zutopia/lives/tour-dates";
 import type { Live, LiveDetail, LiveSetlistEntry, TourDetail } from "./types";
 
 /**
@@ -107,7 +109,7 @@ function toStandaloneLiveEntries(
             type: liveEntryType(live.type),
             startDate: live.start_date,
             // 온라인 공연은 도시 대신 그림 위 "온라인" 태그로(목록 카드).
-            ...(isOnlineText(live.region) || isOnlineText(live.live_venue)
+            ...(isOnlineLive(live)
               ? { online: true }
               : { city: extractKoreanCity(live.region) }),
             visitOrdinal: parseVisitOrdinal(live.metadata),
@@ -389,19 +391,9 @@ function collapseRepeatedDays(
 }
 
 /**
- * 투어 소속 공연일을 찾는 PostgREST or 필터. 공연일은 tour_id로 묶는 게
- * 원칙이지만, slug에 투어 slug를 그대로 넣어(tour_id 없이) 등록된 행도
- * 있어 둘 다 투어 소속으로 본다.
- */
-function tourDateFilter(tour: { id: string; slug: string }): string {
-  return `tour_id.eq.${tour.id},slug.eq.${tour.slug}`;
-}
-
-/**
- * 사이트맵 lastmod용 — 목록 항목 slug → 마지막으로 고친 시각(ISO). 단독 공연은 그
- * 행의 updated_at, 투어는 투어 행과 그 공연일 행(tourDateFilter와 같은 기준: tour_id
- * 또는 투어 slug와 같은 slug) 중 가장 늦은 값. 세트리스트를 고치면 DB 트리거가 그
- * 공연·투어의 updated_at을 올린다(20261118000000_touch_updated_at.sql).
+ * 사이트맵 lastmod용 — 목록 항목 slug → 마지막으로 고친 시각(ISO, 계산은
+ * computeLastModified). 공연·투어·세트리스트를 고치면 DB 트리거가 그 공연·투어의
+ * updated_at을 올린다(20261118000000_touch_updated_at.sql, 20261118010000_refine_updated_at_triggers.sql).
  */
 export async function getLiveLastModified(): Promise<Map<string, string>> {
   const supabase = createBuildTimeSupabaseClient();
@@ -424,26 +416,7 @@ export async function getLiveLastModified(): Promise<Map<string, string>> {
     );
   }
 
-  const latest = (a: string | undefined, b: string) => (a && a > b ? a : b);
-  const result = new Map<string, string>();
-  for (const live of livesResult.data) {
-    if (live.slug)
-      result.set(live.slug, latest(result.get(live.slug), live.updated_at));
-  }
-  // 투어 slug를 그대로 쓴 공연일 행이 있어도 투어 값으로 덮는다(그 행도 아래 계산에 들어감).
-  for (const tour of toursResult.data) {
-    const dates = livesResult.data.filter(
-      (live) => live.tour_id === tour.id || live.slug === tour.slug,
-    );
-    result.set(
-      tour.slug,
-      dates.reduce<string>(
-        (max, live) => latest(max, live.updated_at),
-        tour.updated_at,
-      ),
-    );
-  }
-  return result;
+  return computeLastModified(livesResult.data, toursResult.data);
 }
 
 /**

@@ -5,6 +5,14 @@
 
 ## 알려진 주의사항
 
+- RSS(`/feed.xml`)의 곡 날짜와 사이트맵의 곡 페이지 lastmod는 빌드할 때 git 기록에서 읽습니다
+  (`features/guide/lib/song-history-git.ts`). 얕은 클론(CI·Cloudflare Pages git 연동 등)에서 빌드하면
+  모든 곡이 같은 날짜가 되니 전체 기록이 있는 저장소에서 `pnpm pages:deploy`로 배포하세요(빌드
+  로그에 `[song-history]` 경고가 뜹니다).
+- 이 저장소의 `supabase/migrations/`는 SQL Editor에서 손으로 적용합니다 — 원격 DB의 마이그레이션
+  기록(`supabase_migrations.schema_migrations`)엔 다른 앱 기록만 있어 `supabase db push`를 쓰면
+  안 됩니다. 파일은 다시 실행해도 안전하게(`create or replace`, `drop ... if exists`) 씁니다. 같은
+  객체를 다시 정의하는 뒤 파일이 있으면 앞 파일만 다시 실행하지 말고 뒤 파일까지 순서대로 실행하세요.
 - `@serwist/next`가 아니라 `@serwist/turbopack`을 씁니다. 이 프로젝트는 Turbopack으로
   빌드되는데, `@serwist/next`의 서비스워커 빌드는 webpack 전용이라 Turbopack에서는 아무
   경고 없이 서비스워커를 생성하지 못합니다.

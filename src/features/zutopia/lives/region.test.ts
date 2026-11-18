@@ -24,6 +24,15 @@ describe("온라인 공연 표기", () => {
       original: "大阪",
     });
     expect(displayVenue("Zepp DiverCity")).toBe("Zepp DiverCity");
+    // 마지막 괄호 안에 괄호가 한 겹 더 있는 장소명
+    expect(
+      splitRegion(
+        "幕張メッセ国際展示場 (1~11ホール) (마쿠하리 멧세 국제전시장(1~11홀))",
+      ),
+    ).toEqual({
+      city: "마쿠하리 멧세 국제전시장(1~11홀)",
+      original: "幕張メッセ国際展示場 (1~11ホール)",
+    });
     expect(isOnlineText(null)).toBe(false);
   });
 });

@@ -6,6 +6,9 @@
 -- 세트리스트를 넣거나 고치거나 지우면 그 공연(live_id)·투어(tour_id)의 updated_at도
 -- 함께 올린다. 투어 상세는 투어 행과 그 공연일 행 중 가장 늦은 값을 쓴다(코드에서 계산).
 -- 적용 뒤 다시 빌드·배포해야 사이트맵에 반영된다.
+--
+-- 20261118010000_refine_updated_at_triggers.sql이 이 파일의 트리거·함수를 다시 정의한다 —
+-- 이 파일만 다시 실행하면 그 보완이 조용히 사라지니, 다시 실행할 땐 뒤 파일까지 순서대로.
 
 create or replace function public.set_updated_at()
 returns trigger

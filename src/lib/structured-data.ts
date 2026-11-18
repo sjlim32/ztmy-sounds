@@ -4,12 +4,21 @@ import { getEventStartDate, getEventEndDate, type Event } from "@/data/event";
 import { SITE_URL, SITE_NAME, SITE_BRAND, SITE_DESCRIPTION } from "@/lib/seo";
 
 const OFFICIAL_URL = "https://zutomayo.net";
+export const MUSIC_GROUP_ID = `${SITE_URL}/#zutomayo`;
+
+/** <script type="application/ld+json"> 내용 — 데이터에 든 "</script>"가 태그를 닫지
+ * 않게 "<"를 이스케이프한다(Next 문서 json-ld 가이드). */
+export function serializeJsonLd(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
 
 /** MusicGroup은 아티스트 본인이 아니라 이 팬페이지가 다루는 대상이므로,
  * url은 공식 홈페이지를 가리키고 이 사이트는 sameAs에 넣지 않습니다. */
 export function buildMusicGroupJsonLd() {
   return {
     "@type": "MusicGroup",
+    // 같은 페이지의 다른 노드(공연 performer 등)와 같은 대상으로 묶이게.
+    "@id": MUSIC_GROUP_ID,
     name: ARTIST.name.kr,
     alternateName: [ARTIST.name.jp, ARTIST.name.en],
     url: OFFICIAL_URL,
@@ -40,54 +49,6 @@ export function buildSiteJsonLdGraph() {
 function toKstIsoString(date: string, time: string) {
   const [year, month, day] = date.split(".");
   return `${year}-${month}-${day}T${time}:00+09:00`;
-}
-
-interface PastLiveForJsonLd {
-  title: string;
-  start_date: string;
-  end_date: string | null;
-  live_venue: string;
-  region: string;
-  country: string;
-  poster_image_url: string | null;
-}
-
-/**
- * 즛토피아 공연 상세(지난 공연 아카이브)용 MusicEvent. 시간 정보가 없어 날짜만
- * 넣는다(schema.org Date). 온라인 공연은 VirtualLocation으로.
- */
-export function buildPastLiveJsonLd(
-  live: PastLiveForJsonLd,
-  pageUrl: string,
-  online: boolean,
-) {
-  const startDate = live.start_date.split("T")[0];
-  const endDate = live.end_date?.split("T")[0];
-  return {
-    "@context": "https://schema.org",
-    "@type": "MusicEvent",
-    name: live.title,
-    startDate,
-    ...(endDate && endDate !== startDate && { endDate }),
-    eventAttendanceMode: online
-      ? "https://schema.org/OnlineEventAttendanceMode"
-      : "https://schema.org/OfflineEventAttendanceMode",
-    eventStatus: "https://schema.org/EventScheduled",
-    url: pageUrl,
-    ...(live.poster_image_url && { image: live.poster_image_url }),
-    location: online
-      ? { "@type": "VirtualLocation", url: pageUrl }
-      : {
-          "@type": "Place",
-          name: live.live_venue,
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: live.region,
-            addressCountry: live.country,
-          },
-        },
-    performer: buildMusicGroupJsonLd(),
-  };
 }
 
 export function buildMusicEventJsonLd(event: Event) {

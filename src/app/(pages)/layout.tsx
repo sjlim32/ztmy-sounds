@@ -19,8 +19,10 @@ import {
   SITE_BRAND,
   SITE_DESCRIPTION,
   FEED_ALTERNATE_TYPES,
+  BASE_OPEN_GRAPH,
+  DEFAULT_OG_IMAGE,
 } from "@/lib/seo";
-import { buildSiteJsonLdGraph } from "@/lib/structured-data";
+import { buildSiteJsonLdGraph, serializeJsonLd } from "@/lib/structured-data";
 import "../globals.css";
 
 // 로컬 폰트는 원본이 아니라 scripts/subset-fonts.mjs가 만든 서브셋을 씁니다 —
@@ -132,15 +134,14 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     siteName: SITE_NAME,
-    locale: "ko_KR",
-    type: "website",
-    images: [{ url: "/og/og.webp", width: 1200, height: 630, alt: SITE_NAME }],
+    ...BASE_OPEN_GRAPH,
+    images: [{ ...DEFAULT_OG_IMAGE, alt: SITE_NAME }],
   },
   twitter: {
     card: "summary_large_image",
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    images: ["/og/og.webp"],
+    images: [DEFAULT_OG_IMAGE.url],
   },
   alternates: { types: FEED_ALTERNATE_TYPES },
   robots: {
@@ -171,7 +172,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(buildSiteJsonLdGraph()),
+            __html: serializeJsonLd(buildSiteJsonLdGraph()),
           }}
         />
         <GoogleAnalytics />

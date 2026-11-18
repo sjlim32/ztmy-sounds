@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { BASE_OPEN_GRAPH, SITE_NAME, pageAlternates } from "@/lib/seo";
 import InfoContent from "@/features/info/info.mdx";
 import { originEvent } from "@/data/event";
 import { cn } from "@/lib/utils";
-import { buildMusicEventJsonLd } from "@/lib/structured-data";
+import { buildMusicEventJsonLd, serializeJsonLd } from "@/lib/structured-data";
 import { INFO_SCROLL_CONTAINER_ID } from "@/features/info/info";
 import { EntranceFade } from "@/components/EntranceFade";
 import { PageScrollBody } from "@/components/PageScrollBody";
@@ -18,9 +19,14 @@ const description = `${originEvent.tourName} 공연 일정과 장소, 유의사�
 export const metadata: Metadata = {
   title: "공연 정보",
   description,
+  alternates: pageAlternates("/info"),
+  // openGraph는 루트 값을 통째로 덮어쓰니 공통값(사이트 이름·locale·type)도 함께.
   openGraph: {
     title: originEvent.tourName,
     description,
+    url: "/info",
+    siteName: SITE_NAME,
+    ...BASE_OPEN_GRAPH,
     images: [{ url: originEvent.tourImg }],
   },
   twitter: {
@@ -46,7 +52,7 @@ export default function InfoPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(buildMusicEventJsonLd(originEvent)),
+          __html: serializeJsonLd(buildMusicEventJsonLd(originEvent)),
         }}
       />
 

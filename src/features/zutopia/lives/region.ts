@@ -1,5 +1,5 @@
-// lives/data.ts(서버 전용)와 live-history/units.ts(순수 계산·테스트 대상)가
-// 같이 쓰려고 따로 둔다.
+// 공연 지역·장소 표기(순수 함수) — 서버 전용 조회(lives/data.ts)와 화면·순수 계산
+// (DefaultLiveContent, json-ld.ts, live-history, stats)이 같이 쓰려고 따로 둔다.
 
 /** 온라인 공연의 지역·장소 표기 — DB의 region·live_venue가 "online"인 공연. */
 export const ONLINE_LABEL = "온라인 라이브";
@@ -9,6 +9,14 @@ export function isOnlineText(text: string | null | undefined): boolean {
   return text?.trim().toLowerCase() === "online";
 }
 
+/** 온라인 공연인지 — region·live_venue 둘 중 하나라도 "online"이면. */
+export function isOnlineLive(live: {
+  region?: string | null;
+  live_venue?: string | null;
+}): boolean {
+  return isOnlineText(live.region) || isOnlineText(live.live_venue);
+}
+
 /** 장소 표기 — "online"이면 "온라인 라이브", 그 밖엔 그대로. */
 export function displayVenue(venue: string): string {
   return isOnlineText(venue) ? ONLINE_LABEL : venue;
@@ -16,12 +24,14 @@ export function displayVenue(venue: string): string {
 
 // "大阪 (오사카)" → { city: "오사카", original: "大阪" }. 괄호가 없으면 원본을
 // 그대로 city로 쓴다. "online"이면 { city: "온라인 라이브", original: null }.
+// 마지막 괄호 안에 괄호가 한 겹 더 있어도 된다 — "幕張メッセ (1~11ホール) (마쿠하리
+// 멧세(1~11홀))" → original "幕張メッセ (1~11ホール)".
 export function splitRegion(region: string): {
   city: string;
   original: string | null;
 } {
   if (isOnlineText(region)) return { city: ONLINE_LABEL, original: null };
-  const match = region.match(/^(.*\S)\s*\(([^()]*)\)\s*$/);
+  const match = region.match(/^(.*\S)\s*\(((?:[^()]|\([^()]*\))*)\)\s*$/);
   return match
     ? { city: match[2], original: match[1] }
     : { city: region, original: null };

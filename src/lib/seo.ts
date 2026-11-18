@@ -11,11 +11,29 @@ export const SITE_BRAND = "ZTMY SOUNDS";
 export const FEED_URL = "/feed.xml";
 export const FEED_TITLE = `${SITE_BRAND} 응원 가이드`;
 
-/** 메타데이터 alternates.types — 루트 레이아웃이 넣지만, 하위 페이지가 alternates를
- * 지정하면(대표 주소 canonical 등) 통째로 덮어써지니 그 페이지도 이 값을 함께 넣는다. */
+/** 메타데이터 alternates.types(피드 링크) — 루트 레이아웃이 넣는다. 하위 페이지가
+ * alternates를 지정하면 통째로 덮어써지니 그런 페이지는 pageAlternates를 쓴다. */
 export const FEED_ALTERNATE_TYPES = {
   "application/rss+xml": [{ url: FEED_URL, title: FEED_TITLE }],
 };
+
+/** 페이지 대표 주소 + 피드 링크 — alternates를 지정하는 페이지는 이걸 쓴다. */
+export function pageAlternates(path: string) {
+  return { canonical: path, types: FEED_ALTERNATE_TYPES };
+}
+
+/** 사이트 기본 공유 이미지(1200×630). */
+export const DEFAULT_OG_IMAGE = {
+  url: "/og/og.webp",
+  width: 1200,
+  height: 630,
+};
+
+/** openGraph를 지정하는 페이지가 함께 넣을 공통값 — openGraph도 통째로 덮어써진다. */
+export const BASE_OPEN_GRAPH = {
+  locale: "ko_KR",
+  type: "website",
+} as const;
 
 /** 메인 화면 로고 아래 한 줄 소개. */
 export const SITE_TAGLINE = "계속 한밤중이면 좋을텐데 팬페이지";

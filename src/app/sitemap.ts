@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { songList } from "@/features/guide/data/songs";
 import { getSongsWithTag } from "@/features/guide/lib/song-call-tags";
+import { getSongGitDates } from "@/features/guide/lib/song-history-git";
 import { ZUTOPIA_CATEGORIES } from "@/features/zutopia/registry";
 import { SITE_URL } from "@/lib/seo";
 
@@ -14,13 +15,49 @@ const PRIORITY: Record<string, number> = {
   "/zutopia": 0.5,
   "/zutopia/songs": 0.4,
   "/zutopia/albums": 0.4,
+  "/zutopia/timeline": 0.4,
+  "/zutopia/stats": 0.3,
   "/credits": 0.3,
 };
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const lastModified = new Date();
-  const slamSongList = getSongsWithTag("slam", songList);
+function latest(dates: readonly (Date | undefined)[]): Date | undefined {
+  return dates.reduce<Date | undefined>(
+    (max, date) => (date && (!max || date > max) ? date : max),
+    undefined,
+  );
+}
 
+/**
+ * lastmod는 실제로 바뀐 날짜를 아는 주소에만 넣는다 — 빌드 시각을 넣으면 배포마다
+ * 전부 바뀐 것처럼 보여 검색 엔진이 사이트맵의 lastmod 전체를 믿지 않게 된다
+ * (Google: "consistently and verifiably accurate"일 때만 쓴다).
+ * - 곡 페이지: 곡 데이터 파일의 마지막 git 커밋(guide/lib/song-history-git.ts)
+ * - 즛토피아 항목: DB updated_at(category.getLastModified), 목록 페이지는 그 최댓값
+ * - 그 밖의 고정 페이지: 넣지 않는다
+ */
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const slamSongList = getSongsWithTag("slam", songList);
+  const songDates = getSongGitDates();
+  const songModified = (id: string) => songDates.get(id)?.modified;
+
+  const songRoutes = songList.map((song) => ({
+    url: `${SITE_URL}/guide/${song.id}`,
+    lastModified: songModified(song.id),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
+  const slamSongRoutes = slamSongList.map((song) => ({
+    url: `${SITE_URL}/slam/${song.id}`,
+    lastModified: songModified(song.id),
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
+  const listModified: Record<string, Date | undefined> = {
+    "/guide": latest(songRoutes.map((route) => route.lastModified)),
+    "/slam": latest(slamSongRoutes.map((route) => route.lastModified)),
+  };
   const staticRoutes = [
     "/",
     "/guide",
@@ -29,70 +66,50 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/zutopia",
     "/zutopia/songs",
     "/zutopia/albums",
+    "/zutopia/timeline",
+    "/zutopia/stats",
+    // /zutopia/attendance는 넣지 않는다 — 기록이 브라우저(localStorage)에만 있어 정적
+    // HTML이 거의 비어 있다(개인용 도구, 링크로만 찾게 둔다).
     "/credits",
   ].map((path) => ({
     url: `${SITE_URL}${path}`,
-    lastModified,
+    lastModified: listModified[path],
     changeFrequency: "weekly" as const,
     priority: PRIORITY[path],
   }));
 
-  const songRoutes = songList.map((song) => ({
-    url: `${SITE_URL}/guide/${song.id}`,
-    lastModified,
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
-  }));
-
-  const slamSongRoutes = slamSongList.map((song) => ({
-    url: `${SITE_URL}/slam/${song.id}`,
-    lastModified,
-    changeFrequency: "monthly" as const,
-    priority: 0.5,
-  }));
-
-  // 즛토피아 항목은 DB의 실제 수정 시각(category.getLastModified)을 lastmod로 —
-  // 빌드 시각을 쓰면 배포마다 전부 바뀐 것처럼 보여 검색 엔진이 lastmod를 믿지 않는다.
-  // 카테고리 목록 페이지는 그 안 항목 중 가장 늦은 시각.
   const zutopiaRoutes = await Promise.all(
     ZUTOPIA_CATEGORIES.map(async (category) => {
       const [entries, modified] = await Promise.all([
         category.getEntries(),
         category.getLastModified?.() ?? new Map<string, string>(),
       ]);
-      const entryRoutes = entries.map((entry) => {
-        const updatedAt = modified.get(entry.slug);
-        return {
-          url: `${SITE_URL}/zutopia/${category.slug}/${entry.slug}`,
-          lastModified: updatedAt ? new Date(updatedAt) : lastModified,
-          changeFrequency: "monthly" as const,
-          priority: 0.4,
-        };
-      });
-      const latestEntry = entryRoutes.reduce<Date | null>(
-        (max, route) =>
-          !max || route.lastModified > max ? route.lastModified : max,
-        null,
-      );
+      const toDate = (iso: string | undefined) =>
+        iso ? new Date(iso) : undefined;
       return {
         categoryRoute: {
           url: `${SITE_URL}/zutopia/${category.slug}`,
-          lastModified: latestEntry ?? lastModified,
+          // 목록엔 취소된 공연도 보이므로(상세가 없어 entries엔 없음) 항목만이 아니라
+          // getLastModified가 준 값 전체의 최댓값.
+          lastModified: latest([...modified.values()].map(toDate)),
           changeFrequency: "weekly" as const,
           priority: 0.4,
         },
-        entryRoutes,
+        entryRoutes: entries.map((entry) => ({
+          url: `${SITE_URL}/zutopia/${category.slug}/${entry.slug}`,
+          lastModified: toDate(modified.get(entry.slug)),
+          changeFrequency: "monthly" as const,
+          priority: 0.4,
+        })),
       };
     }),
   );
-  const zutopiaCategoryRoutes = zutopiaRoutes.map((r) => r.categoryRoute);
-  const zutopiaEntryRoutes = zutopiaRoutes.flatMap((r) => r.entryRoutes);
 
   return [
     ...staticRoutes,
     ...songRoutes,
     ...slamSongRoutes,
-    ...zutopiaCategoryRoutes,
-    ...zutopiaEntryRoutes,
+    ...zutopiaRoutes.map((r) => r.categoryRoute),
+    ...zutopiaRoutes.flatMap((r) => r.entryRoutes),
   ];
 }

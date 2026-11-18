@@ -9,9 +9,16 @@ import { getLiveBySlug, getTourBySlug } from "@/features/zutopia/lives/data";
 import { DefaultLiveContent } from "@/features/zutopia/lives/DefaultLiveContent";
 import { DefaultTourContent } from "@/features/zutopia/lives/DefaultTourContent";
 import type { LiveDetail } from "@/features/zutopia/lives/types";
-import { isOnlineText } from "@/features/zutopia/lives/region";
-import { FEED_ALTERNATE_TYPES, SITE_NAME, SITE_URL } from "@/lib/seo";
-import { buildPastLiveJsonLd } from "@/lib/structured-data";
+import { buildPastLiveJsonLd } from "@/features/zutopia/lives/json-ld";
+import {
+  BASE_OPEN_GRAPH,
+  DEFAULT_OG_IMAGE,
+  SITE_NAME,
+  SITE_URL,
+  pageAlternates,
+} from "@/lib/seo";
+import { serializeJsonLd } from "@/lib/structured-data";
+import { ARTIST } from "@/data/artist";
 
 // 공연/항목마다 사진·티켓 등 손으로 채운 콘텐츠가 필요하면 이 맵에 등록해
 // 기본 뷰(DefaultLiveContent)를 덮어쓴다. 등록하지 않은 공연은 기본 뷰
@@ -47,9 +54,10 @@ export async function generateMetadata(
   if (tour) {
     return entryMetadata({
       title: `${tour.title_ko} | ${category.label}`,
-      description: `${tour.title} 아카이브.`,
+      description: `${ARTIST.name.kr} ${tour.title_ko} 투어 일정·세트리스트 아카이브.`,
       path,
-      image: tour.poster_image_url,
+      // DB에 빈 문자열("")로 들어간 주소도 있어 ??가 아니라 ||로 거른다.
+      image: tour.poster_image_url || null,
     });
   }
 
@@ -57,20 +65,28 @@ export async function generateMetadata(
   if (live) {
     return entryMetadata({
       title: `${live.title_ko ?? live.title} | ${category.label}`,
-      description: `${live.title} 아카이브.`,
+      description: `${ARTIST.name.kr} ${live.title_ko ?? live.title} 세트리스트·공연 정보 아카이브.`,
       path,
-      image: live.poster_image_url ?? live.icon_image_url,
+      image: liveImage(live),
     });
   }
 
   return {};
 }
 
+/** 공연 대표 이미지 — 포스터 → 아이콘. DB에 빈 문자열("")도 있어 ||로 거른다. */
+function liveImage(live: {
+  poster_image_url: string | null;
+  icon_image_url: string | null;
+}): string | null {
+  return live.poster_image_url || live.icon_image_url || null;
+}
+
 /**
  * 상세 페이지마다 대표 주소(canonical)와 공유 미리보기 — openGraph·twitter를 안
  * 넣으면 루트 레이아웃 값(사이트 첫 화면 제목·주소·이미지)을 그대로 물려받는다.
- * 포스터가 없으면 사이트 기본 OG 이미지. alternates를 넣으면 루트의 피드 링크가
- * 덮어써지므로 FEED_ALTERNATE_TYPES도 함께.
+ * 포스터가 없으면 사이트 기본 OG 이미지(크기 포함). 포스터는 대부분 세로·정사각이라
+ * 가로로 잘리는 큰 카드 대신 작은 카드(summary)로 보낸다.
  */
 function entryMetadata({
   title,
@@ -83,21 +99,24 @@ function entryMetadata({
   path: string;
   image: string | null;
 }): Metadata {
-  const images = [image ?? "/og/og.webp"];
   return {
     title,
     description,
-    alternates: { canonical: path, types: FEED_ALTERNATE_TYPES },
+    alternates: pageAlternates(path),
     openGraph: {
       title,
       description,
       url: path,
       siteName: SITE_NAME,
-      locale: "ko_KR",
-      type: "website",
-      images,
+      ...BASE_OPEN_GRAPH,
+      images: [image ? { url: image } : DEFAULT_OG_IMAGE],
     },
-    twitter: { card: "summary_large_image", title, description, images },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      images: [image ?? DEFAULT_OG_IMAGE.url],
+    },
   };
 }
 
@@ -121,19 +140,17 @@ export default async function ZutopiaEntryPage(
     const Content =
       CONTENT_BY_KEY[`${categorySlug}/${slug}`] ?? DefaultLiveContent;
     const jsonLd = buildPastLiveJsonLd(
-      live,
+      { ...live, image: liveImage(live) },
       `${SITE_URL}/zutopia/${categorySlug}/${slug}`,
-      isOnlineText(live.region) || isOnlineText(live.live_venue),
     );
     return (
       <>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            // "</script>"가 든 제목이 태그를 닫지 않게 "<"를 이스케이프한다.
-            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-          }}
-        />
+        {jsonLd && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+          />
+        )}
         <Content live={live} />
       </>
     );

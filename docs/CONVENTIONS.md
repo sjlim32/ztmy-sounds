@@ -20,8 +20,8 @@ src/
       serwist/              # 서비스워커를 서빙하는 라우트 핸들러
       sw.ts                 # 서비스워커 엔트리
     feed.xml/route.ts       # /feed.xml 응원 가이드 RSS (빌드 때 out/feed.xml로 생성).
-                             # 곡 날짜는 guide/lib/song-added-dates.ts가 곡 파일이 git에
-                             # 처음 추가된 커밋에서 읽는다(이름 변경만 따라감, 복사는 X).
+                             # 내용은 features/guide/lib/feed.ts, 곡 날짜는
+                             # features/guide/lib/song-history-git.ts(아래 guide/ 참고).
                              # 커밋 전 새 곡은 빌드 시각. 모든 페이지 <head>에
                              # alternates.types로 피드 링크(루트 layout)
   features/                 # 기능 단위 모듈. 각 폴더는 보통 components/lib(/data) 구성
@@ -60,6 +60,13 @@ src/
                              # 곡 목록 필터(SongFilterBar)는 필터 칩 전용 스타일,
                              # 모바일은 줄마다 한 줄 가로 스크롤. 이 세로 열의
                              # 폭은 lib/player-layout.ts 한 곳에서 정한다.
+                             # 곡 페이지 제목·설명은 lib/song-meta.ts(응원·슬램 곡
+                             # 페이지 메타데이터와 RSS가 같이 씀). 곡 파일의 git
+                             # 날짜(RSS 추가일·사이트맵 lastmod)는 lib/song-history-git.ts
+                             # (빌드 전용, server-only) — 기록 해석은 lib/song-history.ts
+                             # (순수·테스트): 이름 변경만 따라가고 복사는 안 따라감,
+                             # not-yet/에서 옮긴 날 = 추가된 날, 이름만 바꾼 커밋
+                             # (R100, 번호 재정렬)은 수정일로 치지 않음.
                              # 응원 색·이름·설명은 lib/call-tag-style.ts.
                              # 응원 아이콘은 public/assets/guide/shamoji/의 샤모지
                              # 세트(그림만 256px `<이름>.webp`, 한자·영문 포함
@@ -329,9 +336,12 @@ src/
                              # content.mdx를 만들어 [slug]/page.tsx의
                              # CONTENT_BY_KEY에 등록한다(선택 사항).
                              # 상세 메타데이터: 대표 주소(canonical)·OG·twitter를
-                             # 공연마다(포스터, 없으면 사이트 OG) — alternates를
-                             # 넣으니 FEED_ALTERNATE_TYPES도 함께. 단독 공연은
-                             # MusicEvent JSON-LD(buildPastLiveJsonLd).
+                             # 공연마다(포스터 → 아이콘 → 사이트 OG, DB의 빈 문자열은
+                             # ||로 거름; 설명엔 아티스트 이름) — alternates는
+                             # seo.ts pageAlternates(피드 링크 포함), 포스터가 대부분
+                             # 세로라 twitter 카드는 summary. 오프라인 단독 공연은
+                             # MusicEvent JSON-LD(lives/json-ld.ts — 페스티벌은
+                             # live_date 하루, 장소는 원어, 나라는 ISO 코드).
       song-db/              # 곡/앨범 DB 조회·정렬·표시 로직 (Supabase 소스)
                              # 곡 목록 정렬: 앨범·발매일·편곡(arranger)·MV 감독
                              # (movie_director) — 사람별 묶음은 groupSongs의 groupByPeople
@@ -458,7 +468,11 @@ src/
     social-links.ts         # 소셜 링크
   lib/                      # 여러 기능이 공유하는 프레임워크 비의존 로직
     supabase/                # Supabase 클라이언트 (빌드 타임 전용 — 아래 "곡 데이터" 참고)
-    seo.ts                   # 사이트 전역 메타데이터 상수 (SITE_NAME, FEED_URL 등)
+    seo.ts                   # 사이트 전역 메타데이터 상수 (SITE_NAME, FEED_URL 등)와
+                             # 하위 페이지용 공통값(pageAlternates, DEFAULT_OG_IMAGE,
+                             # BASE_OPEN_GRAPH — openGraph·alternates는 얕은 병합이라
+                             # 지정하는 페이지가 함께 넣는다)
+    structured-data.ts       # JSON-LD. <script>에는 serializeJsonLd로 넣는다("<" 이스케이프)
     use-install-prompt.ts    # PWA beforeinstallprompt/appinstalled 공용 훅
                              # (아래 "PWA 설치 프롬프트" 참고)
   fonts/                    # 로컬 폰트 원본 (LINE Seed KR, 851MkPOP) — 직접 로드하지 않음
@@ -562,13 +576,25 @@ src/
 
 ### 사이트맵 lastmod(updated_at)
 
-- 즛토피아 항목의 사이트맵 lastmod는 빌드 시각이 아니라 DB `updated_at`입니다
-  (`ZutopiaCategory.getLastModified` → lives는 `getLiveLastModified`). 투어는 투어 행과
-  소속 공연일 행 중 가장 늦은 값, 카테고리 목록 페이지는 그 안 항목 중 가장 늦은 값.
-- `lives`·`tours`·`setlists`의 `updated_at`은 트리거가 고칠 때마다 올리고, 세트리스트를
-  넣거나 고치거나 지우면 그 공연·투어의 `updated_at`도 올립니다
-  (`supabase/migrations/20261118000000_touch_updated_at.sql`). 그 전 행은 `updated_at`이
-  `created_at`과 같습니다.
+- 사이트맵 lastmod는 실제로 바뀐 날짜를 아는 주소에만 넣습니다(빌드 시각은 넣지 않음 —
+  배포마다 전부 바뀐 것처럼 보이면 검색 엔진이 lastmod 전체를 믿지 않음). 곡 페이지는 곡
+  파일의 마지막 git 커밋(음원 버전 `data/origin/` 파일만 고친 건 반영 안 됨), `/guide`·`/slam`은
+  그 최댓값, 그 밖의 고정 페이지는 없음. `/zutopia/attendance`는 사이트맵에서 뺍니다(기록이
+  localStorage에만 있어 정적 HTML이 거의 빔).
+- 즛토피아 항목은 DB `updated_at`입니다(`ZutopiaCategory.getLastModified` → lives는
+  `getLiveLastModified`, 계산은 `lives/last-modified.ts`). 투어는 투어 행과 소속 공연일 행 중
+  가장 늦은 값, 카테고리 목록 페이지는 취소 공연까지 포함한 전체 최댓값.
+- `lives`·`tours`·`setlists`의 `updated_at`은 트리거가 실제로 값이 바뀐 UPDATE에서만 올립니다.
+  세트리스트를 넣거나 고치거나 지우면 그 공연·투어도, 투어 공연일을 고치거나 지우거나 옮기면
+  그 투어도 올립니다(`supabase/migrations/20261118000000_touch_updated_at.sql`,
+  `20261118010000_refine_updated_at_triggers.sql`). 트리거 전 행은 `updated_at`이 `created_at`과
+  같습니다.
+- 반영 못 하는 변경: `songs` 행(세트리스트에 보이는 곡 제목), 화면 코드만 바꾼 경우, 행 삭제
+  (목록 페이지), tour_id 없이 slug로만 묶인 공연일의 삭제·이동.
+- `updated_at`을 직접 넣어도 트리거가 `now()`로 덮어씁니다 — 과거 시각으로 고치려면
+  `alter table ... disable trigger set_updated_at` → 수정 → `enable`.
+- 트리거가 행 전체를 비교(`old.* is distinct from new.*`)하므로 이 세 테이블엔 `json`(등호 연산자가
+  없는 타입) 대신 `jsonb`만 씁니다 — `json` 컬럼을 넣으면 그 테이블의 모든 UPDATE가 실패합니다.
 
 ### 날짜
 
