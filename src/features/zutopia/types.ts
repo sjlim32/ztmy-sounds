@@ -67,6 +67,8 @@ export interface ZutopiaCategory {
   // 카테고리 안의 항목 목록을 가져오는 함수. "lives"처럼 Supabase 등
   // 외부 데이터 소스를 쓸 수 있어 비동기다.
   getEntries: () => Promise<ZutopiaEntry[]>;
+  // 사이트맵 lastmod용 항목 slug → 마지막 수정 시각(ISO). 없으면 빌드 시각을 쓴다.
+  getLastModified?: () => Promise<Map<string, string>>;
 }
 
 // 허브 카드 메타 문구를 만든다 — 모바일 카드 한 줄에 들어가게 짧게. type이

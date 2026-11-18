@@ -42,6 +42,54 @@ function toKstIsoString(date: string, time: string) {
   return `${year}-${month}-${day}T${time}:00+09:00`;
 }
 
+interface PastLiveForJsonLd {
+  title: string;
+  start_date: string;
+  end_date: string | null;
+  live_venue: string;
+  region: string;
+  country: string;
+  poster_image_url: string | null;
+}
+
+/**
+ * 즛토피아 공연 상세(지난 공연 아카이브)용 MusicEvent. 시간 정보가 없어 날짜만
+ * 넣는다(schema.org Date). 온라인 공연은 VirtualLocation으로.
+ */
+export function buildPastLiveJsonLd(
+  live: PastLiveForJsonLd,
+  pageUrl: string,
+  online: boolean,
+) {
+  const startDate = live.start_date.split("T")[0];
+  const endDate = live.end_date?.split("T")[0];
+  return {
+    "@context": "https://schema.org",
+    "@type": "MusicEvent",
+    name: live.title,
+    startDate,
+    ...(endDate && endDate !== startDate && { endDate }),
+    eventAttendanceMode: online
+      ? "https://schema.org/OnlineEventAttendanceMode"
+      : "https://schema.org/OfflineEventAttendanceMode",
+    eventStatus: "https://schema.org/EventScheduled",
+    url: pageUrl,
+    ...(live.poster_image_url && { image: live.poster_image_url }),
+    location: online
+      ? { "@type": "VirtualLocation", url: pageUrl }
+      : {
+          "@type": "Place",
+          name: live.live_venue,
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: live.region,
+            addressCountry: live.country,
+          },
+        },
+    performer: buildMusicGroupJsonLd(),
+  };
+}
+
 export function buildMusicEventJsonLd(event: Event) {
   const startDate = getEventStartDate(event);
   const endDate = getEventEndDate(event);

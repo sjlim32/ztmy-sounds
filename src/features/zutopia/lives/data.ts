@@ -398,6 +398,55 @@ function tourDateFilter(tour: { id: string; slug: string }): string {
 }
 
 /**
+ * 사이트맵 lastmod용 — 목록 항목 slug → 마지막으로 고친 시각(ISO). 단독 공연은 그
+ * 행의 updated_at, 투어는 투어 행과 그 공연일 행(tourDateFilter와 같은 기준: tour_id
+ * 또는 투어 slug와 같은 slug) 중 가장 늦은 값. 세트리스트를 고치면 DB 트리거가 그
+ * 공연·투어의 updated_at을 올린다(20261118000000_touch_updated_at.sql).
+ */
+export async function getLiveLastModified(): Promise<Map<string, string>> {
+  const supabase = createBuildTimeSupabaseClient();
+  const [livesResult, toursResult] = await Promise.all([
+    // 취소된 공연일도 투어 상세 일정엔 보이므로 status로 거르지 않는다(읽기 정책이 정함).
+    supabase.from("lives").select("slug, tour_id, updated_at"),
+    supabase
+      .from("tours")
+      .select("id, slug, updated_at")
+      .eq("status", "ACTIVE"),
+  ]);
+  if (livesResult.error) {
+    throw new Error(
+      `공연 수정 시각을 가져오지 못했습니다: ${livesResult.error.message}`,
+    );
+  }
+  if (toursResult.error) {
+    throw new Error(
+      `투어 수정 시각을 가져오지 못했습니다: ${toursResult.error.message}`,
+    );
+  }
+
+  const latest = (a: string | undefined, b: string) => (a && a > b ? a : b);
+  const result = new Map<string, string>();
+  for (const live of livesResult.data) {
+    if (live.slug)
+      result.set(live.slug, latest(result.get(live.slug), live.updated_at));
+  }
+  // 투어 slug를 그대로 쓴 공연일 행이 있어도 투어 값으로 덮는다(그 행도 아래 계산에 들어감).
+  for (const tour of toursResult.data) {
+    const dates = livesResult.data.filter(
+      (live) => live.tour_id === tour.id || live.slug === tour.slug,
+    );
+    result.set(
+      tour.slug,
+      dates.reduce<string>(
+        (max, live) => latest(max, live.updated_at),
+        tour.updated_at,
+      ),
+    );
+  }
+  return result;
+}
+
+/**
  * 상세 페이지용 — 공연 정보 + 세트리스트(본편 먼저, 앙코르 나중, 각각
  * track_number 오름차순). 없는 슬러그는 null(호출부에서 notFound() 처리).
  * generateMetadata와 페이지 컴포넌트가 같은 slug로 각자 호출하므로 React

@@ -51,25 +51,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  const zutopiaCategoryRoutes = ZUTOPIA_CATEGORIES.map((category) => ({
-    url: `${SITE_URL}/zutopia/${category.slug}`,
-    lastModified,
-    changeFrequency: "weekly" as const,
-    priority: 0.4,
-  }));
-
-  const zutopiaEntryRoutes = (
-    await Promise.all(
-      ZUTOPIA_CATEGORIES.map(async (category) =>
-        (await category.getEntries()).map((entry) => ({
+  // 즛토피아 항목은 DB의 실제 수정 시각(category.getLastModified)을 lastmod로 —
+  // 빌드 시각을 쓰면 배포마다 전부 바뀐 것처럼 보여 검색 엔진이 lastmod를 믿지 않는다.
+  // 카테고리 목록 페이지는 그 안 항목 중 가장 늦은 시각.
+  const zutopiaRoutes = await Promise.all(
+    ZUTOPIA_CATEGORIES.map(async (category) => {
+      const [entries, modified] = await Promise.all([
+        category.getEntries(),
+        category.getLastModified?.() ?? new Map<string, string>(),
+      ]);
+      const entryRoutes = entries.map((entry) => {
+        const updatedAt = modified.get(entry.slug);
+        return {
           url: `${SITE_URL}/zutopia/${category.slug}/${entry.slug}`,
-          lastModified,
+          lastModified: updatedAt ? new Date(updatedAt) : lastModified,
           changeFrequency: "monthly" as const,
           priority: 0.4,
-        })),
-      ),
-    )
-  ).flat();
+        };
+      });
+      const latestEntry = entryRoutes.reduce<Date | null>(
+        (max, route) =>
+          !max || route.lastModified > max ? route.lastModified : max,
+        null,
+      );
+      return {
+        categoryRoute: {
+          url: `${SITE_URL}/zutopia/${category.slug}`,
+          lastModified: latestEntry ?? lastModified,
+          changeFrequency: "weekly" as const,
+          priority: 0.4,
+        },
+        entryRoutes,
+      };
+    }),
+  );
+  const zutopiaCategoryRoutes = zutopiaRoutes.map((r) => r.categoryRoute);
+  const zutopiaEntryRoutes = zutopiaRoutes.flatMap((r) => r.entryRoutes);
 
   return [
     ...staticRoutes,

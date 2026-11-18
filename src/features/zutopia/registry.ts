@@ -1,4 +1,7 @@
-import { getLiveEntries } from "@/features/zutopia/lives/data";
+import {
+  getLiveEntries,
+  getLiveLastModified,
+} from "@/features/zutopia/lives/data";
 import type { ZutopiaCategory } from "@/features/zutopia/types";
 
 // 즛토피아는 "지난 공연" 말고도 나중에 다른 대분류(예: 굿즈, 디스코그래피 등)가
@@ -17,6 +20,7 @@ export const ZUTOPIA_CATEGORIES: ZutopiaCategory[] = [
     description: "지난 공연 목록 및 세트리스트 정보",
     image: "/assets/zutopia/components/lives.webp",
     getEntries: getLiveEntries,
+    getLastModified: getLiveLastModified,
   },
 ];
 

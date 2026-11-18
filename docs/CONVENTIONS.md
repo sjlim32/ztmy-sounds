@@ -328,6 +328,10 @@ src/
                              # 공연별 수동 콘텐츠가 필요하면 lives/<슬러그>/
                              # content.mdx를 만들어 [slug]/page.tsx의
                              # CONTENT_BY_KEY에 등록한다(선택 사항).
+                             # 상세 메타데이터: 대표 주소(canonical)·OG·twitter를
+                             # 공연마다(포스터, 없으면 사이트 OG) — alternates를
+                             # 넣으니 FEED_ALTERNATE_TYPES도 함께. 단독 공연은
+                             # MusicEvent JSON-LD(buildPastLiveJsonLd).
       song-db/              # 곡/앨범 DB 조회·정렬·표시 로직 (Supabase 소스)
                              # 곡 목록 정렬: 앨범·발매일·편곡(arranger)·MV 감독
                              # (movie_director) — 사람별 묶음은 groupSongs의 groupByPeople
@@ -555,6 +559,16 @@ src/
 - 검색 인덱스는 빌드 때 만들어지므로 별명을 고치면 다시 빌드·배포해야 반영됩니다(`.next/cache/fetch-cache`
   캐시 주의).
 - 공연·투어 검색용 조회는 컬럼이 없는 DB에서도 깨지지 않게 `select("*")` + `aliasesOf()`로 읽습니다.
+
+### 사이트맵 lastmod(updated_at)
+
+- 즛토피아 항목의 사이트맵 lastmod는 빌드 시각이 아니라 DB `updated_at`입니다
+  (`ZutopiaCategory.getLastModified` → lives는 `getLiveLastModified`). 투어는 투어 행과
+  소속 공연일 행 중 가장 늦은 값, 카테고리 목록 페이지는 그 안 항목 중 가장 늦은 값.
+- `lives`·`tours`·`setlists`의 `updated_at`은 트리거가 고칠 때마다 올리고, 세트리스트를
+  넣거나 고치거나 지우면 그 공연·투어의 `updated_at`도 올립니다
+  (`supabase/migrations/20261118000000_touch_updated_at.sql`). 그 전 행은 `updated_at`이
+  `created_at`과 같습니다.
 
 ### 날짜
 
