@@ -1,4 +1,5 @@
 import { ThumbImage } from "@/components/ThumbImage";
+import { ARTIST } from "@/data/artist";
 import { ViewTransition } from "react";
 import { posterTransitionName } from "@/features/zutopia/lives/poster-transition";
 import { cn } from "@/lib/utils";
@@ -71,6 +72,9 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
       )}
 
       <div className="flex flex-col items-center text-center">
+        {/* 누구의 공연인지 본문에도 적는다 — 구조화 데이터(MusicEvent performer)와 맞추고,
+        "즛토마요 + 공연명" 검색에 걸리게. */}
+        <p className="mb-1 text-sm text-white/55">{ARTIST.name.jp}</p>
         <h1
           className={cn(
             rocknrollOne.className,
