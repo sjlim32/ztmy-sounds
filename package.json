@@ -11,7 +11,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "fonts:subset": "node scripts/subset-fonts.mjs",
-    "pages:deploy": "pnpm build && wrangler pages deploy out",
+    "pages:deploy": "rm -rf .next/cache/fetch-cache && pnpm build && wrangler pages deploy out",
     "test": "vitest run"
   },
   "dependencies": {
