@@ -598,6 +598,9 @@ src/
   (목록 페이지), tour_id 없이 slug로만 묶인 공연일의 삭제·이동.
 - `updated_at`을 직접 넣어도 트리거가 `now()`로 덮어씁니다 — 과거 시각으로 고치려면
   `alter table ... disable trigger set_updated_at` → 수정 → `enable`.
+- `setlists_track_unique`는 `UNIQUE NULLS NOT DISTINCT`입니다 — 행마다 `tour_id`·`live_id` 중 하나가
+  늘 NULL이라 기본 UNIQUE로는 같은 곡 줄 중복을 못 막습니다
+  (`20261118030000_setlists_track_unique_nulls_not_distinct.sql`).
 - 이미지 주소 칸(`lives.poster_image_url`·`icon_image_url`, `tours.poster_image_url`)은 없으면 NULL —
   빈 문자열은 check 제약이 막습니다(`20261118020000_image_url_not_empty.sql`). 빈 문자열은 코드의 대체
   순서(포스터 → 아이콘 → 기본 이미지)를 건너뛰게 만듭니다.
