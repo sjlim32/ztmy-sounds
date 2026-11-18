@@ -13,7 +13,13 @@ import { MobileHeader } from "@/components/mobile/MobileHeader";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Footer } from "@/components/Footer";
 import { ARTIST } from "@/data/artist";
-import { SITE_URL, SITE_NAME, SITE_BRAND, SITE_DESCRIPTION } from "@/lib/seo";
+import {
+  SITE_URL,
+  SITE_NAME,
+  SITE_BRAND,
+  SITE_DESCRIPTION,
+  FEED_ALTERNATE_TYPES,
+} from "@/lib/seo";
 import { buildSiteJsonLdGraph } from "@/lib/structured-data";
 import "../globals.css";
 
@@ -136,6 +142,7 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: ["/og/og.webp"],
   },
+  alternates: { types: FEED_ALTERNATE_TYPES },
   robots: {
     index: true,
     follow: true,

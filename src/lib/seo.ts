@@ -7,6 +7,16 @@ export const SITE_NAME = `${ARTIST.name.kr} FAN PAGE`;
 /** 로고에 적힌 사이트 브랜드명 — 도메인(ztmy-sounds)과 같은 이름. */
 export const SITE_BRAND = "ZTMY SOUNDS";
 
+/** 새로 추가된 응원 가이드 곡을 알리는 RSS 피드(src/app/feed.xml/route.ts). */
+export const FEED_URL = "/feed.xml";
+export const FEED_TITLE = `${SITE_BRAND} 응원 가이드`;
+
+/** 메타데이터 alternates.types — 루트 레이아웃이 넣지만, 하위 페이지가 alternates를
+ * 지정하면(대표 주소 canonical 등) 통째로 덮어써지니 그 페이지도 이 값을 함께 넣는다. */
+export const FEED_ALTERNATE_TYPES = {
+  "application/rss+xml": [{ url: FEED_URL, title: FEED_TITLE }],
+};
+
 /** 메인 화면 로고 아래 한 줄 소개. */
 export const SITE_TAGLINE = "계속 한밤중이면 좋을텐데 팬페이지";
 

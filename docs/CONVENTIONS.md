@@ -19,6 +19,11 @@ src/
     (pwa)/                  # 서비스워커 전용 라우트 그룹 (레이아웃 없음)
       serwist/              # 서비스워커를 서빙하는 라우트 핸들러
       sw.ts                 # 서비스워커 엔트리
+    feed.xml/route.ts       # /feed.xml 응원 가이드 RSS (빌드 때 out/feed.xml로 생성).
+                             # 곡 날짜는 guide/lib/song-added-dates.ts가 곡 파일이 git에
+                             # 처음 추가된 커밋에서 읽는다(이름 변경만 따라감, 복사는 X).
+                             # 커밋 전 새 곡은 빌드 시각. 모든 페이지 <head>에
+                             # alternates.types로 피드 링크(루트 layout)
   features/                 # 기능 단위 모듈. 각 폴더는 보통 components/lib(/data) 구성
     guide/                  # 곡 가이드(영상+가사+응원법). *-context.tsx로 플레이어/모드 상태 보유
                              # 상세 화면 tablet 이상: 영상 위 GuideDetailToolbar
@@ -449,7 +454,7 @@ src/
     social-links.ts         # 소셜 링크
   lib/                      # 여러 기능이 공유하는 프레임워크 비의존 로직
     supabase/                # Supabase 클라이언트 (빌드 타임 전용 — 아래 "곡 데이터" 참고)
-    seo.ts                   # 사이트 전역 메타데이터 상수 (SITE_NAME 등)
+    seo.ts                   # 사이트 전역 메타데이터 상수 (SITE_NAME, FEED_URL 등)
     use-install-prompt.ts    # PWA beforeinstallprompt/appinstalled 공용 훅
                              # (아래 "PWA 설치 프롬프트" 참고)
   fonts/                    # 로컬 폰트 원본 (LINE Seed KR, 851MkPOP) — 직접 로드하지 않음
