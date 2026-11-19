@@ -11,9 +11,10 @@ import {
   FILTER_CHIP_CLASS,
   FOCUS_RING,
   LINK_BUTTON_CLASS,
-  SOFT_BUTTON_CLASS,
 } from "@/components/button-styles";
 import { SearchIcon } from "@/components/icons/SearchIcon";
+import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
+import { rocknrollOne } from "@/features/zutopia/lives/rocknroll-font";
 import { getFeedbackUrl } from "@/lib/feedback";
 import {
   FilterPanel,
@@ -22,6 +23,7 @@ import {
 } from "@/features/zutopia/components/SortFilterBar";
 import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
 import {
+  cellSortKey,
   DEFAULT_SORT,
   filterRows,
   nextSort,
@@ -157,13 +159,14 @@ export function StatsView({
               </span>
               <span aria-hidden className="h-px flex-1 bg-white/15" />
             </h2>
-            <ul className="tablet:grid-cols-2 pc:grid-cols-3 grid grid-cols-1 gap-4">
+            {/* 다단으로 쌓는다 — 카드마다 제 높이(그래프 유무로 한 줄 높이가 벌어지지 않게) */}
+            <ul className="tablet:columns-2 pc:columns-3 columns-1 gap-4">
               {section.records.map((record) => (
                 // id — 공유 주소(#기록id)로 들어오면 그 카드로 스크롤된다(헤더에 가리지 않게 여백).
                 <li
                   key={record.id}
                   id={record.id}
-                  className="min-w-0 scroll-mt-24"
+                  className="mb-4 min-w-0 scroll-mt-24 break-inside-avoid"
                 >
                   <RecordCard
                     record={record}
@@ -257,6 +260,12 @@ function SummaryRow({
   );
 }
 
+/**
+ * 기록 카드 — 위에서부터 제목·설명(두 줄까지, 전체는 옆 창), 1위(그림·이름·대표
+ * 값·설명), 연도별 흐름(있는 기록만), 2~5위, 맨 아래 "전체 순위 보기" 줄. 카드는
+ * 다단(columns)으로 쌓아 저마다 제 높이를 가진다 — 그래프 있는 카드와 없는 카드가
+ * 한 줄에 놓여 빈칸이 생기지 않게. 돋보이는 건 1위 대표 값 하나(로고 서체 숫자).
+ */
 function RecordCard({
   record,
   onOpen,
@@ -266,77 +275,96 @@ function RecordCard({
 }) {
   const [leader, ...rest] = record.rows;
   const coLeaders = record.leaderCount;
+  const runnersUp = rest.slice(0, RUNNER_UP_COUNT);
+  const scale = runnerUpScale(leader, runnersUp);
 
   return (
     <article
-      className={cn("flex h-full flex-col gap-4 p-4", ZUTOPIA_SURFACE_CLASS)}
+      className={cn("flex flex-col overflow-hidden", ZUTOPIA_SURFACE_CLASS)}
     >
-      <header>
-        <h3 className="tablet:text-lg text-base font-semibold text-white">
-          {record.title}
-        </h3>
-        <p className="mt-0.5 text-sm text-white/55">{record.description}</p>
-      </header>
+      <div className={cn("flex flex-col gap-4 p-4", "tablet:p-5")}>
+        <header className="flex flex-col gap-1">
+          <h3 className="tablet:text-lg text-base leading-snug font-semibold text-white">
+            {record.title}
+          </h3>
+          <p
+            className="line-clamp-2 text-sm break-keep text-white/55"
+            title={record.description}
+          >
+            {record.description}
+          </p>
+        </header>
 
-      {leader ? (
-        <div className="flex items-start gap-3">
-          {leader.image && (
-            <ThumbImage
-              src={leader.image}
-              displayWidth={64}
-              className="size-16 shrink-0 rounded-md bg-black/40 object-cover"
-            />
-          )}
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start gap-2">
-              {/* 1위 이름은 두 줄까지(공연·투어 이름이 길다), 넘치면 title로 전체 이름 */}
-              <RowName
-                row={leader}
-                className="line-clamp-2 text-lg leading-snug font-bold break-keep whitespace-normal"
-              />
-              {coLeaders > 1 && (
-                <span className="mt-0.5 shrink-0 rounded bg-white/10 px-1.5 text-sm leading-6 font-semibold whitespace-nowrap text-white/80">
-                  공동 1위 {coLeaders}
-                </span>
+        {leader ? (
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              {leader.image && (
+                <ThumbImage
+                  src={leader.image}
+                  displayWidth={64}
+                  className="size-14 shrink-0 rounded-md bg-black/40 object-cover"
+                />
               )}
+              <div className="min-w-0 flex-1">
+                {/* 1위 이름은 두 줄까지(공연·투어 이름이 길다), 넘치면 title로 전체 이름 */}
+                <RowName
+                  row={leader}
+                  className="line-clamp-2 text-base leading-snug font-bold break-keep whitespace-normal text-white"
+                />
+                {(leader.sub || coLeaders > 1) && (
+                  <p className="truncate text-sm text-white/55">
+                    {coLeaders > 1 && (
+                      <span className="text-ztmy-pink">
+                        공동 1위 {coLeaders}
+                        {leader.sub && " "}
+                      </span>
+                    )}
+                    {leader.sub}
+                  </p>
+                )}
+              </div>
             </div>
-            {leader.sub && (
-              <p className="truncate text-sm text-white/60">{leader.sub}</p>
-            )}
-            <p className="text-ztmy-magenta mt-1 text-3xl font-bold tabular-nums">
-              <CellText cell={leader.cells[0]} />
-            </p>
+            <Figure cell={leader.cells[0]} />
             {leader.note && (
-              <p className="mt-0.5 text-sm break-keep text-white/60">
-                {leader.note}
-              </p>
+              <p className="text-sm break-keep text-white/60">{leader.note}</p>
             )}
           </div>
-        </div>
-      ) : (
-        <p className="text-sm text-white/55">아직 기록이 없어요.</p>
-      )}
+        ) : (
+          <p className="text-sm text-white/55">아직 기록이 없어요.</p>
+        )}
 
-      {record.trend && <TrendBars trend={record.trend} />}
+        {record.trend && <TrendBars trend={record.trend} />}
 
-      {rest.length > 0 && (
-        <ol className="flex flex-col border-t border-white/10 pt-2">
-          {rest.slice(0, RUNNER_UP_COUNT).map((row) => (
-            <li
-              key={row.key}
-              className="flex items-baseline gap-3 py-1 text-sm"
-            >
-              <span className="w-5 shrink-0 text-right text-white/45 tabular-nums">
-                {row.rank}
-              </span>
-              <RowName row={row} className="flex-1 text-white/85" />
-              <span className="shrink-0 font-medium text-white tabular-nums">
-                <CellText cell={row.cells[0]} />
-              </span>
-            </li>
-          ))}
-        </ol>
-      )}
+        {runnersUp.length > 0 && (
+          <ol className="flex flex-col gap-2 border-t border-white/10 pt-3">
+            {runnersUp.map((row, index) => (
+              <li key={row.key} className="flex flex-col gap-1 text-sm">
+                <span className="flex items-baseline gap-3">
+                  <span className="w-5 shrink-0 text-right text-white/45 tabular-nums">
+                    {row.rank}
+                  </span>
+                  <RowName row={row} className="flex-1 text-white/85" />
+                  <span className="shrink-0 font-medium text-white tabular-nums">
+                    <CellText cell={row.cells[0]} />
+                  </span>
+                </span>
+                {/* 1위 대비 비율 — 값이 큰 순서인 기록만(적은 순 기록은 막대를 두지 않는다) */}
+                {scale && (
+                  <span
+                    aria-hidden
+                    className="ml-8 h-1 overflow-hidden rounded-full bg-white/[0.06]"
+                  >
+                    <span
+                      className="bg-ztmy-pink/70 block h-full rounded-full"
+                      style={{ width: `${scale[index] * 100}%` }}
+                    />
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
 
       {record.total > 1 && (
         <button
@@ -344,15 +372,76 @@ function RecordCard({
           onClick={onOpen}
           aria-haspopup="dialog"
           aria-label={`${record.title} 전체 순위 보기 (${record.total}개)`}
-          className={cn(SOFT_BUTTON_CLASS, "mt-auto self-start")}
+          className={cn(
+            "flex w-full items-center justify-between gap-3 border-t border-white/10 px-4 py-3 text-left text-sm font-medium text-white/80 transition-colors hover:bg-white/[0.06] hover:text-white",
+            "tablet:px-5",
+            FOCUS_RING,
+            "focus-visible:ring-inset",
+          )}
         >
-          자세히 보기
-          <span className="text-white/55 tabular-nums">
-            전체 {record.total}
+          전체 순위 보기
+          <span className="flex items-center gap-1.5 text-white/50 tabular-nums">
+            {record.total}개
+            <ChevronLeftIcon className="size-3.5 rotate-180" />
           </span>
         </button>
       )}
     </article>
+  );
+}
+
+/**
+ * 2~5위 막대의 길이(1위 대비 0~1) — 대표 값이 모두 숫자이고 1위가 가장 큰 기록
+ * (많은 순)일 때만. 적은 순 기록(가장 적게 불린 곡 등)이나 글자 값이면 null.
+ */
+function runnerUpScale(
+  leader: StatRow | undefined,
+  rows: StatRow[],
+): number[] | null {
+  if (!leader || rows.length === 0) return null;
+  const top = cellSortKey(leader.cells[0]);
+  if (typeof top !== "number" || top <= 0) return null;
+  const values = rows.map((row) => cellSortKey(row.cells[0]));
+  if (
+    !values.every(
+      (value): value is number =>
+        typeof value === "number" && value >= 0 && value <= top,
+    )
+  )
+    return null;
+  return values.map((value) => value / top);
+}
+
+/**
+ * 1위 대표 값 — 숫자만 로고 서체(RocknRoll One, 라틴 글자만 불러온다)로 크게,
+ * 앞뒤 글자("앞에서", "회", "%p")는 본문 서체로 작게. 숫자가 없으면 글자 그대로.
+ */
+function Figure({ cell }: { cell: StatCell }) {
+  const text = typeof cell === "string" ? cell : cell.label;
+  const match = text.match(/[+-]?\d[\d,]*(?:\.\d+)?/);
+  if (!match || match.index == null)
+    return (
+      <p className="text-ztmy-magenta text-2xl font-bold break-keep">
+        <CellText cell={cell} />
+      </p>
+    );
+  const before = text.slice(0, match.index);
+  const after = text.slice(match.index + match[0].length);
+  return (
+    <p className="text-ztmy-magenta flex items-baseline gap-1 break-keep">
+      {before && (
+        <span className="text-base font-semibold">{before.trim()}</span>
+      )}
+      <span
+        className={cn(
+          rocknrollOne.className,
+          "tablet:text-5xl text-4xl leading-none tabular-nums",
+        )}
+      >
+        {match[0]}
+      </span>
+      {after && <span className="text-lg font-semibold">{after.trim()}</span>}
+    </p>
   );
 }
 
