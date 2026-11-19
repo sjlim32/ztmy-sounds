@@ -352,8 +352,9 @@ function mergeTourSetlist(
  * - 투어 공통 곡: 날짜와 상관없이 한 줄(일차 없음). 번호는 여러 날 중 가장
  *   많이 쓰인 번호(같으면 앞 날) — 어느 날 데이터에 같은 곡이 두 번 잘못
  *   들어간 경우에도 제자리를 지킨다.
- * - 그 밖의 곡(선택곡): 모든 날에 불렸으면 한 줄(일차 없음, 번호는 위와 같은
- *   방식), 아니면 날마다 따로(DAY 1·DAY 2 배지).
+ * - 그 밖의 곡(선택곡): 모든 날에 같은 번호로 불렸으면 한 줄(일차 없음), 아니면
+ *   날마다 따로(DAY 1·DAY 2 배지). 번호가 다르면 다른 선택곡 자리라서 합치지
+ *   않는다(cosdan 2025-11-18~19: 黒猫のタンゴ가 첫째날 10번, 둘째날 9번).
  */
 function collapseRepeatedDays(
   rows: SetlistRow[],
@@ -372,9 +373,11 @@ function collapseRepeatedDays(
   return [...groups.values()].flatMap((group) => {
     const groupDays = new Set(group.map((row) => row.day_number));
     const numbers = group.map((row) => row.track_number);
-    // 모든 날에 불린 곡이면(번호가 조금 달라도) 일차 없이 한 줄 — 양일 같은
-    // 선택곡은 "선택곡" 배지만 남는다.
-    const sameEveryDay = [...days].every((day) => groupDays.has(day));
+    // 모든 날에 같은 번호로 불린 곡이면 일차 없이 한 줄 — 양일 같은 선택곡은
+    // "선택곡" 배지만 남는다.
+    const sameEveryDay =
+      [...days].every((day) => groupDays.has(day)) &&
+      new Set(numbers).size === 1;
     if (!tourSongIds.has(group[0].songs.id) && !sameEveryDay) return group;
     const ordered = [...group].sort(
       (a, b) => (a.day_number ?? 0) - (b.day_number ?? 0),
