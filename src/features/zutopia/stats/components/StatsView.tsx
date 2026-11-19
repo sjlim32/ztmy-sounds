@@ -182,7 +182,7 @@ export function StatsView({
       <SidePanel
         open={open}
         title={shown?.title ?? ""}
-        subtitle={shown?.description}
+        subtitle={shown?.detail ?? shown?.description}
         onClose={closeRecord}
       >
         <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -261,7 +261,7 @@ function SummaryRow({
 }
 
 /**
- * 기록 카드 — 위에서부터 제목·설명(두 줄까지, 전체는 옆 창), 1위(그림·이름·대표
+ * 기록 카드 — 위에서부터 제목·짧은 설명(자세한 기준은 옆 창), 1위(그림·이름·대표
  * 값·설명), 연도별 흐름(있는 기록만), 2~5위, 맨 아래 "전체 순위 보기" 줄. 카드는
  * 다단(columns)으로 쌓아 저마다 제 높이를 가진다 — 그래프 있는 카드와 없는 카드가
  * 한 줄에 놓여 빈칸이 생기지 않게. 돋보이는 건 1위 대표 값 하나(로고 서체 숫자).
@@ -287,10 +287,7 @@ function RecordCard({
           <h3 className="tablet:text-lg text-base leading-snug font-semibold text-white">
             {record.title}
           </h3>
-          <p
-            className="line-clamp-2 text-sm break-keep text-white/55"
-            title={record.description}
-          >
+          <p className="text-sm break-keep text-white/55">
             {record.description}
           </p>
         </header>

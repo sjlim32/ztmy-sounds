@@ -39,8 +39,10 @@ export interface StatTrend {
 export interface StatRecord {
   id: string;
   title: string;
-  /** 어떻게 셌는지 — 카드와 전체 표 위에 작게 */
+  /** 카드 제목 아래 짧은 한 줄(무엇을 쟀는지) */
   description: string;
+  /** 자세한 세는 기준 — 전체 순위 옆 창의 부제로만(카드엔 없다) */
+  detail?: string;
   /** 순위·이름 다음 칸들의 이름(첫 칸이 대표 값) */
   columns: string[];
   rows: StatRow[];

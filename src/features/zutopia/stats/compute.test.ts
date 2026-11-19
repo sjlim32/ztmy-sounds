@@ -220,7 +220,7 @@ describe("모르는 구간(세트리스트 없는 공연·공연일 없는 투�
       tours,
       canceledTourIds: ["t"],
     });
-    expect(record(canceled, "live-longest-break").description).toBe(
+    expect(record(canceled, "live-longest-break").detail).toBe(
       "연이은 두 공연일 사이 간격",
     );
     expect(
@@ -229,9 +229,7 @@ describe("모르는 구간(세트리스트 없는 공연·공연일 없는 투�
   });
 
   test("공연일 없는 투어 안내는 그런 투어가 있을 때만 설명에 붙는다", () => {
-    expect(record(sections, "live-longest-break").description).toContain(
-      "투어 1개",
-    );
+    expect(record(sections, "live-longest-break").detail).toContain("투어 1개");
     const noEmpty = buildStatSections({
       units,
       upcoming: [],
@@ -239,12 +237,10 @@ describe("모르는 구간(세트리스트 없는 공연·공연일 없는 투�
       albums: [],
       tours: [],
     });
-    expect(record(noEmpty, "live-longest-break").description).toBe(
+    expect(record(noEmpty, "live-longest-break").detail).toBe(
       "연이은 두 공연일 사이 간격",
     );
-    expect(record(noEmpty, "live-busiest-year").description).toBe(
-      "그해 공연일 수",
-    );
+    expect(record(noEmpty, "live-busiest-year").detail).toBe("그해 공연일 수");
   });
 
   test("같은 %(정수)면 같은 순위", () => {

@@ -39,7 +39,9 @@ import { MISSING_SETLIST_RECORD_ID } from "./types";
  * - 온라인 공연은 처음부터 넣지 않는다(stats/data.ts가 현장 공연만 넘긴다). 장소
  *   기록의 isOnline은 혹시 섞여 들어와도 도시·공연장에 "온라인"이 잡히지 않게 하는
  *   안전장치.
- * - 기록 설명(description)은 화면에 그대로 나간다 — 세는 기준이 바뀌면 같이 고친다.
+ * - 기록 설명은 두 가지 — description은 카드 제목 아래 짧은 한 줄(무엇을 쟀는지만),
+ *   detail은 자세한 세는 기준(전체 순위 옆 창 부제). 둘 다 화면에 그대로 나가니
+ *   세는 기준이 바뀌면 detail을 같이 고친다.
  *   공연일이 없는 투어 안내는 그런 투어가 있을 때만 붙는다(emptyTourNote 등).
  *   "모르는 구간"으로 빼거나 끊는 규칙은 계산엔 그대로 두되 설명엔 적지 않는다.
  */
@@ -187,7 +189,8 @@ export function buildStatSummary(input: {
     missing: {
       id: MISSING_SETLIST_RECORD_ID,
       title: "세트리스트가 아직 없는 공연",
-      description:
+      description: "곡 기록에서 빠지는 공연일",
+      detail:
         "곡 기록에서 빠지는 공연일(최신 먼저) — 세트리스트를 알면 제보해 주세요",
       columns: ["종류"],
       rows: missing.map((unit, index) => ({
@@ -642,7 +645,8 @@ function songRecords(
       id: "song-most-played",
       trendFor: songTrend,
       title: "라이브에서 가장 많이 불린 곡",
-      description:
+      description: "부른 공연일 수",
+      detail:
         "세트리스트가 있는 공연일 중 부른 횟수 · 참가율은 발매 후 그런 공연일 중 부른 비율",
       columns: playColumns,
       rows: rank(
@@ -657,7 +661,8 @@ function songRecords(
       id: "song-highest-rate",
       trendFor: songTrend,
       title: "참가율이 가장 높은 곡",
-      description:
+      description: "발매 후 공연일 중 부른 비율",
+      detail:
         "발매 후 세트리스트가 있는 공연일 중 부른 비율 — 그런 공연일이 적은 곡은 순위를 조금 낮게 보정",
       columns: ["참가율", "횟수", "확인된 첫 라이브", "마지막 라이브"],
       rows: rank(
@@ -675,7 +680,8 @@ function songRecords(
     {
       id: "song-least-played",
       title: "라이브에서 가장 적게 불린 곡",
-      description:
+      description: "발매 후 부른 횟수가 적은 순",
+      detail:
         "발매 후 세트리스트가 있는 공연일이 있는 곡 중 횟수가 적은 순(같으면 발매 후 공연일이 많은 곡 먼저)",
       columns: ["횟수", "발매 후 공연일", "참가율", "마지막 라이브"],
       rows: rank(
@@ -703,7 +709,8 @@ function songRecords(
     {
       id: "song-rising",
       title: "최근 1년 사이 부쩍 늘어난 곡",
-      description: `마지막으로 세트리스트를 아는 공연일부터 1년 안의 참가율 − 그 전(발매 후) 참가율(양쪽 다 공연일 ${MIN_TREND_SHOWS}회 이상)`,
+      description: "최근 1년 참가율이 오른 곡",
+      detail: `마지막으로 세트리스트를 아는 공연일부터 1년 안의 참가율 − 그 전(발매 후) 참가율(양쪽 다 공연일 ${MIN_TREND_SHOWS}회 이상)`,
       columns: ["변화", "최근 1년", "그 전"],
       trendFor: songTrend,
       rows: rank(
@@ -717,7 +724,8 @@ function songRecords(
     {
       id: "song-falling",
       title: "최근 1년 사이 뜸해진 곡",
-      description: `마지막으로 세트리스트를 아는 공연일부터 1년 안의 참가율 − 그 전(발매 후) 참가율(양쪽 다 공연일 ${MIN_TREND_SHOWS}회 이상)`,
+      description: "최근 1년 참가율이 내린 곡",
+      detail: `마지막으로 세트리스트를 아는 공연일부터 1년 안의 참가율 − 그 전(발매 후) 참가율(양쪽 다 공연일 ${MIN_TREND_SHOWS}회 이상)`,
       columns: ["변화", "최근 1년", "그 전"],
       trendFor: songTrend,
       rows: rank(
@@ -732,7 +740,8 @@ function songRecords(
       id: "song-comeback",
       trendFor: songTrend,
       title: "가장 오랜 공백 끝에 돌아온 곡",
-      description: "곡마다 연이어 부른 두 공연일 사이가 가장 길었던 때(일수)",
+      description: "다시 부르기까지 걸린 날",
+      detail: "곡마다 연이어 부른 두 공연일 사이가 가장 길었던 때(일수)",
       columns: ["공백", "건너뛴 공연", "이전 라이브", "돌아온 공연"],
       rows: rank(
         byDays,
@@ -752,7 +761,8 @@ function songRecords(
       id: "song-comeback-shows",
       trendFor: songTrend,
       title: "가장 많은 공연을 건너뛰고 돌아온 곡",
-      description:
+      description: "다시 부르기까지 건너뛴 공연",
+      detail:
         "곡마다 연이어 부른 두 공연일 사이에 세트리스트가 있는 공연일이 가장 많았던 때",
       columns: ["건너뛴 공연", "공백", "이전 라이브", "돌아온 공연"],
       rows: rank(
@@ -774,7 +784,8 @@ function songRecords(
       id: "song-streak",
       trendFor: songTrend,
       title: "가장 오래 연속으로 불린 곡",
-      description: "연이은 공연일마다 빠짐없이 부른 최대 횟수",
+      description: "빠짐없이 이어 부른 공연일",
+      detail: "연이은 공연일마다 빠짐없이 부른 최대 횟수",
       columns: ["연속", "시작", "끝"],
       rows: rank(
         streaks,
@@ -796,7 +807,8 @@ function songRecords(
     {
       id: "song-fastest-debut",
       title: "가장 빨리 라이브에 오른 곡",
-      description: "발매일부터 첫 라이브까지(발매 전에 먼저 부른 곡이 앞)",
+      description: "발매일부터 첫 라이브까지",
+      detail: "발매일부터 첫 라이브까지(발매 전에 먼저 부른 곡이 앞)",
       columns: ["첫 라이브까지", "발매일", "첫 라이브"],
       rows: rank(
         debuts,
@@ -809,7 +821,8 @@ function songRecords(
     {
       id: "song-slowest-debut",
       title: "라이브까지 가장 오래 걸린 곡",
-      description: "발매일부터 첫 라이브까지 가장 오래 걸린 순",
+      description: "발매일부터 첫 라이브까지",
+      detail: "발매일부터 첫 라이브까지 가장 오래 걸린 순",
       columns: ["첫 라이브까지", "발매일", "첫 라이브"],
       rows: rank(
         debuts,
@@ -828,7 +841,8 @@ function songRecords(
     {
       id: "song-opener",
       title: "오프닝 단골 곡",
-      description: `공연 첫 곡으로 가장 많이 부른 곡(첫 곡을 아는 공연일 ${withOpening.length}회 기준) · "부른 날 중"은 그 곡을 부른 공연일 중 첫 곡이었던 비율`,
+      description: "공연 첫 곡으로 부른 횟수",
+      detail: `공연 첫 곡으로 가장 많이 부른 곡(첫 곡을 아는 공연일 ${withOpening.length}회 기준) · "부른 날 중"은 그 곡을 부른 공연일 중 첫 곡이었던 비율`,
       columns: ["첫 곡 횟수", "비율", "부른 날 중"],
       rows: rank(
         openings,
@@ -850,7 +864,8 @@ function songRecords(
     {
       id: "song-encore",
       title: "앵콜 단골 곡",
-      description: `앵콜로 가장 많이 부른 곡(앵콜이 있었던 공연일 ${withEncore.length}회 기준) · "부른 날 중"은 그 곡을 부른 공연일 중 앵콜이었던 비율`,
+      description: "앵콜로 부른 횟수",
+      detail: `앵콜로 가장 많이 부른 곡(앵콜이 있었던 공연일 ${withEncore.length}회 기준) · "부른 날 중"은 그 곡을 부른 공연일 중 앵콜이었던 비율`,
       columns: ["앵콜 횟수", "비율", "부른 날 중"],
       rows: rank(
         encores,
@@ -879,7 +894,8 @@ function unreleasedRecords(stats: SongStat[], known: LiveUnit[]): RawRecord[] {
     {
       id: "song-unreleased",
       title: "라이브에서 가장 많이 부른 미공개곡",
-      description:
+      description: "아직 음원이 없는 곡",
+      detail:
         "음원으로 아직 나오지 않은 곡을 부른 공연일 수(세트리스트가 있는 공연일 기준)",
       columns: ["횟수", "확인된 첫 라이브", "마지막 라이브"],
       trendFor: (key) => {
@@ -1053,7 +1069,8 @@ function setlistRecords(
     {
       id: "setlist-closer",
       title: "본편 마지막 곡 단골",
-      description:
+      description: "앵콜 전 마지막 곡",
+      detail:
         '앵콜 전 본편을 마무리한 곡 · "부른 날 중"은 그 곡을 부른 공연일 중 본편 마지막이었던 비율',
       columns: ["마지막 곡 횟수", "비율", "부른 날 중"],
       trendFor: songTrend,
@@ -1062,7 +1079,8 @@ function setlistRecords(
     {
       id: "setlist-finale",
       title: "공연 마지막 곡 단골",
-      description:
+      description: "그날의 마지막 곡",
+      detail:
         '앵콜이 있으면 앵콜 마지막, 없으면 본편 마지막 곡 · "부른 날 중"은 그 곡을 부른 공연일 중 마지막이었던 비율',
       columns: ["마지막 곡 횟수", "비율", "부른 날 중"],
       trendFor: songTrend,
@@ -1073,21 +1091,24 @@ function setlistRecords(
     {
       id: "setlist-early",
       title: "공연 초반에 주로 부르는 곡",
-      description: `본편 평균 위치가 앞인 곡(첫 곡 0% · 마지막 곡 100%, 본편에서 ${MIN_POSITION_PLAYS}회 이상)`,
+      description: "본편 평균 위치가 앞인 곡",
+      detail: `본편 평균 위치가 앞인 곡(첫 곡 0% · 마지막 곡 100%, 본편에서 ${MIN_POSITION_PLAYS}회 이상)`,
       columns: ["평균 위치", "본편 횟수"],
       rows: positionRows("asc"),
     },
     {
       id: "setlist-late",
       title: "공연 후반에 주로 부르는 곡",
-      description: `본편 평균 위치가 뒤인 곡(첫 곡 0% · 마지막 곡 100%, 본편에서 ${MIN_POSITION_PLAYS}회 이상)`,
+      description: "본편 평균 위치가 뒤인 곡",
+      detail: `본편 평균 위치가 뒤인 곡(첫 곡 0% · 마지막 곡 100%, 본편에서 ${MIN_POSITION_PLAYS}회 이상)`,
       columns: ["평균 위치", "본편 횟수"],
       rows: positionRows("desc"),
     },
     {
       id: "setlist-pairs",
       title: "가장 자주 이어 부른 두 곡",
-      description:
+      description: "바로 이어 부른 횟수",
+      detail:
         '본편·앵콜 안에서 바로 이어 부른 횟수(2회 이상) · "앞 곡 부른 날 중"은 앞 곡을 부른 공연일 중 이어진 비율',
       columns: ["횟수", "앞 곡 부른 날 중"],
       rows: rank(
@@ -1112,7 +1133,8 @@ function setlistRecords(
     {
       id: "setlist-versions",
       title: "다른 버전으로 가장 많이 부른 곡",
-      description:
+      description: "short·acoustic 등으로 부른 횟수",
+      detail:
         "short·acoustic·jazz 등 원래와 다른 버전으로 부른 공연일 수(세트리스트 메모 기준)",
       columns: ["횟수", "버전"],
       trendFor: (key) => {
@@ -1134,7 +1156,8 @@ function setlistRecords(
     {
       id: "setlist-covers",
       title: "가장 많이 부른 커버곡",
-      description: "다른 가수의 곡을 부른 공연일 수(제목이 같으면 하나로)",
+      description: "다른 가수의 곡",
+      detail: "다른 가수의 곡을 부른 공연일 수(제목이 같으면 하나로)",
       columns: ["횟수", "원곡 가수", "마지막"],
       rows: rank(
         [...covers.values()],
@@ -1214,7 +1237,8 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
       id: "album-most-played",
       trendFor: albumTrend,
       title: "라이브에서 가장 많이 불린 앨범",
-      description: "수록곡 라이브 횟수 합계(세트리스트가 있는 공연일 기준)",
+      description: "수록곡 라이브 횟수 합계",
+      detail: "수록곡 라이브 횟수 합계(세트리스트가 있는 공연일 기준)",
       columns: ["합계", "라이브된 수록곡", "비율"],
       rows: rank(
         items,
@@ -1236,7 +1260,8 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
       id: "album-coverage",
       trendFor: albumTrend,
       title: "수록곡이 가장 고르게 불린 앨범",
-      description: "수록곡 중 한 번이라도 라이브에서 부른 곡의 비율",
+      description: "라이브에서 부른 수록곡 비율",
+      detail: "수록곡 중 한 번이라도 라이브에서 부른 곡의 비율",
       columns: ["비율", "라이브된 수록곡", "합계"],
       rows: rank(
         items,
@@ -1259,6 +1284,7 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
       id: "album-least-played",
       title: "라이브에서 가장 적게 불린 앨범",
       description: "수록곡 라이브 횟수 합계가 적은 순",
+      detail: "수록곡 라이브 횟수 합계가 적은 순",
       columns: ["합계", "라이브된 수록곡", "비율"],
       rows: rank(
         items,
@@ -1312,7 +1338,8 @@ function albumYearRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
     {
       id: "album-by-year",
       title: "해마다 가장 많이 불린 앨범",
-      description:
+      description: "그해 수록곡을 가장 많이 부른 앨범",
+      detail:
         "그해 세트리스트가 있는 공연일에 수록곡을 가장 많이 부른 앨범(최신 해 먼저) · 비중은 그해 앨범 수록곡 라이브 합계 중",
       columns: ["앨범", "비중", "수록곡 라이브"],
       rows: items.map((item, index) => ({
@@ -1510,7 +1537,8 @@ function liveRecords(
     {
       id: "live-most-songs",
       title: "가장 많은 곡을 부른 공연",
-      description: "세트리스트의 곡 수(같은 곡은 한 번, 어레인지는 원곡으로)",
+      description: "세트리스트 곡 수",
+      detail: "세트리스트의 곡 수(같은 곡은 한 번, 어레인지는 원곡으로)",
       columns: ["곡 수", "종류"],
       rows: rank(
         known,
@@ -1527,7 +1555,8 @@ function liveRecords(
     {
       id: "live-most-debuts",
       title: "라이브 첫 공개가 가장 많았던 공연",
-      description: "그날 처음 라이브에서 부른 곡 수",
+      description: "그날 처음 부른 곡 수",
+      detail: "그날 처음 라이브에서 부른 곡 수",
       columns: ["첫 공개", "곡"],
       rows: rank(
         debutUnits,
@@ -1544,7 +1573,8 @@ function liveRecords(
     {
       id: "live-longest-tour",
       title: "가장 긴 투어",
-      description: "투어 첫날부터 마지막 날까지 기간(공연 횟수는 예정 포함)",
+      description: "첫 공연부터 마지막 공연까지",
+      detail: "투어 첫날부터 마지막 날까지 기간(공연 횟수는 예정 포함)",
       columns: ["기간", "공연 횟수", "일정"],
       rows: rank(
         tours,
@@ -1579,7 +1609,8 @@ function liveRecords(
         highlight: key,
       }),
       title: "공연이 가장 많았던 해",
-      description: `그해 공연일 수${emptyTourNote(context)}`,
+      description: "그해 공연일 수",
+      detail: `그해 공연일 수${emptyTourNote(context)}`,
       columns: ["공연", "종류별"],
       rows: rank(
         [...years],
@@ -1597,7 +1628,8 @@ function liveRecords(
     {
       id: "live-longest-break",
       title: "가장 길었던 공연 공백",
-      description: `연이은 두 공연일 사이 간격${emptyTourBreakNote(context)}`,
+      description: "연이은 두 공연일 사이",
+      detail: `연이은 두 공연일 사이 간격${emptyTourBreakNote(context)}`,
       columns: ["공백", "이전 공연", "다음 공연"],
       rows: rank(
         gaps,
@@ -1627,7 +1659,8 @@ function liveRecords(
     {
       id: "live-tour-fixed",
       title: "세트리스트가 가장 고정된 투어",
-      description:
+      description: "모든 공연일에 부른 곡 비율",
+      detail:
         "세트리스트를 아는 투어 공연일 모두에서 부른 곡 수 ÷ 공연일 평균 곡 수(확인된 공연일 2회 이상)",
       columns: ["고정률", "공통 곡", "확인된 공연일"],
       rows: rank(
@@ -1650,7 +1683,8 @@ function liveRecords(
     {
       id: "live-tour-variety",
       title: "공연일마다 곡이 가장 많이 바뀐 투어",
-      description:
+      description: "공연일마다 바뀐 곡 수",
+      detail:
         "투어에서 부른 곡 중 세트리스트를 아는 공연일 모두에서 부르지는 않은 곡 수(확인된 공연일 2회 이상)",
       columns: ["바뀐 곡", "투어 전체 곡", "확인된 공연일"],
       rows: rank(
@@ -1673,7 +1707,8 @@ function liveRecords(
     {
       id: "live-tour-new",
       title: "신곡 비중이 가장 높은 투어",
-      description:
+      description: "발매 1년 안 곡의 비율",
+      detail:
         "세트리스트를 아는 공연일에 부른 곡 중 그날 기준 발매 1년 안 곡(발매 전 선공개 포함)의 비율",
       columns: ["신곡 비중", "신곡 횟수", "확인된 공연일"],
       rows: rank(
@@ -1696,7 +1731,8 @@ function liveRecords(
     {
       id: "live-festival",
       title: "가장 많이 출연한 페스티벌",
-      description: "연도 표기를 뗀 이름이 같은 페스티벌을 하나로",
+      description: "같은 페스티벌 출연 횟수",
+      detail: "연도 표기를 뗀 이름이 같은 페스티벌을 하나로",
       columns: ["출연", "회차"],
       rows: rank(
         [...festivals],
@@ -1728,7 +1764,8 @@ function koreaRecords(stats: SongStat[], known: LiveUnit[]): RawRecord[] {
     {
       id: "place-korea-songs",
       title: "내한 공연에서 가장 많이 부른 곡",
-      description: `세트리스트가 있는 한국 공연일 ${korea.length}회 기준`,
+      description: "한국 공연일 기준",
+      detail: `세트리스트가 있는 한국 공연일 ${korea.length}회 기준`,
       columns: ["횟수", "비율", "마지막"],
       rows: rank(
         items,
@@ -1813,7 +1850,8 @@ function placeRecords(all: LiveUnit[], context: Context): RawRecord[] {
       id: "place-city",
       trendFor: placeTrend(cities),
       title: "가장 자주 공연한 도시",
-      description: `공연일 기준(온라인 공연 제외)${emptyTourNote(context)}`,
+      description: "공연일 수",
+      detail: `공연일 기준(온라인 공연 제외)${emptyTourNote(context)}`,
       columns: ["공연", "기간"],
       rows: rank(
         cities,
@@ -1832,7 +1870,8 @@ function placeRecords(all: LiveUnit[], context: Context): RawRecord[] {
       id: "place-venue",
       trendFor: placeTrend(venues),
       title: "가장 자주 선 공연장",
-      description: `홀 번호 등 괄호 안 표기가 달라도 같은 공연장은 하나로${emptyTourNote(context)}`,
+      description: "공연일 수",
+      detail: `홀 번호 등 괄호 안 표기가 달라도 같은 공연장은 하나로${emptyTourNote(context)}`,
       columns: ["공연", "도시", "기간"],
       rows: rank(
         venues,
@@ -1858,7 +1897,8 @@ function placeRecords(all: LiveUnit[], context: Context): RawRecord[] {
       id: "place-overseas",
       trendFor: placeTrend(countries),
       title: "해외 공연이 가장 많았던 나라",
-      description: `일본 밖 공연일(해외 공연 총 ${overseasTotal}회)${emptyTourNote(context)}`,
+      description: "일본 밖 공연일 수",
+      detail: `일본 밖 공연일(해외 공연 총 ${overseasTotal}회)${emptyTourNote(context)}`,
       columns: ["공연", "도시", "기간"],
       rows: rank(
         countries,
