@@ -10,6 +10,7 @@ import {
 } from "@/features/zutopia/types";
 import type {
   StatAlbum,
+  StatCell,
   StatRecord,
   StatRow,
   StatSection,
@@ -228,6 +229,16 @@ function unitName(unit: LiveUnit) {
   return unit.titleKo ?? unit.title;
 }
 
+/** 공연 칸 — 날짜와 공연 이름을 나눠 둔다(화면에서 두 줄로). */
+function unitCell(unit: LiveUnit): StatCell {
+  return { date: formatDotDate(unit.date), label: unitName(unit) };
+}
+
+/** 한 줄 글자로 쓰는 공연(1위 설명 등) — 날짜와 이름을 가운뎃점으로 나눈다. */
+function unitText(unit: LiveUnit) {
+  return `${formatDotDate(unit.date)} · ${unitName(unit)}`;
+}
+
 function unitSub(unit: LiveUnit) {
   return [
     formatDotDate(unit.date),
@@ -239,7 +250,7 @@ function unitSub(unit: LiveUnit) {
     .join(" · ");
 }
 
-function unitRow(unit: LiveUnit, cells: string[], note?: string | null) {
+function unitRow(unit: LiveUnit, cells: StatCell[], note?: string | null) {
   return {
     key: unit.id,
     name: unitName(unit),
@@ -287,7 +298,7 @@ function buildSongStats(songs: StatSong[], known: LiveUnit[]): SongStat[] {
   });
 }
 
-function songRow(song: StatSong, cells: string[], note?: string | null) {
+function songRow(song: StatSong, cells: StatCell[], note?: string | null) {
   return {
     key: song.id,
     // 통계는 한글 제목 위주 — 원제는 아래 작은 줄에.
@@ -384,7 +395,7 @@ function songRecords(
   const debutCells = (debut: (typeof debuts)[number]) => [
     debutText(debut.gap),
     formatDotDate(debut.stat.song.releaseDate),
-    `${formatDotDate(debut.first.date)} ${unitName(debut.first)}`,
+    unitCell(debut.first),
   ];
 
   const withOpening = known.filter((unit) => unit.openingSongId);
@@ -477,11 +488,7 @@ function songRecords(
         (item) =>
           songRow(
             item.stat.song,
-            [
-              days(item.gap),
-              formatDotDate(item.from.date),
-              `${formatDotDate(item.to.date)} ${unitName(item.to)}`,
-            ],
+            [days(item.gap), unitCell(item.from), unitCell(item.to)],
             [
               aboutYears(item.gap),
               `${formatDotDate(item.from.date)} → ${formatDotDate(item.to.date)}`,
@@ -523,7 +530,7 @@ function songRecords(
         (item) => item.gap,
         "asc",
         (item) =>
-          songRow(item.stat.song, debutCells(item), debutCells(item)[2]),
+          songRow(item.stat.song, debutCells(item), unitText(item.first)),
       ),
     },
     {
@@ -539,7 +546,7 @@ function songRecords(
           songRow(
             item.stat.song,
             debutCells(item),
-            [aboutYears(item.gap), debutCells(item)[2]]
+            [aboutYears(item.gap), unitText(item.first)]
               .filter(Boolean)
               .join(" · "),
           ),
@@ -599,7 +606,7 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
     .filter((item) => item.songCount > 0);
 
   type Item = (typeof items)[number];
-  const row = (item: Item, cells: string[], note: string) => ({
+  const row = (item: Item, cells: StatCell[], note: string) => ({
     key: item.album.id,
     name: item.album.title,
     sub: item.album.titleKo !== item.album.title ? item.album.titleKo : null,

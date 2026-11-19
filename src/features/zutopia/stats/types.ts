@@ -3,6 +3,12 @@
  * 다 계산해서, 화면(StatsView)에는 글자로 정리된 줄만 내려준다.
  */
 
+/**
+ * 순위표 한 칸 — 글자 그대로, 또는 공연 칸(날짜 + 공연 이름: 화면에선 날짜를 위
+ * 작은 줄에, 이름을 아래 줄에 나눠 둔다).
+ */
+export type StatCell = string | { date: string; label: string };
+
 /** 순위표 한 줄. cells는 기록의 columns와 같은 순서(첫 칸이 대표 값). */
 export interface StatRow {
   key: string;
@@ -13,7 +19,7 @@ export interface StatRow {
   sub?: string | null;
   image?: string | null;
   href?: string | null;
-  cells: string[];
+  cells: StatCell[];
   /** 카드 1위 자리에서 대표 값 아래 덧붙이는 설명 */
   note?: string | null;
 }

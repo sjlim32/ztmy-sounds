@@ -12,7 +12,7 @@ import {
   type SortFilterOption,
 } from "@/features/zutopia/components/SortFilterBar";
 import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
-import type { StatRecord, StatRow, StatSection } from "../types";
+import type { StatCell, StatRecord, StatRow, StatSection } from "../types";
 
 type SectionFilter = "all" | StatSection["id"];
 
@@ -164,7 +164,7 @@ function RecordCard({
               <p className="truncate text-sm text-white/60">{leader.sub}</p>
             )}
             <p className="text-ztmy-magenta mt-1 text-3xl font-bold tabular-nums">
-              {leader.cells[0]}
+              <CellText cell={leader.cells[0]} />
             </p>
             {leader.note && (
               <p className="mt-0.5 text-sm break-keep text-white/60">
@@ -189,7 +189,7 @@ function RecordCard({
               </span>
               <RowName row={row} className="flex-1 text-white/85" />
               <span className="shrink-0 font-medium text-white tabular-nums">
-                {row.cells[0]}
+                <CellText cell={row.cells[0]} />
               </span>
             </li>
           ))}
@@ -282,6 +282,17 @@ function FullTable({ record }: { record: StatRecord }) {
   return <RecordTable record={record} rows={rows} />;
 }
 
+/** 순위표 한 칸 — 공연 칸은 날짜를 위 작은 줄(옅게), 공연 이름을 아래 줄로 나눈다. */
+function CellText({ cell }: { cell: StatCell }) {
+  if (typeof cell === "string") return cell;
+  return (
+    <>
+      <span className="block text-sm text-white/45">{cell.date}</span>
+      <span className="block">{cell.label}</span>
+    </>
+  );
+}
+
 /** 전체 순위표 — 넓지 않은 화면에선 표만 가로로 넘긴다. 1~3위 순위는 마젠타. */
 function RecordTable({
   record,
@@ -355,7 +366,7 @@ function RecordTable({
                       : "min-w-24 break-keep text-white/70",
                   )}
                 >
-                  {cell}
+                  <CellText cell={cell} />
                 </td>
               ))}
             </tr>

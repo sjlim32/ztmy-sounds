@@ -191,6 +191,11 @@ describe("모르는 구간(세트리스트 없는 공연·공연일 없는 투�
     expect(rows.map((row) => [row.key, row.cells[0]])).toEqual([
       ["a", "546일"],
     ]);
+    // 이전 라이브도 돌아온 공연처럼 날짜와 공연 이름(화면에서 두 줄로 나눈다).
+    expect(rows[0].cells.slice(1)).toEqual([
+      { date: "2021.01.01", label: "live-u2" },
+      { date: "2022.07.01", label: "live-u3" },
+    ]);
   });
 
   test("공연일 없는 투어 기간은 공연 공백을 끊는다", () => {
