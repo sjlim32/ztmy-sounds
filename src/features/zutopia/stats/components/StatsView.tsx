@@ -6,10 +6,13 @@ import { ThumbImage } from "@/components/ThumbImage";
 import { SidePanel } from "@/components/SidePanel";
 import { cn } from "@/lib/utils";
 import {
+  ACTIVE_FILTER_CHIP_CLASS,
+  FILTER_CHIP_CLASS,
   FOCUS_RING,
   LINK_BUTTON_CLASS,
   SOFT_BUTTON_CLASS,
 } from "@/components/button-styles";
+import { SearchIcon } from "@/components/icons/SearchIcon";
 import { getFeedbackUrl } from "@/lib/feedback";
 import {
   FilterPanel,
@@ -17,6 +20,14 @@ import {
   type SortFilterOption,
 } from "@/features/zutopia/components/SortFilterBar";
 import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
+import {
+  DEFAULT_SORT,
+  filterRows,
+  nextSort,
+  sortRows,
+  type SortColumn,
+  type SortState,
+} from "../table-sort";
 import {
   MISSING_SETLIST_RECORD_ID,
   type StatCell,
@@ -397,7 +408,14 @@ function CellText({ cell }: { cell: StatCell }) {
   );
 }
 
-/** 전체 순위표 — 넓지 않은 화면에선 표만 가로로 넘긴다. 1~3위 순위는 마젠타. */
+/** 검색칸을 보여 줄 최소 줄 수 — 몇 줄 안 되는 표엔 두지 않는다. */
+const SEARCH_MIN_ROWS = 10;
+
+/**
+ * 전체 순위표 — 위에 검색칸(이름·원제·날짜·도시), 열 이름을 누르면 그 열로 정렬
+ * (값 열은 큰 것부터, 다시 누르면 뒤집기 — table-sort.ts). 태블릿 이상은 표(넓지
+ * 않으면 표만 가로로 넘김), 모바일은 줄마다 카드(칸 이름: 값). 1~3위 순위는 마젠타.
+ */
 function RecordTable({
   record,
   rows,
@@ -405,78 +423,221 @@ function RecordTable({
   record: StatRecord;
   rows: StatRow[];
 }) {
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<SortState>(DEFAULT_SORT);
+  const shownRows = sortRows(filterRows(rows, query), sort);
+  const headers: { column: SortColumn; label: string }[] = [
+    { column: "rank", label: "순위" },
+    { column: "name", label: "이름" },
+    ...record.columns.map((label, index) => ({ column: index, label })),
+  ];
+
   return (
-    <div className="-mx-4 overflow-x-auto px-4">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-white/15 text-left text-white/55">
-            <th scope="col" className="py-2 pr-3 font-medium">
-              순위
-            </th>
-            <th scope="col" className="py-2 pr-3 font-medium">
-              이름
-            </th>
-            {record.columns.map((column) => (
-              <th
-                key={column}
-                scope="col"
-                className="py-2 pr-3 font-medium whitespace-nowrap"
-              >
-                {column}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.key} className="border-b border-white/5 align-top">
-              <td
-                className={cn(
-                  "py-2 pr-3 font-semibold tabular-nums",
-                  row.rank <= 3 ? "text-ztmy-magenta" : "text-white/55",
-                )}
-              >
-                {row.rank}
-              </td>
-              <td className="min-w-40 py-2 pr-3">
-                <span className="flex items-center gap-2">
-                  {row.image && (
-                    <ThumbImage
-                      src={row.image}
-                      displayWidth={32}
-                      className="size-8 shrink-0 rounded bg-black/40 object-cover"
-                    />
-                  )}
-                  <span className="min-w-0">
-                    <RowName
-                      row={row}
-                      className="block font-medium break-keep whitespace-normal text-white"
-                    />
-                    {row.sub && (
-                      <span className="block text-sm break-keep text-white/50">
-                        {row.sub}
-                      </span>
-                    )}
-                  </span>
-                </span>
-              </td>
-              {row.cells.map((cell, index) => (
-                <td
-                  key={index}
-                  className={cn(
-                    "py-2 pr-3 tabular-nums",
-                    index === 0
-                      ? "font-semibold whitespace-nowrap text-white"
-                      : "min-w-24 break-keep text-white/70",
-                  )}
+    <div className="flex flex-col gap-3">
+      {rows.length >= SEARCH_MIN_ROWS && (
+        <div className="group relative">
+          <SearchIcon className="group-focus-within:text-ztmy-magenta pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-white/55 transition-colors" />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            aria-label={`${record.title} 순위에서 찾기`}
+            placeholder="이름으로 찾기"
+            className={cn(
+              // 모바일 Safari 확대를 막으려고 text-base 이상.
+              "h-11 w-full rounded-lg border border-white/15 bg-black/40 pr-3 pl-10 text-base text-white transition-colors placeholder:text-white/45 hover:border-white/30",
+              "focus:border-ztmy-magenta/70 focus:ring-ztmy-magenta/15 focus:ring-4 focus:outline-none",
+            )}
+          />
+        </div>
+      )}
+      {/* 모바일은 표 머리칸이 없어 정렬 기준을 칩 줄로 고른다 */}
+      <div
+        role="group"
+        aria-label="정렬 기준"
+        className="tablet:hidden flex flex-wrap gap-1.5"
+      >
+        {headers.map((header) => (
+          <SortButton
+            key={String(header.column)}
+            header={header}
+            sort={sort}
+            onSort={(column) => setSort(nextSort(sort, column))}
+            chip
+          />
+        ))}
+      </div>
+
+      {query && (
+        <p role="status" className="text-sm text-white/55">
+          {shownRows.length > 0
+            ? `${shownRows.length}줄 찾음`
+            : "찾는 이름이 없어요."}
+        </p>
+      )}
+
+      {/* 모바일 — 줄마다 카드 */}
+      <ol className="tablet:hidden flex flex-col">
+        {shownRows.map((row) => (
+          <li
+            key={row.key}
+            className="flex gap-3 border-b border-white/5 py-3 last:border-b-0"
+          >
+            <span
+              className={cn(
+                "w-6 shrink-0 text-right text-sm font-semibold tabular-nums",
+                row.rank <= 3 ? "text-ztmy-magenta" : "text-white/55",
+              )}
+            >
+              {row.rank}
+            </span>
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <RowHead row={row} />
+              <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+                {row.cells.map((cell, index) => (
+                  <div key={index} className="contents">
+                    <dt className="text-white/50">{record.columns[index]}</dt>
+                    <dd
+                      className={cn(
+                        "min-w-0 break-keep tabular-nums",
+                        index === 0
+                          ? "font-semibold text-white"
+                          : "text-white/75",
+                      )}
+                    >
+                      <CellText cell={cell} />
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      {/* 태블릿 이상 — 표 */}
+      <div className="tablet:block -mx-4 hidden overflow-x-auto px-4">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-white/15 text-left text-white/55">
+              {headers.map((header) => (
+                <th
+                  key={String(header.column)}
+                  scope="col"
+                  aria-sort={
+                    sort.column === header.column
+                      ? sort.direction === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : undefined
+                  }
+                  className="py-1 pr-3 font-medium whitespace-nowrap"
                 >
-                  <CellText cell={cell} />
-                </td>
+                  <SortButton
+                    header={header}
+                    sort={sort}
+                    onSort={(column) => setSort(nextSort(sort, column))}
+                  />
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {shownRows.map((row) => (
+              <tr key={row.key} className="border-b border-white/5 align-top">
+                <td
+                  className={cn(
+                    "py-2 pr-3 font-semibold tabular-nums",
+                    row.rank <= 3 ? "text-ztmy-magenta" : "text-white/55",
+                  )}
+                >
+                  {row.rank}
+                </td>
+                <td className="min-w-40 py-2 pr-3">
+                  <RowHead row={row} />
+                </td>
+                {row.cells.map((cell, index) => (
+                  <td
+                    key={index}
+                    className={cn(
+                      "py-2 pr-3 tabular-nums",
+                      index === 0
+                        ? "font-semibold whitespace-nowrap text-white"
+                        : "min-w-24 break-keep text-white/70",
+                    )}
+                  >
+                    <CellText cell={cell} />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
+  );
+}
+
+/** 순위표 줄의 이름 칸 — 그림(있으면) + 이름(링크) + 아래 작은 줄. */
+function RowHead({ row }: { row: StatRow }) {
+  return (
+    <span className="flex items-center gap-2">
+      {row.image && (
+        <ThumbImage
+          src={row.image}
+          displayWidth={32}
+          className="size-8 shrink-0 rounded bg-black/40 object-cover"
+        />
+      )}
+      <span className="min-w-0">
+        <RowName
+          row={row}
+          className="block font-medium break-keep whitespace-normal text-white"
+        />
+        {row.sub && (
+          <span className="block text-sm break-keep text-white/50">
+            {row.sub}
+          </span>
+        )}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * 정렬 버튼 — 표 머리칸(chip 아님)이나 모바일 정렬 줄(chip)에. 지금 정렬 중인
+ * 열엔 방향 화살표(↑ 작은 것부터, ↓ 큰 것부터).
+ */
+function SortButton({
+  header,
+  sort,
+  onSort,
+  chip = false,
+}: {
+  header: { column: SortColumn; label: string };
+  sort: SortState;
+  onSort: (column: SortColumn) => void;
+  chip?: boolean;
+}) {
+  const active = sort.column === header.column;
+  const arrow = active ? (sort.direction === "asc" ? "↑" : "↓") : null;
+  return (
+    <button
+      type="button"
+      onClick={() => onSort(header.column)}
+      aria-pressed={chip ? active : undefined}
+      className={cn(
+        chip
+          ? cn(FILTER_CHIP_CLASS, active && ACTIVE_FILTER_CHIP_CLASS)
+          : cn(
+              "-mx-1 inline-flex items-center gap-1 rounded px-1 py-1 transition-colors hover:text-white",
+              active && "text-white",
+              FOCUS_RING,
+            ),
+      )}
+    >
+      {header.label}
+      {arrow && <span aria-hidden>{arrow}</span>}
+    </button>
   );
 }
