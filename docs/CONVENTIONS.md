@@ -400,6 +400,9 @@ src/
                              # 공유 주소 /zutopia/stats#기록id — 옆 창을 열면
                              # replaceState로 붙이고 닫으면 떼며, 그 주소로 들어오면
                              # (hashchange 포함) 그 기록 창을 연다. 창 안 ShareButton.
+                             # 1위 카드의 연도별 미니 막대(StatRecord.trend)는 기록의
+                             # trendFor(1위 key)로 1위 하나만 계산 — 분홍 한 색, 빈 해는
+                             # 바닥선, 가리키면 그 해 값, 화면 읽기용 목록(sr-only).
                              # 동점은 같은 순위. LiveUnit의 통계 전용 필드(장소·
                              # 나라·첫 곡·앵콜)는 클라이언트로 넘길 때
                              # toClientUnit으로 뺀다.

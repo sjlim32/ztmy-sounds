@@ -389,3 +389,39 @@ describe("공연 칸 링크", () => {
     ]);
   });
 });
+
+describe("1위 연도별 흐름", () => {
+  const sections = buildStatSections({
+    units: [
+      unit("t1", "2020-03-01", ["a"]),
+      unit("t2", "2022-03-01", ["a"]),
+      unit("t3", "2022-05-01", ["a", "b"]),
+    ],
+    upcoming: [],
+    songs: [song("a", "2019-01-01"), song("b", "2019-01-01")],
+    albums: [],
+    tours: [],
+  });
+
+  test("1위 곡의 해마다 라이브 횟수(빈 해는 0)", () => {
+    expect(record(sections, "song-most-played").trend).toEqual({
+      label: "해마다 라이브 횟수",
+      unit: "회",
+      points: [
+        { label: "2020", value: 1 },
+        { label: "2021", value: 0 },
+        { label: "2022", value: 2 },
+      ],
+    });
+  });
+
+  test("공연이 가장 많았던 해는 모든 해를 그리고 1위 해를 강조", () => {
+    const trend = record(sections, "live-busiest-year").trend!;
+    expect(trend.highlight).toBe("2022");
+    expect(trend.points.map((point) => point.value)).toEqual([1, 0, 2]);
+  });
+
+  test("흐름이 없는 기록은 null", () => {
+    expect(record(sections, "live-most-songs").trend).toBeNull();
+  });
+});

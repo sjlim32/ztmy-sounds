@@ -17,6 +17,7 @@ import type {
   StatSong,
   StatSummary,
   StatTour,
+  StatTrend,
 } from "./types";
 import { MISSING_SETLIST_RECORD_ID } from "./types";
 
@@ -114,10 +115,12 @@ export function buildStatSections(input: {
   ];
   return sections.map((section) => ({
     ...section,
-    records: section.records.map((record) => ({
+    records: section.records.map(({ trendFor, ...record }) => ({
       ...record,
       total: record.rows.length,
       leaderCount: record.rows.filter((row) => row.rank === 1).length,
+      // 흐름 그래프는 1위 카드에만 — 1위 하나만 계산한다.
+      trend: trendFor && record.rows[0] ? trendFor(record.rows[0].key) : null,
     })),
   }));
 }
@@ -213,8 +216,43 @@ const byDate = (a: LiveUnit, b: LiveUnit) =>
 
 // ─── 공통 ──────────────────────────────────────────────────────────────
 
-/** 기록 하나(전체 줄 수 total은 buildStatSections가 마지막에 붙인다) */
-type RawRecord = Omit<StatRecord, "total" | "leaderCount">;
+/**
+ * 기록 하나(전체 줄 수 total·공동 1위 수는 buildStatSections가 마지막에 붙인다).
+ * trendFor가 있으면 1위 줄의 key로 연도별 흐름을 만든다.
+ */
+type RawRecord = Omit<StatRecord, "total" | "leaderCount" | "trend"> & {
+  trendFor?: (key: string) => StatTrend | null;
+};
+
+/** 공연일들의 첫 해부터 마지막 해까지(빈 해 포함) — 연도별 막대의 가로축. */
+function yearSpan(units: LiveUnit[]): string[] {
+  if (units.length === 0) return [];
+  const years = units.map((unit) => Number(unit.date.slice(0, 4)));
+  const [from, to] = [Math.min(...years), Math.max(...years)];
+  return Array.from({ length: to - from + 1 }, (_, i) => String(from + i));
+}
+
+/** 해마다 몇 번(weight가 있으면 공연일마다 그 값을 더한다). */
+function yearlyTrend(
+  label: string,
+  axis: LiveUnit[],
+  units: LiveUnit[],
+  weight: (unit: LiveUnit) => number = () => 1,
+): StatTrend {
+  const counts = new Map<string, number>();
+  for (const unit of units) {
+    const year = unit.date.slice(0, 4);
+    counts.set(year, (counts.get(year) ?? 0) + weight(unit));
+  }
+  return {
+    label,
+    unit: "회",
+    points: yearSpan(axis).map((year) => ({
+      label: year,
+      value: counts.get(year) ?? 0,
+    })),
+  };
+}
 
 /** 날짜 구간(양 끝 포함, "YYYY-MM-DD") */
 interface Span {
@@ -412,6 +450,12 @@ function songRecords(
   const playColumns = ["횟수", "참가율", "확인된 첫 라이브", "마지막 라이브"];
 
   const played = stats.filter((stat) => stat.played.length > 0);
+  const statById = new Map(stats.map((stat) => [stat.song.id, stat]));
+  // 1위 곡의 해마다 라이브 횟수(가로축은 세트리스트가 있는 공연일의 해).
+  const songTrend = (key: string) => {
+    const stat = statById.get(key);
+    return stat ? yearlyTrend("해마다 라이브 횟수", known, stat.played) : null;
+  };
   // 참가율 순위는 공연일이 적은 곡을 조금 낮게 보정한 값(Wilson 하한)으로 매긴다 —
   // 발매 후 공연일 2회 중 2회(100%)가 30회 중 29회(97%)를 이기지 않게.
   const rateScore = (stat: SongStat) =>
@@ -537,6 +581,7 @@ function songRecords(
   return [
     {
       id: "song-most-played",
+      trendFor: songTrend,
       title: "라이브에서 가장 많이 불린 곡",
       description:
         "세트리스트가 있는 공연일 중 부른 횟수 · 참가율은 발매 후 그런 공연일 중 부른 비율",
@@ -551,6 +596,7 @@ function songRecords(
     },
     {
       id: "song-highest-rate",
+      trendFor: songTrend,
       title: "참가율이 가장 높은 곡",
       description:
         "발매 후 세트리스트가 있는 공연일 중 부른 비율 — 그런 공연일이 적은 곡은 순위를 조금 낮게 보정",
@@ -597,6 +643,7 @@ function songRecords(
     },
     {
       id: "song-comeback",
+      trendFor: songTrend,
       title: "가장 오랜 공백 끝에 돌아온 곡",
       description: "곡마다 연이어 부른 두 공연일 사이가 가장 길었던 때(일수)",
       columns: ["공백", "건너뛴 공연", "이전 라이브", "돌아온 공연"],
@@ -616,6 +663,7 @@ function songRecords(
     },
     {
       id: "song-comeback-shows",
+      trendFor: songTrend,
       title: "가장 많은 공연을 건너뛰고 돌아온 곡",
       description:
         "곡마다 연이어 부른 두 공연일 사이에 세트리스트가 있는 공연일이 가장 많았던 때",
@@ -637,6 +685,7 @@ function songRecords(
     },
     {
       id: "song-streak",
+      trendFor: songTrend,
       title: "가장 오래 연속으로 불린 곡",
       description: "연이은 공연일마다 빠짐없이 부른 최대 횟수",
       columns: ["연속", "시작", "끝"],
@@ -763,12 +812,30 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
     note,
   });
   const coverage = (item: Item) => `${item.playedCount}/${item.songCount}곡`;
+  // 1위 앨범 수록곡의 해마다 라이브 횟수 합계.
+  const known = [
+    ...new Map(
+      stats.flatMap((stat) => stat.played).map((unit) => [unit.id, unit]),
+    ).values(),
+  ];
+  const albumTrend = (key: string) => {
+    const album = albums.find((item) => item.id === key);
+    if (!album) return null;
+    const ids = new Set(album.songIds);
+    return yearlyTrend(
+      "해마다 수록곡 라이브 횟수",
+      known,
+      known,
+      (unit) => unit.songIds.filter((id) => ids.has(id)).length,
+    );
+  };
   const note = (item: Item) =>
     `수록곡 ${item.songCount}곡 중 ${item.playedCount}곡 라이브 · 합계 ${times(item.total)}`;
 
   return [
     {
       id: "album-most-played",
+      trendFor: albumTrend,
       title: "라이브에서 가장 많이 불린 앨범",
       description: "수록곡 라이브 횟수 합계(세트리스트가 있는 공연일 기준)",
       columns: ["합계", "라이브된 수록곡", "비율"],
@@ -790,6 +857,7 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
     },
     {
       id: "album-coverage",
+      trendFor: albumTrend,
       title: "수록곡이 가장 고르게 불린 앨범",
       description: "수록곡 중 한 번이라도 라이브에서 부른 곡의 비율",
       columns: ["비율", "라이브된 수록곡", "합계"],
@@ -1027,6 +1095,11 @@ function liveRecords(
     },
     {
       id: "live-busiest-year",
+      // 모든 해를 그리고 1위 해를 강조한다.
+      trendFor: (key) => ({
+        ...yearlyTrend("해마다 공연일", all, all),
+        highlight: key,
+      }),
       title: "공연이 가장 많았던 해",
       description: `그해 공연일 수${emptyTourNote(context)}`,
       columns: ["공연", "종류별"],
@@ -1145,10 +1218,18 @@ function placeRecords(all: LiveUnit[], context: Context): RawRecord[] {
     0,
   );
   const unique = (values: string[]) => [...new Set(values)].join(", ");
+  // 1위 장소의 해마다 공연일(가로축은 전체 공연일의 해).
+  const placeTrend =
+    (groups: [string, LiveUnit[]][]) =>
+    (key: string): StatTrend | null => {
+      const units = groups.find(([name]) => name === key)?.[1];
+      return units ? yearlyTrend("해마다 공연일", offline, units) : null;
+    };
 
   return [
     {
       id: "place-city",
+      trendFor: placeTrend(cities),
       title: "가장 자주 공연한 도시",
       description: `공연일 기준(온라인 공연 제외)${emptyTourNote(context)}`,
       columns: ["공연", "기간"],
@@ -1167,6 +1248,7 @@ function placeRecords(all: LiveUnit[], context: Context): RawRecord[] {
     },
     {
       id: "place-venue",
+      trendFor: placeTrend(venues),
       title: "가장 자주 선 공연장",
       description: `홀 번호 등 괄호 안 표기가 달라도 같은 공연장은 하나로${emptyTourNote(context)}`,
       columns: ["공연", "도시", "기간"],
@@ -1192,6 +1274,7 @@ function placeRecords(all: LiveUnit[], context: Context): RawRecord[] {
     },
     {
       id: "place-overseas",
+      trendFor: placeTrend(countries),
       title: "해외 공연이 가장 많았던 나라",
       description: `일본 밖 공연일(해외 공연 총 ${overseasTotal}회)${emptyTourNote(context)}`,
       columns: ["공연", "도시", "기간"],

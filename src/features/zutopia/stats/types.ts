@@ -25,6 +25,17 @@ export interface StatRow {
   note?: string | null;
 }
 
+/** 1위 카드의 연도별 미니 막대 — 1위 하나에만 붙인다(빌드 때 계산). */
+export interface StatTrend {
+  /** 그래프 이름("해마다 라이브 횟수") */
+  label: string;
+  /** 값 뒤에 붙는 단위("회") */
+  unit: string;
+  points: { label: string; value: number }[];
+  /** 강조할 막대(공연이 가장 많았던 해의 1위 연도 등) */
+  highlight?: string;
+}
+
 export interface StatRecord {
   id: string;
   title: string;
@@ -37,6 +48,8 @@ export interface StatRecord {
   total: number;
   /** 공동 1위 수(1이면 단독) — 미리보기 줄만으로는 셀 수 없어 따로 둔다. */
   leaderCount: number;
+  /** 1위의 연도별 흐름(있는 기록만) */
+  trend?: StatTrend | null;
 }
 
 export interface StatSection {

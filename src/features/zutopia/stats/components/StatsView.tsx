@@ -36,6 +36,7 @@ import {
   type StatRow,
   type StatSection,
   type StatSummary,
+  type StatTrend,
 } from "../types";
 
 type SectionFilter = "all" | StatSection["id"];
@@ -316,6 +317,8 @@ function RecordCard({
         <p className="text-sm text-white/55">아직 기록이 없어요.</p>
       )}
 
+      {record.trend && <TrendBars trend={record.trend} />}
+
       {rest.length > 0 && (
         <ol className="flex flex-col border-t border-white/10 pt-2">
           {rest.slice(0, RUNNER_UP_COUNT).map((row) => (
@@ -350,6 +353,87 @@ function RecordCard({
         </button>
       )}
     </article>
+  );
+}
+
+/**
+ * 1위의 연도별 미니 막대 — 한 가지 색(분홍) 세로 막대, 막대 사이 2px, 위 끝만
+ * 둥글게. 위 줄엔 평소 가장 많았던 해를, 막대에 마우스를 올리거나(포커스) 누르면
+ * 그 해 값을 보여 준다. 가로축은 첫 해·마지막 해만 글자로. 화면 읽기 프로그램엔
+ * 해마다 값을 목록으로 읽어 준다(sr-only).
+ */
+function TrendBars({ trend }: { trend: StatTrend }) {
+  const [active, setActive] = useState<number | null>(null);
+  const max = Math.max(1, ...trend.points.map((point) => point.value));
+  if (trend.points.length < 2) return null;
+  const peakIndex = trend.points.reduce(
+    (best, point, index) =>
+      point.value > trend.points[best].value ? index : best,
+    0,
+  );
+  const highlightIndex = trend.highlight
+    ? trend.points.findIndex((point) => point.label === trend.highlight)
+    : -1;
+  const focus =
+    trend.points[active ?? (highlightIndex >= 0 ? highlightIndex : peakIndex)];
+
+  return (
+    <figure className="flex flex-col gap-1.5">
+      <figcaption className="flex items-baseline justify-between gap-2 text-sm">
+        <span className="text-white/55">{trend.label}</span>
+        <span aria-hidden className="text-white/80 tabular-nums">
+          {focus.label}년 {focus.value.toLocaleString("ko-KR")}
+          {trend.unit}
+        </span>
+      </figcaption>
+      <div
+        aria-hidden
+        className="flex h-12 items-end gap-0.5"
+        onMouseLeave={() => setActive(null)}
+      >
+        {trend.points.map((point, index) => (
+          <span
+            key={point.label}
+            onMouseEnter={() => setActive(index)}
+            onClick={() => setActive(index)}
+            title={`${point.label}년 ${point.value}${trend.unit}`}
+            // 마우스 대상은 막대보다 크게(칸 전체 높이).
+            className="flex h-full min-w-0 flex-1 cursor-default items-end"
+          >
+            <span
+              className={cn(
+                "block w-full rounded-t-[4px] transition-opacity",
+                point.value === 0 ? "bg-white/10" : "bg-ztmy-pink",
+                active != null && active !== index && "opacity-50",
+                highlightIndex >= 0 &&
+                  active == null &&
+                  index !== highlightIndex &&
+                  "opacity-50",
+              )}
+              style={{
+                // 0인 해도 바닥선이 보이게 2px.
+                height: point.value === 0 ? 2 : `${(point.value / max) * 100}%`,
+              }}
+            />
+          </span>
+        ))}
+      </div>
+      <div
+        aria-hidden
+        className="flex justify-between text-sm text-white/45 tabular-nums"
+      >
+        <span>{trend.points[0].label}</span>
+        <span>{trend.points.at(-1)!.label}</span>
+      </div>
+      <ul className="sr-only">
+        {trend.points.map((point) => (
+          <li key={point.label}>
+            {point.label}년 {point.value}
+            {trend.unit}
+          </li>
+        ))}
+      </ul>
+    </figure>
   );
 }
 
