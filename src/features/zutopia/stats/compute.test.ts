@@ -200,8 +200,8 @@ describe("모르는 구간(세트리스트 없는 공연·공연일 없는 투�
     // 이전 라이브도 돌아온 공연처럼 날짜와 공연 이름(화면에서 두 줄로 나눈다).
     expect(rows[0].cells.slice(1)).toEqual([
       "0회",
-      { date: "2021.01.01", label: "live-u2" },
-      { date: "2022.07.01", label: "live-u3" },
+      { date: "2021.01.01", label: "live-u2", href: null },
+      { date: "2022.07.01", label: "live-u3", href: null },
     ]);
   });
 
@@ -365,5 +365,27 @@ describe("buildStatSummary", () => {
       ["m2", 2],
     ]);
     expect(summary.missing.total).toBe(2);
+  });
+});
+
+describe("공연 칸 링크", () => {
+  test("공연 칸은 그 공연 상세로 이어진다(공연 공백 포함)", () => {
+    const sections = buildStatSections({
+      units: [
+        unit("h1", "2020-01-01", ["a"], { href: "/zutopia/lives/one" }),
+        unit("h2", "2021-01-01", ["a"], { href: "/zutopia/lives/two" }),
+      ],
+      upcoming: [],
+      songs: [song("a", "2019-01-01")],
+      albums: [],
+      tours: [],
+    });
+    const comeback = record(sections, "song-comeback").rows[0];
+    expect(comeback.cells[3]).toMatchObject({ href: "/zutopia/lives/two" });
+    const gap = record(sections, "live-longest-break").rows[0];
+    expect(gap.cells.slice(1)).toEqual([
+      { date: "2020.01.01", label: "live-h1", href: "/zutopia/lives/one" },
+      { date: "2021.01.01", label: "live-h2", href: "/zutopia/lives/two" },
+    ]);
   });
 });

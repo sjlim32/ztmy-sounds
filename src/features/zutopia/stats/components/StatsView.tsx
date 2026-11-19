@@ -371,13 +371,28 @@ function FullTable({ record }: { record: StatRecord }) {
   return <RecordTable record={record} rows={rows} />;
 }
 
-/** 순위표 한 칸 — 공연 칸은 날짜를 위 작은 줄(옅게), 공연 이름을 아래 줄로 나눈다. */
+/**
+ * 순위표 한 칸 — 공연 칸은 날짜를 위 작은 줄(옅게), 공연 이름을 아래 줄로 나누고,
+ * 공연 상세가 있으면 이름이 링크(이름 칸 RowName과 같은 모양).
+ */
 function CellText({ cell }: { cell: StatCell }) {
   if (typeof cell === "string") return cell;
   return (
     <>
       <span className="block text-sm text-white/45">{cell.date}</span>
-      <span className="block">{cell.label}</span>
+      {cell.href ? (
+        <Link
+          href={cell.href}
+          className={cn(
+            "block rounded-sm transition-colors hover:text-white hover:underline hover:decoration-white/40 hover:underline-offset-4",
+            FOCUS_RING,
+          )}
+        >
+          {cell.label}
+        </Link>
+      ) : (
+        <span className="block">{cell.label}</span>
+      )}
     </>
   );
 }

@@ -5,9 +5,10 @@
 
 /**
  * 순위표 한 칸 — 글자 그대로, 또는 공연 칸(날짜 + 공연 이름: 화면에선 날짜를 위
- * 작은 줄에, 이름을 아래 줄에 나눠 둔다).
+ * 작은 줄에, 이름을 아래 줄에 나눠 둔다. href가 있으면 이름이 공연 상세 링크).
  */
-export type StatCell = string | { date: string; label: string };
+export type StatCell =
+  string | { date: string; label: string; href?: string | null };
 
 /** 순위표 한 줄. cells는 기록의 columns와 같은 순서(첫 칸이 대표 값). */
 export interface StatRow {

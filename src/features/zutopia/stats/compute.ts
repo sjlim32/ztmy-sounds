@@ -306,7 +306,11 @@ function unitName(unit: LiveUnit) {
 
 /** 공연 칸 — 날짜와 공연 이름을 나눠 둔다(화면에서 두 줄로). */
 function unitCell(unit: LiveUnit): StatCell {
-  return { date: formatDotDate(unit.date), label: unitName(unit) };
+  return {
+    date: formatDotDate(unit.date),
+    label: unitName(unit),
+    href: unit.href,
+  };
 }
 
 /** 한 줄 글자로 쓰는 공연(1위 설명 등) — 날짜와 이름을 가운뎃점으로 나눈다. */
@@ -920,17 +924,22 @@ function liveRecords(
 
   // 공연 사이 공백 — 공연일과 공연일이 없는 투어 기간을 "공연이 있던 때"로 이어
   // 붙이고, 그 사이 빈 기간을 잰다.
-  const busy = [
+  const busy: (Span & { label: string; href: string | null })[] = [
     ...all.map((unit) => ({
       from: unit.date,
       to: unit.date,
       label: unitName(unit),
+      href: unit.href,
     })),
-    ...emptyTours.map((span) => ({ ...span, label: span.tour.titleKo })),
+    ...emptyTours.map((span) => ({
+      ...span,
+      label: span.tour.titleKo,
+      href: `/zutopia/lives/${span.tour.slug}`,
+    })),
   ].sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to));
   const gaps: {
-    from: Span & { label: string };
-    to: Span & { label: string };
+    from: (typeof busy)[number];
+    to: (typeof busy)[number];
     gap: number;
   }[] = [];
   let reach = busy[0];
@@ -940,7 +949,7 @@ function liveRecords(
       if (gap > 1) gaps.push({ from: reach, to: span, gap });
       reach = span;
     } else if (span.to > reach.to)
-      reach = { ...reach, to: span.to, label: span.label };
+      reach = { ...reach, to: span.to, label: span.label, href: span.href };
   }
 
   // 같은 페스티벌 출연 횟수
@@ -1049,8 +1058,16 @@ function liveRecords(
           sub: `${item.from.label} → ${item.to.label}`,
           cells: [
             days(item.gap),
-            `${formatDotDate(item.from.to)} ${item.from.label}`,
-            `${formatDotDate(item.to.from)} ${item.to.label}`,
+            {
+              date: formatDotDate(item.from.to),
+              label: item.from.label,
+              href: item.from.href,
+            },
+            {
+              date: formatDotDate(item.to.from),
+              label: item.to.label,
+              href: item.to.href,
+            },
           ],
           note: aboutYears(item.gap),
         }),
