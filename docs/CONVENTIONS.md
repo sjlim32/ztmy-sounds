@@ -420,6 +420,11 @@ src/
                              # 서체). 2~5위엔 1위 대비 막대(많은 순 기록만), 맨 아래
                              # 전체 폭 "전체 순위 보기" 줄. 카드 설명(description)은
                              # 무엇을 쟀는지만 짧게, 자세한 기준(detail)은 옆 창 부제로.
+                             # 맨 위 "내 기록"(MyStats)은 참전 기록 체크가 있을 때만
+                             # /zutopia/stats-me.json(공연일별 곡·곡별 횟수·참가율,
+                             # my-stats.ts buildMyStatsData)을 받아 브라우저에서 센다
+                             # (summarizeMine — 다녀온 공연일, 들은 곡, 희귀곡, 못 들은
+                             # 인기곡). 체크가 없으면 참전 기록으로 가는 한 줄만.
                              # 1위 카드의 연도별 미니 막대(StatRecord.trend)는 기록의
                              # trendFor(1위 key)로 1위 하나만 계산 — 분홍 한 색, 빈 해는
                              # 바닥선, 가리키면 그 해 값, 화면 읽기용 목록(sr-only).

@@ -13,6 +13,7 @@ import {
   parseSongMetadata,
 } from "@/features/zutopia/song-db/song-metadata";
 import { buildStatSections, buildStatSummary } from "./compute";
+import { buildMyStatsData, type MyStatsData } from "./my-stats";
 import type { StatSection, StatSong, StatSummary, StatTour } from "./types";
 
 /**
@@ -114,4 +115,9 @@ export const getStatSections = cache(async (): Promise<StatSection[]> =>
 /** 통계 맨 위 요약(공연일·세트리스트 확보율 등) — 같은 입력으로. */
 export const getStatSummary = cache(async (): Promise<StatSummary> =>
   buildStatSummary(await getStatInput()),
+);
+
+/** "내 기록"용 공연일별 곡·곡별 라이브 기록(/zutopia/stats-me.json). */
+export const getMyStatsData = cache(async (): Promise<MyStatsData> =>
+  buildMyStatsData(await getStatInput()),
 );

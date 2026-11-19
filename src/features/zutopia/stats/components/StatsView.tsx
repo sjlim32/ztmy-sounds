@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ThumbImage } from "@/components/ThumbImage";
 import { SidePanel } from "@/components/SidePanel";
+import { MyStats } from "./MyStats";
 import { ShareButton } from "@/components/ShareButton";
 import { cn } from "@/lib/utils";
 import {
@@ -131,6 +132,8 @@ export function StatsView({
 
   return (
     <div className="flex flex-col gap-8">
+      <MyStats />
+
       <SummaryRow
         summary={summary}
         onOpenMissing={() => openRecord(summary.missing)}
