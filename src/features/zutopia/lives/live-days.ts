@@ -138,3 +138,30 @@ export function splitLiveDays(
 
   return { common, dates };
 }
+
+/**
+ * 투어 공연일 한 행(lives)이 이틀 이상(start_date~end_date)이면 날마다 한 행으로
+ * 나눈다 — 일정 행마다 그날의 선택곡만 보이고, 펼치면 그날 세트리스트만 보인다.
+ * 일차가 비어 있는 곡(공통 곡, 모든 날 같은 번호로 부른 선택곡)은 날마다 들어간다.
+ * 취소된 공연일은 펼칠 세트리스트가 없어 한 행 그대로 둔다.
+ */
+export function splitTourDateByDay(date: TourDateEntry): TourDateEntry[] {
+  if (date.canceled || !date.endDate) return [date];
+  const dayCount = diffDays(date.startDate, date.endDate) + 1;
+  if (dayCount < 2) return [date];
+  return Array.from({ length: dayCount }, (_, i) => {
+    const day = i + 1;
+    const startDate = addDays(date.startDate, i);
+    return {
+      ...date,
+      id: `${date.id}:${day}`,
+      date: formatKoreanDate(startDate),
+      startDate,
+      endDate: null,
+      dayNumber: day,
+      setlist: date.setlist.filter(
+        (entry) => entry.dayNumber == null || entry.dayNumber === day,
+      ),
+    };
+  });
+}

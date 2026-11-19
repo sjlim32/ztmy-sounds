@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { splitLiveDays } from "./live-days";
-import type { LiveDetail, LiveSetlistEntry } from "./types";
+import { splitLiveDays, splitTourDateByDay } from "./live-days";
+import type { LiveDetail, LiveSetlistEntry, TourDateEntry } from "./types";
 
 function entry(
   songId: string,
@@ -170,5 +170,77 @@ describe("splitLiveDays", () => {
     ]);
     // 공통 세트리스트엔 곡이 한 번만
     expect(result.common.map((e) => e.songId)).toEqual(["a"]);
+  });
+});
+
+function tourDate(overrides: Partial<TourDateEntry>): TourDateEntry {
+  return {
+    id: "D",
+    date: "2025년 11월 18일 ~ 2025년 11월 19일",
+    startDate: "2025-11-18",
+    endDate: "2025-11-19",
+    country: "일본",
+    city: "도쿄",
+    cityOriginal: "東京",
+    region: "東京 (도쿄)",
+    venue: "Zepp",
+    iconImageUrl: null,
+    posterImageUrl: null,
+    additionalImageUrls: [],
+    setlist: [],
+    ...overrides,
+  };
+}
+
+describe("splitTourDateByDay", () => {
+  test("하루 공연·취소된 공연일은 그대로 한 행", () => {
+    const oneDay = tourDate({ endDate: null });
+    expect(splitTourDateByDay(oneDay)).toEqual([oneDay]);
+    const sameDay = tourDate({ endDate: "2025-11-18" });
+    expect(splitTourDateByDay(sameDay)).toEqual([sameDay]);
+    const canceled = tourDate({ canceled: true });
+    expect(splitTourDateByDay(canceled)).toEqual([canceled]);
+  });
+
+  test("이틀 공연은 날마다 한 행 — 일차 없는 곡은 날마다, 일차 있는 곡은 그날만", () => {
+    const result = splitTourDateByDay(
+      tourDate({
+        startDate: "2025-11-18T00:00:00+00:00",
+        endDate: "2025-11-19T00:00:00+00:00",
+        setlist: [
+          entry("common", 1, null),
+          entry("sameBoth", 9, null),
+          entry("neko", 10, 1),
+          entry("neko", 9, 2),
+        ],
+      }),
+    );
+    expect(
+      result.map((d) => ({
+        id: d.id,
+        date: d.date,
+        startDate: d.startDate,
+        endDate: d.endDate,
+        dayNumber: d.dayNumber,
+        songs: d.setlist.map((e) => `${e.songId}:${e.trackNumber}`),
+      })),
+    ).toEqual([
+      {
+        id: "D:1",
+        date: "2025년 11월 18일",
+        startDate: "2025-11-18",
+        endDate: null,
+        dayNumber: 1,
+        songs: ["common:1", "sameBoth:9", "neko:10"],
+      },
+      {
+        id: "D:2",
+        date: "2025년 11월 19일",
+        startDate: "2025-11-19",
+        endDate: null,
+        dayNumber: 2,
+        songs: ["common:1", "sameBoth:9", "neko:9"],
+      },
+    ]);
   });
 });

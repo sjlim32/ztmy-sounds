@@ -13,6 +13,7 @@ import {
 } from "@/features/zutopia/lives/region";
 import { computeLastModified } from "@/features/zutopia/lives/last-modified";
 import { tourDateFilter } from "@/features/zutopia/lives/tour-dates";
+import { splitTourDateByDay } from "@/features/zutopia/lives/live-days";
 import type { Live, LiveDetail, LiveSetlistEntry, TourDetail } from "./types";
 
 /**
@@ -501,10 +502,11 @@ export const getTourBySlug = cache(
       );
     }
 
-    const dates = lives.map((live) => {
+    // 이틀 이상인 공연일은 날마다 한 행으로 나눈다(일정 행·펼침이 그날 것만, live-days.ts).
+    const dates = lives.flatMap((live) => {
       const { city, original } = splitRegion(live.region);
       const canceled = live.status === "CANCELED";
-      return {
+      return splitTourDateByDay({
         id: live.id,
         date: formatLiveDateRange(live.start_date, live.end_date),
         startDate: live.start_date,
@@ -525,7 +527,7 @@ export const getTourBySlug = cache(
               normalizeSetlistRows(tourSetlist),
               normalizeSetlistRows(live.setlists),
             ),
-      };
+      });
     });
 
     // 투어 공통 세트리스트(공연일마다 바뀌는 선택곡 제외) — 상세에서 한 번만

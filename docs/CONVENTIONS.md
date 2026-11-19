@@ -218,7 +218,11 @@ src/
                              # 공연 목록(getCanceledLiveEntries, 목록 화면만)에
                              # 회색 + 빨간 취소선(lives/surface.ts CANCELED_TEXT_CLASS)
                              # + "공연 취소" 태그로, 누를 수 없다. 상세·사이트맵·
-                             # 검색·참전·통계는 ACTIVE만, 공연 수에서도 뺀다. 행 안엔 그날의 선택곡이 미리 보이고, 공통
+                             # 검색·참전·통계는 ACTIVE만, 공연 수에서도 뺀다. 이틀
+                             # 이상인 공연일 행(lives 한 행)은 날마다 한 행(DAY 1·
+                             # DAY 2 태그)으로 나눠, 행·펼침 모두 그날 것만 보인다
+                             # (live-days.ts splitTourDateByDay — 일차 없는 곡은
+                             # 날마다, 취소된 공연일은 한 행). 행 안엔 그날의 선택곡이 미리 보이고, 공통
                              # 곡은 위 "투어 공통 세트리스트"(TourCommonSetlist,
                              # TourDetail.setlist)에 한 번만 둔다 — 처음엔 펼침,
                              # 제목 줄로 접기. 공연일마다 다른 곡이 들어가는
