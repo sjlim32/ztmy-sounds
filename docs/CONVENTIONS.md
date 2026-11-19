@@ -409,6 +409,10 @@ src/
                              # ZutopiaSearchButton, 창 본체는 SiteHeader가 dynamic으로
                              # (다른 페이지 번들에 안 들어가게). 창의 여닫힘·포커스는
                              # SidePanel과 같은 lib/use-presence·use-dialog-focus.
+                             # 곡·앨범 드로어(SongDbDrawer)도 같은 두 hook을 쓰고
+                             # (포커스 되돌리기만 restoreFocus "next-frame"), 열린 채
+                             # 다른 카드를 눌러 내용만 바꾸는 비모달 동작 때문에
+                             # SidePanel과는 컴포넌트를 따로 둔다.
                              # "열린 창이 있는지"는 lib/open-modal의 hasOpenModal
                              # (닫혀도 DOM에 남는 드로어는 aria-hidden으로 제외).
       (스크롤)              # ZUTOPIA는 모든 페이지가 스크롤 박스 하나

@@ -1,26 +1,16 @@
 "use client";
 
-import {
-  useLayoutEffect,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
+import { getFocusableIn, useDialogFocus } from "@/lib/use-dialog-focus";
+import { usePresence } from "@/lib/use-presence";
 import { DrawerCloseButton } from "@/features/zutopia/song-db/components/DrawerCloseButton";
 
 const noopSubscribe = () => () => {};
 
-const FOCUSABLE_SELECTOR =
-  'button, a[href], iframe, [tabindex]:not([tabindex="-1"])';
-
-function getFocusableIn(container: HTMLElement | null): HTMLElement[] {
-  return Array.from(
-    container?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? [],
-  ).filter((el) => !el.hasAttribute("data-focus-sentinel"));
-}
+// 여닫는 움직임(duration-300)과 같은 길이.
+const PANEL_TRANSITION_MS = 300;
 
 /**
  * 정적 export라 서버 렌더 시점엔 document가 없어 createPortal은
@@ -71,34 +61,24 @@ export function SongDbDrawer<T>({
   contentKey,
   ariaLabel = "상세 정보",
 }: SongDbDrawerProps<T>) {
-  const [displayed, setDisplayed] = useState<T | null>(null);
   const mounted = useMounted();
   const isOpen = selected !== null;
   const dialogRef = useRef<HTMLDivElement>(null);
+  // 닫힌 뒤에도 슬라이드 아웃이 끝날 때까지 마지막 내용을 남겨 둔다(SidePanel과 같은 usePresence).
+  // 패널 틀은 늘 그려 둔다 — 화면 밖(translate-x-full)에서 미끄러져 들어와야 해서.
+  const present = usePresence(isOpen, PANEL_TRANSITION_MS);
+  const [displayed, setDisplayed] = useState<T | null>(null);
 
   // selected가 바뀌면 렌더 중에 즉시 displayed를 맞춰 내용만 바로 스왑한다.
-  // null이 되는(닫히는) 경우는 아래 effect가 슬라이드 아웃 후 비동기로
-  // 처리한다.
   if (selected !== null && selected !== displayed) {
     setDisplayed(selected);
   }
-
-  useEffect(() => {
-    if (isOpen) return;
-    const timer = setTimeout(() => setDisplayed(null), 300);
-    return () => clearTimeout(timer);
-  }, [isOpen]);
+  const shown = present ? displayed : null;
 
   /**
-   * 포커스 관리 — 열리면 패널로 포커스를 옮기고 Tab을 패널 안에 가둔다,
-   * 닫히면 원래 포커스로 되돌린다.
-   *
-   * 트리거 ref 대신 effect 실행 시점의 document.activeElement를 스냅샷으로
-   * 쓴다(키보드/클릭 모두 정확). 여는 쪽은 useLayoutEffect라 페인트 전에
-   * 포커스가 이미 옮겨간 채로 그려진다. 닫을 때 포커스를 되돌리는 쪽은
-   * cleanup에서 rAF로 한 프레임 미룬다 — 커밋 직후 React-DOM이 자체
-   * restoreSelection을 한 번 더 돌리는 타이밍과 겹쳐 곧바로 focus()하면
-   * 그게 다시 뺏어간다(실측).
+   * 포커스 관리(useDialogFocus) — 열리면 패널로 포커스를 옮기고 Tab을 패널 안에
+   * 가두고, 닫히면 원래 포커스로 한 프레임 미뤄 되돌린다(restoreFocus "next-frame",
+   * 곧바로 되돌리면 React-DOM의 restoreSelection이 다시 뺏어간다 — 실측).
    *
    * #app-root에 inert를 걸어 배경을 통째로 비활성화하는 방법은 되돌렸다 —
    * 드로어가 열린 채로 다른 카드(data-song-db-item)를 눌러 선택을 바꿀 수
@@ -109,43 +89,21 @@ export function SongDbDrawer<T>({
    * document로 전파되지 않는다 — 다이얼로그 끝에 숨은 sentinel을 두어
    * iframe을 빠져나오면 맨 앞으로 순환하는 것만은 보장한다.
    */
-  useLayoutEffect(() => {
+  useDialogFocus({
+    open: isOpen,
+    containerRef: dialogRef,
+    onClose,
+    restoreFocus: "next-frame",
+  });
+
+  // 열린 동안 뒤 페이지가 스크롤되지 않게 잠근다.
+  useEffect(() => {
     if (!isOpen) return;
-
-    const previouslyFocused =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
-
-    dialogRef.current?.focus();
     document.body.style.overflow = "hidden";
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-        return;
-      }
-      if (event.key !== "Tab") return;
-      const focusable = getFocusableIn(dialogRef.current);
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
-      requestAnimationFrame(() => previouslyFocused?.focus());
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   /**
    * "바깥 클릭 시 닫힘"을 배경 onClick이 아니라 document 레벨에서 처리한다.
@@ -217,12 +175,12 @@ export function SongDbDrawer<T>({
 
         {/* 열린 채로 다른 항목을 고르면 내용이 툭 바뀌지 않고 살짝 올라오며
         바뀐다(key). 닫히는 동안엔 마지막 내용을 그대로 둔다. */}
-        {displayed && (
+        {shown && (
           <div
-            key={contentKey(displayed)}
+            key={contentKey(shown)}
             className="animate-content-in flex grow flex-col"
           >
-            {renderContent(displayed)}
+            {renderContent(shown)}
           </div>
         )}
         {isOpen && (
