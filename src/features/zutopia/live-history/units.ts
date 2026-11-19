@@ -100,7 +100,8 @@ function buildAllUnits(input: {
       const covers = rows.flatMap((row) =>
         seen.has(row.title)
           ? []
-          : (seen.add(row.title), [{ title: row.title, artist: row.artist }]),
+          : (seen.add(row.title),
+            [{ title: row.title, titleKo: row.titleKo, artist: row.artist }]),
       );
       return covers.length ? { covers } : {};
     };

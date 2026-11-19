@@ -98,6 +98,11 @@ export function buildStatSections(input: {
       records: songRecords(songStats, known, context),
     },
     {
+      id: "setlists",
+      title: "세트리스트",
+      records: setlistRecords(songStats, known, all),
+    },
+    {
       id: "albums",
       title: "앨범",
       records: albumRecords(input.albums, songStats),
@@ -780,6 +785,262 @@ function songRecords(
             `앵콜이 있었던 공연일 ${withEncore.length}회 중 ${percent(item.count, withEncore.length)} · 부른 날 ${item.base}회 중 ${percent(item.count, item.base)}`,
           ),
         (a, b) => b.count / b.base - a.count / a.base,
+      ),
+    },
+  ];
+}
+
+// ─── 세트리스트 ────────────────────────────────────────────────────────
+
+/** 평균 위치 기록에 넣는 최소 횟수 — 몇 번 안 부른 곡은 위치가 우연에 가깝다. */
+const MIN_POSITION_PLAYS = 5;
+
+/**
+ * 세트리스트 안의 자리·흐름 — 본편 마지막 곡, 공연 마지막 곡, 본편 평균 위치(초반·
+ * 후반), 이어 부른 두 곡, 다른 버전, 커버곡. 순서는 공연일의 mainOrder·encoreOrder
+ * (곡 순서를 아는 공연일만).
+ */
+function setlistRecords(
+  stats: SongStat[],
+  known: LiveUnit[],
+  all: LiveUnit[],
+): RawRecord[] {
+  const statById = new Map(stats.map((stat) => [stat.song.id, stat]));
+  const ordered = known.filter((unit) => unit.mainOrder?.length);
+  const songTrend = (key: string) => {
+    const stat = statById.get(key);
+    return stat ? yearlyTrend("해마다 라이브 횟수", known, stat.played) : null;
+  };
+
+  // 자리별 단골 — pick이 고른 곡을 센다. "부른 날 중"은 곡 순서를 아는 공연일 중
+  // 그 곡을 부른 날에서의 비율.
+  const slotItems = (pick: (unit: LiveUnit) => string | undefined) => {
+    const counts = new Map<string, number>();
+    for (const unit of ordered) {
+      const id = pick(unit);
+      if (id && statById.has(id)) counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    return [...counts].map(([id, count]) => {
+      const stat = statById.get(id)!;
+      const base = stat.played.filter((unit) => unit.mainOrder?.length).length;
+      return { stat, count, base };
+    });
+  };
+  type SlotItem = ReturnType<typeof slotItems>[number];
+  const slotRows = (items: SlotItem[]) =>
+    rank(
+      items,
+      (item) => item.count,
+      "desc",
+      (item) =>
+        songRow(
+          item.stat.song,
+          [
+            times(item.count),
+            percent(item.count, ordered.length),
+            percent(item.count, item.base),
+          ],
+          `곡 순서를 아는 공연일 ${ordered.length}회 중 ${percent(item.count, ordered.length)} · 부른 날 ${item.base}회 중 ${percent(item.count, item.base)}`,
+        ),
+      (a, b) => b.count / b.base - a.count / a.base,
+    );
+
+  // 본편 평균 위치 — 첫 곡 0%, 마지막 곡 100%.
+  const positions = new Map<string, number[]>();
+  for (const unit of ordered) {
+    const order = unit.mainOrder!;
+    if (order.length < 2) continue;
+    order.forEach((id, index) => {
+      if (!statById.has(id)) return;
+      positions.set(id, [
+        ...(positions.get(id) ?? []),
+        index / (order.length - 1),
+      ]);
+    });
+  }
+  const placed = [...positions]
+    .filter(([, list]) => list.length >= MIN_POSITION_PLAYS)
+    .map(([id, list]) => ({
+      stat: statById.get(id)!,
+      average: list.reduce((sum, value) => sum + value, 0) / list.length,
+      count: list.length,
+    }));
+  const positionText = (value: number) => `앞에서 ${Math.round(value * 100)}%`;
+  const positionRows = (order: "asc" | "desc") =>
+    rank(
+      placed,
+      (item) => Math.round(item.average * 100),
+      order,
+      (item) =>
+        songRow(
+          item.stat.song,
+          [positionText(item.average), times(item.count)],
+          `본편 ${times(item.count)} 평균 ${positionText(item.average)}(첫 곡 0% · 마지막 곡 100%)`,
+        ),
+      (a, b) => b.count - a.count,
+    );
+
+  // 이어 부른 두 곡 — 본편·앵콜 안에서 바로 다음 곡(앵콜 첫 곡은 본편 마지막과 잇지 않는다).
+  const pairs = new Map<
+    string,
+    { from: SongStat; to: SongStat; count: number }
+  >();
+  for (const unit of ordered) {
+    for (const order of [unit.mainOrder!, unit.encoreOrder ?? []]) {
+      for (let i = 1; i < order.length; i++) {
+        const [from, to] = [statById.get(order[i - 1]), statById.get(order[i])];
+        if (!from || !to) continue;
+        const key = `${from.song.id}>${to.song.id}`;
+        const pair = pairs.get(key) ?? { from, to, count: 0 };
+        pair.count += 1;
+        pairs.set(key, pair);
+      }
+    }
+  }
+  const songName = (song: StatSong) => song.titleKo || song.title;
+
+  // 다른 버전으로 부른 곡(short·acoustic …)
+  const versions = new Map<
+    string,
+    { stat: SongStat; units: LiveUnit[]; names: string[] }
+  >();
+  for (const unit of known) {
+    for (const { songId, name } of unit.variations ?? []) {
+      const stat = statById.get(songId);
+      if (!stat) continue;
+      const item = versions.get(songId) ?? { stat, units: [], names: [] };
+      if (!item.units.includes(unit)) item.units.push(unit);
+      if (!item.names.includes(name)) item.names.push(name);
+      versions.set(songId, item);
+    }
+  }
+
+  // 커버곡 — 제목이 같으면 하나로.
+  const covers = new Map<
+    string,
+    {
+      title: string;
+      titleKo: string | null;
+      artist: string | null;
+      units: LiveUnit[];
+    }
+  >();
+  for (const unit of all) {
+    for (const cover of unit.covers ?? []) {
+      const item = covers.get(cover.title) ?? { ...cover, units: [] };
+      item.units.push(unit);
+      covers.set(cover.title, item);
+    }
+  }
+
+  return [
+    {
+      id: "setlist-closer",
+      title: "본편 마지막 곡 단골",
+      description:
+        '앵콜 전 본편을 마무리한 곡 · "부른 날 중"은 그 곡을 부른 공연일 중 본편 마지막이었던 비율',
+      columns: ["마지막 곡 횟수", "비율", "부른 날 중"],
+      trendFor: songTrend,
+      rows: slotRows(slotItems((unit) => unit.mainOrder!.at(-1))),
+    },
+    {
+      id: "setlist-finale",
+      title: "공연 마지막 곡 단골",
+      description:
+        '앵콜이 있으면 앵콜 마지막, 없으면 본편 마지막 곡 · "부른 날 중"은 그 곡을 부른 공연일 중 마지막이었던 비율',
+      columns: ["마지막 곡 횟수", "비율", "부른 날 중"],
+      trendFor: songTrend,
+      rows: slotRows(
+        slotItems((unit) => unit.encoreOrder?.at(-1) ?? unit.mainOrder!.at(-1)),
+      ),
+    },
+    {
+      id: "setlist-early",
+      title: "공연 초반에 주로 부르는 곡",
+      description: `본편 평균 위치가 앞인 곡(첫 곡 0% · 마지막 곡 100%, 본편에서 ${MIN_POSITION_PLAYS}회 이상)`,
+      columns: ["평균 위치", "본편 횟수"],
+      rows: positionRows("asc"),
+    },
+    {
+      id: "setlist-late",
+      title: "공연 후반에 주로 부르는 곡",
+      description: `본편 평균 위치가 뒤인 곡(첫 곡 0% · 마지막 곡 100%, 본편에서 ${MIN_POSITION_PLAYS}회 이상)`,
+      columns: ["평균 위치", "본편 횟수"],
+      rows: positionRows("desc"),
+    },
+    {
+      id: "setlist-pairs",
+      title: "가장 자주 이어 부른 두 곡",
+      description:
+        '본편·앵콜 안에서 바로 이어 부른 횟수(2회 이상) · "앞 곡 부른 날 중"은 앞 곡을 부른 공연일 중 이어진 비율',
+      columns: ["횟수", "앞 곡 부른 날 중"],
+      rows: rank(
+        [...pairs.values()].filter((pair) => pair.count >= 2),
+        (pair) => pair.count,
+        "desc",
+        (pair) => {
+          const base = pair.from.played.filter(
+            (unit) => unit.mainOrder?.length,
+          ).length;
+          return {
+            key: `${pair.from.song.id}>${pair.to.song.id}`,
+            name: `${songName(pair.from.song)} → ${songName(pair.to.song)}`,
+            image: pair.from.song.cover,
+            href: `/zutopia/songs?song=${pair.from.song.slug}`,
+            cells: [times(pair.count), percent(pair.count, base)],
+            note: `${songName(pair.from.song)}을(를) 부른 날 ${base}회 중 ${percent(pair.count, base)}`,
+          };
+        },
+      ),
+    },
+    {
+      id: "setlist-versions",
+      title: "다른 버전으로 가장 많이 부른 곡",
+      description:
+        "short·acoustic·jazz 등 원래와 다른 버전으로 부른 공연일 수(세트리스트 메모 기준)",
+      columns: ["횟수", "버전"],
+      trendFor: (key) => {
+        const item = versions.get(key);
+        return item ? yearlyTrend("해마다 다른 버전", known, item.units) : null;
+      },
+      rows: rank(
+        [...versions.values()],
+        (item) => item.units.length,
+        "desc",
+        (item) =>
+          songRow(
+            item.stat.song,
+            [times(item.units.length), item.names.join(", ")],
+            item.names.join(" · "),
+          ),
+      ),
+    },
+    {
+      id: "setlist-covers",
+      title: "가장 많이 부른 커버곡",
+      description: "다른 가수의 곡을 부른 공연일 수(제목이 같으면 하나로)",
+      columns: ["횟수", "원곡 가수", "마지막"],
+      rows: rank(
+        [...covers.values()],
+        (item) => item.units.length,
+        "desc",
+        (item) => {
+          const last = item.units.at(-1)!;
+          return {
+            key: `cover:${item.title}`,
+            // 통계는 한글 제목 위주 — 원제는 아래 작은 줄에.
+            name: item.titleKo ?? item.title,
+            sub:
+              item.titleKo && item.titleKo !== item.title ? item.title : null,
+            cells: [
+              times(item.units.length),
+              item.artist ?? "–",
+              unitCell(last),
+            ],
+            note: `${item.artist ? `${item.artist} · ` : ""}마지막 ${unitText(last)}`,
+          };
+        },
+        (a, b) => b.units.at(-1)!.date.localeCompare(a.units.at(-1)!.date),
       ),
     },
   ];

@@ -53,7 +53,7 @@ export interface StatRecord {
 }
 
 export interface StatSection {
-  id: "songs" | "albums" | "lives" | "places";
+  id: "songs" | "setlists" | "albums" | "lives" | "places";
   title: string;
   records: StatRecord[];
 }

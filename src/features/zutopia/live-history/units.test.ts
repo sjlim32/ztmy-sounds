@@ -375,6 +375,7 @@ describe("오프닝·앵콜 곡(통계용)", () => {
             tour_id: null,
             day_number: null,
             title: "X",
+            titleKo: "엑스",
             artist: "Y",
           },
           {
@@ -382,6 +383,7 @@ describe("오프닝·앵콜 곡(통계용)", () => {
             tour_id: "T",
             day_number: null,
             title: "X",
+            titleKo: "엑스",
             artist: "Y",
           },
           {
@@ -389,6 +391,7 @@ describe("오프닝·앵콜 곡(통계용)", () => {
             tour_id: null,
             day_number: 2,
             title: "Z",
+            titleKo: null,
             artist: null,
           },
         ],
@@ -400,8 +403,8 @@ describe("오프닝·앵콜 곡(통계용)", () => {
     expect(unit.variations).toEqual([{ songId: "b", name: "acoustic" }]);
     // 투어 공통·공연일 양쪽의 같은 커버곡은 한 번, 다른 날(day 2) 커버곡은 하루 공연이라 함께.
     expect(unit.covers).toEqual([
-      { title: "X", artist: "Y" },
-      { title: "Z", artist: null },
+      { title: "X", titleKo: "엑스", artist: "Y" },
+      { title: "Z", titleKo: null, artist: null },
     ]);
   });
 

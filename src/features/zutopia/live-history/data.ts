@@ -132,6 +132,7 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
               day_number: row.day_number,
               show_number: row.show_number,
               title,
+              titleKo: parseSetlistNote(row.note, "title_kr"),
               artist: parseSetlistNote(row.note, "original_artist"),
             },
           ]

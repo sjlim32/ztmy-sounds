@@ -309,7 +309,7 @@ src/
                              # 커버곡 행은 song_id 없이 note.title·title_kr(제목 오른쪽 괄호)·original_artist —
                              # lives/data.ts normalizeSetlistRows가 가짜 곡(id
                              # "cover:제목")으로 바꾸고, 라이브 기록·통계·검색은 곡이
-                             # 연결된 행만 센다.
+                             # 연결된 행만 센다(통계의 "가장 많이 부른 커버곡"만 따로).
                              # variation(코너 이름)은 같은 줄 맨 앞에 값 그대로 + " ver.".
                              # 미공개곡(songs.metadata.unrelease)은 "미공개" 태그
                              # (LIVE_TAG_TONE.unreleased, 흰 계열 — DAY·선택곡·
@@ -400,6 +400,11 @@ src/
                              # 공유 주소 /zutopia/stats#기록id — 옆 창을 열면
                              # replaceState로 붙이고 닫으면 떼며, 그 주소로 들어오면
                              # (hashchange 포함) 그 기록 창을 연다. 창 안 ShareButton.
+                             # 구역은 곡·세트리스트·앨범·공연·장소. 세트리스트 구역
+                             # (setlistRecords)은 곡 순서를 아는 공연일로 본편·공연
+                             # 마지막 곡, 본편 평균 위치(5회 이상), 이어 부른 두 곡
+                             # (본편·앵콜 안에서만, 2회 이상), 다른 버전, 커버곡(한글
+                             # 제목 note.title_kr).
                              # 1위 카드의 연도별 미니 막대(StatRecord.trend)는 기록의
                              # trendFor(1위 key)로 1위 하나만 계산 — 분홍 한 색, 빈 해는
                              # 바닥선, 가리키면 그 해 값, 화면 읽기용 목록(sr-only).

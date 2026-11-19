@@ -425,3 +425,55 @@ describe("1위 연도별 흐름", () => {
     expect(record(sections, "live-most-songs").trend).toBeNull();
   });
 });
+
+describe("세트리스트 구역", () => {
+  // 곡 순서를 아는 공연일 5회 — a로 시작해 c로 본편을 닫고, 둘째 날부터 앵콜 e.
+  const units = Array.from({ length: 5 }, (_, i) =>
+    unit(`p${i}`, `2024-01-0${i + 1}`, ["a", "b", "c", ...(i ? ["e"] : [])], {
+      mainOrder: ["a", "b", "c"],
+      encoreOrder: i ? ["e"] : [],
+      variations: i === 0 ? [{ songId: "b", name: "acoustic" }] : [],
+      covers:
+        i < 2 ? [{ title: "Neko", titleKo: "고양이", artist: "X" }] : [],
+    }),
+  );
+  const sections = buildStatSections({
+    units,
+    upcoming: [],
+    songs: ["a", "b", "c", "e"].map((id) => song(id, "2020-01-01")),
+    albums: [],
+    tours: [],
+  });
+  const keys = (id: string) =>
+    record(sections, id).rows.map((row) => [row.key, row.cells[0]]);
+
+  test("본편 마지막·공연 마지막(앵콜 있으면 앵콜 마지막)", () => {
+    expect(keys("setlist-closer")).toEqual([["c", "5회"]]);
+    expect(keys("setlist-finale")).toEqual([
+      ["e", "4회"],
+      ["c", "1회"],
+    ]);
+  });
+
+  test("본편 평균 위치 — 초반·후반", () => {
+    expect(keys("setlist-early")[0]).toEqual(["a", "앞에서 0%"]);
+    expect(keys("setlist-late")[0]).toEqual(["c", "앞에서 100%"]);
+  });
+
+  test("이어 부른 두 곡은 본편 안에서만(앵콜 첫 곡과 잇지 않는다)", () => {
+    expect(keys("setlist-pairs")).toEqual([
+      ["a>b", "5회"],
+      ["b>c", "5회"],
+    ]);
+  });
+
+  test("다른 버전·커버곡(한글 제목, 원제는 아래 줄)", () => {
+    expect(keys("setlist-versions")).toEqual([["b", "1회"]]);
+    const [cover] = record(sections, "setlist-covers").rows;
+    expect([cover.name, cover.sub, cover.cells[0]]).toEqual([
+      "고양이",
+      "Neko",
+      "2회",
+    ]);
+  });
+});

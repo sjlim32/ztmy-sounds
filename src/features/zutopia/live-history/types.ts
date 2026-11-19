@@ -49,8 +49,8 @@ export interface LiveUnit {
   encoreOrder?: string[];
   /** 다른 버전으로 부른 곡(note.variation — "short", "acoustic" …) */
   variations?: { songId: string; name: string }[];
-  /** 곡이 연결되지 않은 커버곡(note.title, 원곡 가수 note.original_artist) */
-  covers?: { title: string; artist: string | null }[];
+  /** 곡이 연결되지 않은 커버곡(note.title, 한글 제목 note.title_kr, 원곡 가수 note.original_artist) */
+  covers?: { title: string; titleKo: string | null; artist: string | null }[];
 }
 
 /** 통계에만 쓰는 공연일 필드 — 클라이언트로 넘길 땐 toClientUnit으로 뺀다. */
@@ -126,5 +126,6 @@ export interface RawCoverRow {
   day_number: number | null;
   show_number?: number | null;
   title: string;
+  titleKo: string | null;
   artist: string | null;
 }
