@@ -215,6 +215,23 @@ function rank<T>(
   });
 }
 
+/**
+ * 비율의 95% 신뢰구간 하한(Wilson score) — 표본(whole)이 적을수록 낮게 나와서,
+ * 비율로 순위를 매길 때 공연일이 몇 번 안 되는 곡이 100%로 앞서지 않게 한다.
+ */
+export function wilsonLowerBound(part: number, whole: number): number {
+  if (whole === 0) return 0;
+  const z = 1.96;
+  const p = part / whole;
+  const z2 = z * z;
+  return (
+    (p +
+      z2 / (2 * whole) -
+      z * Math.sqrt((p * (1 - p)) / whole + z2 / (4 * whole * whole))) /
+    (1 + z2 / whole)
+  );
+}
+
 const percent = (part: number, whole: number) =>
   whole > 0 ? `${Math.round((part / whole) * 100)}%` : "–";
 
@@ -332,22 +349,57 @@ function songRecords(
   // 첫 라이브는 세트리스트가 있는 공연 중 처음 — 그 전 공연 기록이 비어 있을 수 있다.
   const playColumns = ["횟수", "참가율", "확인된 첫 라이브", "마지막 라이브"];
 
-  const MIN_ELIGIBLE = 10;
   const played = stats.filter((stat) => stat.played.length > 0);
+  // 참가율 순위는 공연일이 적은 곡을 조금 낮게 보정한 값(Wilson 하한)으로 매긴다 —
+  // 발매 후 공연일 2회 중 2회(100%)가 30회 중 29회(97%)를 이기지 않게.
+  const rateScore = (stat: SongStat) =>
+    wilsonLowerBound(stat.playedSinceRelease, stat.eligible);
 
-  // 오랜 공백 끝 부활 — 연이은 두 라이브 사이가 가장 길었던 때.
-  const comebacks = played.flatMap((stat) => {
-    let best: { from: LiveUnit; to: LiveUnit; gap: number } | null = null;
+  // 오랜 공백 끝 부활 — 연이은 두 라이브 사이. 날짜(일수)로 가장 길었던 때와,
+  // 그 사이 건너뛴 공연일(세트리스트가 있는 공연일) 수로 가장 많았던 때를 따로 잰다
+  // — 공연이 드물던 시기엔 일수만 길어서, 일부러 뺐다가 돌아온 곡은 공연 수로 보인다.
+  const knownIndex = new Map(known.map((unit, index) => [unit.id, index]));
+  type Comeback = {
+    stat: SongStat;
+    from: LiveUnit;
+    to: LiveUnit;
+    gap: number;
+    skipped: number;
+  };
+  const byDays: Comeback[] = [];
+  const byShows: Comeback[] = [];
+  for (const stat of played) {
+    let longest: Comeback | null = null;
+    let most: Comeback | null = null;
     for (let i = 1; i < stat.played.length; i++) {
-      const [from, to] = [stat.played[i - 1].date, stat.played[i].date];
+      const [from, to] = [stat.played[i - 1], stat.played[i]];
       // 사이에 세트리스트를 모르는 공연이 있으면 그때 불렀을 수도 있다.
-      if (unknownBetween(context, from, to)) continue;
-      const gap = diffDays(from, to);
-      if (!best || gap > best.gap)
-        best = { from: stat.played[i - 1], to: stat.played[i], gap };
+      if (unknownBetween(context, from.date, to.date)) continue;
+      const item = {
+        stat,
+        from,
+        to,
+        gap: diffDays(from.date, to.date),
+        skipped: knownIndex.get(to.id)! - knownIndex.get(from.id)! - 1,
+      };
+      if (!longest || item.gap > longest.gap) longest = item;
+      if (!most || item.skipped > most.skipped) most = item;
     }
-    return best ? [{ stat, ...best }] : [];
-  });
+    if (longest) byDays.push(longest);
+    if (most && most.skipped > 0) byShows.push(most);
+  }
+  const comebackCells = (item: Comeback, first: StatCell) => [
+    first,
+    unitCell(item.from),
+    unitCell(item.to),
+  ];
+  const comebackNote = (item: Comeback) =>
+    [
+      `${days(item.gap)} · 공연 ${times(item.skipped)} 건너뜀`,
+      aboutYears(item.gap),
+    ]
+      .filter(Boolean)
+      .join(" · ");
 
   // 연속 공연일 — 세트리스트가 있는 공연일을 날짜 순으로 이어 볼 때 연달아 부른 최대 횟수.
   const streaks = played.map((stat) => {
@@ -400,11 +452,14 @@ function songRecords(
 
   const withOpening = known.filter((unit) => unit.openingSongId);
   const withEncore = known.filter((unit) => unit.encoreSongIds?.length);
+  // 비율은 두 가지 — 첫 곡(앵콜)을 아는 공연일 중, 그리고 그 곡을 부른 공연일 중.
+  // 뒤쪽은 많이 불린 곡이 횟수로만 이기지 않게 "불렀다 하면 첫 곡"인 곡을 보여 준다.
   const openings = played
     .map((stat) => ({
       stat,
       count: withOpening.filter((unit) => unit.openingSongId === stat.song.id)
         .length,
+      base: stat.played.filter((unit) => unit.openingSongId).length,
     }))
     .filter((item) => item.count > 0);
   const encores = played
@@ -413,6 +468,7 @@ function songRecords(
       count: withEncore.filter((unit) =>
         unit.encoreSongIds!.includes(stat.song.id),
       ).length,
+      base: stat.played.filter((unit) => unit.encoreSongIds?.length).length,
     }))
     .filter((item) => item.count > 0);
 
@@ -434,18 +490,19 @@ function songRecords(
     {
       id: "song-highest-rate",
       title: "참가율이 가장 높은 곡",
-      description: `발매 후 세트리스트가 있는 공연일 중 부른 비율(그런 공연일이 ${MIN_ELIGIBLE}회 이상인 곡만)`,
+      description:
+        "발매 후 세트리스트가 있는 공연일 중 부른 비율 — 그런 공연일이 적은 곡은 순위를 조금 낮게 보정",
       columns: ["참가율", "횟수", "확인된 첫 라이브", "마지막 라이브"],
       rows: rank(
-        stats.filter((stat) => stat.eligible >= MIN_ELIGIBLE),
-        // 화면의 %(정수)와 같은 단위로 순위를 매긴다 — 같은 %면 같은 순위.
-        (stat) => Math.round(rate(stat) * 100),
+        stats.filter((stat) => stat.eligible > 0),
+        // 보정값을 0.1% 단위로 — 같으면 같은 순위.
+        (stat) => Math.round(rateScore(stat) * 1000),
         "desc",
         (stat) => {
           const [count, pct, first, last] = playCells(stat);
           return songRow(stat.song, [pct, count, first, last], playNote(stat));
         },
-        (a, b) => b.played.length - a.played.length,
+        (a, b) => rate(b) - rate(a) || b.played.length - a.played.length,
       ),
     },
     {
@@ -479,23 +536,41 @@ function songRecords(
     {
       id: "song-comeback",
       title: "가장 오랜 공백 끝에 돌아온 곡",
-      description: "곡마다 연이어 부른 두 공연일 사이가 가장 길었던 때",
-      columns: ["공백", "이전 라이브", "돌아온 공연"],
+      description: "곡마다 연이어 부른 두 공연일 사이가 가장 길었던 때(일수)",
+      columns: ["공백", "건너뛴 공연", "이전 라이브", "돌아온 공연"],
       rows: rank(
-        comebacks,
+        byDays,
         (item) => item.gap,
         "desc",
-        (item) =>
-          songRow(
+        (item) => {
+          const [first, from, to] = comebackCells(item, days(item.gap));
+          return songRow(
             item.stat.song,
-            [days(item.gap), unitCell(item.from), unitCell(item.to)],
-            [
-              aboutYears(item.gap),
-              `${formatDotDate(item.from.date)} → ${formatDotDate(item.to.date)}`,
-            ]
-              .filter(Boolean)
-              .join(" · "),
-          ),
+            [first, times(item.skipped), from, to],
+            comebackNote(item),
+          );
+        },
+      ),
+    },
+    {
+      id: "song-comeback-shows",
+      title: "가장 많은 공연을 건너뛰고 돌아온 곡",
+      description:
+        "곡마다 연이어 부른 두 공연일 사이에 세트리스트가 있는 공연일이 가장 많았던 때",
+      columns: ["건너뛴 공연", "공백", "이전 라이브", "돌아온 공연"],
+      rows: rank(
+        byShows,
+        (item) => item.skipped,
+        "desc",
+        (item) => {
+          const [first, from, to] = comebackCells(item, times(item.skipped));
+          return songRow(
+            item.stat.song,
+            [first, days(item.gap), from, to],
+            comebackNote(item),
+          );
+        },
+        (a, b) => b.gap - a.gap,
       ),
     },
     {
@@ -555,8 +630,8 @@ function songRecords(
     {
       id: "song-opener",
       title: "오프닝 단골 곡",
-      description: `공연 첫 곡으로 가장 많이 부른 곡(첫 곡을 아는 공연일 ${withOpening.length}회 기준)`,
-      columns: ["첫 곡 횟수", "비율"],
+      description: `공연 첫 곡으로 가장 많이 부른 곡(첫 곡을 아는 공연일 ${withOpening.length}회 기준) · "부른 날 중"은 그 곡을 부른 공연일 중 첫 곡이었던 비율`,
+      columns: ["첫 곡 횟수", "비율", "부른 날 중"],
       rows: rank(
         openings,
         (item) => item.count,
@@ -564,16 +639,21 @@ function songRecords(
         (item) =>
           songRow(
             item.stat.song,
-            [times(item.count), percent(item.count, withOpening.length)],
-            `첫 곡을 아는 공연일 ${withOpening.length}회 중 ${percent(item.count, withOpening.length)}`,
+            [
+              times(item.count),
+              percent(item.count, withOpening.length),
+              percent(item.count, item.base),
+            ],
+            `첫 곡을 아는 공연일 ${withOpening.length}회 중 ${percent(item.count, withOpening.length)} · 부른 날 ${item.base}회 중 ${percent(item.count, item.base)}`,
           ),
+        (a, b) => b.count / b.base - a.count / a.base,
       ),
     },
     {
       id: "song-encore",
       title: "앵콜 단골 곡",
-      description: `앵콜로 가장 많이 부른 곡(앵콜이 있었던 공연일 ${withEncore.length}회 기준)`,
-      columns: ["앵콜 횟수", "비율"],
+      description: `앵콜로 가장 많이 부른 곡(앵콜이 있었던 공연일 ${withEncore.length}회 기준) · "부른 날 중"은 그 곡을 부른 공연일 중 앵콜이었던 비율`,
+      columns: ["앵콜 횟수", "비율", "부른 날 중"],
       rows: rank(
         encores,
         (item) => item.count,
@@ -581,9 +661,14 @@ function songRecords(
         (item) =>
           songRow(
             item.stat.song,
-            [times(item.count), percent(item.count, withEncore.length)],
-            `앵콜이 있었던 공연일 ${withEncore.length}회 중 ${percent(item.count, withEncore.length)}`,
+            [
+              times(item.count),
+              percent(item.count, withEncore.length),
+              percent(item.count, item.base),
+            ],
+            `앵콜이 있었던 공연일 ${withEncore.length}회 중 ${percent(item.count, withEncore.length)} · 부른 날 ${item.base}회 중 ${percent(item.count, item.base)}`,
           ),
+        (a, b) => b.count / b.base - a.count / a.base,
       ),
     },
   ];

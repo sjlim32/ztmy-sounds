@@ -1,6 +1,11 @@
 import { describe, expect, test } from "vitest";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
-import { buildStatSections, festivalKey, venueName } from "./compute";
+import {
+  buildStatSections,
+  festivalKey,
+  venueName,
+  wilsonLowerBound,
+} from "./compute";
 import type { StatSong } from "./types";
 
 function unit(
@@ -193,6 +198,7 @@ describe("모르는 구간(세트리스트 없는 공연·공연일 없는 투�
     ]);
     // 이전 라이브도 돌아온 공연처럼 날짜와 공연 이름(화면에서 두 줄로 나눈다).
     expect(rows[0].cells.slice(1)).toEqual([
+      "0회",
       { date: "2021.01.01", label: "live-u2" },
       { date: "2022.07.01", label: "live-u3" },
     ]);
@@ -264,6 +270,71 @@ describe("모르는 구간(세트리스트 없는 공연·공연일 없는 투�
       ["x", 1, "100%"],
       ["y", 2, "97%"],
       ["z", 3, "93%"],
+    ]);
+  });
+});
+
+describe("기록 보정", () => {
+  test("참가율 순위는 공연일이 적은 곡을 낮게 보정한다", () => {
+    expect(wilsonLowerBound(2, 2)).toBeLessThan(wilsonLowerBound(29, 30));
+    expect(wilsonLowerBound(0, 0)).toBe(0);
+    const sections = buildStatSections({
+      units: Array.from({ length: 30 }, (_, i) =>
+        unit(`w${i}`, `2025-01-${String(i + 1).padStart(2, "0")}`, [
+          ...(i < 29 ? ["many"] : []),
+          ...(i >= 28 ? ["new"] : []),
+        ]),
+      ),
+      upcoming: [],
+      // new는 마지막 두 공연일 전날 발매 — 2회 중 2회(100%)
+      songs: [song("many", "2024-01-01"), song("new", "2025-01-29")],
+      albums: [],
+      tours: [],
+    });
+    const rows = record(sections, "song-highest-rate").rows;
+    expect(rows.map((row) => [row.key, row.cells[0]])).toEqual([
+      ["many", "97%"],
+      ["new", "100%"],
+    ]);
+  });
+
+  test("공백은 건너뛴 공연 수로도 잰다", () => {
+    const sections = buildStatSections({
+      units: [
+        unit("s1", "2020-01-01", ["a", "b"]),
+        unit("s2", "2020-01-02", ["b"]),
+        unit("s3", "2020-01-03", ["b"]),
+        unit("s4", "2020-01-04", ["a", "b"]),
+        unit("s5", "2023-01-01", ["b"]),
+        unit("s6", "2025-01-01", ["b"]),
+      ],
+      upcoming: [],
+      songs: [song("a", "2019-01-01"), song("b", "2019-01-01")],
+      albums: [],
+      tours: [],
+    });
+    // 일수로는 b(2023→2025, 731일)가, 공연 수로는 a(사이 2회)가 1위.
+    expect(record(sections, "song-comeback").rows[0].key).toBe("b");
+    const shows = record(sections, "song-comeback-shows").rows;
+    expect(shows.map((row) => [row.key, row.cells[0]])).toEqual([["a", "2회"]]);
+  });
+
+  test("오프닝은 부른 날 중 첫 곡이었던 비율도 보여 준다", () => {
+    const sections = buildStatSections({
+      units: [
+        unit("o1", "2020-01-01", ["a", "b"], { openingSongId: "a" }),
+        unit("o2", "2020-01-02", ["a", "b"], { openingSongId: "b" }),
+        unit("o3", "2020-01-03", ["b"], { openingSongId: "b" }),
+      ],
+      upcoming: [],
+      songs: [song("a", "2019-01-01"), song("b", "2019-01-01")],
+      albums: [],
+      tours: [],
+    });
+    const rows = record(sections, "song-opener").rows;
+    expect(rows.map((row) => [row.key, ...row.cells])).toEqual([
+      ["b", "2회", "67%", "67%"],
+      ["a", "1회", "33%", "50%"],
     ]);
   });
 });
