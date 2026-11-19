@@ -512,3 +512,35 @@ describe("투어 비교", () => {
     expect(cells("live-tour-new")).toEqual(["33%", "2회", "2회"]);
   });
 });
+
+describe("최근 흐름", () => {
+  // 2022년 5회(a만), 2024년 5회(b만) — 마지막 공연일 기준 1년 안이 2024년.
+  const units = [
+    ...Array.from({ length: 5 }, (_, i) =>
+      unit(`q${i}`, `2022-01-0${i + 1}`, ["a"]),
+    ),
+    ...Array.from({ length: 5 }, (_, i) =>
+      unit(`r${i}`, `2024-01-0${i + 1}`, ["b"]),
+    ),
+  ];
+  const sections = buildStatSections({
+    units,
+    upcoming: [],
+    songs: [song("a", "2020-01-01"), song("b", "2020-01-01")],
+    albums: [],
+    tours: [],
+  });
+
+  test("최근 1년과 그 전 참가율 차이", () => {
+    expect(record(sections, "song-rising").rows[0].cells).toEqual([
+      "+100%p",
+      "100%",
+      "0%",
+    ]);
+    expect(record(sections, "song-falling").rows[0].cells).toEqual([
+      "-100%p",
+      "0%",
+      "100%",
+    ]);
+  });
+});

@@ -1,4 +1,4 @@
-import { diffDays, formatDotDate } from "@/lib/ymd";
+import { addDays, diffDays, formatDotDate } from "@/lib/ymd";
 import { splitParenSuffix } from "@/features/zutopia/lives/split-paren-suffix";
 import { isOnlineText, ONLINE_LABEL } from "@/features/zutopia/lives/region";
 import { formatDayShow } from "@/features/zutopia/lives/shows";
@@ -512,6 +512,46 @@ function songRecords(
       .filter(Boolean)
       .join(" · ");
 
+  // 최근 흐름 — 마지막으로 세트리스트를 아는 공연일부터 1년 안(최근)과 그 전(발매
+  // 후)의 참가율을 비교한다. 양쪽 다 공연일이 MIN_TREND_SHOWS회 이상인 곡만.
+  const lastKnown = known.at(-1)?.date;
+  const recentFrom = lastKnown ? addDays(lastKnown, -364) : "";
+  const shifts = played.flatMap((stat) => {
+    const eligible = known.filter((unit) => unit.date >= stat.song.releaseDate);
+    const recent = eligible.filter((unit) => unit.date >= recentFrom);
+    const before = eligible.filter((unit) => unit.date < recentFrom);
+    if (recent.length < MIN_TREND_SHOWS || before.length < MIN_TREND_SHOWS)
+      return [];
+    const ids = new Set(stat.played.map((unit) => unit.id));
+    const count = (units: LiveUnit[]) =>
+      units.filter((unit) => ids.has(unit.id)).length;
+    const [recentPlayed, beforePlayed] = [count(recent), count(before)];
+    const recentRate = recentPlayed / recent.length;
+    const beforeRate = beforePlayed / before.length;
+    return [
+      {
+        stat,
+        recent: recent.length,
+        before: before.length,
+        recentPlayed,
+        beforePlayed,
+        // 화면의 %p(정수)와 같은 단위
+        delta: Math.round(recentRate * 100) - Math.round(beforeRate * 100),
+      },
+    ];
+  });
+  type Shift = (typeof shifts)[number];
+  const shiftRow = (item: Shift) =>
+    songRow(
+      item.stat.song,
+      [
+        `${item.delta > 0 ? "+" : ""}${item.delta}%p`,
+        percent(item.recentPlayed, item.recent),
+        percent(item.beforePlayed, item.before),
+      ],
+      `최근 1년 공연일 ${item.recent}회 중 ${item.recentPlayed}회 · 그 전 ${item.before}회 중 ${item.beforePlayed}회`,
+    );
+
   // 연속 공연일 — 세트리스트가 있는 공연일을 날짜 순으로 이어 볼 때 연달아 부른 최대 횟수.
   const streaks = played.map((stat) => {
     const set = new Set(stat.played.map((unit) => unit.id));
@@ -644,6 +684,34 @@ function songRecords(
               : playNote(stat),
           ),
         (a, b) => b.eligible - a.eligible,
+      ),
+    },
+    {
+      id: "song-rising",
+      title: "최근 1년 사이 부쩍 늘어난 곡",
+      description: `마지막으로 세트리스트를 아는 공연일부터 1년 안의 참가율 − 그 전(발매 후) 참가율(양쪽 다 공연일 ${MIN_TREND_SHOWS}회 이상)`,
+      columns: ["변화", "최근 1년", "그 전"],
+      trendFor: songTrend,
+      rows: rank(
+        shifts.filter((item) => item.delta > 0),
+        (item) => item.delta,
+        "desc",
+        shiftRow,
+        (a, b) => b.recentPlayed - a.recentPlayed,
+      ),
+    },
+    {
+      id: "song-falling",
+      title: "최근 1년 사이 뜸해진 곡",
+      description: `마지막으로 세트리스트를 아는 공연일부터 1년 안의 참가율 − 그 전(발매 후) 참가율(양쪽 다 공연일 ${MIN_TREND_SHOWS}회 이상)`,
+      columns: ["변화", "최근 1년", "그 전"],
+      trendFor: songTrend,
+      rows: rank(
+        shifts.filter((item) => item.delta < 0),
+        (item) => item.delta,
+        "asc",
+        shiftRow,
+        (a, b) => b.beforePlayed - a.beforePlayed,
       ),
     },
     {
@@ -791,6 +859,9 @@ function songRecords(
 }
 
 // ─── 세트리스트 ────────────────────────────────────────────────────────
+
+/** 최근 흐름 기록에 넣는 최소 공연일 수(최근 1년·그 전 각각) */
+const MIN_TREND_SHOWS = 5;
 
 /** 평균 위치 기록에 넣는 최소 횟수 — 몇 번 안 부른 곡은 위치가 우연에 가깝다. */
 const MIN_POSITION_PLAYS = 5;
