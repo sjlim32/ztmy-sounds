@@ -199,7 +199,9 @@ export function SongDbDrawer<T>({
         tabIndex={-1}
         className={cn(
           "pointer-events-auto absolute top-0 right-0 flex h-full w-full flex-col overflow-y-auto bg-black/50 backdrop-blur-md",
-          "tablet:max-w-md pc:max-w-xl",
+          // 화면이 넓어질수록 한 단계씩 넓힌다(512 → 576 → 672px). 순위표가 들어가는
+          // SidePanel보다는 한 단계 좁다 — 세로 한 줄 구성이라 더 넓으면 여백만 는다.
+          "tablet:max-w-lg pc:max-w-xl wide:max-w-2xl",
           "shadow-[-8px_0_32px_rgba(0,0,0,0.6)] transition-transform duration-300 ease-out",
           "focus:outline-none",
           isOpen ? "translate-x-0" : "translate-x-full",

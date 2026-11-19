@@ -69,7 +69,8 @@ export function SidePanel({
         aria-labelledby={titleId}
         className={cn(
           "bg-background flex max-h-[85dvh] w-full flex-col rounded-t-xl border-t border-white/15 shadow-[0_-8px_32px_rgba(0,0,0,0.5)]",
-          "tablet:max-h-none tablet:w-[34rem] pc:w-[40rem] tablet:rounded-none tablet:border-t-0 tablet:border-l",
+          // 순위표처럼 칸이 많은 내용이 들어가 화면이 넓어질수록 한 단계씩 넓힌다(576 → 704 → 832px).
+          "tablet:max-h-none tablet:w-xl pc:w-176 wide:w-208 tablet:rounded-none tablet:border-t-0 tablet:border-l",
           // 모바일은 아래에서, 태블릿 이상은 오른쪽에서 밀려 나온다.
           "transition-transform duration-300 ease-out motion-reduce:transition-none",
           "tablet:starting:translate-x-full tablet:starting:translate-y-0 starting:translate-y-full",
