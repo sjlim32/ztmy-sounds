@@ -544,3 +544,58 @@ describe("최근 흐름", () => {
     ]);
   });
 });
+
+describe("내한·미공개곡·해마다 앨범", () => {
+  const sections = buildStatSections({
+    units: [
+      unit("k1", "2023-03-01", ["a", "u"], { country: "한국" }),
+      unit("k2", "2024-03-01", ["a", "b"], { country: "일본" }),
+      unit("k3", "2024-04-01", ["b"], { country: "한국" }),
+    ],
+    upcoming: [],
+    songs: [song("a", "2020-01-01"), song("b", "2020-01-01")],
+    unreleasedSongs: [song("u", "2099-01-01")],
+    albums: [
+      {
+        id: "A",
+        slug: "A",
+        title: "앨범A",
+        titleKo: "앨범A",
+        cover: null,
+        songIds: ["a"],
+      },
+      {
+        id: "B",
+        slug: "B",
+        title: "앨범B",
+        titleKo: "앨범B",
+        cover: null,
+        songIds: ["b"],
+      },
+    ],
+    tours: [],
+  });
+
+  test("미공개곡은 곡 순위엔 없고 미공개곡 기록에만", () => {
+    expect(
+      record(sections, "song-most-played").rows.map((row) => row.key),
+    ).not.toContain("u");
+    expect(record(sections, "song-unreleased").rows[0].key).toBe("u");
+  });
+
+  test("내한 공연은 한국 공연일만", () => {
+    const rows = record(sections, "place-korea-songs").rows;
+    expect(rows.map((row) => [row.key, row.cells[0], row.cells[1]])).toEqual([
+      ["a", "1회", "50%"],
+      ["b", "1회", "50%"],
+    ]);
+  });
+
+  test("해마다 가장 많이 불린 앨범(최신 해 먼저)", () => {
+    const rows = record(sections, "album-by-year").rows;
+    expect(rows.map((row) => [row.name, ...row.cells])).toEqual([
+      ["2024년", "앨범B", "67%", "2회"],
+      ["2023년", "앨범A", "100%", "1회"],
+    ]);
+  });
+});

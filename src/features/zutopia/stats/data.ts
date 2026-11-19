@@ -8,7 +8,10 @@ import {
   getSongsWithAlbums,
 } from "@/features/zutopia/song-db/data";
 import { getSongCoverSrc } from "@/features/zutopia/song-db/song-album-grouping";
-import { isCountableOriginal } from "@/features/zutopia/song-db/song-metadata";
+import {
+  isCountableOriginal,
+  parseSongMetadata,
+} from "@/features/zutopia/song-db/song-metadata";
 import { buildStatSections, buildStatSummary } from "./compute";
 import type { StatSection, StatSong, StatSummary, StatTour } from "./types";
 
@@ -49,16 +52,24 @@ const getStatInput = cache(async () => {
     );
   }
 
+  const toStatSong = (song: (typeof songs)[number]): StatSong => ({
+    id: song.id,
+    slug: song.slug,
+    title: song.title,
+    titleKo: song.title_ko,
+    releaseDate: song.release_date.slice(0, 10),
+    cover: getSongCoverSrc(song),
+  });
   const statSongs: StatSong[] = songs
     .filter(isCountableOriginal)
-    .map((song) => ({
-      id: song.id,
-      slug: song.slug,
-      title: song.title,
-      titleKo: song.title_ko,
-      releaseDate: song.release_date.slice(0, 10),
-      cover: getSongCoverSrc(song),
-    }));
+    .map(toStatSong);
+  // 미공개곡(원곡만) — 곡 기록 순위엔 안 넣고 "가장 많이 부른 미공개곡"에만.
+  const unreleasedSongs: StatSong[] = songs
+    .filter(
+      (song) =>
+        !song.original_song_id && parseSongMetadata(song.metadata).isUnreleased,
+    )
+    .map(toStatSong);
   const songIds = new Set(statSongs.map((song) => song.id));
 
   const tours: StatTour[] = toursResult.data.map((tour) => ({
@@ -77,6 +88,7 @@ const getStatInput = cache(async () => {
     upcoming: inPersonUnits(history.upcoming),
     canceledTourIds: canceledResult.data.flatMap((row) => row.tour_id ?? []),
     songs: statSongs,
+    unreleasedSongs,
     albums: albums.map((album) => ({
       id: album.id,
       slug: album.slug,

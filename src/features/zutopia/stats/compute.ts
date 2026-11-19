@@ -55,6 +55,8 @@ export function buildStatSections(input: {
    */
   canceledTourIds?: string[];
   songs: StatSong[];
+  /** 미공개곡(원곡) — "가장 많이 부른 미공개곡"에만 쓴다 */
+  unreleasedSongs?: StatSong[];
   albums: StatAlbum[];
   tours: StatTour[];
 }): StatSection[] {
@@ -95,7 +97,13 @@ export function buildStatSections(input: {
     {
       id: "songs",
       title: "곡",
-      records: songRecords(songStats, known, context),
+      records: [
+        ...songRecords(songStats, known, context),
+        ...unreleasedRecords(
+          buildSongStats(input.unreleasedSongs ?? [], known),
+          known,
+        ),
+      ],
     },
     {
       id: "setlists",
@@ -105,7 +113,10 @@ export function buildStatSections(input: {
     {
       id: "albums",
       title: "앨범",
-      records: albumRecords(input.albums, songStats),
+      records: [
+        ...albumRecords(input.albums, songStats),
+        ...albumYearRecords(input.albums, songStats),
+      ],
     },
     {
       id: "lives",
@@ -115,7 +126,10 @@ export function buildStatSections(input: {
     {
       id: "places",
       title: "장소",
-      records: placeRecords(all, context),
+      records: [
+        ...placeRecords(all, context),
+        ...koreaRecords(songStats, known),
+      ],
     },
   ];
   return sections.map((section) => ({
@@ -858,6 +872,37 @@ function songRecords(
   ];
 }
 
+/** 미공개곡 — 발매 전이라 참가율이 없어 횟수만. */
+function unreleasedRecords(stats: SongStat[], known: LiveUnit[]): RawRecord[] {
+  const played = stats.filter((stat) => stat.played.length > 0);
+  return [
+    {
+      id: "song-unreleased",
+      title: "라이브에서 가장 많이 부른 미공개곡",
+      description:
+        "음원으로 아직 나오지 않은 곡을 부른 공연일 수(세트리스트가 있는 공연일 기준)",
+      columns: ["횟수", "확인된 첫 라이브", "마지막 라이브"],
+      trendFor: (key) => {
+        const stat = played.find((item) => item.song.id === key);
+        return stat
+          ? yearlyTrend("해마다 라이브 횟수", known, stat.played)
+          : null;
+      },
+      rows: rank(
+        played,
+        (stat) => stat.played.length,
+        "desc",
+        (stat) =>
+          songRow(stat.song, [
+            times(stat.played.length),
+            unitCell(stat.played[0]),
+            unitCell(stat.played.at(-1)!),
+          ]),
+      ),
+    },
+  ];
+}
+
 // ─── 세트리스트 ────────────────────────────────────────────────────────
 
 /** 최근 흐름 기록에 넣는 최소 공연일 수(최근 1년·그 전 각각) */
@@ -1230,6 +1275,59 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
             note(item),
           ),
       ),
+    },
+  ];
+}
+
+/**
+ * 해마다 가장 많이 불린 앨범 — 그해 세트리스트가 있는 공연일의 곡 라이브 횟수를
+ * 앨범별로 더해, 1위 앨범과 그 비중(그해 앨범 수록곡 라이브 합계 중). 한 곡이
+ * 여러 앨범에 실렸으면 앨범마다 센다. 줄은 최신 해 먼저(순위 = 해 순서).
+ */
+function albumYearRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
+  const years = new Map<string, Map<string, number>>();
+  const albumsBySong = new Map<string, StatAlbum[]>();
+  for (const album of albums)
+    for (const id of album.songIds)
+      albumsBySong.set(id, [...(albumsBySong.get(id) ?? []), album]);
+  for (const stat of stats)
+    for (const unit of stat.played) {
+      const year = unit.date.slice(0, 4);
+      const counts = years.get(year) ?? new Map<string, number>();
+      for (const album of albumsBySong.get(stat.song.id) ?? [])
+        counts.set(album.id, (counts.get(album.id) ?? 0) + 1);
+      years.set(year, counts);
+    }
+  const byId = new Map(albums.map((album) => [album.id, album]));
+  const items = [...years]
+    .flatMap(([year, counts]) => {
+      const sorted = [...counts].sort((a, b) => b[1] - a[1]);
+      if (sorted.length === 0) return [];
+      const total = sorted.reduce((sum, [, count]) => sum + count, 0);
+      const [id, count] = sorted[0];
+      return [{ year, album: byId.get(id)!, count, total }];
+    })
+    .sort((a, b) => b.year.localeCompare(a.year));
+  return [
+    {
+      id: "album-by-year",
+      title: "해마다 가장 많이 불린 앨범",
+      description:
+        "그해 세트리스트가 있는 공연일에 수록곡을 가장 많이 부른 앨범(최신 해 먼저) · 비중은 그해 앨범 수록곡 라이브 합계 중",
+      columns: ["앨범", "비중", "수록곡 라이브"],
+      rows: items.map((item, index) => ({
+        key: item.year,
+        rank: index + 1,
+        name: `${item.year}년`,
+        image: item.album.cover,
+        href: `/zutopia/albums?album=${item.album.slug}`,
+        cells: [
+          item.album.title,
+          percent(item.count, item.total),
+          times(item.count),
+        ],
+        note: `${item.album.title} · 그해 ${percent(item.count, item.total)}`,
+      })),
     },
   ];
 }
@@ -1612,6 +1710,41 @@ function liveRecords(
           cells: [times(units.length), units.map(festivalEdition).join(", ")],
           note: units.map(festivalEdition).join(" · "),
         }),
+      ),
+    },
+  ];
+}
+
+/** 내한 공연(나라 "한국")에서 가장 많이 부른 곡. */
+function koreaRecords(stats: SongStat[], known: LiveUnit[]): RawRecord[] {
+  const korea = known.filter((unit) => unit.country === "한국");
+  const items = stats
+    .map((stat) => ({
+      stat,
+      units: stat.played.filter((unit) => unit.country === "한국"),
+    }))
+    .filter((item) => item.units.length > 0);
+  return [
+    {
+      id: "place-korea-songs",
+      title: "내한 공연에서 가장 많이 부른 곡",
+      description: `세트리스트가 있는 한국 공연일 ${korea.length}회 기준`,
+      columns: ["횟수", "비율", "마지막"],
+      rows: rank(
+        items,
+        (item) => item.units.length,
+        "desc",
+        (item) =>
+          songRow(
+            item.stat.song,
+            [
+              times(item.units.length),
+              percent(item.units.length, korea.length),
+              unitCell(item.units.at(-1)!),
+            ],
+            `한국 공연일 ${korea.length}회 중 ${percent(item.units.length, korea.length)}`,
+          ),
+        (a, b) => byRelease(a.stat, b.stat),
       ),
     },
   ];
