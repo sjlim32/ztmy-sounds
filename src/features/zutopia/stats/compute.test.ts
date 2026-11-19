@@ -433,8 +433,7 @@ describe("세트리스트 구역", () => {
       mainOrder: ["a", "b", "c"],
       encoreOrder: i ? ["e"] : [],
       variations: i === 0 ? [{ songId: "b", name: "acoustic" }] : [],
-      covers:
-        i < 2 ? [{ title: "Neko", titleKo: "고양이", artist: "X" }] : [],
+      covers: i < 2 ? [{ title: "Neko", titleKo: "고양이", artist: "X" }] : [],
     }),
   );
   const sections = buildStatSections({
@@ -475,5 +474,41 @@ describe("세트리스트 구역", () => {
       "Neko",
       "2회",
     ]);
+  });
+});
+
+describe("투어 비교", () => {
+  const tour = {
+    id: "T",
+    slug: "t",
+    title: "T",
+    titleKo: "투어",
+    startDate: "2024-01-01",
+    endDate: "2024-01-03",
+    poster: null,
+  };
+  const sections = buildStatSections({
+    units: [
+      unit("v1", "2024-01-01", ["old", "new", "x"], { tourId: "T" }),
+      unit("v2", "2024-01-02", ["old", "new", "y"], { tourId: "T" }),
+    ],
+    upcoming: [],
+    songs: [
+      song("old", "2010-01-01"),
+      song("new", "2023-12-01"),
+      song("x", "2010-01-01"),
+      song("y", "2010-01-01"),
+    ],
+    albums: [],
+    tours: [tour],
+  });
+
+  test("고정률·바뀐 곡·신곡 비중", () => {
+    const cells = (id: string) => record(sections, id).rows[0].cells;
+    // 공통 2곡 ÷ 평균 3곡
+    expect(cells("live-tour-fixed")).toEqual(["67%", "2곡", "2회"]);
+    expect(cells("live-tour-variety")).toEqual(["2곡", "4곡", "2회"]);
+    // 6곡 중 발매 1년 안 곡(new) 2회
+    expect(cells("live-tour-new")).toEqual(["33%", "2회", "2회"]);
   });
 });

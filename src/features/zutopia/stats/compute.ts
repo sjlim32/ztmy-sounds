@@ -1281,6 +1281,54 @@ function liveRecords(
       reach = { ...reach, to: span.to, label: span.label, href: span.href };
   }
 
+  // 투어 비교 — 세트리스트가 있는 공연일만. 고정률 = 그 투어의 확인된 모든 공연일에
+  // 부른 곡 수 / 공연일 평균 곡 수, 다른 곡 = 투어에서 부른 곡 중 그 공통 곡이 아닌 곡,
+  // 신곡 비중 = 공연일 기준 발매 1년 안(발매 전 선공개 포함) 곡의 비율.
+  const songById = new Map(input.songs.map((song) => [song.id, song]));
+  const tourComparisons = input.tours.flatMap((tour) => {
+    const units = known.filter((unit) => unit.tourId === tour.id);
+    if (units.length === 0) return [];
+    const sets = units.map((unit) => new Set(unit.songIds));
+    const everySong = new Set(units.flatMap((unit) => unit.songIds));
+    const common = [...everySong].filter((id) =>
+      sets.every((set) => set.has(id)),
+    );
+    const average =
+      units.reduce((sum, unit) => sum + unit.songIds.length, 0) / units.length;
+    let plays = 0;
+    let fresh = 0;
+    for (const unit of units)
+      for (const id of unit.songIds) {
+        const song = songById.get(id);
+        if (!song) continue;
+        plays += 1;
+        if (diffDays(song.releaseDate, unit.date) < 365) fresh += 1;
+      }
+    return [
+      {
+        tour,
+        units,
+        common: common.length,
+        distinct: everySong.size,
+        fixed: average > 0 ? common.length / average : 0,
+        plays,
+        fresh,
+      },
+    ];
+  });
+  type TourComparison = (typeof tourComparisons)[number];
+  const tourRow = (item: TourComparison, cells: StatCell[], note: string) => ({
+    key: item.tour.id,
+    name: item.tour.titleKo,
+    sub: `${formatDotDate(item.tour.startDate)} – ${formatDotDate(item.tour.endDate ?? item.tour.startDate)}`,
+    image: item.tour.poster,
+    href: `/zutopia/lives/${item.tour.slug}`,
+    cells,
+    note,
+  });
+  // 고정·다양함은 공연일이 2회 이상 확인된 투어만(하루면 모두 공통 곡이다).
+  const comparable = tourComparisons.filter((item) => item.units.length >= 2);
+
   // 같은 페스티벌 출연 횟수
   const festivals = new Map<string, LiveUnit[]>();
   for (const unit of all) {
@@ -1405,6 +1453,75 @@ function liveRecords(
           ],
           note: aboutYears(item.gap),
         }),
+      ),
+    },
+    {
+      id: "live-tour-fixed",
+      title: "세트리스트가 가장 고정된 투어",
+      description:
+        "세트리스트를 아는 투어 공연일 모두에서 부른 곡 수 ÷ 공연일 평균 곡 수(확인된 공연일 2회 이상)",
+      columns: ["고정률", "공통 곡", "확인된 공연일"],
+      rows: rank(
+        comparable,
+        (item) => Math.round(item.fixed * 100),
+        "desc",
+        (item) =>
+          tourRow(
+            item,
+            [
+              percent(item.fixed, 1),
+              `${item.common}곡`,
+              times(item.units.length),
+            ],
+            `확인된 공연일 ${item.units.length}회 모두 부른 곡 ${item.common}곡`,
+          ),
+        (a, b) => b.units.length - a.units.length,
+      ),
+    },
+    {
+      id: "live-tour-variety",
+      title: "공연일마다 곡이 가장 많이 바뀐 투어",
+      description:
+        "투어에서 부른 곡 중 세트리스트를 아는 공연일 모두에서 부르지는 않은 곡 수(확인된 공연일 2회 이상)",
+      columns: ["바뀐 곡", "투어 전체 곡", "확인된 공연일"],
+      rows: rank(
+        comparable,
+        (item) => item.distinct - item.common,
+        "desc",
+        (item) =>
+          tourRow(
+            item,
+            [
+              `${item.distinct - item.common}곡`,
+              `${item.distinct}곡`,
+              times(item.units.length),
+            ],
+            `투어 전체 ${item.distinct}곡 중 공연일마다 바뀐 곡 ${item.distinct - item.common}곡`,
+          ),
+        (a, b) => b.units.length - a.units.length,
+      ),
+    },
+    {
+      id: "live-tour-new",
+      title: "신곡 비중이 가장 높은 투어",
+      description:
+        "세트리스트를 아는 공연일에 부른 곡 중 그날 기준 발매 1년 안 곡(발매 전 선공개 포함)의 비율",
+      columns: ["신곡 비중", "신곡 횟수", "확인된 공연일"],
+      rows: rank(
+        tourComparisons.filter((item) => item.plays > 0),
+        (item) => Math.round((item.fresh / item.plays) * 100),
+        "desc",
+        (item) =>
+          tourRow(
+            item,
+            [
+              percent(item.fresh, item.plays),
+              times(item.fresh),
+              times(item.units.length),
+            ],
+            `부른 곡 ${times(item.plays)} 중 신곡 ${times(item.fresh)}`,
+          ),
+        (a, b) => b.fresh - a.fresh,
       ),
     },
     {
