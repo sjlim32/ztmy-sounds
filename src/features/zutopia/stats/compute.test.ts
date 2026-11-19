@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
 import {
   buildStatSections,
+  buildStatSummary,
   festivalKey,
   venueName,
   wilsonLowerBound,
@@ -336,5 +337,33 @@ describe("기록 보정", () => {
       ["b", "2회", "67%", "67%"],
       ["a", "1회", "33%", "50%"],
     ]);
+  });
+});
+
+describe("buildStatSummary", () => {
+  test("확보율·부른 곡·해외 공연과, 세트리스트 없는 공연(최신 먼저)", () => {
+    const summary = buildStatSummary({
+      units: [
+        unit("m1", "2020-01-01", ["a"]),
+        unit("m2", "2021-01-01", []),
+        unit("m3", "2022-01-01", ["a"], { country: "한국", city: "서울" }),
+        unit("m4", "2023-01-01", []),
+      ],
+      songs: [song("a", "2019-01-01"), song("b", "2019-01-01")],
+    });
+    expect(
+      summary.items.map((item) => [item.label, item.value, item.note]),
+    ).toEqual([
+      ["현장 공연일", "4회", "2020 – 2023"],
+      ["세트리스트 확보", "50%", "2 / 4회"],
+      ["라이브로 부른 곡", "1곡", "발매곡 2곡 중 50%"],
+      ["해외 공연일", "1회", "1개 나라"],
+    ]);
+    expect(summary.items[1].ratio).toBe(0.5);
+    expect(summary.missing.rows.map((row) => [row.key, row.rank])).toEqual([
+      ["m4", 1],
+      ["m2", 2],
+    ]);
+    expect(summary.missing.total).toBe(2);
   });
 });

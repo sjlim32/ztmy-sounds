@@ -5,14 +5,26 @@ import Link from "next/link";
 import { ThumbImage } from "@/components/ThumbImage";
 import { SidePanel } from "@/components/SidePanel";
 import { cn } from "@/lib/utils";
-import { FOCUS_RING, SOFT_BUTTON_CLASS } from "@/components/button-styles";
+import {
+  FOCUS_RING,
+  LINK_BUTTON_CLASS,
+  SOFT_BUTTON_CLASS,
+} from "@/components/button-styles";
+import { getFeedbackUrl } from "@/lib/feedback";
 import {
   FilterPanel,
   SortFilterBar,
   type SortFilterOption,
 } from "@/features/zutopia/components/SortFilterBar";
 import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
-import type { StatCell, StatRecord, StatRow, StatSection } from "../types";
+import {
+  MISSING_SETLIST_RECORD_ID,
+  type StatCell,
+  type StatRecord,
+  type StatRow,
+  type StatSection,
+  type StatSummary,
+} from "../types";
 
 type SectionFilter = "all" | StatSection["id"];
 
@@ -43,7 +55,13 @@ function loadTables() {
  * 계산돼 내려온다(compute.ts). 창이 닫히며 미끄러지는 동안에도 마지막 기록을
  * 그대로 보여 주려고 연 기록(shown)과 열림 여부(open)를 따로 둔다.
  */
-export function StatsView({ sections }: { sections: StatSection[] }) {
+export function StatsView({
+  sections,
+  summary,
+}: {
+  sections: StatSection[];
+  summary: StatSummary;
+}) {
   const [filter, setFilter] = useState<SectionFilter>("all");
   const [shown, setShown] = useState<StatRecord | null>(null);
   const [open, setOpen] = useState(false);
@@ -62,9 +80,18 @@ export function StatsView({ sections }: { sections: StatSection[] }) {
   const visible = sections.filter(
     (section) => filter === "all" || section.id === filter,
   );
+  const openRecord = (record: StatRecord) => {
+    setShown(record);
+    setOpen(true);
+  };
 
   return (
     <div className="flex flex-col gap-8">
+      <SummaryRow
+        summary={summary}
+        onOpenMissing={() => openRecord(summary.missing)}
+      />
+
       <FilterPanel>
         <SortFilterBar
           label="구역"
@@ -93,10 +120,7 @@ export function StatsView({ sections }: { sections: StatSection[] }) {
                 <li key={record.id} className="min-w-0">
                   <RecordCard
                     record={record}
-                    onOpen={() => {
-                      setShown(record);
-                      setOpen(true);
-                    }}
+                    onOpen={() => openRecord(record)}
                   />
                 </li>
               ))}
@@ -111,9 +135,74 @@ export function StatsView({ sections }: { sections: StatSection[] }) {
         subtitle={shown?.description}
         onClose={() => setOpen(false)}
       >
+        {shown?.id === MISSING_SETLIST_RECORD_ID && (
+          <a
+            href={getFeedbackUrl({ title: "세트리스트 제보" })}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(LINK_BUTTON_CLASS, "mb-3")}
+          >
+            세트리스트 제보하기
+          </a>
+        )}
         {shown && <FullTable key={shown.id} record={shown} />}
       </SidePanel>
     </div>
+  );
+}
+
+/**
+ * 맨 위 요약 줄 — 공연일 수·세트리스트 확보율·라이브로 부른 곡·해외 공연을 타일로.
+ * 확보율 타일엔 얇은 막대(같은 색 계열의 옅은 바탕 위 채움)와, 세트리스트가 없는
+ * 공연 목록을 옆 창으로 여는 버튼을 둔다 — 곡 기록을 얼마나 믿을 수 있는지 보이게.
+ */
+function SummaryRow({
+  summary,
+  onOpenMissing,
+}: {
+  summary: StatSummary;
+  onOpenMissing: () => void;
+}) {
+  return (
+    <ul className="tablet:grid-cols-4 grid grid-cols-2 gap-3">
+      {summary.items.map((item) => (
+        <li
+          key={item.label}
+          className={cn("flex flex-col gap-1 p-4", ZUTOPIA_SURFACE_CLASS)}
+        >
+          <p className="text-sm text-white/60">{item.label}</p>
+          <p className="tablet:text-3xl text-2xl font-semibold text-white tabular-nums">
+            {item.value}
+          </p>
+          {item.ratio != null && (
+            <span
+              role="presentation"
+              className="bg-ztmy-pink/20 mt-1 h-2 overflow-hidden rounded-full"
+            >
+              <span
+                className="bg-ztmy-pink block h-full rounded-full"
+                style={{ width: `${Math.round(item.ratio * 100)}%` }}
+              />
+            </span>
+          )}
+          {item.note && (
+            <p className="text-sm text-white/50 tabular-nums">{item.note}</p>
+          )}
+          {item.ratio != null && summary.missing.total > 0 && (
+            <button
+              type="button"
+              onClick={onOpenMissing}
+              className={cn(
+                "mt-auto self-start rounded-sm pt-1 text-sm text-white/75 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white",
+                FOCUS_RING,
+              )}
+            >
+              비어 있는 공연 {summary.missing.total}개
+            </button>
+          )}
+        </li>
+      ))}
+    </ul>
   );
 }
 

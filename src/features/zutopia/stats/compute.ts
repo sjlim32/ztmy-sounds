@@ -15,8 +15,10 @@ import type {
   StatRow,
   StatSection,
   StatSong,
+  StatSummary,
   StatTour,
 } from "./types";
+import { MISSING_SETLIST_RECORD_ID } from "./types";
 
 /**
  * 통계 페이지 기록 계산(순수 함수 — 빌드 때 한 번, 테스트 대상).
@@ -118,6 +120,62 @@ export function buildStatSections(input: {
       leaderCount: record.rows.filter((row) => row.rank === 1).length,
     })),
   }));
+}
+
+/**
+ * 통계 맨 위 요약 — 공연일 수, 세트리스트 확보율(곡 기록을 얼마나 믿을 수 있는지),
+ * 라이브로 부른 곡 수, 해외 공연 수. 세트리스트가 없는 공연일은 최신 먼저 목록으로
+ * (옆 창에서 보고 제보할 수 있게).
+ */
+export function buildStatSummary(input: {
+  units: LiveUnit[];
+  songs: StatSong[];
+}): StatSummary {
+  const all = [...input.units].sort(byDate);
+  const known = all.filter((unit) => unit.songIds.length > 0);
+  const missing = all.filter((unit) => unit.songIds.length === 0).reverse();
+  const playedIds = new Set(known.flatMap((unit) => unit.songIds));
+  const playedSongs = input.songs.filter((song) => playedIds.has(song.id));
+  const overseas = all.filter(
+    (unit) => !isOnline(unit) && unit.country && unit.country !== "일본",
+  );
+  const years = all.length
+    ? `${all[0].date.slice(0, 4)} – ${all.at(-1)!.date.slice(0, 4)}`
+    : null;
+  return {
+    items: [
+      { label: "현장 공연일", value: times(all.length), note: years },
+      {
+        label: "세트리스트 확보",
+        value: percent(known.length, all.length),
+        note: `${known.length.toLocaleString("ko-KR")} / ${all.length.toLocaleString("ko-KR")}회`,
+        ratio: all.length ? known.length / all.length : 0,
+      },
+      {
+        label: "라이브로 부른 곡",
+        value: `${playedSongs.length}곡`,
+        note: `발매곡 ${input.songs.length}곡 중 ${percent(playedSongs.length, input.songs.length)}`,
+      },
+      {
+        label: "해외 공연일",
+        value: times(overseas.length),
+        note: `${new Set(overseas.map((unit) => unit.country)).size}개 나라`,
+      },
+    ],
+    missing: {
+      id: MISSING_SETLIST_RECORD_ID,
+      title: "세트리스트가 아직 없는 공연",
+      description:
+        "곡 기록에서 빠지는 공연일(최신 먼저) — 세트리스트를 알면 제보해 주세요",
+      columns: ["종류"],
+      rows: missing.map((unit, index) => ({
+        ...unitRow(unit, [ENTRY_TYPE_LABEL[entryTypeOf(unit)]]),
+        rank: index + 1,
+      })),
+      total: missing.length,
+      leaderCount: missing.length ? 1 : 0,
+    },
+  };
 }
 
 /** 카드에 보이는 줄 수(1위 + 2~5위) — 나머지는 "자세히 보기"에서 stats.json으로. */

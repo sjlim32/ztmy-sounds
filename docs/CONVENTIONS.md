@@ -390,6 +390,10 @@ src/
                              # 묶는다. 페이지엔 기록마다 앞 5줄만(previewSections),
                              # 전체 순위표는 /zutopia/stats.json(force-static
                              # route.ts)을 "자세히 보기"에서 받아 SidePanel에.
+                             # 맨 위 요약 줄(buildStatSummary — 공연일·세트리스트
+                             # 확보율·부른 곡·해외 공연)은 같은 입력(getStatInput)으로,
+                             # 세트리스트가 없는 공연 목록은 stats.json의
+                             # MISSING_SETLIST_RECORD_ID 키로 싣고 옆 창에 제보 링크와.
                              # 동점은 같은 순위. LiveUnit의 통계 전용 필드(장소·
                              # 나라·첫 곡·앵콜)는 클라이언트로 넘길 때
                              # toClientUnit으로 뺀다.

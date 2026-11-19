@@ -44,6 +44,25 @@ export interface StatSection {
   records: StatRecord[];
 }
 
+/** 통계 맨 위 요약 줄의 타일 하나 */
+export interface StatSummaryItem {
+  label: string;
+  value: string;
+  /** 값 아래 작은 줄 */
+  note: string | null;
+  /** 0~1 — 있으면 타일 아래 얇은 막대로(세트리스트 확보율) */
+  ratio?: number;
+}
+
+/** 세트리스트가 아직 없는 공연 목록의 기록 id — stats.json에도 이 키로 싣는다. */
+export const MISSING_SETLIST_RECORD_ID = "data-missing-setlist";
+
+/** 통계 맨 위 요약 — 타일들과, 세트리스트가 아직 없는 공연 목록(옆 창으로 연다). */
+export interface StatSummary {
+  items: StatSummaryItem[];
+  missing: StatRecord;
+}
+
 /** 통계에 쓰는 곡 — 원곡·발매곡만(페이지에서 거른다). */
 export interface StatSong {
   id: string;

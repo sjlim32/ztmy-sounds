@@ -9,15 +9,15 @@ import {
 } from "@/features/zutopia/song-db/data";
 import { getSongCoverSrc } from "@/features/zutopia/song-db/song-album-grouping";
 import { isCountableOriginal } from "@/features/zutopia/song-db/song-metadata";
-import { buildStatSections } from "./compute";
-import type { StatSection, StatSong, StatTour } from "./types";
+import { buildStatSections, buildStatSummary } from "./compute";
+import type { StatSection, StatSong, StatSummary, StatTour } from "./types";
 
 /**
- * 통계 페이지 기록(빌드 때 한 번). 곡은 isCountableOriginal — 원곡·발매곡만이고
+ * 통계 계산 입력(빌드 때 한 번) — 기록(getStatSections)과 맨 위 요약(getStatSummary)이 같이 쓴다. 곡은 isCountableOriginal — 원곡·발매곡만이고
  * 협업곡도 뺀다(참전 기록은 들은 협업곡을 넣는 것과 다름). 라이브 기록은 원곡으로
  * 세고, 앨범 수록곡도 어레인지는 원곡으로 바꿔 센다.
  */
-export const getStatSections = cache(async (): Promise<StatSection[]> => {
+const getStatInput = cache(async () => {
   const supabase = createBuildTimeSupabaseClient();
   const [history, songs, albums, toursResult, canceledResult] =
     await Promise.all([
@@ -71,7 +71,7 @@ export const getStatSections = cache(async (): Promise<StatSection[]> => {
     poster: tour.poster_image_url,
   }));
 
-  return buildStatSections({
+  return {
     // 통계는 현장 공연만 — 온라인 공연은 뺀다.
     units: inPersonUnits(history.units),
     upcoming: inPersonUnits(history.upcoming),
@@ -92,5 +92,14 @@ export const getStatSections = cache(async (): Promise<StatSection[]> => {
       ],
     })),
     tours,
-  });
+  };
 });
+
+export const getStatSections = cache(async (): Promise<StatSection[]> =>
+  buildStatSections(await getStatInput()),
+);
+
+/** 통계 맨 위 요약(공연일·세트리스트 확보율 등) — 같은 입력으로. */
+export const getStatSummary = cache(async (): Promise<StatSummary> =>
+  buildStatSummary(await getStatInput()),
+);
