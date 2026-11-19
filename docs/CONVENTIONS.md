@@ -396,7 +396,10 @@ src/
                              # MISSING_SETLIST_RECORD_ID 키로 싣고 옆 창에 제보 링크와.
                              # 전체 순위표는 검색(10줄 이상)·열 정렬(table-sort.ts —
                              # 화면 글자에서 날짜·첫 숫자를 다시 읽고 "–"는 맨 뒤),
-                             # 모바일은 표 대신 줄마다 카드 + 정렬 칩 줄.
+                             # 모바일은 표 대신 줄마다 카드 + 정렬 칩 줄. 기록마다
+                             # 공유 주소 /zutopia/stats#기록id — 옆 창을 열면
+                             # replaceState로 붙이고 닫으면 떼며, 그 주소로 들어오면
+                             # (hashchange 포함) 그 기록 창을 연다. 창 안 ShareButton.
                              # 동점은 같은 순위. LiveUnit의 통계 전용 필드(장소·
                              # 나라·첫 곡·앵콜)는 클라이언트로 넘길 때
                              # toClientUnit으로 뺀다.

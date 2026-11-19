@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ThumbImage } from "@/components/ThumbImage";
 import { SidePanel } from "@/components/SidePanel";
+import { ShareButton } from "@/components/ShareButton";
 import { cn } from "@/lib/utils";
 import {
   ACTIVE_FILTER_CHIP_CLASS,
@@ -91,10 +92,39 @@ export function StatsView({
   const visible = sections.filter(
     (section) => filter === "all" || section.id === filter,
   );
+  // 기록마다 공유 주소(/zutopia/stats#기록id) — 열면 주소에 붙이고 닫으면 뗀다.
+  // replaceState라 뒤로 가기 기록은 쌓이지 않는다.
   const openRecord = (record: StatRecord) => {
     setShown(record);
     setOpen(true);
+    window.history.replaceState(null, "", `#${record.id}`);
   };
+  const closeRecord = () => {
+    setOpen(false);
+    window.history.replaceState(
+      null,
+      "",
+      window.location.pathname + window.location.search,
+    );
+  };
+
+  // 주소에 #기록id가 있으면(공유 링크로 들어왔거나 주소를 고쳤을 때) 그 기록을 연다.
+  useEffect(() => {
+    const records = [
+      ...sections.flatMap((section) => section.records),
+      summary.missing,
+    ];
+    const openFromHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      const record = records.find((item) => item.id === id);
+      if (!record) return;
+      setShown(record);
+      setOpen(true);
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, [sections, summary.missing]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -128,7 +158,12 @@ export function StatsView({
             </h2>
             <ul className="tablet:grid-cols-2 pc:grid-cols-3 grid grid-cols-1 gap-4">
               {section.records.map((record) => (
-                <li key={record.id} className="min-w-0">
+                // id — 공유 주소(#기록id)로 들어오면 그 카드로 스크롤된다(헤더에 가리지 않게 여백).
+                <li
+                  key={record.id}
+                  id={record.id}
+                  className="min-w-0 scroll-mt-24"
+                >
                   <RecordCard
                     record={record}
                     onOpen={() => openRecord(record)}
@@ -144,18 +179,22 @@ export function StatsView({
         open={open}
         title={shown?.title ?? ""}
         subtitle={shown?.description}
-        onClose={() => setOpen(false)}
+        onClose={closeRecord}
       >
-        {shown?.id === MISSING_SETLIST_RECORD_ID && (
-          <a
-            href={getFeedbackUrl({ title: "세트리스트 제보" })}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(LINK_BUTTON_CLASS, "mb-3")}
-          >
-            세트리스트 제보하기
-          </a>
-        )}
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          {shown?.id === MISSING_SETLIST_RECORD_ID && (
+            <a
+              href={getFeedbackUrl({ title: "세트리스트 제보" })}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={LINK_BUTTON_CLASS}
+            >
+              세트리스트 제보하기
+            </a>
+          )}
+          {/* 이 기록 주소(#기록id) 공유 — 복사 안내는 버튼 아래로(창 위쪽에서 잘리지 않게) */}
+          <ShareButton tooltipClassName="top-full bottom-auto left-0 right-auto mt-2 mb-0" />
+        </div>
         {shown && <FullTable key={shown.id} record={shown} />}
       </SidePanel>
     </div>
