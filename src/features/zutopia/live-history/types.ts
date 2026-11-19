@@ -43,11 +43,26 @@ export interface LiveUnit {
   openingSongId?: string | null;
   /** 이날 앵콜로 부른 곡(원곡 id, 중복 없음) */
   encoreSongIds?: string[];
+  /** 본편 곡 순서(원곡 id, 처음 나온 자리만) — 세트리스트 위치·이어 부른 곡 통계 */
+  mainOrder?: string[];
+  /** 앵콜 곡 순서(원곡 id, 처음 나온 자리만) */
+  encoreOrder?: string[];
+  /** 다른 버전으로 부른 곡(note.variation — "short", "acoustic" …) */
+  variations?: { songId: string; name: string }[];
+  /** 곡이 연결되지 않은 커버곡(note.title, 원곡 가수 note.original_artist) */
+  covers?: { title: string; artist: string | null }[];
 }
 
 /** 통계에만 쓰는 공연일 필드 — 클라이언트로 넘길 땐 toClientUnit으로 뺀다. */
 export type StatOnlyUnitField =
-  "venue" | "country" | "openingSongId" | "encoreSongIds";
+  | "venue"
+  | "country"
+  | "openingSongId"
+  | "encoreSongIds"
+  | "mainOrder"
+  | "encoreOrder"
+  | "variations"
+  | "covers";
 
 export interface SongLiveStat {
   count: number;
@@ -100,4 +115,16 @@ export interface RawSetlistRow {
   is_encore?: boolean;
   /** 같은 날 몇 번째 회차(1부터), 비면 그날 모든 회차 */
   show_number?: number | null;
+  /** 세트리스트 메모(variation 등, 통계용) */
+  note?: Json | null;
+}
+
+/** 곡이 연결되지 않은 커버곡 행(통계용) — 나누는 규칙은 RawSetlistRow와 같다. */
+export interface RawCoverRow {
+  live_id: string | null;
+  tour_id: string | null;
+  day_number: number | null;
+  show_number?: number | null;
+  title: string;
+  artist: string | null;
 }

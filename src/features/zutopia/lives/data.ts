@@ -14,6 +14,7 @@ import {
 import { computeLastModified } from "@/features/zutopia/lives/last-modified";
 import { tourDateFilter } from "@/features/zutopia/lives/tour-dates";
 import { splitTourDateByDay } from "@/features/zutopia/lives/live-days";
+import { parseSetlistNote } from "@/features/zutopia/lives/setlist-note";
 import type { Live, LiveDetail, LiveSetlistEntry, TourDetail } from "./types";
 
 /**
@@ -273,19 +274,6 @@ function normalizeSetlistRows(rows: FetchedSetlistRow[]): SetlistRow[] {
       },
     ];
   });
-}
-
-/** setlists.note의 글자 칸 하나(arrange·info·variation) — 없거나 비면 null. */
-function parseSetlistNote(
-  note: Json | null,
-  key:
-    "arrange" | "info" | "variation" | "title" | "title_kr" | "original_artist",
-): string | null {
-  if (!note || typeof note !== "object" || Array.isArray(note)) return null;
-  const value = (note as Record<string, unknown>)[key];
-  if (typeof value !== "string") return null;
-  const text = value.trim();
-  return text.length > 0 ? text : null;
 }
 
 // 본편 먼저, 앙코르 나중, 각각 track_number 오름차순, 동률이면 day_number 오름차순.

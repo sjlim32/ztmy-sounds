@@ -6,7 +6,8 @@ import {
   buildUpcomingUnits,
   buildSongLiveStats,
 } from "./units";
-import type { LiveHistory } from "./types";
+import { parseSetlistNote } from "@/features/zutopia/lives/setlist-note";
+import type { LiveHistory, RawCoverRow } from "./types";
 
 /**
  * 어레인지 버전 곡 id → 원곡 id. 원곡은 키가 없다. 라이브 기록은 원곡 기준으로
@@ -41,7 +42,7 @@ export const getOriginalOf = cache(
  */
 export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
   const supabase = createBuildTimeSupabaseClient();
-  const [livesResult, toursResult, setlistsResult, originalOf] =
+  const [livesResult, toursResult, setlistsResult, coversResult, originalOf] =
     await Promise.all([
       supabase
         .from("lives")
@@ -56,9 +57,15 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
       supabase
         .from("setlists")
         .select(
-          "live_id, tour_id, song_id, day_number, show_number, track_number, is_encore, songs!inner(status)",
+          "live_id, tour_id, song_id, day_number, show_number, track_number, is_encore, note, songs!inner(status)",
         )
         .eq("songs.status", "ACTIVE"),
+      // 곡이 연결되지 않은 커버곡(note.title) — 곡 기록엔 안 넣고 통계의 커버곡 기록에만.
+      supabase
+        .from("setlists")
+        .select("live_id, tour_id, day_number, show_number, note")
+        .is("song_id", null)
+        .not("note", "is", null),
       getOriginalOf(),
     ]);
 
@@ -70,6 +77,11 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
   if (toursResult.error) {
     throw new Error(
       `투어 목록을 가져오지 못했습니다: ${toursResult.error.message}`,
+    );
+  }
+  if (coversResult.error) {
+    throw new Error(
+      `커버곡 세트리스트를 가져오지 못했습니다: ${coversResult.error.message}`,
     );
   }
   if (setlistsResult.error) {
@@ -93,6 +105,7 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
         show_number,
         track_number,
         is_encore,
+        note,
       }) =>
         song_id
           ? [
@@ -104,10 +117,26 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
                 show_number,
                 track_number,
                 is_encore,
+                note,
               },
             ]
           : [],
     ),
+    covers: coversResult.data.flatMap((row): RawCoverRow[] => {
+      const title = parseSetlistNote(row.note, "title");
+      return title
+        ? [
+            {
+              live_id: row.live_id,
+              tour_id: row.tour_id,
+              day_number: row.day_number,
+              show_number: row.show_number,
+              title,
+              artist: parseSetlistNote(row.note, "original_artist"),
+            },
+          ]
+        : [];
+    }),
     originalOf,
   };
   const units = buildLiveUnits(input, today);

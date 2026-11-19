@@ -4,8 +4,10 @@ import {
   isOnlineLive,
 } from "@/features/zutopia/lives/region";
 import { showsForDay } from "@/features/zutopia/lives/shows";
+import { parseSetlistNote } from "@/features/zutopia/lives/setlist-note";
 import type {
   LiveUnit,
+  RawCoverRow,
   RawLive,
   RawSetlistRow,
   RawTour,
@@ -24,6 +26,8 @@ function buildAllUnits(input: {
   tours: RawTour[];
   setlists: RawSetlistRow[];
   originalOf: Record<string, string>;
+  /** 곡이 연결되지 않은 커버곡 행(통계용, 없어도 된다) */
+  covers?: RawCoverRow[];
 }): LiveUnit[] {
   const { lives, tours, setlists, originalOf } = input;
   const toursById = new Map(tours.map((tour) => [tour.id, tour]));
@@ -34,6 +38,12 @@ function buildAllUnits(input: {
   for (const row of setlists) {
     if (row.live_id) push(liveRows, row.live_id, row);
     else if (row.tour_id) push(tourRows, row.tour_id, row);
+  }
+  const tourCovers = new Map<string, RawCoverRow[]>();
+  const liveCovers = new Map<string, RawCoverRow[]>();
+  for (const row of input.covers ?? []) {
+    if (row.live_id) push(liveCovers, row.live_id, row);
+    else if (row.tour_id) push(tourCovers, row.tour_id, row);
   }
 
   const units: LiveUnit[] = [];
@@ -72,21 +82,34 @@ function buildAllUnits(input: {
     };
     // day = null(하루 공연)이면 DAY 번호가 붙은 자기 행도 전부 센다. 회차(show)도
     // 같은 규칙 — show_number가 빈 행은 그날 모든 회차에 부른 곡.
+    const inUnit =
+      (day: number | null, show: number | null) =>
+      (row: Pick<RawSetlistRow, "day_number" | "show_number">) =>
+        (day === null || row.day_number == null || row.day_number === day) &&
+        (show === null || row.show_number == null || row.show_number === show);
     const rowsFor = (day: number | null, show: number | null) => [
       ...common,
-      ...own.filter(
-        (row) =>
-          (day === null || row.day_number == null || row.day_number === day) &&
-          (show === null ||
-            row.show_number == null ||
-            row.show_number === show),
-      ),
+      ...own.filter(inUnit(day, show)),
     ];
+    const coversFor = (day: number | null, show: number | null) => {
+      const rows = [
+        ...(tour ? (tourCovers.get(tour.id) ?? []) : []),
+        ...(liveCovers.get(live.id) ?? []).filter(inUnit(day, show)),
+      ];
+      const seen = new Set<string>();
+      const covers = rows.flatMap((row) =>
+        seen.has(row.title)
+          ? []
+          : (seen.add(row.title), [{ title: row.title, artist: row.artist }]),
+      );
+      return covers.length ? { covers } : {};
+    };
     const unitFields = (day: number | null, show: number | null) => {
       const rows = rowsFor(day, show);
       return {
         songIds: uniqueSongIds(rows, originalOf),
         ...setlistDetails(rows, originalOf),
+        ...coversFor(day, show),
         ...(live.live_venue !== undefined && { venue: live.live_venue }),
         ...(live.country !== undefined && { country: live.country }),
       };
@@ -228,38 +251,71 @@ function uniqueSongIds(
 }
 
 /**
- * 오프닝·앵콜 곡(통계용) — track_number·is_encore가 있는 행에서만. 첫 곡은 앵콜이
- * 아닌 곡 중 순서가 가장 앞선 곡(같으면 투어 공통 행이 먼저). 둘 다 없으면 빈 값.
+ * 오프닝·앵콜·곡 순서·버전(통계용) — track_number·is_encore가 있는 행에서만. 첫
+ * 곡은 앵콜이 아닌 곡 중 순서가 가장 앞선 곡(같으면 투어 공통 행이 먼저). 순서는
+ * 본편·앵콜 따로 track_number 순(같으면 앞 행 먼저), 같은 곡은 처음 나온 자리만.
+ * 순서 정보가 없는 원시 데이터면 빈 값.
  */
 function setlistDetails(
   rows: RawSetlistRow[],
   originalOf: Record<string, string>,
-): Pick<LiveUnit, "openingSongId" | "encoreSongIds"> {
+): Pick<
+  LiveUnit,
+  "openingSongId" | "encoreSongIds" | "mainOrder" | "encoreOrder" | "variations"
+> {
   if (!rows.some((row) => row.track_number !== undefined)) return {};
   const original = (row: RawSetlistRow) =>
     originalOf[row.song_id] ?? row.song_id;
-  let opening: RawSetlistRow | null = null;
-  for (const row of rows) {
-    if (row.is_encore || row.track_number === undefined) continue;
-    if (!opening || row.track_number < opening.track_number!) opening = row;
-  }
+  const ordered = (encore: boolean) => [
+    ...new Set(
+      rows
+        .map((row, index) => ({ row, index }))
+        .filter(
+          ({ row }) => !!row.is_encore === encore && row.track_number != null,
+        )
+        .sort(
+          (a, b) =>
+            a.row.track_number! - b.row.track_number! || a.index - b.index,
+        )
+        .map(({ row }) => original(row)),
+    ),
+  ];
+  const mainOrder = ordered(false);
+  const variations = rows.flatMap((row) => {
+    const name = parseSetlistNote(row.note, "variation");
+    return name ? [{ songId: original(row), name }] : [];
+  });
   return {
-    openingSongId: opening ? original(opening) : null,
+    openingSongId: mainOrder[0] ?? null,
     encoreSongIds: [
       ...new Set(rows.filter((row) => row.is_encore).map(original)),
     ],
+    mainOrder,
+    encoreOrder: ordered(true),
+    ...(variations.length > 0 && { variations }),
   };
 }
 
 /**
  * 클라이언트 컴포넌트(참전 기록 등)로 넘길 공연일 — 통계 전용 필드(장소·나라·첫 곡·
- * 앵콜)를 빼서 페이지 데이터를 줄인다.
+ * 앵콜·곡 순서·버전·커버곡)를 빼서 페이지 데이터를 줄인다.
  */
 export function toClientUnit(
   unit: LiveUnit,
 ): Omit<LiveUnit, StatOnlyUnitField> {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- 빼려고 꺼낸다
-  const { venue, country, openingSongId, encoreSongIds, ...rest } = unit;
+  /* eslint-disable @typescript-eslint/no-unused-vars -- 빼려고 꺼낸다 */
+  const {
+    venue,
+    country,
+    openingSongId,
+    encoreSongIds,
+    mainOrder,
+    encoreOrder,
+    variations,
+    covers,
+    ...rest
+  } = unit;
+  /* eslint-enable @typescript-eslint/no-unused-vars */
   return rest;
 }
 

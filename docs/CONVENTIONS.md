@@ -404,8 +404,10 @@ src/
                              # trendFor(1위 key)로 1위 하나만 계산 — 분홍 한 색, 빈 해는
                              # 바닥선, 가리키면 그 해 값, 화면 읽기용 목록(sr-only).
                              # 동점은 같은 순위. LiveUnit의 통계 전용 필드(장소·
-                             # 나라·첫 곡·앵콜)는 클라이언트로 넘길 때
-                             # toClientUnit으로 뺀다.
+                             # 나라·첫 곡·앵콜·본편/앵콜 곡 순서·버전(note.variation)·
+                             # 커버곡(곡 없는 행의 note.title, 따로 조회))는
+                             # 클라이언트로 넘길 때 toClientUnit으로 뺀다. 세트리스트
+                             # 메모 읽기는 lives/setlist-note.ts parseSetlistNote 하나.
       search/               # 첫 화면(/zutopia) 통합 검색. data.ts가 빌드 때 곡·
                              # 앨범·공연 + 곡별 세트리스트 연결(공연일은 투어로
                              # 묶음)로 인덱스를 만들고, search.ts가 브라우저에서

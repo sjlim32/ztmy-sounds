@@ -341,6 +341,70 @@ describe("오프닝·앵콜 곡(통계용)", () => {
     expect(unit.venue).toBe("Zepp");
   });
 
+  test("본편·앵콜 곡 순서(처음 나온 자리만), 버전, 커버곡", () => {
+    const rows: RawSetlistRow[] = [
+      { ...row("c", { tour_id: "T" }), track_number: 3, is_encore: false },
+      { ...row("a", { live_id: "L" }), track_number: 1, is_encore: false },
+      {
+        ...row("b", { live_id: "L" }),
+        track_number: 2,
+        is_encore: false,
+        note: { variation: "acoustic" },
+      },
+      { ...row("a", { live_id: "L" }), track_number: 4, is_encore: false },
+      { ...row("e", { live_id: "L" }), track_number: 6, is_encore: true },
+      { ...row("d", { live_id: "L" }), track_number: 5, is_encore: true },
+    ];
+    const [unit] = buildLiveUnits(
+      {
+        lives: [live({ id: "L", tour_id: "T" })],
+        tours: [
+          {
+            id: "T",
+            slug: "t",
+            title: "T",
+            title_ko: "T",
+            poster_image_url: null,
+          },
+        ],
+        setlists: rows,
+        originalOf: {},
+        covers: [
+          {
+            live_id: "L",
+            tour_id: null,
+            day_number: null,
+            title: "X",
+            artist: "Y",
+          },
+          {
+            live_id: null,
+            tour_id: "T",
+            day_number: null,
+            title: "X",
+            artist: "Y",
+          },
+          {
+            live_id: "L",
+            tour_id: null,
+            day_number: 2,
+            title: "Z",
+            artist: null,
+          },
+        ],
+      },
+      TODAY,
+    );
+    expect(unit.mainOrder).toEqual(["a", "b", "c"]);
+    expect(unit.encoreOrder).toEqual(["d", "e"]);
+    expect(unit.variations).toEqual([{ songId: "b", name: "acoustic" }]);
+    // 투어 공통·공연일 양쪽의 같은 커버곡은 한 번, 다른 날(day 2) 커버곡은 하루 공연이라 함께.
+    expect(unit.covers).toEqual([
+      { title: "X", artist: "Y" },
+      { title: "Z", artist: null },
+    ]);
+  });
+
   test("순서 정보가 없는 원시 데이터면 필드를 만들지 않는다", () => {
     const [unit] = build([live({ id: "L" })], [row("a", { live_id: "L" })]);
     expect(unit.openingSongId).toBeUndefined();
