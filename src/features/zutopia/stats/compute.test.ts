@@ -457,11 +457,37 @@ describe("세트리스트 구역", () => {
     expect(keys("setlist-late")[0]).toEqual(["c", "100% 지점"]);
   });
 
-  test("이어 부른 두 곡은 본편 안에서만(앵콜 첫 곡과 잇지 않는다)", () => {
+  test("이어 부른 두 곡은 본편 안에서만(앵콜 첫 곡과 잇지 않는다), 투어·공연 수로", () => {
     expect(keys("setlist-pairs")).toEqual([
-      ["a>b", "5회"],
-      ["b>c", "5회"],
+      ["a>b", "5곳"],
+      ["b>c", "5곳"],
     ]);
+  });
+
+  test("한 투어에서만 이어 부른 두 곡은 하나로 친다", () => {
+    const tourSections = buildStatSections({
+      units: [
+        ...Array.from({ length: 4 }, (_, i) =>
+          unit(`t${i}`, `2024-02-0${i + 1}`, ["a", "b"], {
+            tourId: "T",
+            mainOrder: ["a", "b"],
+          }),
+        ),
+        unit("x1", "2024-03-01", ["c", "d"], { mainOrder: ["c", "d"] }),
+        unit("x2", "2024-04-01", ["c", "d"], { mainOrder: ["c", "d"] }),
+      ],
+      upcoming: [],
+      songs: ["a", "b", "c", "d"].map((id) => song(id, "2020-01-01")),
+      albums: [],
+      tours: [],
+    });
+    // a→b는 공연일 4회지만 한 투어라 1곳(2곳 미만이라 빠짐), c→d는 공연 2곳.
+    expect(
+      record(tourSections, "setlist-pairs").rows.map((row) => [
+        row.key,
+        ...row.cells,
+      ]),
+    ).toEqual([["c>d", "2곳", "2회", "100%"]]);
   });
 
   test("다른 버전·커버곡(한글 제목, 원제는 아래 줄)", () => {
@@ -581,11 +607,38 @@ describe("내한·미공개곡·해마다 앨범", () => {
     expect(record(sections, "song-unreleased").rows[0].key).toBe("u");
   });
 
-  test("내한 공연은 한국 공연일만", () => {
-    const rows = record(sections, "place-korea-songs").rows;
-    expect(rows.map((row) => [row.key, row.cells[0], row.cells[1]])).toEqual([
-      ["a", "1회", "50%"],
-      ["b", "1회", "50%"],
+  test("내한 공연에서 유독 자주 부른 곡 — 내한 참가율 − 그 밖 참가율(한국 3회 이상)", () => {
+    const korea = buildStatSections({
+      units: [
+        ...Array.from({ length: 3 }, (_, i) =>
+          unit(`k${i}`, `2024-0${i + 1}-01`, ["h", "x"], { country: "한국" }),
+        ),
+        ...Array.from({ length: 4 }, (_, i) =>
+          unit(`j${i}`, `2024-0${i + 5}-01`, i === 0 ? ["h", "x"] : ["x"], {
+            country: "일본",
+          }),
+        ),
+      ],
+      upcoming: [],
+      songs: [song("h", "2020-01-01"), song("x", "2020-01-01")],
+      albums: [],
+      tours: [],
+    });
+    // h: 내한 3/3(100%) − 그 밖 1/4(25%) = +75%p. x는 어디서나 100%라 빠진다.
+    expect(
+      record(korea, "place-korea-songs").rows.map((row) => [
+        row.key,
+        ...row.cells,
+      ]),
+    ).toEqual([["h", "+75%p", "100%", "25%"]]);
+  });
+
+  test("수록곡 평균 참가율로 앨범을 가른다", () => {
+    const rows = record(sections, "album-rate").rows;
+    // a·b 모두 세트리스트를 아는 3회 중 2회 — 같은 평균 참가율이면 같은 순위.
+    expect(rows.map((row) => [row.key, row.rank, row.cells[0]])).toEqual([
+      ["A", 1, "67%"],
+      ["B", 1, "67%"],
     ]);
   });
 

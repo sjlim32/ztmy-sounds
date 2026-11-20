@@ -192,14 +192,14 @@ export function StatsView({
               </span>
               <span aria-hidden className="h-px flex-1 bg-white/15" />
             </h2>
-            {/* 다단으로 쌓는다 — 카드마다 제 높이(그래프 유무로 한 줄 높이가 벌어지지 않게) */}
-            <ul className="tablet:columns-2 pc:columns-3 columns-1 gap-4">
+            {/* 격자 — 모든 줄을 같은 높이로(auto-rows-fr), 카드 안은 고정 틀(RecordCard) */}
+            <ul className="tablet:grid-cols-2 pc:grid-cols-3 grid auto-rows-fr grid-cols-1 gap-4">
               {section.records.map((record) => (
                 // id — 공유 주소(#기록id)로 들어오면 그 카드로 스크롤된다(헤더에 가리지 않게 여백).
                 <li
                   key={record.id}
                   id={record.id}
-                  className="mb-4 min-w-0 scroll-mt-24 break-inside-avoid"
+                  className="min-w-0 scroll-mt-24"
                 >
                   <RecordCard
                     record={record}
@@ -233,6 +233,12 @@ export function StatsView({
           {/* 이 기록 주소(#기록id) 공유 — 복사 안내는 버튼 아래로(창 위쪽에서 잘리지 않게) */}
           <ShareButton tooltipClassName="top-full bottom-auto left-0 right-auto mt-2 mb-0" />
         </div>
+        {/* 1위의 연도별 흐름 — 카드 높이를 흔들지 않게 카드 대신 여기에 */}
+        {shown?.trend && shown.rows[0] && (
+          <div className="mb-4 rounded-lg border border-white/10 p-3">
+            <TrendBars trend={shown.trend} subject={shown.rows[0].name} />
+          </div>
+        )}
         {shown && <FullTable key={shown.id} record={shown} />}
       </SidePanel>
     </div>
@@ -295,10 +301,10 @@ function SummaryRow({
 }
 
 /**
- * 기록 카드 — 위에서부터 제목·짧은 설명(자세한 기준은 옆 창), 1위(그림·이름·대표
- * 값·설명), 연도별 흐름(있는 기록만), 2~5위, 맨 아래 "전체 순위 보기" 줄. 카드는
- * 다단(columns)으로 쌓아 저마다 제 높이를 가진다 — 그래프 있는 카드와 없는 카드가
- * 한 줄에 놓여 빈칸이 생기지 않게. 돋보이는 건 1위 대표 값 하나(크고 굵은 숫자).
+ * 기록 카드 — 모든 카드가 같은 틀이라 한 줄에 놓여도 높이가 같다: 제목·짧은 설명(각
+ * 한 줄), 1위(그림·이름 두 줄 자리·아래 줄·대표 값·설명 한 줄), 2~5위(늘 네 줄
+ * 자리 — 모자라면 빈 줄), 맨 아래 "전체 순위 보기" 줄. 넘치는 글자는 말줄임하고
+ * 전체는 title·옆 창에서. 연도별 흐름 그래프는 옆 창 위쪽에 둔다(카드엔 없음).
  */
 function RecordCard({
   record,
@@ -311,17 +317,27 @@ function RecordCard({
   const coLeaders = record.leaderCount;
   const runnersUp = rest.slice(0, RUNNER_UP_COUNT);
   const scale = record.bars === false ? null : runnerUpScale(leader, runnersUp);
+  const emptySlots = RUNNER_UP_COUNT - runnersUp.length;
 
   return (
     <article
-      className={cn("flex flex-col overflow-hidden", ZUTOPIA_SURFACE_CLASS)}
+      className={cn(
+        "flex h-full flex-col overflow-hidden",
+        ZUTOPIA_SURFACE_CLASS,
+      )}
     >
-      <div className={cn("flex flex-col gap-4 p-4", "tablet:p-5")}>
-        <header className="flex flex-col gap-1">
-          <h3 className="tablet:text-lg text-base leading-snug font-semibold text-white">
+      <div className={cn("flex flex-1 flex-col gap-4 p-4", "tablet:p-5")}>
+        <header className="flex min-w-0 flex-col gap-1">
+          <h3
+            className="tablet:text-lg truncate text-base leading-snug font-semibold text-white"
+            title={record.title}
+          >
             {record.title}
           </h3>
-          <p className="text-sm break-keep text-white/55">
+          <p
+            className="truncate text-sm text-white/55"
+            title={record.description}
+          >
             {record.description}
           </p>
         </header>
@@ -329,75 +345,92 @@ function RecordCard({
         {leader ? (
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
-              {leader.image && (
+              {leader.image ? (
                 <ThumbImage
                   src={leader.image}
                   displayWidth={64}
                   className="size-14 shrink-0 rounded-md bg-black/40 object-cover"
                 />
+              ) : (
+                // 그림이 없어도 같은 자리를 차지해 이름 줄 높이가 같다.
+                <span
+                  aria-hidden
+                  className="size-14 shrink-0 rounded-md bg-white/[0.04]"
+                />
               )}
               <div className="min-w-0 flex-1">
-                {/* 1위 이름은 두 줄까지(공연·투어 이름이 길다), 넘치면 title로 전체 이름 */}
+                {/* 이름은 두 줄 자리(짧아도 비워 둔다), 넘치면 말줄임 + title로 전체 */}
                 <RowName
                   row={leader}
-                  className="line-clamp-2 text-base leading-snug font-bold break-keep whitespace-normal text-white"
+                  className="line-clamp-2 min-h-[2lh] text-base leading-snug font-bold break-keep whitespace-normal text-white"
                 />
-                {(leader.sub || coLeaders > 1) && (
-                  <p className="truncate text-sm text-white/55">
-                    {coLeaders > 1 && (
-                      <span className="text-ztmy-pink">
-                        공동 1위 {coLeaders}
-                        {leader.sub && " "}
-                      </span>
-                    )}
-                    {leader.sub}
-                  </p>
-                )}
+                <p className="min-h-[1lh] truncate text-sm text-white/55">
+                  {coLeaders > 1 && (
+                    <span className="text-ztmy-pink">
+                      공동 1위 {coLeaders}
+                      {leader.sub && " "}
+                    </span>
+                  )}
+                  {leader.sub}
+                </p>
               </div>
             </div>
             <Figure cell={leader.cells[0]} />
-            {leader.note && (
-              <p className="text-sm break-keep text-white/60">{leader.note}</p>
-            )}
+            <p
+              className="min-h-[1lh] truncate text-sm text-white/60"
+              title={leader.note ?? undefined}
+            >
+              {leader.note}
+            </p>
           </div>
         ) : (
           <p className="text-sm text-white/55">아직 기록이 없어요.</p>
         )}
 
-        {record.trend && <TrendBars trend={record.trend} />}
-
-        {runnersUp.length > 0 && (
-          <ol className="flex flex-col gap-2 border-t border-white/10 pt-3">
-            {runnersUp.map((row, index) => (
-              <li key={row.key} className="flex flex-col gap-1 text-sm">
-                <span className="flex items-baseline gap-3">
-                  <span className="w-5 shrink-0 text-right text-white/55 tabular-nums">
-                    {row.rank}
-                  </span>
-                  <RowName row={row} className="flex-1 text-white/85" />
-                  <span className="shrink-0 font-medium text-white tabular-nums">
-                    <CellText cell={row.cells[0]} />
-                  </span>
+        <ol className="flex flex-col gap-2 border-t border-white/10 pt-3">
+          {runnersUp.map((row, index) => (
+            <li key={row.key} className="flex flex-col gap-1 text-sm">
+              <span className="flex items-baseline gap-3">
+                <span className="w-5 shrink-0 text-right text-white/55 tabular-nums">
+                  {row.rank}
                 </span>
-                {/* 1위 대비 비율 — 값이 큰 순서인 기록만(적은 순 기록은 막대를 두지 않는다) */}
+                <RowName row={row} className="flex-1 text-white/85" />
+                <span className="max-w-[45%] shrink-0 truncate font-medium text-white tabular-nums">
+                  <CellText cell={row.cells[0]} />
+                </span>
+              </span>
+              {/* 1위 대비 비율 — 값이 큰 순서인 기록만. 막대가 없어도 같은 높이를 둔다. */}
+              <span
+                aria-hidden
+                className={cn(
+                  "ml-8 h-1 overflow-hidden rounded-full",
+                  scale && "bg-white/[0.06]",
+                )}
+              >
                 {scale && (
                   <span
-                    aria-hidden
-                    className="ml-8 h-1 overflow-hidden rounded-full bg-white/[0.06]"
-                  >
-                    <span
-                      className="bg-ztmy-pink/70 block h-full rounded-full"
-                      style={{ width: `${scale[index] * 100}%` }}
-                    />
-                  </span>
+                    className="bg-ztmy-pink/70 block h-full rounded-full"
+                    style={{ width: `${scale[index] * 100}%` }}
+                  />
                 )}
-              </li>
-            ))}
-          </ol>
-        )}
+              </span>
+            </li>
+          ))}
+          {/* 2~5위가 모자라면 빈 줄로 자리를 채운다(카드 높이를 맞추려고) */}
+          {Array.from({ length: emptySlots }, (_, index) => (
+            <li
+              key={`empty-${index}`}
+              aria-hidden
+              className="flex flex-col gap-1 text-sm"
+            >
+              <span className="invisible">–</span>
+              <span className="h-1" />
+            </li>
+          ))}
+        </ol>
       </div>
 
-      {record.total > 1 && (
+      {record.total > 0 ? (
         <button
           type="button"
           onClick={onOpen}
@@ -416,6 +449,16 @@ function RecordCard({
             <ChevronLeftIcon className="size-3.5 rotate-180" />
           </span>
         </button>
+      ) : (
+        // 기록이 없어도 같은 높이의 맨 아래 줄
+        <p
+          className={cn(
+            "border-t border-white/10 px-4 py-3 text-sm text-white/40",
+            "tablet:px-5",
+          )}
+        >
+          순위 없음
+        </p>
       )}
     </article>
   );
@@ -478,12 +521,19 @@ function Figure({ cell }: { cell: StatCell }) {
 }
 
 /**
- * 1위의 연도별 미니 막대 — 한 가지 색(분홍) 세로 막대, 막대 사이 2px, 위 끝만
+ * 1위의 연도별 미니 막대(전체 순위 창 위쪽) — 한 가지 색(분홍) 세로 막대, 막대 사이 2px, 위 끝만
  * 둥글게. 위 줄엔 평소 가장 많았던 해를, 막대에 마우스를 올리거나 누르면
  * 그 해 값을 보여 준다. 가로축은 첫 해·마지막 해만 글자로. 화면 읽기 프로그램엔
  * 해마다 값을 목록으로 읽어 준다(sr-only).
  */
-function TrendBars({ trend }: { trend: StatTrend }) {
+function TrendBars({
+  trend,
+  subject,
+}: {
+  trend: StatTrend;
+  /** 무엇의 흐름인지(1위 이름) — 그래프 이름 앞에 */
+  subject: string;
+}) {
   const [active, setActive] = useState<number | null>(null);
   const max = Math.max(1, ...trend.points.map((point) => point.value));
   if (trend.points.length < 2) return null;
@@ -501,8 +551,10 @@ function TrendBars({ trend }: { trend: StatTrend }) {
   return (
     <figure className="flex flex-col gap-1.5">
       <figcaption className="flex items-baseline justify-between gap-2 text-sm">
-        <span className="text-white/55">{trend.label}</span>
-        <span aria-hidden className="text-white/80 tabular-nums">
+        <span className="min-w-0 truncate text-white/55">
+          1위 {subject} · {trend.label}
+        </span>
+        <span aria-hidden className="shrink-0 text-white/80 tabular-nums">
           {focus.label}년 {focus.value.toLocaleString("ko-KR")}
           {trend.unit}
         </span>

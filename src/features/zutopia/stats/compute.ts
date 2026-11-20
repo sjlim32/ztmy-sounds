@@ -136,10 +136,7 @@ export function buildStatSections(input: {
     {
       id: "places",
       title: "장소",
-      records: [
-        ...placeRecords(all, context),
-        ...koreaRecords(songStats, known),
-      ],
+      records: [...placeRecords(all, context), ...koreaRecords(songStats)],
     },
   ];
   return sections.map((section) => ({
@@ -1090,9 +1087,11 @@ function setlistRecords(
     );
 
   // 이어 부른 두 곡 — 본편·앵콜 안에서 바로 다음 곡(앵콜 첫 곡은 본편 마지막과 잇지 않는다).
+  // 순위는 이어 부른 투어·공연(투어면 투어 하나, 아니면 공연 하나) 수로 — 공연일 수로
+  // 세면 세트리스트가 고정된 투어 하나의 곡 쌍이 전부 같은 횟수로 1위를 덮는다.
   const pairs = new Map<
     string,
-    { from: SongStat; to: SongStat; count: number }
+    { from: SongStat; to: SongStat; count: number; groups: Set<string> }
   >();
   for (const unit of ordered) {
     for (const order of [unit.mainOrder!, unit.encoreOrder ?? []]) {
@@ -1100,8 +1099,14 @@ function setlistRecords(
         const [from, to] = [statById.get(order[i - 1]), statById.get(order[i])];
         if (!from || !to) continue;
         const key = `${from.song.id}>${to.song.id}`;
-        const pair = pairs.get(key) ?? { from, to, count: 0 };
+        const pair = pairs.get(key) ?? {
+          from,
+          to,
+          count: 0,
+          groups: new Set<string>(),
+        };
         pair.count += 1;
+        pair.groups.add(unit.tourId ?? unit.liveId);
         pairs.set(key, pair);
       }
     }
@@ -1189,27 +1194,33 @@ function setlistRecords(
     {
       id: "setlist-pairs",
       title: "가장 자주 이어 부른 두 곡",
-      description: "바로 이어 부른 횟수",
+      description: "여러 투어·공연에 걸쳐 바로 이어 부른 두 곡",
       detail:
-        '본편·앵콜 안에서 바로 이어 부른 횟수(2회 이상) · "앞 곡 부른 날 중"은 앞 곡을 부른 공연일 중 이어진 비율',
-      columns: ["횟수", "앞 곡 부른 날 중"],
+        '본편·앵콜 안에서 바로 이어 부른 투어·공연 수(투어는 하나로, 2곳 이상) · "앞 곡 부른 날 중"은 앞 곡을 부른 공연일 중 이어진 비율',
+      columns: ["투어·공연", "공연일", "앞 곡 부른 날 중"],
       rows: rank(
-        [...pairs.values()].filter((pair) => pair.count >= 2),
-        (pair) => pair.count,
+        [...pairs.values()].filter((pair) => pair.groups.size >= 2),
+        (pair) => pair.groups.size,
         "desc",
         (pair) => {
-          const base = pair.from.played.filter(
-            (unit) => unit.mainOrder?.length,
+          const inOrdered = new Set(ordered.map((unit) => unit.id));
+          const base = pair.from.played.filter((unit) =>
+            inOrdered.has(unit.id),
           ).length;
           return {
             key: `${pair.from.song.id}>${pair.to.song.id}`,
             name: `${songName(pair.from.song)} → ${songName(pair.to.song)}`,
             image: pair.from.song.cover,
             href: `/zutopia/songs?song=${pair.from.song.slug}`,
-            cells: [times(pair.count), percent(pair.count, base)],
-            note: `「${songName(pair.from.song)}」 부른 날 ${base}회 중 ${percent(pair.count, base)}`,
+            cells: [
+              `${pair.groups.size}곳`,
+              times(pair.count),
+              percent(pair.count, base),
+            ],
+            note: `투어·공연 ${pair.groups.size}곳 · 「${songName(pair.from.song)}」 부른 날 ${base}회 중 ${percent(pair.count, base)}`,
           };
         },
+        (a, b) => b.count - a.count,
       ),
     },
     {
@@ -1274,11 +1285,20 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
   const items = albums
     .map((album) => {
       const songs = album.songIds.flatMap((id) => bySong.get(id) ?? []);
+      // 수록곡 평균 참가율 — 발매 후 공연일이 있는 수록곡만(신곡은 아직 셀 수 없다).
+      const rated = songs.filter((stat) => stat.eligible > 0);
       return {
         album,
         total: songs.reduce((sum, stat) => sum + stat.played.length, 0),
         songCount: songs.length,
         playedCount: songs.filter((stat) => stat.played.length > 0).length,
+        averageRate: rated.length
+          ? rated.reduce(
+              (sum, stat) => sum + stat.playedSinceRelease / stat.eligible,
+              0,
+            ) / rated.length
+          : null,
+        ratedCount: rated.length,
       };
     })
     .filter((item) => item.songCount > 0);
@@ -1321,43 +1341,33 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
       title: "라이브에서 가장 많이 불린 앨범",
       description: "수록곡 라이브 횟수 합계",
       detail: "수록곡 라이브 횟수 합계(세트리스트가 있는 공연일 기준)",
-      columns: ["합계", "라이브된 수록곡", "비율"],
+      columns: ["합계", "라이브된 수록곡"],
       rows: rank(
         items,
         (item) => item.total,
         "desc",
-        (item) =>
-          row(
-            item,
-            [
-              times(item.total),
-              coverage(item),
-              percent(item.playedCount, item.songCount),
-            ],
-            note(item),
-          ),
+        (item) => row(item, [times(item.total), coverage(item)], note(item)),
       ),
     },
     {
-      id: "album-coverage",
+      // 한 번이라도 부른 수록곡 비율은 거의 모든 앨범이 100%라 가르지 못해서, 수록곡이
+      // 공연마다 얼마나 자주 나오는지(평균 참가율)로 잰다.
+      id: "album-rate",
       trendFor: albumTrend,
-      title: "수록곡이 가장 고르게 불린 앨범",
-      description: "라이브에서 부른 수록곡 비율",
-      detail: "수록곡 중 한 번이라도 라이브에서 부른 곡의 비율",
-      columns: ["비율", "라이브된 수록곡", "합계"],
+      title: "수록곡이 가장 자주 불리는 앨범",
+      description: "수록곡 평균 참가율",
+      detail:
+        "수록곡마다 발매 후 세트리스트가 있는 공연일 중 부른 비율의 평균(발매 후 공연일이 아직 없는 곡은 빠짐)",
+      columns: ["평균 참가율", "라이브된 수록곡", "합계"],
       rows: rank(
-        items,
-        (item) => Math.round((item.playedCount / item.songCount) * 100),
+        items.filter((item) => item.averageRate != null),
+        (item) => Math.round(item.averageRate! * 1000),
         "desc",
         (item) =>
           row(
             item,
-            [
-              percent(item.playedCount, item.songCount),
-              coverage(item),
-              times(item.total),
-            ],
-            note(item),
+            [percent(item.averageRate!, 1), coverage(item), times(item.total)],
+            `수록곡 ${item.ratedCount}곡 평균 참가율 ${percent(item.averageRate!, 1)} · 합계 ${times(item.total)}`,
           ),
         (a, b) => b.total - a.total,
       ),
@@ -1367,21 +1377,12 @@ function albumRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
       title: "라이브에서 가장 적게 불린 앨범",
       description: "수록곡 라이브 횟수 합계가 적은 순",
       detail: "수록곡 라이브 횟수 합계가 적은 순",
-      columns: ["합계", "라이브된 수록곡", "비율"],
+      columns: ["합계", "라이브된 수록곡"],
       rows: rank(
         items,
         (item) => item.total,
         "asc",
-        (item) =>
-          row(
-            item,
-            [
-              times(item.total),
-              coverage(item),
-              percent(item.playedCount, item.songCount),
-            ],
-            note(item),
-          ),
+        (item) => row(item, [times(item.total), coverage(item)], note(item)),
       ),
     },
   ];
@@ -1840,37 +1841,55 @@ function liveRecords(
   ];
 }
 
-/** 내한 공연(나라 "한국")에서 가장 많이 부른 곡. */
-function koreaRecords(stats: SongStat[], known: LiveUnit[]): RawRecord[] {
-  const korea = known.filter((unit) => unit.country === "한국");
-  const items = stats
-    .map((stat) => ({
-      stat,
-      units: stat.played.filter((unit) => unit.country === "한국"),
-    }))
-    .filter((item) => item.units.length > 0);
+/** 내한 참가율을 셀 최소 한국 공연일 수(발매 후·그 곡을 불렀는지 아는 날) */
+const MIN_KOREA_SHOWS = 3;
+
+/**
+ * 내한 공연(나라 "한국")에서 유독 자주 부른 곡 — 내한 참가율 − 그 밖 공연 참가율.
+ * 세트리스트를 아는 내한 공연이 몇 회 안 돼 "가장 많이 부른 곡"은 여러 곡이 전부
+ * 100%로 묶여서, 평소보다 얼마나 더 불렀는지로 잰다.
+ */
+function koreaRecords(stats: SongStat[]): RawRecord[] {
+  const items = stats.flatMap((stat) => {
+    const eligible = stat.known.filter(
+      (unit) => unit.date >= stat.song.releaseDate,
+    );
+    const korea = eligible.filter((unit) => unit.country === "한국");
+    const others = eligible.filter((unit) => unit.country !== "한국");
+    if (korea.length < MIN_KOREA_SHOWS || others.length === 0) return [];
+    const played = new Set(stat.played.map((unit) => unit.id));
+    const count = (units: LiveUnit[]) =>
+      units.filter((unit) => played.has(unit.id)).length;
+    const [inKorea, elsewhere] = [count(korea), count(others)];
+    const delta =
+      Math.round((inKorea / korea.length) * 100) -
+      Math.round((elsewhere / others.length) * 100);
+    return delta > 0
+      ? [{ stat, korea, others, inKorea, elsewhere, delta }]
+      : [];
+  });
   return [
     {
       id: "place-korea-songs",
-      title: "내한 공연에서 가장 많이 부른 곡",
-      description: "한국 공연일 기준",
-      detail: `세트리스트가 있는 한국 공연일 ${korea.length}회 기준`,
-      columns: ["횟수", "비율", "마지막 라이브"],
+      title: "내한 공연에서 유독 자주 부른 곡",
+      description: "내한 참가율 − 그 밖 참가율",
+      detail: `발매 후 세트리스트를 아는 한국 공연일 중 부른 비율 − 그 밖 공연일 중 부른 비율(한국 공연일 ${MIN_KOREA_SHOWS}회 이상인 곡)`,
+      columns: ["차이", "내한", "그 밖"],
       rows: rank(
         items,
-        (item) => item.units.length,
+        (item) => item.delta,
         "desc",
         (item) =>
           songRow(
             item.stat.song,
             [
-              times(item.units.length),
-              percent(item.units.length, korea.length),
-              unitCell(item.units.at(-1)!),
+              `+${item.delta}%p`,
+              percent(item.inKorea, item.korea.length),
+              percent(item.elsewhere, item.others.length),
             ],
-            `한국 공연일 ${korea.length}회 중 ${percent(item.units.length, korea.length)}`,
+            `내한 ${item.korea.length}회 중 ${item.inKorea}회 · 그 밖 ${item.others.length}회 중 ${item.elsewhere}회`,
           ),
-        (a, b) => byRelease(a.stat, b.stat),
+        (a, b) => b.inKorea - a.inKorea,
       ),
     },
   ];
