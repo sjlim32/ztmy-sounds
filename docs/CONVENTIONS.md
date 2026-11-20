@@ -333,6 +333,14 @@ src/
                              # 둘째부터 "id:날짜:2"(예전 체크 유지). 공유 코드는 첫
                              # 회차들이 앞 비트, 둘째 회차부터 그 뒤(예전 코드 호환).
                              # 표기는 lives/shows.ts의 formatDayShow("DAY 1 昼の部").
+                             # 세트리스트 줄엔 번호 옆에 곡 커버(LiveSetlistEntry.cover —
+                             # lives/data.ts getSongCovers가 곡 목록의 getSongCoverSrc 규칙
+                             # 그대로, SongLink artwork, 곡 목록과 같은 displayWidth 44로
+                             # 받아 변환 파일을 함께 쓴다). 커버가 아예 없는 곡(커버곡 등)은
+                             # 우니구리 물음표 그림(lives/artwork.ts UNKNOWN_COVER_SRC, 점선
+                             # 테두리),
+                             # 선택곡 자리는 들어간 곡들의 커버를 같은 칸 안에 겹쳐서
+                             # (같은 그림은 한 장, 최대 3장 — stackedCovers).
                              # 세트리스트 메모 setlists.note: arrange(편곡)·info(덧붙임,
                              # "Short ver.")는 곡 아래 한 줄(" · "로 이음) — info가
                              # "Live debut"면 대신 제목 앞 마젠타 "[첫 공개]"(투어는

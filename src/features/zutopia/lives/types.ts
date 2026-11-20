@@ -33,6 +33,8 @@ export interface LiveSetlistEntry {
   isCover: boolean;
   // 커버곡의 원곡 아티스트(note.original_artist) — 제목 아래 줄에.
   coverArtist: string | null;
+  // 곡 커버(곡 커버, 없으면 첫 앨범 커버 — 곡 목록과 같은 규칙). 커버곡·모르면 null.
+  cover: string | null;
 }
 
 export interface LiveDetail extends Live {

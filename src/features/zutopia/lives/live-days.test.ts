@@ -26,6 +26,7 @@ function entry(
     unreleased: false,
     isCover: false,
     coverArtist: null,
+    cover: null,
   };
 }
 

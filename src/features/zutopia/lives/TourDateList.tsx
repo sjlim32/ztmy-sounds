@@ -378,6 +378,7 @@ export function collectSelectedSlots(
             title: entry.titleKo,
             places: [],
             unreleased: entry.unreleased,
+            cover: entry.cover,
           };
           slot.songs.push(song);
         }

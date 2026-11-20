@@ -23,7 +23,13 @@ export interface SetlistSlot {
   /** 번호 칸 표시("14", "15-1"). */
   label: string;
   isEncore: boolean;
-  songs: { title: string; places: string[]; unreleased: boolean }[];
+  songs: {
+    title: string;
+    places: string[];
+    unreleased: boolean;
+    /** 곡 커버(없으면 null — 화면에서 물음표 그림) */
+    cover: string | null;
+  }[];
 }
 
 type SetlistRow =
@@ -132,6 +138,7 @@ export function Setlist({
                   variation={row.entry.variation}
                   unreleased={row.entry.unreleased}
                   cover={row.entry.isCover}
+                  artwork={row.entry.cover}
                   // 커버곡은 제목 하나뿐이라 둘째 줄에 원곡 아티스트를.
                   subtitle={
                     row.entry.isCover
@@ -162,6 +169,8 @@ export function Setlist({
                   indexLabel={row.slot.label}
                   encore={row.slot.isEncore}
                   selected
+                  // 그 자리에 들어간 곡들의 커버를 겹쳐서
+                  artwork={row.slot.songs.map((song) => song.cover)}
                   // 곡이 하나뿐인 자리면 "미공개"도 오른쪽 태그 자리에(선택곡과 나란히).
                   unreleased={
                     row.slot.songs.length === 1 && row.slot.songs[0].unreleased

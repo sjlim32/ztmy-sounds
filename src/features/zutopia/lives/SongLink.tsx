@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { ThumbImage } from "@/components/ThumbImage";
+import {
+  stackedCovers,
+  UNKNOWN_COVER_SRC,
+} from "@/features/zutopia/lives/artwork";
 import { formatDayShow } from "@/features/zutopia/lives/shows";
 import {
   LIVE_TAG_CLASS,
@@ -64,6 +69,7 @@ export function SongLink({
   selected = false,
   wrapTitle = false,
   indexLabel,
+  artwork,
   children,
 }: {
   href?: string | null;
@@ -87,6 +93,11 @@ export function SongLink({
   selected?: boolean;
   /** 제목을 한 줄로 자르지 않고 여러 줄로(투어 공통 세트리스트의 선택곡 후보 목록). */
   wrapTitle?: boolean;
+  /**
+   * 곡 커버(번호 옆 작은 정사각형). null이면 물음표 그림(커버곡·커버 없음), 여러 장이면
+   * 같은 칸 안에 겹쳐서(선택곡 자리), 주지 않으면(undefined) 칸 자체를 두지 않는다.
+   */
+  artwork?: string | null | (string | null)[];
   children: ReactNode;
 }) {
   const number = indexLabel ?? String(index).padStart(2, "0");
@@ -128,6 +139,7 @@ export function SongLink({
           number
         )}
       </span>
+      {artwork !== undefined && <Artwork artwork={artwork} />}
       <div className="flex min-w-0 flex-1 flex-col justify-center">
         {/* 모바일은 폭이 좁아 한 줄로 자르면 제목이 거의 안 보여서 두 줄까지 보여준다. */}
         <span
@@ -202,5 +214,63 @@ export function SongLink({
         <span aria-hidden className="h-7 w-7 shrink-0" />
       )}
     </div>
+  );
+}
+
+// 물음표 그림(커버 없음)은 점선 테두리로 "자리만 있는 그림"임을 드러낸다.
+// 테두리는 어둡고 흐리게 — 그림보다 앞에 나서지 않게.
+const UNKNOWN_COVER_BORDER = "border border-dashed border-white/20";
+
+/**
+ * 번호 옆 곡 커버 칸 — 다른 줄과 같은 크기(32px, 태블릿 이상 36px)라 제목 위치가
+ * 맞는다. 한 장이면 칸을 꽉 채우고, 여러 장(선택곡 자리)이면 같은 칸 안에서 작게
+ * 줄여 오른쪽 아래로 조금씩 밀어 겹친다(앞 장이 위). 곡 목록과 같은 폭(44)으로 받아
+ * 같은 변환 파일을 함께 쓴다.
+ */
+function Artwork({ artwork }: { artwork: string | null | (string | null)[] }) {
+  const covers = Array.isArray(artwork)
+    ? stackedCovers(artwork)
+    : [artwork ?? UNKNOWN_COVER_SRC];
+  if (covers.length === 1)
+    return (
+      <ThumbImage
+        src={covers[0]}
+        displayWidth={44}
+        className={cn(
+          "size-8 shrink-0 rounded object-cover",
+          "tablet:size-9",
+          covers[0] === UNKNOWN_COVER_SRC && UNKNOWN_COVER_BORDER,
+        )}
+      />
+    );
+  // 2장이면 2/3 크기로 대각선 두 칸, 3장이면 3/5 크기로 세 칸.
+  const step = covers.length === 2 ? 33.34 : 20;
+  const size = covers.length === 2 ? 66.66 : 60;
+  return (
+    <span
+      aria-hidden
+      className={cn("relative size-8 shrink-0", "tablet:size-9")}
+    >
+      {covers.map((cover, index) => (
+        <ThumbImage
+          key={cover}
+          src={cover}
+          displayWidth={44}
+          className={cn(
+            "absolute rounded-sm object-cover",
+            cover === UNKNOWN_COVER_SRC
+              ? UNKNOWN_COVER_BORDER
+              : "ring-1 ring-black/60",
+          )}
+          style={{
+            width: `${size}%`,
+            height: `${size}%`,
+            left: `${step * index}%`,
+            top: `${step * index}%`,
+            zIndex: covers.length - index,
+          }}
+        />
+      ))}
+    </span>
   );
 }

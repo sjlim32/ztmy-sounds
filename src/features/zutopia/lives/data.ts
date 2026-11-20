@@ -21,6 +21,8 @@ import {
   type TourVersion,
 } from "@/features/zutopia/lives/tour-versions";
 import { diffDays } from "@/lib/ymd";
+import { getSongsWithAlbums } from "@/features/zutopia/song-db/data";
+import { getSongCoverSrc } from "@/features/zutopia/song-db/song-album-grouping";
 import type {
   Live,
   LiveDetail,
@@ -320,7 +322,28 @@ function toSetlist(
       unreleased: parseSongMetadata(entry.songs.metadata).isUnreleased,
       isCover: !!entry.songs.isCover,
       coverArtist: entry.songs.coverArtist ?? null,
+      cover: null,
     }));
+}
+
+/**
+ * 곡 id → 커버(곡 목록과 같은 getSongCoverSrc 규칙 — 곡 커버, 없으면 첫 앨범 커버).
+ * 곡 목록이 쓰는 getSongsWithAlbums(cache)를 그대로 써서 빌드 중 조회가 늘지 않는다.
+ */
+const getSongCovers = cache(async (): Promise<Map<string, string | null>> => {
+  const songs = await getSongsWithAlbums();
+  return new Map(songs.map((song) => [song.id, getSongCoverSrc(song)]));
+});
+
+/** 세트리스트 줄에 곡 커버를 붙인다(커버곡 "cover:…"·모르는 곡은 null). */
+function withCovers(
+  entries: LiveSetlistEntry[],
+  covers: Map<string, string | null>,
+): LiveSetlistEntry[] {
+  return entries.map((entry) => ({
+    ...entry,
+    cover: covers.get(entry.songId) ?? null,
+  }));
 }
 
 /**
@@ -505,11 +528,13 @@ export const getLiveBySlug = cache(
     if (!data) return null;
 
     const { setlists, ...live } = data;
+    const covers = await getSongCovers();
     // "그날만 빠진 곡"(omitted)은 투어 공통 행에 대한 표시라 단독 공연엔 쓰지 않는다.
     return {
       ...live,
-      setlist: toSetlist(
-        normalizeSetlistRows(setlists.filter((row) => !row.omitted)),
+      setlist: withCovers(
+        toSetlist(normalizeSetlistRows(setlists.filter((row) => !row.omitted))),
+        covers,
       ),
     };
   },
@@ -592,6 +617,7 @@ export const getTourBySlug = cache(
     }
 
     // 이틀 이상인 공연일은 날마다 한 행으로 나눈다(일정 행·펼침이 그날 것만, live-days.ts).
+    const covers = await getSongCovers();
     const dates = lives.flatMap((live) => {
       const { city, original } = splitRegion(live.region);
       const canceled = live.status === "CANCELED";
@@ -622,10 +648,16 @@ export const getTourBySlug = cache(
           // 취소된 공연일엔 투어 공통 세트리스트도 얹지 않는다(불린 곡이 없다).
           setlist: canceled
             ? []
-            : mergeTourSetlist(
-                tourRowsOf(version?.id ?? null),
-                normalizeSetlistRows(live.setlists),
-                Array.from({ length: Math.max(1, dayCount) }, (_, i) => i + 1),
+            : withCovers(
+                mergeTourSetlist(
+                  tourRowsOf(version?.id ?? null),
+                  normalizeSetlistRows(live.setlists),
+                  Array.from(
+                    { length: Math.max(1, dayCount) },
+                    (_, i) => i + 1,
+                  ),
+                ),
+                covers,
               ),
         },
         live.live_date,
@@ -641,7 +673,7 @@ export const getTourBySlug = cache(
             label: version.label,
             startsOn: version.startsOn,
             endsOn: versionEndsOn(versions, version),
-            entries: toSetlist(tourRowsOf(version.id)),
+            entries: withCovers(toSetlist(tourRowsOf(version.id)), covers),
           }))
         : setlistResult.data.length > 0
           ? [
@@ -650,7 +682,7 @@ export const getTourBySlug = cache(
                 label: null,
                 startsOn: tour.start_date,
                 endsOn: null,
-                entries: toSetlist(tourRowsOf(null)),
+                entries: withCovers(toSetlist(tourRowsOf(null)), covers),
               },
             ]
           : [];
