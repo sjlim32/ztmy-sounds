@@ -9,7 +9,7 @@ import { LiveTicket } from "@/features/zutopia/lives/LiveTicket";
 import { countTourShows } from "@/features/zutopia/lives/tour-shows";
 import {
   LiveSchedule,
-  TourCommonSetlist,
+  TourSetlistVersions,
 } from "@/features/zutopia/lives/TourDateList";
 import type { TourDetail } from "@/features/zutopia/lives/types";
 import { parseVisitOrdinal } from "@/features/zutopia/lives/visit";
@@ -121,7 +121,7 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
         metadata={tour.metadata}
       />
 
-      <TourCommonSetlist entries={tour.setlist} dates={tour.dates} />
+      <TourSetlistVersions versions={tour.setlists} dates={tour.dates} />
 
       <LiveSchedule dates={tour.dates} />
     </div>

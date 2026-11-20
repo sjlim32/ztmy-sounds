@@ -211,9 +211,13 @@ src/
                              # 바로 아래에 그 공연의 이미지·세트리스트를 펼친다
                              # (아코디언, 한 번에 하나). 이미지는 공연 상세와 같은
                              # 방식 — 포스터는 크게, 아이콘(포스터와 다를 때)·추가
-                             # 이미지는 작은 목록. 행은 썸네일 중심 — 왼쪽에
-                             # 아이콘(없으면 포스터)을 3:4로 크게, 날짜는 그림
-                             # 아래쪽에 얹고, 그림이 없으면 같은 폭의 날짜 칸.
+                             # 이미지는 작은 목록. 공연일마다 카드를 두지 않고 목록 전체를
+                             # 어두운 면 하나로(공연일 사이는 구분선), 열린 행과 펼친
+                             # 영역은 같은 옅은 바탕으로 잇고, 펼친 세트리스트도 카드 틀
+                             # 없이(Setlist plain). 행은 날짜·도시 먼저 — 맨 위 날짜(가장
+                             # 큰 글자, 요일·연도·회차 시각), 그 아래 도시(크게)·공연장·
+                             # 선택곡, 왼쪽엔 아이콘(없으면 포스터) 작은 3:4 그림(없으면
+                             # 글자가 전체 폭), 오른쪽 끝은 그날 곡 수 + 꺾쇠.
                              # 취소된 공연(lives.status = 'CANCELED')은 투어 일정과
                              # 공연 목록(getCanceledLiveEntries, 목록 화면만)에
                              # 회색 + 빨간 취소선(lives/surface.ts CANCELED_TEXT_CLASS)
@@ -226,7 +230,7 @@ src/
                              # 하루 행). 투어 공통 곡도 날마다 번호가 다르면 날마다 한
                              # 줄(collapseRepeatedDays). 행 안엔 그날의 선택곡이 미리 보이고, 공통
                              # 곡은 위 "투어 공통 세트리스트"(TourCommonSetlist,
-                             # TourDetail.setlist)에 한 번만 둔다 — 처음엔 펼침,
+                             # TourDetail.setlists, "투어 세트리스트 한 눈에 보기")에 한 번만 둔다 — 처음엔 접힘,
                              # 제목 줄로 접기. 공연일마다 다른 곡이 들어가는
                              # 번호엔 "선택곡" 줄(그 자리에 들어간 곡마다 불린
                              # 도시·일차, 예: "서울 DAY 1")을, 그날 어느 공통 곡
@@ -238,6 +242,29 @@ src/
                              # 선택곡·DAY 1·DAY 2·ENCORE·내한 태그는 surface.ts의
                              # LIVE_TAG_CLASS/LIVE_TAG_TONE(알약·테두리 없는 옅은
                              # 면, 가이드 중요도 배지와 같은 결).
+                             # 투어 세트리스트 판(tour_setlist_versions, 20261120010000):
+                             # 투어 공통 행(setlists.tour_id)은 반드시 판(version_id)에
+                             # 속하고, 판은 starts_on부터 다음 판 전날까지의 공연일에
+                             # 적용된다. 중간에 순서·곡이 바뀌면 새 판(copy_tour_setlist_
+                             # version으로 앞 판 복사 후 바뀐 줄만 수정 — Live debut는
+                             # 복사 안 함), 그날만 다르면 공연일 행(그날만 빠진 곡은
+                             # omitted = true), 날짜로 안 정해지는 공연일만
+                             # lives.setlist_version_id. fixed 판 = 선택곡 없는 고정
+                             # 세트리스트. 공연일의 판은 lives/tour-versions.ts
+                             # versionForDate(직접 지정 → 공연 날짜(live_date 우선) 이전에
+                             # 시작한 가장 늦은 판 → 첫 판) — 투어 상세(getTourBySlug)와
+                             # 라이브 기록(live-history/units.ts)이 같이 쓴다. 공연일
+                             # 세트리스트 = 그 판의 공통 행 + 그날 행(omitted는 그 곡을
+                             # 빼는 표시라 곡으로 안 셈, 일차가 있으면 그날만), fixed 판은
+                             # 그날 행이 없어도 commonOnly가 아니다. 투어 상세의 투어
+                             # 공통 세트리스트는 판마다(TourDetail.setlists) — 둘 이상이면
+                             # 펼친 카드 안 제목 아래에 판 고르기 버튼(TourSetlistVersions —
+                             # 같은 폭으로 나란히, 이름 + 그 판 공연일의 첫–마지막 도시·
+                             # 횟수 — 안내 문장 없이 버튼만으로). 이름은
+                             # 판의 label, 없으면 전반기·후반기(셋이면 중반기, 넷 이상
+                             # "1기"…). 판을 바꿔도 펼친 상태는 그대로, 선택곡 자리는 그
+                             # 판의 공연일로만. 공연일 행 꺾쇠 옆엔 그날 곡 수("23곡" — 펼치면
+                             # 세트리스트가 나온다는 표시, 세트리스트가 없으면 꺾쇠만).
                              # 투어 공연일 세트리스트는 투어 공통 곡
                              # (setlists.tour_id) + 그 공연일 곡(setlists.live_id)을
                              # track_number로 합치고, 공연일에만 있는 곡은
@@ -308,7 +335,10 @@ src/
                              # 표기는 lives/shows.ts의 formatDayShow("DAY 1 昼の部").
                              # 세트리스트 메모 setlists.note: arrange(편곡)·info(덧붙임,
                              # "Short ver.")는 곡 아래 한 줄(" · "로 이음) — info가
-                             # "Live debut"면 대신 제목 앞 마젠타 "[첫 공개]",
+                             # "Live debut"면 대신 제목 앞 마젠타 "[첫 공개]"(투어는
+                             # 첫 공개를 공연일 행이 아니라 그 곡이 처음 들어간 판의
+                             # 투어 공통 행에 단다 — 공통 행이 없는 선택곡만 공연일
+                             # 행에),
                              # info에 "cover"가 들어가면 제목 앞 하늘색 "[커버송]".
                              # 커버곡 행은 song_id 없이 note.title·title_kr(제목 오른쪽 괄호)·original_artist —
                              # lives/data.ts normalizeSetlistRows가 가짜 곡(id

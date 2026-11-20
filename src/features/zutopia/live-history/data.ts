@@ -43,44 +43,54 @@ export const getOriginalOf = cache(
  */
 export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
   const supabase = createBuildTimeSupabaseClient();
-  const [livesResult, toursResult, setlistsResult, coversResult, originalOf] =
-    await Promise.all([
+  const [
+    livesResult,
+    toursResult,
+    setlistsResult,
+    coversResult,
+    versionsResult,
+    originalOf,
+  ] = await Promise.all([
+    supabase
+      .from("lives")
+      .select(
+        "id, slug, tour_id, title, title_ko, type, start_date, end_date, live_date, setlist_version_id, region, country, live_venue, icon_image_url, poster_image_url, metadata",
+      )
+      .eq("status", "ACTIVE"),
+    supabase
+      .from("tours")
+      .select("id, slug, title, title_ko, poster_image_url")
+      .eq("status", "ACTIVE"),
+    // 세트리스트는 1000행(max_rows)을 넘을 수 있어(지금 약 800행) 끝까지 나눠 받는다(fetchAllRows).
+    fetchAllRows((from, to) =>
       supabase
-        .from("lives")
+        .from("setlists")
         .select(
-          "id, slug, tour_id, title, title_ko, type, start_date, end_date, live_date, region, country, live_venue, icon_image_url, poster_image_url, metadata",
+          "live_id, tour_id, version_id, song_id, day_number, show_number, track_number, is_encore, omitted, note, songs!inner(status)",
         )
-        .eq("status", "ACTIVE"),
+        .eq("songs.status", "ACTIVE")
+        .order("id")
+        .range(from, to),
+    ),
+    // 곡이 연결되지 않은 커버곡(note.title) — 곡 기록엔 안 넣고 통계의 커버곡 기록과
+    // 곡 순서(자리 차지)에만.
+    fetchAllRows((from, to) =>
       supabase
-        .from("tours")
-        .select("id, slug, title, title_ko, poster_image_url")
-        .eq("status", "ACTIVE"),
-      // 세트리스트는 1000행(max_rows)을 넘을 수 있어(지금 약 800행) 끝까지 나눠 받는다(fetchAllRows).
-      fetchAllRows((from, to) =>
-        supabase
-          .from("setlists")
-          .select(
-            "live_id, tour_id, song_id, day_number, show_number, track_number, is_encore, note, songs!inner(status)",
-          )
-          .eq("songs.status", "ACTIVE")
-          .order("id")
-          .range(from, to),
-      ),
-      // 곡이 연결되지 않은 커버곡(note.title) — 곡 기록엔 안 넣고 통계의 커버곡 기록과
-      // 곡 순서(자리 차지)에만.
-      fetchAllRows((from, to) =>
-        supabase
-          .from("setlists")
-          .select(
-            "live_id, tour_id, day_number, show_number, track_number, is_encore, note",
-          )
-          .is("song_id", null)
-          .not("note", "is", null)
-          .order("id")
-          .range(from, to),
-      ),
-      getOriginalOf(),
-    ]);
+        .from("setlists")
+        .select(
+          "live_id, tour_id, version_id, day_number, show_number, track_number, is_encore, omitted, note",
+        )
+        .is("song_id", null)
+        .not("note", "is", null)
+        .order("id")
+        .range(from, to),
+    ),
+    // 투어 세트리스트 판 — 공연일마다 그 판의 투어 공통 행만 쓴다(units.ts).
+    supabase
+      .from("tour_setlist_versions")
+      .select("id, tour_id, starts_on, label, fixed"),
+    getOriginalOf(),
+  ]);
 
   if (livesResult.error) {
     throw new Error(
@@ -95,6 +105,11 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
   if (coversResult.error) {
     throw new Error(
       `커버곡 세트리스트를 가져오지 못했습니다: ${coversResult.error.message}`,
+    );
+  }
+  if (versionsResult.error) {
+    throw new Error(
+      `투어 세트리스트 판을 가져오지 못했습니다: ${versionsResult.error.message}`,
     );
   }
   if (setlistsResult.error) {
@@ -113,11 +128,13 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
       ({
         live_id,
         tour_id,
+        version_id,
         song_id,
         day_number,
         show_number,
         track_number,
         is_encore,
+        omitted,
         note,
       }) =>
         song_id
@@ -125,11 +142,13 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
               {
                 live_id,
                 tour_id,
+                version_id,
                 song_id,
                 day_number,
                 show_number,
                 track_number,
                 is_encore,
+                omitted,
                 note,
               },
             ]
@@ -149,10 +168,13 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
               artist: parseSetlistNote(row.note, "original_artist"),
               track_number: row.track_number,
               is_encore: row.is_encore,
+              version_id: row.version_id,
+              omitted: row.omitted,
             },
           ]
         : [];
     }),
+    versions: versionsResult.data,
     originalOf,
   };
   const units = buildLiveUnits(input, today);

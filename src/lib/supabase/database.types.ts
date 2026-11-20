@@ -195,6 +195,8 @@ export interface Database {
           start_date: string;
           end_date: string | null;
           live_date: string | null;
+          /** 날짜로 안 정해지는 공연일만 직접 지정하는 투어 세트리스트 판 */
+          setlist_version_id: string | null;
           country: string;
           region: string;
           live_venue: string;
@@ -220,6 +222,7 @@ export interface Database {
           start_date: string;
           end_date?: string | null;
           live_date?: string | null;
+          setlist_version_id?: string | null;
           country: string;
           region: string;
           live_venue: string;
@@ -245,6 +248,7 @@ export interface Database {
           start_date?: string;
           end_date?: string | null;
           live_date?: string | null;
+          setlist_version_id?: string | null;
           country?: string;
           region?: string;
           live_venue?: string;
@@ -323,6 +327,10 @@ export interface Database {
           updated_at: string;
           day_number: number | null;
           show_number: number | null;
+          /** 투어 공통 행의 판(tour_setlist_versions) — 투어 공통 행은 반드시 판에 속한다 */
+          version_id: string | null;
+          /** 공연일 행에서만 — true면 판의 이 곡을 그날 세트리스트에서 뺀다 */
+          omitted: boolean;
         };
         Insert: {
           id?: string;
@@ -335,6 +343,8 @@ export interface Database {
           updated_at?: string;
           day_number?: number | null;
           show_number?: number | null;
+          version_id?: string | null;
+          omitted?: boolean;
         };
         Update: {
           id?: string;
@@ -347,6 +357,8 @@ export interface Database {
           updated_at?: string;
           day_number?: number | null;
           show_number?: number | null;
+          version_id?: string | null;
+          omitted?: boolean;
         };
         Relationships: [
           {
@@ -368,6 +380,46 @@ export interface Database {
             columns: ["song_id"];
             isOneToOne: false;
             referencedRelation: "songs";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      /** 투어 세트리스트 판 — starts_on부터 다음 판 전날까지의 공연일에 적용 */
+      tour_setlist_versions: {
+        Row: {
+          id: string;
+          tour_id: string;
+          starts_on: string;
+          label: string | null;
+          /** 선택곡 없는 고정 세트리스트 — 공연일 행이 없어도 세트리스트를 안다 */
+          fixed: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          tour_id: string;
+          starts_on: string;
+          label?: string | null;
+          fixed?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          tour_id?: string;
+          starts_on?: string;
+          label?: string | null;
+          fixed?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tour_setlist_versions_tour_id_fkey";
+            columns: ["tour_id"];
+            isOneToOne: false;
+            referencedRelation: "tours";
             referencedColumns: ["id"];
           },
         ];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { ThumbImage } from "@/components/ThumbImage";
 import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
@@ -14,9 +14,11 @@ import {
   LIVE_TAG_TONE,
 } from "@/features/zutopia/lives/surface";
 import { formatDayShow } from "@/features/zutopia/lives/shows";
+import { FOCUS_RING } from "@/components/button-styles";
 import type {
   LiveSetlistEntry,
   TourDateEntry,
+  TourSetlistVersion,
 } from "@/features/zutopia/lives/types";
 
 const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -57,7 +59,7 @@ export function LiveSchedule({ dates }: { dates: TourDateEntry[] }) {
       {/* 카드 밖 제목이라 배경 그림 위에서도 읽히게 글자 그림자 */}
       <div
         className={cn(
-          "flex items-baseline justify-between border-b border-white/15 pb-2",
+          "flex items-baseline justify-between gap-3 border-b border-white/15 pb-2",
           "tablet:pb-3",
           LIVE_SECTION_TITLE_SHADOW,
         )}
@@ -115,8 +117,14 @@ export function TourDateList({ dates }: { dates: TourDateEntry[] }) {
   };
 
   return (
+    // 공연일마다 카드를 두지 않고, 목록 전체를 어두운 면 하나로(배경 그림 위에서도
+    // 읽히게) — 공연일 사이는 얇은 구분선만.
     <ul
-      className={cn("flex flex-col gap-1.5 pt-3", "tablet:gap-2 tablet:pt-4")}
+      className={cn(
+        "mt-3 flex flex-col divide-y divide-white/10 overflow-hidden rounded-lg",
+        "tablet:mt-4",
+        LIVE_SURFACE_CLASS,
+      )}
     >
       {dates.map((date) => {
         const isOpen = openId === date.id;
@@ -145,27 +153,141 @@ export function TourDateList({ dates }: { dates: TourDateEntry[] }) {
 }
 
 /**
- * 투어 공통 세트리스트 — 투어 상세에 한 번만, 처음엔 펼쳐 두고 제목 줄을 눌러
- * 접을 수 있다. 공연일마다 다른 곡이 들어가는 번호엔 "선택곡" 줄을 끼워, 그
- * 자리에 실제로 들어간 곡들(공연일 전체에서 모음)을 보여준다. 공통 곡이 없는
- * 투어(공연일마다 전부 다른 구성이거나 아직 데이터가 없음)면 그리지 않는다.
+ * 투어 공통 세트리스트 — 투어 상세에 한 번만, 처음엔 접어 두고("투어 세트리스트 한
+ * 눈에 보기") 제목 줄을 눌러 펼친다. 공연일마다 다른 곡이 들어가는 번호엔 "선택곡"
+ * 줄을 끼워, 그 자리에 실제로 들어간 곡들(공연일 전체에서 모음)을 보여준다. 공통
+ * 곡이 없는 투어(공연일마다 전부 다른 구성이거나 아직 데이터가 없음)면 그리지 않는다.
+ * toolbar는 펼쳤을 때 제목 아래(판 고르기).
  */
 export function TourCommonSetlist({
   entries,
   dates,
+  title = "투어 세트리스트 한 눈에 보기",
+  toolbar = null,
 }: {
   entries: LiveSetlistEntry[];
   dates: TourDateEntry[];
+  title?: string;
+  toolbar?: ReactNode;
 }) {
   if (entries.length === 0) return null;
   return (
     <Setlist
-      title="SETLIST"
+      title={title}
       entries={entries}
       slots={collectSelectedSlots(entries, dates)}
       collapsible
+      defaultOpen={false}
+      toolbar={toolbar}
     />
   );
+}
+
+/**
+ * 투어 공통 세트리스트를 판(tour_setlist_versions)마다 — 판이 하나면 지금처럼 하나,
+ * 둘 이상이면 펼친 카드 안 제목 아래에 판 고르기 탭(같은 폭으로 나란히: 이름 + 그 판
+ * 공연일의 첫–마지막 도시·횟수)을 두고 고른 판의 세트리스트를 보여 준다. 이름은 판에
+ * 적은 이름(label), 없으면 versionName의 기본 이름(전반기·후반기). 판을 바꿔도 펼친
+ * 상태는 그대로다. 선택곡 자리는 그 판을 따른 공연일로만 모은다.
+ */
+export function TourSetlistVersions({
+  versions,
+  dates,
+}: {
+  versions: TourSetlistVersion[];
+  dates: TourDateEntry[];
+}) {
+  const [selectedId, setSelectedId] = useState(versions[0]?.id ?? null);
+  const selected =
+    versions.find((version) => version.id === selectedId) ?? versions[0];
+  if (!selected) return null;
+  if (versions.length === 1)
+    return <TourCommonSetlist entries={selected.entries} dates={dates} />;
+
+  const tabs = (
+    <div className={cn("border-b border-white/10 px-4 py-3", "tablet:px-5")}>
+      <div
+        role="group"
+        aria-label="세트리스트 시기 고르기"
+        className={cn(
+          "grid gap-2",
+          versions.length === 2
+            ? "grid-cols-2"
+            : "tablet:grid-cols-3 grid-cols-1",
+        )}
+      >
+        {versions.map((version, index) => {
+          const active = version.id === selected.id;
+          const versionDates = dates.filter(
+            (date) => date.versionId === version.id && !date.canceled,
+          );
+          const cities = versionCities(versionDates);
+          return (
+            <button
+              key={version.id}
+              type="button"
+              aria-pressed={active}
+              onClick={() => setSelectedId(version.id)}
+              className={cn(
+                "flex min-w-0 flex-col items-start rounded-lg border px-3 py-2 text-left transition-colors",
+                FOCUS_RING,
+                active
+                  ? "border-ztmy-magenta/80 bg-ztmy-magenta/15 text-white"
+                  : "border-white/15 bg-white/[0.03] text-white/75 hover:border-white/35 hover:text-white",
+              )}
+            >
+              <span className="text-base font-semibold">
+                {version.label ?? versionName(index, versions.length)}
+              </span>
+              <span
+                className={cn(
+                  "w-full truncate text-sm",
+                  active ? "text-white/80" : "text-white/55",
+                )}
+              >
+                {[
+                  cities,
+                  versionDates.length ? `${versionDates.length}회` : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  // key 없이 — 판을 바꿔도 펼친 상태(Setlist의 isOpen)를 그대로 둔다.
+  return (
+    <TourCommonSetlist
+      entries={selected.entries}
+      dates={dates.filter((date) => date.versionId === selected.id)}
+      toolbar={tabs}
+    />
+  );
+}
+
+/** 판의 기본 이름 — 둘이면 전반기·후반기, 셋이면 전반기·중반기·후반기, 그 이상은 "1기"부터. */
+function versionName(index: number, count: number) {
+  if (count === 2) return ["전반기", "후반기"][index];
+  if (count === 3) return ["전반기", "중반기", "후반기"][index];
+  return `${index + 1}기`;
+}
+
+/**
+ * 판을 따른 공연일의 첫 도시–마지막 도시(취소된 공연일은 빼고, 날짜 순). 도시가 하나면
+ * 그 도시, 공연일이 없으면 null.
+ */
+function versionCities(dates: TourDateEntry[]) {
+  const held = dates
+    .filter((date) => !date.canceled)
+    .sort((a, b) => a.startDate.localeCompare(b.startDate));
+  if (held.length === 0) return null;
+  const first = held[0].city;
+  const last = held.at(-1)!.city;
+  return first === last ? first : `${first}–${last}`;
 }
 
 // 공연일들의 선택곡을 투어 공통 세트리스트의 "선택곡 자리"별로 모은다. 곡마다
@@ -297,9 +419,9 @@ function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
     <div
       id={id}
       className={cn(
-        // 들여써서 일정 행과 구분한다. 세트리스트는 자기 카드 면(Setlist)이 있다.
-        "mt-2 ml-3 flex flex-col gap-3",
-        "tablet:ml-6",
+        // 열린 행과 같은 옅은 바탕으로 이어 한 덩어리로(테두리·카드 없이).
+        "flex flex-col gap-3 bg-white/[0.05] px-3 pb-4",
+        "tablet:px-4",
       )}
     >
       {date.posterImageUrl && (
@@ -323,7 +445,7 @@ function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
         </div>
       )}
       {date.setlist.length > 0 ? (
-        <Setlist entries={date.setlist} />
+        <Setlist entries={date.setlist} plain />
       ) : (
         <p className={cn("text-sm text-white/50", "tablet:text-base")}>
           세트리스트가 곧 업데이트됩니다.
@@ -334,10 +456,11 @@ function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
 }
 
 /**
- * 공연 일정 한 줄 — 썸네일이 주인공. 왼쪽에 공연일 그림(아이콘, 없으면 포스터)을
- * 세로 3:4로 크게 두고, 날짜는 그림 아래쪽에 얹는다. 그림이 없는 공연일은 같은
- * 자리에 날짜 칸만(같은 폭이라 목록 정렬이 흐트러지지 않는다). 오른쪽은 도시·
- * 장소·그날의 선택곡. 한국 공연은 마젠타 "내한" 태그로 강조한다.
+ * 공연 일정 한 줄 — 가장 중요한 날짜·도시를 먼저 크게: 맨 위 날짜(요일·연도·시각
+ * 함께), 그 아래 도시(원어 이름·DAY·내한 태그), 공연장, 그날의 선택곡 순. 왼쪽엔
+ * 공연일 그림(아이콘, 없으면 포스터)을 작은 3:4로, 그림이 없으면 글자가 전체 폭을
+ * 쓴다. 오른쪽 끝은 그날 곡 수 + 꺾쇠(펼치면 세트리스트). 카드 없이 목록의 한 줄이고,
+ * 펼치면 행과 펼친 영역(TourDatePanel)이 같은 옅은 바탕으로 이어진다.
  */
 function TourDateRow({
   date,
@@ -371,73 +494,48 @@ function TourDateRow({
   const weekdayLabel = end ? `${start.weekday}–${end.weekday}` : start.weekday;
   // 취소된 공연일 — 회색·빨간 취소선, 펼칠 세트리스트가 없어 누를 수 없다.
   const canceled = !!date.canceled;
+  // 카드 없이 목록의 한 줄 — 면·테두리는 목록 전체(TourDateList)가 하나로 갖는다.
   const rowClass = cn(
-    "group flex w-full items-stretch overflow-hidden rounded-lg border text-left transition-colors",
-    // 배경 그림 위에서도 읽히게 어두운 면 + 흐림(LIVE_SURFACE_CLASS).
-    LIVE_SURFACE_CLASS,
+    "group flex w-full items-start gap-3 px-3 py-3 text-left transition-colors",
+    "tablet:gap-4 tablet:px-4",
   );
 
   const content = (
     <>
-      {/* 왼쪽 썸네일 칸 — 그림이 있으면 3:4로 크게 + 아래에 날짜, 없으면 날짜 칸. */}
-      <span
-        className={cn(
-          "relative flex w-24 shrink-0 flex-col items-center justify-center overflow-hidden border-r border-white/10",
-          "tablet:w-32",
-          thumbnail ? "aspect-[3/4] self-start" : "min-h-24 bg-white/[0.03]",
-        )}
-      >
-        {thumbnail ? (
-          <>
-            <ThumbImage
-              src={thumbnail}
-              displayWidth={320}
-              className={cn(
-                "absolute inset-0 h-full w-full object-cover",
-                canceled
-                  ? "opacity-40 grayscale"
-                  : "transition-transform duration-300 group-hover:scale-105",
-              )}
-            />
-            {/* 그림 위 날짜가 읽히게 아래에서 위로 어두워지는 막 */}
-            <span className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/85 to-transparent" />
-            <span className="absolute inset-x-0 bottom-0 flex flex-col items-center px-1 pb-1.5">
-              <DateText
-                label={dateLabel}
-                weekday={weekdayLabel}
-                year={yearLabel}
-                long={!!end && start.month !== end.month}
-                startTime={date.startTime}
-                openTime={date.openTime}
-                canceled={canceled}
-              />
-            </span>
-          </>
-        ) : (
-          <span className="flex flex-col items-center px-1 py-3">
-            <DateText
-              label={dateLabel}
-              weekday={weekdayLabel}
-              year={yearLabel}
-              long={!!end && start.month !== end.month}
-              startTime={date.startTime}
-              openTime={date.openTime}
-              canceled={canceled}
-            />
-          </span>
-        )}
-      </span>
+      {/* 왼쪽 그림 칸(3:4) — 그림이 없으면 두지 않고 글자가 전체 폭을 쓴다. */}
+      {thumbnail && (
+        <span
+          className={cn(
+            "relative aspect-[3/4] w-14 shrink-0 overflow-hidden rounded-md bg-white/5",
+            "tablet:w-20",
+          )}
+        >
+          <ThumbImage
+            src={thumbnail}
+            displayWidth={240}
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover",
+              canceled
+                ? "opacity-40 grayscale"
+                : "transition-transform duration-300 group-hover:scale-105",
+            )}
+          />
+        </span>
+      )}
 
-      <span
-        className={cn(
-          "flex min-w-0 flex-1 flex-col justify-center gap-1 px-3 py-3",
-          "tablet:px-5",
-        )}
-      >
+      <span className={cn("flex min-w-0 flex-1 flex-col justify-center gap-1")}>
+        <DateLine
+          label={dateLabel}
+          weekday={weekdayLabel}
+          year={yearLabel}
+          startTime={date.startTime}
+          openTime={date.openTime}
+          canceled={canceled}
+        />
         <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
           <span
             className={cn(
-              "text-base font-semibold transition-colors",
+              "text-lg leading-tight font-bold transition-colors",
               "tablet:text-xl",
               canceled
                 ? CANCELED_TEXT_CLASS
@@ -451,8 +549,7 @@ function TourDateRow({
           {date.cityOriginal && (
             <span
               className={cn(
-                "text-xs",
-                "tablet:text-sm",
+                "text-sm",
                 canceled ? CANCELED_TEXT_CLASS : "text-white/55",
               )}
             >
@@ -493,20 +590,14 @@ function TourDateRow({
         <span
           className={cn(
             "truncate text-sm",
-            "tablet:text-base",
-            canceled ? CANCELED_TEXT_CLASS : "text-white/75",
+            canceled ? CANCELED_TEXT_CLASS : "text-white/65",
           )}
         >
           <VenueText venue={date.venue} />
         </span>
 
         {selectedSongs.length > 0 && (
-          <span
-            className={cn(
-              "mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs",
-              "tablet:text-sm",
-            )}
-          >
+          <span className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm">
             <span className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.selected)}>
               선택곡
             </span>
@@ -527,7 +618,20 @@ function TourDateRow({
       </span>
 
       {!canceled && (
-        <span className="flex shrink-0 items-center pr-3">
+        <span className="flex shrink-0 items-center gap-1.5 self-center">
+          {/* 펼치면 무엇이 나오는지 — 그날 곡 수(세트리스트가 아직 없으면 꺾쇠만) */}
+          {date.setlist.length > 0 && (
+            <span
+              className={cn(
+                "text-sm whitespace-nowrap tabular-nums transition-colors",
+                isOpen
+                  ? "text-white/80"
+                  : "text-white/50 group-hover:text-white/80",
+              )}
+            >
+              {date.setlist.length}곡
+            </span>
+          )}
           <ChevronLeftIcon
             className={cn(
               "h-3.5 w-3.5 text-white/30 transition-[transform,color] group-hover:text-white/70",
@@ -550,9 +654,7 @@ function TourDateRow({
       aria-controls={panelId}
       className={cn(
         rowClass,
-        isOpen
-          ? "border-ztmy-pink/60 bg-black/70"
-          : "hover:border-white/25 hover:bg-black/65",
+        isOpen ? "bg-white/[0.05]" : "hover:bg-white/[0.04]",
       )}
     >
       {content}
@@ -560,12 +662,14 @@ function TourDateRow({
   );
 }
 
-/** 썸네일 칸의 날짜(MM.DD + 요일, 해를 넘기는 투어면 연도). */
-function DateText({
+/**
+ * 공연일 행 맨 위 날짜 — 행에서 가장 큰 글자("03.29", 이틀이면 "03.29–30"). 옆에
+ * 요일, 해를 넘기는 투어면 연도, 회차가 있으면 시작·개장 시각을 작게.
+ */
+function DateLine({
   label,
   weekday,
   year,
-  long,
   startTime,
   openTime,
   canceled = false,
@@ -573,64 +677,38 @@ function DateText({
   label: string;
   weekday: string;
   year: string | null;
-  /** 달을 넘기는 기간("03.28–04.02")처럼 긴 날짜는 한 단계 작게. */
-  long: boolean;
-  /** 같은 날 여러 회차 공연의 시작·개장 시각 "HH:MM" — 요일 아래에(lives.metadata.shows). */
+  /** 같은 날 여러 회차 공연의 시작·개장 시각 "HH:MM"(lives.metadata.shows). */
   startTime?: string;
   openTime?: string;
-  /** 취소된 공연일 — 날짜·요일을 회색·빨간 취소선으로. */
+  /** 취소된 공연일 — 회색·빨간 취소선으로. */
   canceled?: boolean;
 }) {
+  const muted = canceled ? CANCELED_TEXT_CLASS : "text-white/60";
   return (
-    <>
-      {year && (
-        <span
-          className={cn(
-            "font-mono text-xs",
-            canceled ? CANCELED_TEXT_CLASS : "text-white/60",
-          )}
-        >
-          {year}
-        </span>
-      )}
+    <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
       <span
         className={cn(
-          "text-center font-mono font-bold tracking-tight whitespace-nowrap tabular-nums drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]",
-          long ? "tablet:text-sm text-xs" : "tablet:text-base text-sm",
+          "text-2xl leading-none font-bold tracking-tight whitespace-nowrap tabular-nums",
+          "tablet:text-3xl",
           canceled ? CANCELED_TEXT_CLASS : "text-white",
         )}
       >
         {label}
       </span>
-      <span
-        className={cn(
-          "font-mono text-xs font-medium tracking-[0.15em]",
-          canceled ? CANCELED_TEXT_CLASS : "text-white/70",
-        )}
-      >
+      <span className={cn("text-sm font-semibold tracking-wider", muted)}>
         {weekday}
       </span>
-      {startTime && (
-        <span
-          className={cn(
-            "mt-0.5 font-mono text-sm font-semibold tabular-nums drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]",
-            canceled ? CANCELED_TEXT_CLASS : "text-white",
-          )}
-        >
-          {startTime}
+      {year && (
+        <span className={cn("text-sm tabular-nums", muted)}>{year}</span>
+      )}
+      {(startTime || openTime) && (
+        <span className={cn("text-sm tabular-nums", muted)}>
+          {[openTime && `OPEN ${openTime}`, startTime && `START ${startTime}`]
+            .filter(Boolean)
+            .join(" / ")}
         </span>
       )}
-      {openTime && (
-        <span
-          className={cn(
-            "font-mono text-xs tabular-nums",
-            canceled ? CANCELED_TEXT_CLASS : "text-white/60",
-          )}
-        >
-          OPEN {openTime}
-        </span>
-      )}
-    </>
+    </span>
   );
 }
 

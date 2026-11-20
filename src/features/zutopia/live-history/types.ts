@@ -102,6 +102,17 @@ export interface RawLive {
   country?: string;
   /** 하루 회차 이름(metadata.shows)을 읽으려고 — 없으면 하루 1회 */
   metadata?: Json | null;
+  /** 날짜로 안 정해지는 공연일만 직접 지정한 투어 세트리스트 판 */
+  setlist_version_id?: string | null;
+}
+
+/** 투어 세트리스트 판(tour_setlist_versions) */
+export interface RawTourVersion {
+  id: string;
+  tour_id: string;
+  starts_on: string;
+  label: string | null;
+  fixed: boolean;
 }
 
 export interface RawTour {
@@ -123,6 +134,10 @@ export interface RawSetlistRow {
   show_number?: number | null;
   /** 세트리스트 메모(variation 등, 통계용) */
   note?: Json | null;
+  /** 투어 공통 행의 판 */
+  version_id?: string | null;
+  /** 공연일 행에서만 — 판의 이 곡을 그날 세트리스트에서 뺀다 */
+  omitted?: boolean;
 }
 
 /** 곡이 연결되지 않은 커버곡 행(통계용) — 나누는 규칙은 RawSetlistRow와 같다. */
@@ -136,4 +151,6 @@ export interface RawCoverRow {
   artist: string | null;
   track_number?: number;
   is_encore?: boolean;
+  version_id?: string | null;
+  omitted?: boolean;
 }

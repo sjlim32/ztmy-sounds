@@ -564,3 +564,74 @@ describe("2차 검토 반영", () => {
     expect(unit.songIds).toEqual(["all", "d2"]);
   });
 });
+
+describe("투어 세트리스트 판", () => {
+  const tours: RawTour[] = [
+    { id: "T", slug: "t", title: "T", title_ko: "T", poster_image_url: null },
+  ];
+  const versions = [
+    {
+      id: "v1",
+      tour_id: "T",
+      starts_on: "2025-03-29",
+      label: null,
+      fixed: false,
+    },
+    {
+      id: "v2",
+      tour_id: "T",
+      starts_on: "2025-04-28",
+      label: null,
+      fixed: true,
+    },
+  ];
+  const common: RawSetlistRow[] = [
+    { ...row("a", { tour_id: "T" }), track_number: 1, version_id: "v1" },
+    { ...row("old", { tour_id: "T" }), track_number: 2, version_id: "v1" },
+    { ...row("a", { tour_id: "T" }), track_number: 1, version_id: "v2" },
+    { ...row("new", { tour_id: "T" }), track_number: 2, version_id: "v2" },
+  ];
+  const units = (lives: RawLive[], own: RawSetlistRow[] = []) =>
+    buildLiveUnits(
+      { lives, tours, setlists: [...common, ...own], originalOf: {}, versions },
+      TODAY,
+    );
+
+  test("공연 날짜로 판을 고르고 그 판의 공통 곡만", () => {
+    const [before, after] = units([
+      live({ id: "A", tour_id: "T", start_date: "2025-04-20" }),
+      live({ id: "B", tour_id: "T", start_date: "2025-05-01" }),
+    ]).sort((x, y) => x.date.localeCompare(y.date));
+    expect(before.songIds).toEqual(["a", "old"]);
+    expect(after.songIds).toEqual(["a", "new"]);
+  });
+
+  test("직접 지정한 판이 날짜보다 먼저", () => {
+    const [unit] = units([
+      live({
+        id: "B",
+        tour_id: "T",
+        start_date: "2025-05-01",
+        setlist_version_id: "v1",
+      }),
+    ]);
+    expect(unit.songIds).toEqual(["a", "old"]);
+  });
+
+  test("그날만 빠진 곡(omitted)은 판에서 빼고, 곡으로 세지 않는다", () => {
+    const [unit] = units(
+      [live({ id: "A", tour_id: "T", start_date: "2025-04-20" })],
+      [{ ...row("old", { live_id: "A" }), track_number: 2, omitted: true }],
+    );
+    expect(unit.songIds).toEqual(["a"]);
+  });
+
+  test("고정 세트리스트 판(fixed)은 그날 행이 없어도 아는 날, 아니면 공통 곡만 있는 날", () => {
+    const sorted = units([
+      live({ id: "A", tour_id: "T", start_date: "2025-04-20" }),
+      live({ id: "B", tour_id: "T", start_date: "2025-05-01" }),
+    ]).sort((x, y) => x.date.localeCompare(y.date));
+    expect(sorted[0].commonOnly).toBe(true);
+    expect(sorted[1].commonOnly).toBeUndefined();
+  });
+});

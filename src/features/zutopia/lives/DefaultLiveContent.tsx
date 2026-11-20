@@ -146,7 +146,11 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
       {days ? (
         // 이틀 이상 단독 공연 — 투어 상세와 같은 모양(공통 세트리스트 + DAY별 일정)
         <>
-          <TourCommonSetlist entries={days.common} dates={days.dates} />
+          <TourCommonSetlist
+            entries={days.common}
+            dates={days.dates}
+            title="세트리스트 한 눈에 보기"
+          />
           <LiveSchedule dates={days.dates} />
         </>
       ) : (

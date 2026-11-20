@@ -5,10 +5,15 @@ import {
 } from "@/features/zutopia/lives/region";
 import { showsForDay } from "@/features/zutopia/lives/shows";
 import { parseSetlistNote } from "@/features/zutopia/lives/setlist-note";
+import {
+  versionForDate,
+  type TourVersion,
+} from "@/features/zutopia/lives/tour-versions";
 import type {
   LiveUnit,
   RawCoverRow,
   RawLive,
+  RawTourVersion,
   RawSetlistRow,
   RawTour,
   SongLiveStat,
@@ -28,8 +33,18 @@ function buildAllUnits(input: {
   originalOf: Record<string, string>;
   /** 곡이 연결되지 않은 커버곡 행(통계용, 없어도 된다) */
   covers?: RawCoverRow[];
+  /** 투어 세트리스트 판 — 없으면(예전 데이터) 투어 공통 행을 모두 한 판으로 */
+  versions?: RawTourVersion[];
 }): LiveUnit[] {
   const { lives, tours, setlists, originalOf } = input;
+  const versionsByTour = new Map<string, TourVersion[]>();
+  for (const version of input.versions ?? [])
+    push(versionsByTour, version.tour_id, {
+      id: version.id,
+      startsOn: version.starts_on,
+      label: version.label,
+      fixed: version.fixed,
+    });
   const toursById = new Map(tours.map((tour) => [tour.id, tour]));
   const toursBySlug = new Map(tours.map((tour) => [tour.slug, tour]));
 
@@ -52,8 +67,21 @@ function buildAllUnits(input: {
       (live.tour_id ? toursById.get(live.tour_id) : undefined) ??
       (live.slug ? toursBySlug.get(live.slug) : undefined) ??
       null;
-    const common = tour ? (tourRows.get(tour.id) ?? []) : [];
-    const own = liveRows.get(live.id) ?? [];
+    // 공연일의 판(lives/tour-versions.ts — 투어 상세와 같은 규칙)과 그 판의 공통 행.
+    const version = tour
+      ? versionForDate(
+          versionsByTour.get(tour.id) ?? [],
+          live.live_date ?? live.start_date,
+          live.setlist_version_id ?? null,
+        )
+      : null;
+    const inVersion = (row: { version_id?: string | null }) =>
+      !version || row.version_id === version.id;
+    const common = tour ? (tourRows.get(tour.id) ?? []).filter(inVersion) : [];
+    // 공연일 행 중 "그날만 빠진 곡"(omitted)은 곡이 아니라 판에서 뺄 표시.
+    const allOwn = liveRows.get(live.id) ?? [];
+    const own = allOwn.filter((row) => !row.omitted);
+    const omits = allOwn.filter((row) => row.omitted);
     const slug = tour?.slug ?? live.slug;
 
     const base = {
@@ -91,20 +119,32 @@ function buildAllUnits(input: {
     // (lives/data.ts mergeTourSetlist와 같은 규칙).
     const rowsFor = (day: number | null, show: number | null) => {
       const mine = own.filter(inUnit(day, show));
-      const mineIds = new Set(
-        mine.map((row) => originalOf[row.song_id] ?? row.song_id),
+      const skip = new Set(
+        [...mine, ...omits.filter(inUnit(day, show))].map(
+          (row) => originalOf[row.song_id] ?? row.song_id,
+        ),
       );
       return [
         ...common.filter(
-          (row) => !mineIds.has(originalOf[row.song_id] ?? row.song_id),
+          (row) => !skip.has(originalOf[row.song_id] ?? row.song_id),
         ),
         ...mine,
       ];
     };
-    const coverRowsFor = (day: number | null, show: number | null) => [
-      ...(tour ? (tourCovers.get(tour.id) ?? []) : []),
-      ...(liveCovers.get(live.id) ?? []).filter(inUnit(day, show)),
-    ];
+    const coverRowsFor = (day: number | null, show: number | null) => {
+      const ownCovers = liveCovers.get(live.id) ?? [];
+      const omittedTitles = new Set(
+        ownCovers
+          .filter((row) => row.omitted && inUnit(day, show)(row))
+          .map((row) => row.title),
+      );
+      return [
+        ...(tour ? (tourCovers.get(tour.id) ?? []) : []).filter(
+          (row) => inVersion(row) && !omittedTitles.has(row.title),
+        ),
+        ...ownCovers.filter((row) => !row.omitted && inUnit(day, show)(row)),
+      ];
+    };
     const coversFor = (day: number | null, show: number | null) => {
       const rows = coverRowsFor(day, show);
       const seen = new Set<string>();
@@ -119,9 +159,12 @@ function buildAllUnits(input: {
     const unitFields = (day: number | null, show: number | null) => {
       const rows = rowsFor(day, show);
       // 투어 공통 세트리스트만 있고 그날 행(곡·커버곡)이 하나도 없는 공연일 — 그날의
-      // 선택곡을 모른다(통계는 세트리스트를 모르는 날로 친다).
+      // 선택곡을 모른다(통계는 세트리스트를 모르는 날로 친다). 고정 세트리스트 판(fixed)은
+      // 선택곡이 없어 그날 행이 없어도 안다.
       const commonOnly =
         common.length > 0 &&
+        !version?.fixed &&
+        // "빠진 곡" 표시만 있는 날도 그날 선택곡은 모른다.
         !own.some(inUnit(day, show)) &&
         !(liveCovers.get(live.id) ?? []).some(inUnit(day, show));
       return {

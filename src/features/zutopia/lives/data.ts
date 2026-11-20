@@ -15,7 +15,19 @@ import { computeLastModified } from "@/features/zutopia/lives/last-modified";
 import { tourDateFilter } from "@/features/zutopia/lives/tour-dates";
 import { splitTourDateByDay } from "@/features/zutopia/lives/live-days";
 import { parseSetlistNote } from "@/features/zutopia/lives/setlist-note";
-import type { Live, LiveDetail, LiveSetlistEntry, TourDetail } from "./types";
+import {
+  versionEndsOn,
+  versionForDate,
+  type TourVersion,
+} from "@/features/zutopia/lives/tour-versions";
+import { diffDays } from "@/lib/ymd";
+import type {
+  Live,
+  LiveDetail,
+  LiveSetlistEntry,
+  TourDetail,
+  TourSetlistVersion,
+} from "./types";
 
 /**
  * live_date는 timestamptz라 PostgREST가 "2026-09-06T00:00:00+00:00" 같은
@@ -216,7 +228,7 @@ export async function getLiveEntries(): Promise<ZutopiaEntry[]> {
 }
 
 const SETLIST_COLUMNS =
-  "track_number, is_encore, day_number, show_number, note, songs(id, slug, title, title_ko, title_en, metadata)";
+  "track_number, is_encore, day_number, show_number, omitted, note, songs(id, slug, title, title_ko, title_en, metadata)";
 const SETLIST_SELECT = `setlists(${SETLIST_COLUMNS})`;
 
 interface SetlistSong {
@@ -237,6 +249,8 @@ interface SetlistRow {
   is_encore: boolean;
   day_number: number | null;
   show_number: number | null;
+  /** 공연일 행에서만 — 판의 이 곡을 그날 세트리스트에서 뺀다(그날만 빠진 곡) */
+  omitted: boolean;
   note: Json | null;
   songs: SetlistSong;
 }
@@ -321,9 +335,17 @@ function toSetlist(
  * 투어 번호를 남기면 그 공연일의 15번 곡과 번호가 겹치고 14번이 빈다.
  */
 function mergeTourSetlist(
-  tourRows: SetlistRow[],
-  rawLiveRows: SetlistRow[],
+  rawTourRows: SetlistRow[],
+  allLiveRows: SetlistRow[],
+  /** 공연의 일차들(하루 공연이면 [1]) — 일차를 지정한 "그날만 빠진 곡"에 쓴다 */
+  days: number[] = [1],
 ): LiveSetlistEntry[] {
+  const tourRows = omitTourRows(
+    rawTourRows,
+    allLiveRows.filter((row) => row.omitted),
+    days,
+  );
+  const rawLiveRows = allLiveRows.filter((row) => !row.omitted);
   const tourSongIds = new Set(tourRows.map((row) => row.songs.id));
   const liveRows = collapseRepeatedDays(rawLiveRows, tourSongIds);
   const liveSongIds = new Set(liveRows.map((row) => row.songs.id));
@@ -333,6 +355,30 @@ function mergeTourSetlist(
     liveRows.filter((row) => !tourSongIds.has(row.songs.id)),
   );
   return toSetlist([...tourOnly, ...liveRows], (row) => selected.has(row));
+}
+
+/**
+ * 공연일 행의 "그날만 빠진 곡"(omitted)을 판의 공통 행에서 뺀다. 일차가 없으면 그
+ * 공연 전체에서, 일차가 있으면 그날만 — 공통 행을 나머지 일차의 행으로 나눠 둔다.
+ */
+function omitTourRows(
+  tourRows: SetlistRow[],
+  omittedRows: SetlistRow[],
+  days: number[],
+): SetlistRow[] {
+  if (omittedRows.length === 0) return tourRows;
+  return tourRows.flatMap((row) => {
+    const omits = omittedRows.filter(
+      (omit) =>
+        omit.songs.id === row.songs.id && omit.is_encore === row.is_encore,
+    );
+    if (omits.length === 0) return [row];
+    if (omits.some((omit) => omit.day_number == null)) return [];
+    const omittedDays = new Set(omits.map((omit) => omit.day_number));
+    return days
+      .filter((day) => !omittedDays.has(day))
+      .map((day) => ({ ...row, day_number: day }));
+  });
 }
 
 /**
@@ -459,7 +505,13 @@ export const getLiveBySlug = cache(
     if (!data) return null;
 
     const { setlists, ...live } = data;
-    return { ...live, setlist: toSetlist(normalizeSetlistRows(setlists)) };
+    // "그날만 빠진 곡"(omitted)은 투어 공통 행에 대한 표시라 단독 공연엔 쓰지 않는다.
+    return {
+      ...live,
+      setlist: toSetlist(
+        normalizeSetlistRows(setlists.filter((row) => !row.omitted)),
+      ),
+    };
   },
 );
 
@@ -486,22 +538,46 @@ export const getTourBySlug = cache(
     }
     if (!tour) return null;
 
-    const { data: tourSetlist, error: tourSetlistError } = await supabase
-      .from("setlists")
-      .select(SETLIST_COLUMNS)
-      .eq("tour_id", tour.id)
-      .eq("songs.status", "ACTIVE");
-
-    if (tourSetlistError) {
+    const [setlistResult, versionsResult] = await Promise.all([
+      supabase
+        .from("setlists")
+        .select(`version_id, ${SETLIST_COLUMNS}`)
+        .eq("tour_id", tour.id)
+        .eq("songs.status", "ACTIVE"),
+      supabase
+        .from("tour_setlist_versions")
+        .select("id, starts_on, label, fixed")
+        .eq("tour_id", tour.id)
+        .order("starts_on", { ascending: true }),
+    ]);
+    if (setlistResult.error) {
       throw new Error(
-        `투어 세트리스트를 가져오지 못했습니다: ${tourSetlistError.message}`,
+        `투어 세트리스트를 가져오지 못했습니다: ${setlistResult.error.message}`,
       );
     }
+    if (versionsResult.error) {
+      throw new Error(
+        `투어 세트리스트 판을 가져오지 못했습니다: ${versionsResult.error.message}`,
+      );
+    }
+    const versions: TourVersion[] = versionsResult.data.map((version) => ({
+      id: version.id,
+      startsOn: version.starts_on,
+      label: version.label,
+      fixed: version.fixed,
+    }));
+    // 판마다 그 판의 투어 공통 행 — 판이 하나도 없으면(예전 데이터) 모두 한 판으로.
+    const tourRowsOf = (versionId: string | null) =>
+      normalizeSetlistRows(
+        setlistResult.data.filter(
+          (row) => versionId === null || row.version_id === versionId,
+        ),
+      );
 
     const { data: lives, error: livesError } = await supabase
       .from("lives")
       .select(
-        `id, start_date, end_date, live_date, country, region, live_venue, icon_image_url, poster_image_url, additional_image_urls, status, ${SETLIST_SELECT}`,
+        `id, start_date, end_date, live_date, setlist_version_id, country, region, live_venue, icon_image_url, poster_image_url, additional_image_urls, status, ${SETLIST_SELECT}`,
       )
       .or(tourDateFilter(tour))
       // 취소된 공연일도 일정엔 회색·취소선으로 남긴다(누를 수 없음, TourDateList).
@@ -519,6 +595,14 @@ export const getTourBySlug = cache(
     const dates = lives.flatMap((live) => {
       const { city, original } = splitRegion(live.region);
       const canceled = live.status === "CANCELED";
+      // 공연일의 판 — 직접 지정한 판, 아니면 공연 날짜로(tour-versions.ts).
+      const version = versionForDate(
+        versions,
+        live.live_date ?? live.start_date,
+        live.setlist_version_id,
+      );
+      const dayCount =
+        diffDays(live.start_date, live.end_date ?? live.start_date) + 1;
       return splitTourDateByDay(
         {
           id: live.id,
@@ -534,24 +618,42 @@ export const getTourBySlug = cache(
           posterImageUrl: live.poster_image_url,
           additionalImageUrls: live.additional_image_urls ?? [],
           canceled,
+          ...(version && { versionId: version.id }),
           // 취소된 공연일엔 투어 공통 세트리스트도 얹지 않는다(불린 곡이 없다).
           setlist: canceled
             ? []
             : mergeTourSetlist(
-                normalizeSetlistRows(tourSetlist),
+                tourRowsOf(version?.id ?? null),
                 normalizeSetlistRows(live.setlists),
+                Array.from({ length: Math.max(1, dayCount) }, (_, i) => i + 1),
               ),
         },
         live.live_date,
       );
     });
 
-    // 투어 공통 세트리스트(공연일마다 바뀌는 선택곡 제외) — 상세에서 한 번만
+    // 투어 공통 세트리스트(공연일마다 바뀌는 선택곡 제외) — 판마다 하나씩 상세에서
     // 보여주고, 공연일 행엔 그날의 선택곡만 미리 보여준다(TourDateList).
-    return {
-      ...tour,
-      setlist: toSetlist(normalizeSetlistRows(tourSetlist)),
-      dates,
-    };
+    const setlists: TourSetlistVersion[] =
+      versions.length > 0
+        ? versions.map((version) => ({
+            id: version.id,
+            label: version.label,
+            startsOn: version.startsOn,
+            endsOn: versionEndsOn(versions, version),
+            entries: toSetlist(tourRowsOf(version.id)),
+          }))
+        : setlistResult.data.length > 0
+          ? [
+              {
+                id: "all",
+                label: null,
+                startsOn: tour.start_date,
+                endsOn: null,
+                entries: toSetlist(tourRowsOf(null)),
+              },
+            ]
+          : [];
+    return { ...tour, setlists, dates };
   },
 );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { SongLink } from "@/features/zutopia/lives/SongLink";
@@ -33,21 +33,29 @@ type SetlistRow =
 /**
  * 공연 상세·투어 공통 세트리스트·투어 공연일 펼침이 함께 쓰는 세트리스트 카드.
  * - title: 제목 줄 문구(기본 "세트리스트").
- * - collapsible: 제목 줄을 눌러 목록을 접고 펼 수 있다(처음엔 펼침).
+ * - collapsible: 제목 줄을 눌러 목록을 접고 펼 수 있다(처음 상태는 defaultOpen, 기본 펼침).
  * - slots: 공통 세트리스트의 선택곡 자리 — 곡 사이 번호 순서대로 끼워 넣는다.
+ * - toolbar: 펼쳤을 때 제목 줄과 목록 사이에 두는 것(투어 세트리스트 판 고르기 등).
+ * - plain: 카드 면·테두리 없이 목록만(이미 어두운 면 안에 놓일 때 — 공연일 펼침).
  */
 export function Setlist({
   entries,
   title = "SETLIST",
   collapsible = false,
+  defaultOpen = true,
   slots = [],
+  toolbar = null,
+  plain = false,
 }: {
   entries: LiveSetlistEntry[];
   title?: string;
   collapsible?: boolean;
+  defaultOpen?: boolean;
   slots?: SetlistSlot[];
+  toolbar?: ReactNode;
+  plain?: boolean;
 }) {
-  const [isOpen, setOpen] = useState(true);
+  const [isOpen, setOpen] = useState(defaultOpen);
   const rows: SetlistRow[] = [
     ...entries.map((entry) => ({ kind: "song" as const, entry })),
     ...slots.map((slot) => ({ kind: "slot" as const, slot })),
@@ -85,12 +93,15 @@ export function Setlist({
     </>
   );
   const headingClass = cn(
-    "flex w-full items-baseline justify-between px-4 py-3 text-left",
+    "flex w-full items-baseline justify-between text-left",
+    plain ? "py-2" : "px-4 py-3",
     isOpen && "border-b border-white/10",
   );
 
   return (
-    <section className={cn(LIVE_SURFACE_CLASS, "w-full rounded-lg")}>
+    <section
+      className={cn("w-full", !plain && cn(LIVE_SURFACE_CLASS, "rounded-lg"))}
+    >
       {collapsible ? (
         <button
           type="button"
@@ -103,6 +114,7 @@ export function Setlist({
       ) : (
         <div className={headingClass}>{heading}</div>
       )}
+      {isOpen && toolbar}
       {isOpen && (
         <ul className="flex flex-col divide-y divide-white/10">
           {rows.map((row) =>

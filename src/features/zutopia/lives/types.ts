@@ -69,11 +69,27 @@ export interface TourDateEntry {
   /** 그 회차의 개장·개연 시각 "HH:MM"(lives.metadata.shows의 open·start) */
   openTime?: string;
   startTime?: string;
+  /** 투어 공연일이 따른 세트리스트 판(tour_setlist_versions.id) — 판이 없는 투어면 없음 */
+  versionId?: string;
+}
+
+/** 투어 세트리스트 판 하나 — 그 판의 투어 공통 세트리스트(선택곡 제외). */
+export interface TourSetlistVersion {
+  id: string;
+  /** 판 이름(없으면 화면에서 "1판"처럼 순번) */
+  label: string | null;
+  /** "YYYY-MM-DD" — 이 날부터의 공연일에 적용 */
+  startsOn: string;
+  /** 다음 판 시작 전날, 마지막 판이면 null */
+  endsOn: string | null;
+  entries: LiveSetlistEntry[];
 }
 
 export interface TourDetail extends Tour {
-  // 투어 공통 세트리스트(setlists.tour_id) — 공연일마다 바뀌는 선택곡은 빠진다.
-  setlist: LiveSetlistEntry[];
+  // 투어 공통 세트리스트(setlists.tour_id) — 판(tour_setlist_versions)마다 하나, 시작일
+  // 순. 판이 바뀐 적 없는 투어는 하나, 공통 세트리스트가 없으면 빈 배열. 공연일마다
+  // 바뀌는 선택곡은 빠진다.
+  setlists: TourSetlistVersion[];
   // 이 투어에 묶인 개별 공연일(lives.tour_id로 연결) — 아직 없을 수 있다.
   dates: TourDateEntry[];
 }
