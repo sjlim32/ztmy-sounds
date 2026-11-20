@@ -76,9 +76,10 @@ export function SongDbDrawer<T>({
   const shown = present ? displayed : null;
 
   /**
-   * 포커스 관리(useDialogFocus) — 열리면 패널로 포커스를 옮기고 Tab을 패널 안에
-   * 가두고, 닫히면 원래 포커스로 한 프레임 미뤄 되돌린다(restoreFocus "next-frame",
-   * 곧바로 되돌리면 React-DOM의 restoreSelection이 다시 뺏어간다 — 실측).
+   * 포커스 관리(useDialogFocus) — 열리면 패널로 포커스를 옮기고, 닫히면 원래
+   * 포커스로 한 프레임 미뤄 되돌린다. trapOutside false — 열린 채 뒤의 다른 카드를
+   * 눌러 포커스가 패널 밖에 있으면 Tab을 가로채지 않는다(예전처럼 패널 첫·끝
+   * 요소에서만 감싼다).
    *
    * #app-root에 inert를 걸어 배경을 통째로 비활성화하는 방법은 되돌렸다 —
    * 드로어가 열린 채로 다른 카드(data-song-db-item)를 눌러 선택을 바꿀 수
@@ -93,7 +94,7 @@ export function SongDbDrawer<T>({
     open: isOpen,
     containerRef: dialogRef,
     onClose,
-    restoreFocus: "next-frame",
+    trapOutside: false,
   });
 
   // 열린 동안 뒤 페이지가 스크롤되지 않게 잠근다.
@@ -134,6 +135,9 @@ export function SongDbDrawer<T>({
   return createPortal(
     <div
       aria-hidden={!isOpen}
+      // 닫힌 드로어는 화면 밖에 남아 있어 inert로 Tab·포커스도 막는다(닫힌 뒤 Tab이 숨은
+      // 닫기 버튼으로 가지 않게). 닫혀 있을 땐 클릭도 받지 않아 히트테스트 문제는 없다.
+      inert={!isOpen}
       className={cn(
         "fixed inset-0 z-50",
         !isOpen && "pointer-events-none",

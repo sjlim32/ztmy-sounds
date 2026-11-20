@@ -457,9 +457,21 @@ src/
                              # (다른 페이지 번들에 안 들어가게). 창의 여닫힘·포커스는
                              # SidePanel과 같은 lib/use-presence·use-dialog-focus.
                              # 곡·앨범 드로어(SongDbDrawer)도 같은 두 hook을 쓰고
-                             # (포커스 되돌리기만 restoreFocus "next-frame"), 열린 채
-                             # 다른 카드를 눌러 내용만 바꾸는 비모달 동작 때문에
-                             # SidePanel과는 컴포넌트를 따로 둔다.
+                             # (trapOutside false — 포커스가 창 밖이면 Tab을 가로채지
+                             # 않음), 열린 채 다른 카드를 눌러 내용만 바꾸는 비모달
+                             # 동작 때문에 SidePanel과는 컴포넌트를 따로 둔다. hook은
+                             # 닫을 때 포커스 되돌리기를 한 프레임 미루고(React-DOM
+                             # restoreSelection이 닫히는 창 안으로 다시 가져가서), 그
+                             # 사이 다른 곳을 눌렀으면 되돌리지 않고, 기다리는 사이 다시
+                             # 열리면(StrictMode 등) 취소하고 처음 연 요소를 이어받는다.
+                             # 보이는 요소만 Tab 순환, 키는 포커스가 든 창이(어느 창에도
+                             # 없으면 맨 위 창이) 처리, 한글 조합 중이거나 창 안 요소가
+                             # preventDefault한 Esc는 창을 닫지 않는다(검색칸은 글자가
+                             # 있으면 Esc로 글자만 지운다 — SearchField·순위표 검색칸).
+                             # 창 본체는 tabIndex -1(안을 눌러도 포커스가 창에 남게),
+                             # 닫힌 드로어는 inert. SidePanel 폭은
+                             # size — default(목록) 544·640px, wide(통계 순위표)
+                             # 576·704·832px.
                              # "열린 창이 있는지"는 lib/open-modal의 hasOpenModal
                              # (닫혀도 DOM에 남는 드로어는 aria-hidden으로 제외).
       (스크롤)              # ZUTOPIA는 모든 페이지가 스크롤 박스 하나

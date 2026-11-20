@@ -27,12 +27,18 @@ export function SidePanel({
   subtitle,
   onClose,
   children,
+  size = "default",
 }: {
   open: boolean;
   title: string;
   subtitle?: ReactNode;
   onClose: () => void;
   children: ReactNode;
+  /**
+   * 태블릿 이상의 폭 — default 544·640px(목록), wide는 화면이 넓어질수록 한 단계씩
+   * 576·704·832px(통계 순위표처럼 칸이 많은 표).
+   */
+  size?: "default" | "wide";
 }) {
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -67,10 +73,16 @@ export function SidePanel({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        // 창 안의 글자·여백을 눌러도 포커스가 창에 남게(body로 빠지면 창이 둘 열렸을 때
+        // 키가 엉뚱한 창으로 간다 — use-dialog-focus).
+        tabIndex={-1}
         className={cn(
+          "focus:outline-none",
           "bg-background flex max-h-[85dvh] w-full flex-col rounded-t-xl border-t border-white/15 shadow-[0_-8px_32px_rgba(0,0,0,0.5)]",
-          // 순위표처럼 칸이 많은 내용이 들어가 화면이 넓어질수록 한 단계씩 넓힌다(576 → 704 → 832px).
-          "tablet:max-h-none tablet:w-xl pc:w-176 wide:w-208 tablet:rounded-none tablet:border-t-0 tablet:border-l",
+          "tablet:max-h-none tablet:rounded-none tablet:border-t-0 tablet:border-l",
+          size === "wide"
+            ? "tablet:w-xl pc:w-176 wide:w-208"
+            : "tablet:w-136 pc:w-160",
           // 모바일은 아래에서, 태블릿 이상은 오른쪽에서 밀려 나온다.
           "transition-transform duration-300 ease-out motion-reduce:transition-none",
           "tablet:starting:translate-x-full tablet:starting:translate-y-0 starting:translate-y-full",

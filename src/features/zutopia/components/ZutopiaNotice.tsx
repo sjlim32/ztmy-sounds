@@ -99,7 +99,11 @@ export function ZutopiaNotice() {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        // 창 안의 글자·여백을 눌러도 포커스가 창에 남게(body로 빠지면 창이 둘 열렸을 때
+        // 키가 엉뚱한 창으로 간다 — use-dialog-focus).
+        tabIndex={-1}
         className={cn(
+          "focus:outline-none",
           ZUTOPIA_SURFACE_CLASS,
           "bg-background/95 tablet:max-w-xl tablet:p-8 w-full max-w-lg p-6",
           "transition-[opacity,translate] duration-200 ease-out motion-reduce:transition-none starting:translate-y-2 starting:opacity-0",

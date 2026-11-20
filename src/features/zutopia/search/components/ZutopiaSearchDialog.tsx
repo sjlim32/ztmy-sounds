@@ -117,7 +117,11 @@ function DialogPanel({ open }: { open: boolean }) {
         role="dialog"
         aria-modal="true"
         aria-label="통합 검색"
+        // 창 안의 글자·여백을 눌러도 포커스가 창에 남게(body로 빠지면 창이 둘 열렸을 때
+        // 키가 엉뚱한 창으로 간다 — use-dialog-focus).
+        tabIndex={-1}
         className={cn(
+          "focus:outline-none",
           // 모바일은 화면 전체, 태블릿 이상은 위쪽 가운데 창.
           "bg-background flex h-full w-full flex-col",
           "tablet:h-auto tablet:max-h-[80dvh] tablet:w-[40rem] tablet:rounded-xl tablet:border tablet:border-white/15 tablet:shadow-2xl",

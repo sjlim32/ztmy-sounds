@@ -48,6 +48,18 @@ export function SearchField({
           if (event.key === "Enter" && !event.nativeEvent.isComposing)
             event.currentTarget.blur();
           onKeyDown?.(event);
+          // 글자가 있으면 Esc는 글자만 지운다(호출부가 따로 처리하지 않았을 때) — 브라우저
+          // 기본 지우기는 브라우저마다 달라서 직접 지우고, preventDefault로 창(검색 창)이
+          // 같이 닫히지 않게 알린다(use-dialog-focus).
+          if (
+            event.key === "Escape" &&
+            !event.defaultPrevented &&
+            !event.nativeEvent.isComposing &&
+            value
+          ) {
+            event.preventDefault();
+            onClear();
+          }
         }}
         enterKeyHint="search"
         aria-label="곡·앨범·공연 검색"
