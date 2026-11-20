@@ -483,3 +483,84 @@ describe("온라인 공연", () => {
     expect(inPersonUnits(units).map((unit) => unit.liveId)).toEqual(["OFF"]);
   });
 });
+
+describe("1차 검토 반영", () => {
+  const tours: RawTour[] = [
+    { id: "T", slug: "t", title: "T", title_ko: "T", poster_image_url: null },
+  ];
+
+  test("투어 공통 곡만 있고 그날 행이 없으면 commonOnly", () => {
+    const units = buildLiveUnits(
+      {
+        lives: [
+          live({ id: "A", tour_id: "T", start_date: "2024-01-01" }),
+          live({ id: "B", tour_id: "T", start_date: "2024-01-02" }),
+        ],
+        tours,
+        setlists: [
+          { ...row("c", { tour_id: "T" }), track_number: 1 },
+          { ...row("s", { live_id: "A" }), track_number: 2 },
+        ],
+        originalOf: {},
+      },
+      TODAY,
+    );
+    const byId = new Map(units.map((unit) => [unit.liveId, unit]));
+    expect(byId.get("A")!.commonOnly).toBeUndefined();
+    expect(byId.get("B")!.commonOnly).toBe(true);
+    expect(byId.get("B")!.songIds).toEqual(["c"]);
+  });
+
+  test("같은 곡이 투어 공통·공연일 양쪽에 있으면 공연일 번호, 커버곡도 자리를 차지", () => {
+    const [unit] = buildLiveUnits(
+      {
+        lives: [live({ id: "A", tour_id: "T" })],
+        tours,
+        setlists: [
+          { ...row("x", { tour_id: "T" }), track_number: 14, is_encore: false },
+          { ...row("x", { live_id: "A" }), track_number: 15, is_encore: false },
+          { ...row("z", { live_id: "A" }), track_number: 14, is_encore: false },
+          { ...row("a", { live_id: "A" }), track_number: 12, is_encore: false },
+        ],
+        originalOf: {},
+        covers: [
+          {
+            live_id: "A",
+            tour_id: null,
+            day_number: null,
+            title: "C",
+            titleKo: null,
+            artist: null,
+            track_number: 13,
+            is_encore: false,
+          },
+        ],
+      },
+      TODAY,
+    );
+    expect(unit.mainOrder).toEqual(["a", "cover:C", "z", "x"]);
+  });
+});
+
+describe("2차 검토 반영", () => {
+  test("여러 날 공연의 live_date면 그날 일차의 행만 센다", () => {
+    const [unit] = build(
+      [
+        live({
+          id: "L",
+          start_date: "2023-05-24",
+          end_date: "2023-05-25",
+          live_date: "2023-05-25",
+        }),
+      ],
+      [
+        row("all", { live_id: "L" }),
+        row("d1", { live_id: "L" }, 1),
+        row("d2", { live_id: "L" }, 2),
+      ],
+    );
+    expect(unit.date).toBe("2023-05-25");
+    expect(unit.dayNumber).toBeNull();
+    expect(unit.songIds).toEqual(["all", "d2"]);
+  });
+});

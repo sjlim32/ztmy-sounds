@@ -49,6 +49,11 @@ export interface LiveUnit {
   encoreOrder?: string[];
   /** 다른 버전으로 부른 곡(note.variation — "short", "acoustic" …) */
   variations?: { songId: string; name: string }[];
+  /**
+   * 투어 공통 세트리스트만 있고 그날의 행이 없는 공연일 — 공통 곡은 songIds에 있지만
+   * 그날 선택곡을 몰라서, 통계는 세트리스트를 모르는 날로 친다.
+   */
+  commonOnly?: true;
   /** 곡이 연결되지 않은 커버곡(note.title, 한글 제목 note.title_kr, 원곡 가수 note.original_artist) */
   covers?: { title: string; titleKo: string | null; artist: string | null }[];
 }
@@ -62,7 +67,8 @@ export type StatOnlyUnitField =
   | "mainOrder"
   | "encoreOrder"
   | "variations"
-  | "covers";
+  | "covers"
+  | "commonOnly";
 
 export interface SongLiveStat {
   count: number;
@@ -128,4 +134,6 @@ export interface RawCoverRow {
   title: string;
   titleKo: string | null;
   artist: string | null;
+  track_number?: number;
+  is_encore?: boolean;
 }

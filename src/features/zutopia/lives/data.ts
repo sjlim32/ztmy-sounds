@@ -338,9 +338,11 @@ function mergeTourSetlist(
 /**
  * 이틀 이상 공연(day_number가 있는 공연일)에서 날마다 세트리스트 전체를 따로
  * 등록한 경우, 같은 곡이 날마다 한 줄씩 반복되지 않게 한 줄로 합친다.
- * - 투어 공통 곡: 날짜와 상관없이 한 줄(일차 없음). 번호는 여러 날 중 가장
- *   많이 쓰인 번호(같으면 앞 날) — 어느 날 데이터에 같은 곡이 두 번 잘못
- *   들어간 경우에도 제자리를 지킨다.
+ * - 투어 공통 곡: 날마다 번호가 같으면 한 줄(일차 없음), 날마다 다르면 날마다
+ *   한 줄씩(그날 번호) — 공연일을 날마다 나눠 보여 주므로(splitTourDateByDay) 한
+ *   번호로 합치면 다른 날에 번호가 겹치거나 빈다. 같은 날 안에서는 가장 많이 쓰인
+ *   번호(같으면 모든 날 기준으로 많이 쓰인 번호, 그래도 같으면 작은 번호) — 그날
+ *   데이터에 같은 곡이 두 번 잘못 들어가도 제자리를 지킨다.
  * - 그 밖의 곡(선택곡): 모든 날에 같은 번호로 불렸으면 한 줄(일차 없음), 아니면
  *   날마다 따로(DAY 1·DAY 2 배지). 번호가 다르면 다른 선택곡 자리라서 합치지
  *   않는다(cosdan 2025-11-18~19: 黒猫のタンゴ가 첫째날 10번, 둘째날 9번).
@@ -359,26 +361,49 @@ function collapseRepeatedDays(
     const key = `${row.songs.id}-${row.is_encore}`;
     groups.set(key, [...(groups.get(key) ?? []), row]);
   }
+  // 가장 많이 쓰인 번호의 행(같으면 앞 행)
+  // 가장 많이 쓰인 번호의 행 — 같으면 tieBreak(모든 날 기준 횟수)가 많은 번호, 그래도
+  // 같으면 번호가 작은 행(DB가 주는 행 순서에 따라 빌드마다 바뀌지 않게).
+  const countNumbers = (list: SetlistRow[]) => {
+    const count = new Map<number, number>();
+    for (const row of list)
+      count.set(row.track_number, (count.get(row.track_number) ?? 0) + 1);
+    return count;
+  };
+  const mostUsed = (list: SetlistRow[], tieBreak = countNumbers(list)) => {
+    const count = countNumbers(list);
+    const score = (row: SetlistRow) => [
+      count.get(row.track_number) ?? 0,
+      tieBreak.get(row.track_number) ?? 0,
+      -row.track_number,
+    ];
+    return list.reduce((picked, row) => {
+      const [a, b] = [score(row), score(picked)];
+      for (let i = 0; i < a.length; i++)
+        if (a[i] !== b[i]) return a[i] > b[i] ? row : picked;
+      return picked;
+    });
+  };
   return [...groups.values()].flatMap((group) => {
+    if (tourSongIds.has(group[0].songs.id)) {
+      const byDay = new Map<number | null, SetlistRow[]>();
+      for (const row of group)
+        byDay.set(row.day_number, [...(byDay.get(row.day_number) ?? []), row]);
+      // 같은 날 안에서 동점이면(그날 같은 곡이 두 번 잘못 들어간 경우) 모든 날 기준 번호로.
+      const overall = countNumbers(group);
+      const picks = [...byDay.values()].map((list) => mostUsed(list, overall));
+      if (new Set(picks.map((row) => row.track_number)).size === 1)
+        return [{ ...picks[0], day_number: null }];
+      return picks;
+    }
     const groupDays = new Set(group.map((row) => row.day_number));
-    const numbers = group.map((row) => row.track_number);
     // 모든 날에 같은 번호로 불린 곡이면 일차 없이 한 줄 — 양일 같은 선택곡은
     // "선택곡" 배지만 남는다.
     const sameEveryDay =
       [...days].every((day) => groupDays.has(day)) &&
-      new Set(numbers).size === 1;
-    if (!tourSongIds.has(group[0].songs.id) && !sameEveryDay) return group;
-    const ordered = [...group].sort(
-      (a, b) => (a.day_number ?? 0) - (b.day_number ?? 0),
-    );
-    const count = new Map<number, number>();
-    for (const n of numbers) count.set(n, (count.get(n) ?? 0) + 1);
-    const best = ordered.reduce((picked, row) =>
-      (count.get(row.track_number) ?? 0) > (count.get(picked.track_number) ?? 0)
-        ? row
-        : picked,
-    );
-    return [{ ...best, day_number: null }];
+      new Set(group.map((row) => row.track_number)).size === 1;
+    if (!sameEveryDay) return group;
+    return [{ ...mostUsed(group), day_number: null }];
   });
 }
 
@@ -476,7 +501,7 @@ export const getTourBySlug = cache(
     const { data: lives, error: livesError } = await supabase
       .from("lives")
       .select(
-        `id, start_date, end_date, country, region, live_venue, icon_image_url, poster_image_url, additional_image_urls, status, ${SETLIST_SELECT}`,
+        `id, start_date, end_date, live_date, country, region, live_venue, icon_image_url, poster_image_url, additional_image_urls, status, ${SETLIST_SELECT}`,
       )
       .or(tourDateFilter(tour))
       // 취소된 공연일도 일정엔 회색·취소선으로 남긴다(누를 수 없음, TourDateList).
@@ -494,28 +519,31 @@ export const getTourBySlug = cache(
     const dates = lives.flatMap((live) => {
       const { city, original } = splitRegion(live.region);
       const canceled = live.status === "CANCELED";
-      return splitTourDateByDay({
-        id: live.id,
-        date: formatLiveDateRange(live.start_date, live.end_date),
-        startDate: live.start_date,
-        endDate: live.end_date,
-        country: live.country,
-        city,
-        cityOriginal: original,
-        region: live.region,
-        venue: displayVenue(live.live_venue),
-        iconImageUrl: live.icon_image_url,
-        posterImageUrl: live.poster_image_url,
-        additionalImageUrls: live.additional_image_urls ?? [],
-        canceled,
-        // 취소된 공연일엔 투어 공통 세트리스트도 얹지 않는다(불린 곡이 없다).
-        setlist: canceled
-          ? []
-          : mergeTourSetlist(
-              normalizeSetlistRows(tourSetlist),
-              normalizeSetlistRows(live.setlists),
-            ),
-      });
+      return splitTourDateByDay(
+        {
+          id: live.id,
+          date: formatLiveDateRange(live.start_date, live.end_date),
+          startDate: live.start_date,
+          endDate: live.end_date,
+          country: live.country,
+          city,
+          cityOriginal: original,
+          region: live.region,
+          venue: displayVenue(live.live_venue),
+          iconImageUrl: live.icon_image_url,
+          posterImageUrl: live.poster_image_url,
+          additionalImageUrls: live.additional_image_urls ?? [],
+          canceled,
+          // 취소된 공연일엔 투어 공통 세트리스트도 얹지 않는다(불린 곡이 없다).
+          setlist: canceled
+            ? []
+            : mergeTourSetlist(
+                normalizeSetlistRows(tourSetlist),
+                normalizeSetlistRows(live.setlists),
+              ),
+        },
+        live.live_date,
+      );
     });
 
     // 투어 공통 세트리스트(공연일마다 바뀌는 선택곡 제외) — 상세에서 한 번만

@@ -143,9 +143,29 @@ export function splitLiveDays(
  * 투어 공연일 한 행(lives)이 이틀 이상(start_date~end_date)이면 날마다 한 행으로
  * 나눈다 — 일정 행마다 그날의 선택곡만 보이고, 펼치면 그날 세트리스트만 보인다.
  * 일차가 비어 있는 곡(공통 곡, 모든 날 같은 번호로 부른 선택곡)은 날마다 들어간다.
- * 취소된 공연일은 펼칠 세트리스트가 없어 한 행 그대로 둔다.
+ * 취소된 공연일은 펼칠 세트리스트가 없어 한 행 그대로 둔다. liveDate(즛토마요가
+ * 실제로 선 날, lives.live_date)가 있으면 나누지 않고 그날 하루 행으로 — 라이브 기록·
+ * 통계(live-history/units.ts)도 그날 하루로 센다.
  */
-export function splitTourDateByDay(date: TourDateEntry): TourDateEntry[] {
+export function splitTourDateByDay(
+  date: TourDateEntry,
+  liveDate: string | null = null,
+): TourDateEntry[] {
+  if (liveDate) {
+    const day = liveDate.slice(0, 10);
+    const index = diffDays(date.startDate, day) + 1;
+    return [
+      {
+        ...date,
+        date: formatKoreanDate(day),
+        startDate: day,
+        endDate: null,
+        setlist: date.setlist.filter(
+          (entry) => entry.dayNumber == null || entry.dayNumber === index,
+        ),
+      },
+    ];
+  }
   if (date.canceled || !date.endDate) return [date];
   const dayCount = diffDays(date.startDate, date.endDate) + 1;
   if (dayCount < 2) return [date];

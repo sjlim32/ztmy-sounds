@@ -244,3 +244,31 @@ describe("splitTourDateByDay", () => {
     ]);
   });
 });
+
+describe("splitTourDateByDay — live_date", () => {
+  test("즛토마요가 선 날(live_date)이 있으면 나누지 않고 그날 하루", () => {
+    const result = splitTourDateByDay(
+      tourDate({
+        startDate: "2023-05-24",
+        endDate: "2023-05-25",
+        setlist: [entry("a", 1, null), entry("b", 2, 1), entry("c", 2, 2)],
+      }),
+      "2023-05-25T00:00:00+00:00",
+    );
+    expect(
+      result.map((d) => ({
+        startDate: d.startDate,
+        endDate: d.endDate,
+        dayNumber: d.dayNumber,
+        songs: d.setlist.map((e) => e.songId),
+      })),
+    ).toEqual([
+      {
+        startDate: "2023-05-25",
+        endDate: null,
+        dayNumber: undefined,
+        songs: ["a", "c"],
+      },
+    ]);
+  });
+});

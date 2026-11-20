@@ -87,15 +87,26 @@ function buildAllUnits(input: {
       (row: Pick<RawSetlistRow, "day_number" | "show_number">) =>
         (day === null || row.day_number == null || row.day_number === day) &&
         (show === null || row.show_number == null || row.show_number === show);
-    const rowsFor = (day: number | null, show: number | null) => [
-      ...common,
-      ...own.filter(inUnit(day, show)),
+    // 같은 곡이 투어 공통·공연일 양쪽에 있으면 공연일 행(그날의 실제 번호)만 쓴다
+    // (lives/data.ts mergeTourSetlist와 같은 규칙).
+    const rowsFor = (day: number | null, show: number | null) => {
+      const mine = own.filter(inUnit(day, show));
+      const mineIds = new Set(
+        mine.map((row) => originalOf[row.song_id] ?? row.song_id),
+      );
+      return [
+        ...common.filter(
+          (row) => !mineIds.has(originalOf[row.song_id] ?? row.song_id),
+        ),
+        ...mine,
+      ];
+    };
+    const coverRowsFor = (day: number | null, show: number | null) => [
+      ...(tour ? (tourCovers.get(tour.id) ?? []) : []),
+      ...(liveCovers.get(live.id) ?? []).filter(inUnit(day, show)),
     ];
     const coversFor = (day: number | null, show: number | null) => {
-      const rows = [
-        ...(tour ? (tourCovers.get(tour.id) ?? []) : []),
-        ...(liveCovers.get(live.id) ?? []).filter(inUnit(day, show)),
-      ];
+      const rows = coverRowsFor(day, show);
       const seen = new Set<string>();
       const covers = rows.flatMap((row) =>
         seen.has(row.title)
@@ -107,10 +118,17 @@ function buildAllUnits(input: {
     };
     const unitFields = (day: number | null, show: number | null) => {
       const rows = rowsFor(day, show);
+      // 투어 공통 세트리스트만 있고 그날 행(곡·커버곡)이 하나도 없는 공연일 — 그날의
+      // 선택곡을 모른다(통계는 세트리스트를 모르는 날로 친다).
+      const commonOnly =
+        common.length > 0 &&
+        !own.some(inUnit(day, show)) &&
+        !(liveCovers.get(live.id) ?? []).some(inUnit(day, show));
       return {
         songIds: uniqueSongIds(rows, originalOf),
-        ...setlistDetails(rows, originalOf),
+        ...setlistDetails(rows, originalOf, coverRowsFor(day, show)),
         ...coversFor(day, show),
+        ...(commonOnly && { commonOnly: true as const }),
         ...(live.live_venue !== undefined && { venue: live.live_venue }),
         ...(live.country !== undefined && { country: live.country }),
       };
@@ -119,16 +137,22 @@ function buildAllUnits(input: {
     // 하루 회차(metadata.shows · 그날 세트리스트의 show_number 중 큰 쪽, 2회 이상일
     // 때만) — 날마다 회차 수만큼 단위를 만든다. 첫 회차 id는 예전과 같은
     // "공연id:날짜"라 이미 저장된 체크가 그대로 첫 회차가 된다.
-    const pushDay = (date: string, dayNumber: number | null) => {
+    // rowDay: 이 공연일에 넣을 세트리스트 행의 일차(기본은 dayNumber와 같다). live_date로
+    // 하루만 세는 여러 날 공연은 dayNumber는 비우되 그날 일차의 행만 넣는다.
+    const pushDay = (
+      date: string,
+      dayNumber: number | null,
+      rowDay: number | null = dayNumber,
+    ) => {
       const shows = showsForDay(
         live.metadata,
-        dayNumber ?? 1,
+        rowDay ?? 1,
         own
           .filter(
             (row) =>
-              dayNumber === null ||
+              rowDay === null ||
               row.day_number == null ||
-              row.day_number === dayNumber,
+              row.day_number === rowDay,
           )
           .map((row) => row.show_number),
       );
@@ -138,7 +162,7 @@ function buildAllUnits(input: {
           id: `${live.id}:${date}`,
           date,
           dayNumber,
-          ...unitFields(dayNumber, null),
+          ...unitFields(rowDay, null),
         });
         return;
       }
@@ -150,14 +174,23 @@ function buildAllUnits(input: {
           dayNumber,
           showNumber: show,
           showLabel: label,
-          ...unitFields(dayNumber, show),
+          ...unitFields(rowDay, show),
         });
       });
     };
 
     // 페스티벌, 그리고 live_date(즛토마요가 실제로 선 날)가 있는 공연은 그날 하루.
+    // 여러 날 공연의 live_date면 그날 일차(시작일부터 몇째 날)의 행만 — 투어 상세
+    // (lives/live-days.ts splitTourDateByDay)와 같은 기준.
     if (live.type === "FESTIVAL" || live.live_date) {
-      pushDay((live.live_date ?? live.start_date).slice(0, 10), null);
+      const date = (live.live_date ?? live.start_date).slice(0, 10);
+      const start = live.start_date.slice(0, 10);
+      const end = (live.end_date ?? live.start_date).slice(0, 10);
+      const rowDay =
+        live.type !== "FESTIVAL" && end > start
+          ? daysInclusive(start, date)
+          : null;
+      pushDay(date, null, rowDay);
       continue;
     }
 
@@ -255,11 +288,14 @@ function uniqueSongIds(
  * 오프닝·앵콜·곡 순서·버전(통계용) — track_number·is_encore가 있는 행에서만. 첫
  * 곡은 앵콜이 아닌 곡 중 순서가 가장 앞선 곡(같으면 투어 공통 행이 먼저). 순서는
  * 본편·앵콜 따로 track_number 순(같으면 앞 행 먼저), 같은 곡은 처음 나온 자리만.
- * 순서 정보가 없는 원시 데이터면 빈 값.
+ * 커버곡도 "cover:제목"으로 자리를 차지한다 — 커버를 사이에 둔 두 곡이 이어 부른
+ * 곡으로 세지거나 위치가 당겨지지 않게(통계는 곡이 아닌 id를 건너뛴다). 순서 정보가
+ * 없는 원시 데이터면 빈 값.
  */
 function setlistDetails(
   rows: RawSetlistRow[],
   originalOf: Record<string, string>,
+  coverRows: RawCoverRow[] = [],
 ): Pick<
   LiveUnit,
   "openingSongId" | "encoreSongIds" | "mainOrder" | "encoreOrder" | "variations"
@@ -267,18 +303,25 @@ function setlistDetails(
   if (!rows.some((row) => row.track_number !== undefined)) return {};
   const original = (row: RawSetlistRow) =>
     originalOf[row.song_id] ?? row.song_id;
+  const slots = [
+    ...rows.map((row) => ({
+      id: original(row),
+      track: row.track_number,
+      encore: !!row.is_encore,
+    })),
+    ...coverRows.map((row) => ({
+      id: `cover:${row.title}`,
+      track: row.track_number,
+      encore: !!row.is_encore,
+    })),
+  ];
   const ordered = (encore: boolean) => [
     ...new Set(
-      rows
-        .map((row, index) => ({ row, index }))
-        .filter(
-          ({ row }) => !!row.is_encore === encore && row.track_number != null,
-        )
-        .sort(
-          (a, b) =>
-            a.row.track_number! - b.row.track_number! || a.index - b.index,
-        )
-        .map(({ row }) => original(row)),
+      slots
+        .map((slot, index) => ({ slot, index }))
+        .filter(({ slot }) => slot.encore === encore && slot.track != null)
+        .sort((a, b) => a.slot.track! - b.slot.track! || a.index - b.index)
+        .map(({ slot }) => slot.id),
     ),
   ];
   const mainOrder = ordered(false);
@@ -314,6 +357,7 @@ export function toClientUnit(
     encoreOrder,
     variations,
     covers,
+    commonOnly,
     ...rest
   } = unit;
   /* eslint-enable @typescript-eslint/no-unused-vars */

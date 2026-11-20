@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
+import { fetchAllRows } from "@/lib/supabase/fetch-all";
 import { koreaDate } from "@/lib/korea-date";
 import {
   buildLiveUnits,
@@ -54,18 +55,30 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
         .from("tours")
         .select("id, slug, title, title_ko, poster_image_url")
         .eq("status", "ACTIVE"),
-      supabase
-        .from("setlists")
-        .select(
-          "live_id, tour_id, song_id, day_number, show_number, track_number, is_encore, note, songs!inner(status)",
-        )
-        .eq("songs.status", "ACTIVE"),
-      // 곡이 연결되지 않은 커버곡(note.title) — 곡 기록엔 안 넣고 통계의 커버곡 기록에만.
-      supabase
-        .from("setlists")
-        .select("live_id, tour_id, day_number, show_number, note")
-        .is("song_id", null)
-        .not("note", "is", null),
+      // 세트리스트는 1000행(max_rows)을 넘을 수 있어(지금 약 800행) 끝까지 나눠 받는다(fetchAllRows).
+      fetchAllRows((from, to) =>
+        supabase
+          .from("setlists")
+          .select(
+            "live_id, tour_id, song_id, day_number, show_number, track_number, is_encore, note, songs!inner(status)",
+          )
+          .eq("songs.status", "ACTIVE")
+          .order("id")
+          .range(from, to),
+      ),
+      // 곡이 연결되지 않은 커버곡(note.title) — 곡 기록엔 안 넣고 통계의 커버곡 기록과
+      // 곡 순서(자리 차지)에만.
+      fetchAllRows((from, to) =>
+        supabase
+          .from("setlists")
+          .select(
+            "live_id, tour_id, day_number, show_number, track_number, is_encore, note",
+          )
+          .is("song_id", null)
+          .not("note", "is", null)
+          .order("id")
+          .range(from, to),
+      ),
       getOriginalOf(),
     ]);
 
@@ -134,6 +147,8 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
               title,
               titleKo: parseSetlistNote(row.note, "title_kr"),
               artist: parseSetlistNote(row.note, "original_artist"),
+              track_number: row.track_number,
+              is_encore: row.is_encore,
             },
           ]
         : [];
