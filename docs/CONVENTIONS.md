@@ -519,6 +519,9 @@ src/
     social-links.ts         # 소셜 링크
   lib/                      # 여러 기능이 공유하는 프레임워크 비의존 로직
     supabase/                # Supabase 클라이언트 (빌드 타임 전용 — 아래 "곡 데이터" 참고)
+                             # fetch-all.ts fetchAllRows — 1000행(max_rows)을 넘을 수 있는
+                             # 조회(세트리스트)를 .order + .range로 빈 페이지가 올 때까지
+                             # 나눠 받는다(넘는 행은 오류 없이 잘린다)
     seo.ts                   # 사이트 전역 메타데이터 상수 (SITE_NAME, FEED_URL 등)와
                              # 하위 페이지용 공통값(pageAlternates, DEFAULT_OG_IMAGE,
                              # BASE_OPEN_GRAPH — openGraph·alternates는 얕은 병합이라

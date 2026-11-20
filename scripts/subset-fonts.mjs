@@ -262,7 +262,8 @@ async function checkBuildOutput() {
   const record = (map, char, file) =>
     map.set(char, (map.get(char) ?? new Set()).add(file));
 
-  for (const { file, text } of await readFiles(BUILD_DIR, /\.html$/)) {
+  // JSON도 본다 — 통계 전체 순위표(stats.json) 등 화면이 받아 그리는 글자가 HTML에 없을 수 있다.
+  for (const { file, text } of await readFiles(BUILD_DIR, /\.(html|json)$/)) {
     const mkpopElements = text.matchAll(
       /<[a-z0-9]+\b[^>]*\bclass="[^"]*(?<![\w-])font-mkpop(?![\w-])[^"]*"[^>]*>([^<]*)/g,
     );

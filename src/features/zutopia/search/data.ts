@@ -1,5 +1,6 @@
 import "server-only";
 import { createBuildTimeSupabaseClient } from "@/lib/supabase/build-time-client";
+import { fetchAllRows } from "@/lib/supabase/fetch-all";
 import {
   getAlbumsWithSongs,
   getSongsWithAlbums,
@@ -24,7 +25,14 @@ async function getSetlistLinks(): Promise<{
 }> {
   const supabase = createBuildTimeSupabaseClient();
   const [setlists, lives, tours] = await Promise.all([
-    supabase.from("setlists").select("song_id, live_id, tour_id"),
+    // 세트리스트는 1000행(max_rows)을 넘을 수 있어(지금 약 800행) 끝까지 나눠 받는다.
+    fetchAllRows((from, to) =>
+      supabase
+        .from("setlists")
+        .select("song_id, live_id, tour_id")
+        .order("id")
+        .range(from, to),
+    ),
     // "*" — aliases 컬럼이 아직 없는 DB에서도 빌드가 깨지지 않게 이름을 집지 않는다.
     supabase.from("lives").select("*").eq("status", "ACTIVE"),
     supabase.from("tours").select("*").eq("status", "ACTIVE"),
