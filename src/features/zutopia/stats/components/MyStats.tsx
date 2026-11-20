@@ -129,9 +129,13 @@ function MySummaryView({
           <dd className="text-2xl font-semibold text-white tabular-nums">
             {summary.attended}회
           </dd>
-          <dd className="text-sm text-white/50">
-            세트리스트가 있는 날 {summary.known}회로 곡을 셌어요
-          </dd>
+          {summary.known < summary.attended && (
+            <dd className="text-sm break-keep text-white/55">
+              {summary.known > 0
+                ? `${summary.attended - summary.known}회는 세트리스트가 없거나 투어 공통 곡만 있어요`
+                : "체크한 공연은 아직 세트리스트가 없거나 투어 공통 곡만 있어요"}
+            </dd>
+          )}
         </div>
         <div className="flex flex-col gap-1">
           <dt className="text-sm text-white/60">라이브로 들은 곡</dt>
@@ -139,7 +143,7 @@ function MySummaryView({
             {summary.heard}
             <span className="text-base text-white/55">
               {" "}
-              / {summary.total}곡
+              / 발매곡 {summary.total}곡
             </span>
           </dd>
           <dd
@@ -157,15 +161,24 @@ function MySummaryView({
       <div className="tablet:grid-cols-2 grid grid-cols-1 gap-5">
         <SongList
           title="내가 들은 희귀곡"
-          empty="세트리스트가 있는 공연을 체크하면 보여요."
+          empty="세트리스트를 아는 공연을 체크하면 보여요."
           songs={summary.rare}
           value={(song) => `전체 ${song.played}회`}
         />
         <SongList
           title="아직 못 들은 인기곡"
-          empty="많이 부르는 곡은 다 들었어요."
+          empty={
+            summary.known > 0
+              ? "많이 부르는 곡은 다 들었어요."
+              : "세트리스트를 아는 공연을 체크하면 보여요."
+          }
           songs={summary.missed}
           value={(song) => `참가율 ${Math.round(song.rate! * 100)}%`}
+          note={
+            summary.known > 0 && summary.known < summary.attended
+              ? `세트리스트를 모르는 ${summary.attended - summary.known}회에서 들었을 수도 있어요`
+              : null
+          }
         />
       </div>
     </div>
@@ -177,11 +190,14 @@ function SongList({
   empty,
   songs,
   value,
+  note = null,
 }: {
   title: string;
   empty: string;
   songs: MyStatSong[];
   value: (song: MyStatSong) => string;
+  /** 목록 아래 안내 한 줄 */
+  note?: string | null;
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -220,6 +236,7 @@ function SongList({
           ))}
         </ol>
       )}
+      {note && <p className="text-sm break-keep text-white/50">{note}</p>}
     </div>
   );
 }

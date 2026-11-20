@@ -52,6 +52,11 @@ export interface StatRecord {
   leaderCount: number;
   /** 1위의 연도별 흐름(있는 기록만) */
   trend?: StatTrend | null;
+  /**
+   * false면 카드 2~5위에 1위 대비 막대를 두지 않는다 — 값이 크기가 아닌 기록(평균
+   * 위치, 순위를 보정값으로 매긴 참가율 등). 없으면 값이 숫자일 때 둔다.
+   */
+  bars?: false;
 }
 
 export interface StatSection {

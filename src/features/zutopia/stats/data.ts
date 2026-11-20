@@ -17,11 +17,13 @@ import { buildMyStatsData, type MyStatsData } from "./my-stats";
 import type { StatSection, StatSong, StatSummary, StatTour } from "./types";
 
 /**
- * 통계 계산 입력(빌드 때 한 번) — 기록(getStatSections)과 맨 위 요약(getStatSummary)이 같이 쓴다. 곡은 isCountableOriginal — 원곡·발매곡만이고
+ * 통계 계산 입력 — 기록(getStatSections)과 맨 위 요약(getStatSummary)이 같이 쓴다.
+ * React cache는 페이지 렌더 안에서만 한 번으로 묶인다(Route Handler에선 묶이지 않아
+ * stats.json route는 입력을 한 번 받아 직접 넘긴다). 곡은 isCountableOriginal — 원곡·발매곡만이고
  * 협업곡도 뺀다(참전 기록은 들은 협업곡을 넣는 것과 다름). 라이브 기록은 원곡으로
  * 세고, 앨범 수록곡도 어레인지는 원곡으로 바꿔 센다.
  */
-const getStatInput = cache(async () => {
+export const getStatInput = cache(async () => {
   const supabase = createBuildTimeSupabaseClient();
   const [history, songs, albums, toursResult, canceledResult] =
     await Promise.all([

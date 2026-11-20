@@ -20,15 +20,19 @@ import type {
   StatTrend,
 } from "./types";
 import { MISSING_SETLIST_RECORD_ID } from "./types";
+import { hasSetlist, knowsSong, wilsonLowerBound } from "./has-setlist";
+
+export { hasSetlist, wilsonLowerBound };
 
 /**
  * 통계 페이지 기록 계산(순수 함수 — 빌드 때 한 번, 테스트 대상).
  *
  * 세는 기준:
  * - 공연일(LiveUnit) 하나 = 1회. 투어 각 회차·이틀 공연의 각 날을 따로 센다.
- * - 세트리스트가 아직 없는 공연일(songIds가 빈 날)은 곡·공연 기록(횟수·참가율·
- *   첫 곡 등)에서 뺀다 — "안 불렀다"로 세면 기록이 틀어진다. 공연 횟수·
- *   장소·공백 같은 기록엔 넣는다.
+ * - 세트리스트를 모르는 공연일(songIds가 비었거나 투어 공통 곡만 있는 날 —
+ *   hasSetlist)은 곡·공연 기록(횟수·참가율·첫 곡 등)에서 뺀다 — "안 불렀다"로 세면
+ *   기록이 틀어진다. 다만 투어 공통 곡만 있는 날도 그 공통 곡은 불렀으니 그 곡에
+ *   한해서는 아는 날로 센다(knowsSong). 공연 횟수·장소·공백 같은 기록엔 넣는다.
  * - "모르는 구간" = 세트리스트 없는 공연일 + 공연일이 하나도 등록되지 않은 투어
  *   기간. 첫 라이브·라이브 데뷔·첫 공개·공백 끝 부활·연속 기록은 이 구간을 사이에
  *   두면 단정할 수 없어서, 그런 곡·구간은 빼거나(데뷔·부활) 끊는다(연속).
@@ -63,8 +67,9 @@ export function buildStatSections(input: {
   tours: StatTour[];
 }): StatSection[] {
   const all = [...input.units].sort(byDate);
-  const known = all.filter((unit) => unit.songIds.length > 0);
-  const songStats = buildSongStats(input.songs, known);
+  const known = all.filter(hasSetlist);
+  const songStats = buildSongStats(input.songs, all);
+  const unreleasedStats = buildSongStats(input.unreleasedSongs ?? [], all);
   const scheduled = new Set(
     [...all, ...input.upcoming].flatMap((unit) => unit.tourId ?? []),
   );
@@ -83,13 +88,12 @@ export function buildStatSections(input: {
       from: tour.startDate,
       to: minDate(tour.endDate ?? tour.startDate, lastDate),
     }));
-  const unknown: Span[] = [
-    ...all
-      .filter((unit) => unit.songIds.length === 0)
-      .map((unit) => ({ from: unit.date, to: unit.date })),
-    ...emptyTours,
-  ];
-  const context: Context = { unknown, emptyTourCount: emptyTours.length };
+  const context: Context = {
+    order: new Map(all.map((unit, index) => [unit.id, index])),
+    unknownUnits: all.filter((unit) => !hasSetlist(unit)),
+    emptyTours,
+    emptyTourCount: emptyTours.length,
+  };
 
   const sections: {
     id: StatSection["id"];
@@ -101,10 +105,7 @@ export function buildStatSections(input: {
       title: "곡",
       records: [
         ...songRecords(songStats, known, context),
-        ...unreleasedRecords(
-          buildSongStats(input.unreleasedSongs ?? [], known),
-          known,
-        ),
+        ...unreleasedRecords(unreleasedStats, known),
       ],
     },
     {
@@ -123,7 +124,14 @@ export function buildStatSections(input: {
     {
       id: "lives",
       title: "공연",
-      records: liveRecords(all, known, songStats, input, emptyTours, context),
+      records: liveRecords(
+        all,
+        known,
+        [...songStats, ...unreleasedStats],
+        input,
+        emptyTours,
+        context,
+      ),
     },
     {
       id: "places",
@@ -156,8 +164,8 @@ export function buildStatSummary(input: {
   songs: StatSong[];
 }): StatSummary {
   const all = [...input.units].sort(byDate);
-  const known = all.filter((unit) => unit.songIds.length > 0);
-  const missing = all.filter((unit) => unit.songIds.length === 0).reverse();
+  const known = all.filter(hasSetlist);
+  const missing = all.filter((unit) => !hasSetlist(unit)).reverse();
   const playedIds = new Set(known.flatMap((unit) => unit.songIds));
   const playedSongs = input.songs.filter((song) => playedIds.has(song.id));
   const overseas = all.filter(
@@ -188,13 +196,16 @@ export function buildStatSummary(input: {
     ],
     missing: {
       id: MISSING_SETLIST_RECORD_ID,
-      title: "세트리스트가 아직 없는 공연",
+      title: "세트리스트를 아직 모르는 공연",
       description: "곡 기록에서 빠지는 공연일",
       detail:
-        "곡 기록에서 빠지는 공연일(최신 먼저) — 세트리스트를 알면 제보해 주세요",
-      columns: ["종류"],
+        "곡 기록에서 빠지는 공연일(최신 먼저) — 그날 세트리스트(선택곡 포함)를 알면 제보해 주세요",
+      columns: ["종류", "세트리스트"],
       rows: missing.map((unit, index) => ({
-        ...unitRow(unit, [ENTRY_TYPE_LABEL[entryTypeOf(unit)]]),
+        ...unitRow(unit, [
+          ENTRY_TYPE_LABEL[entryTypeOf(unit)],
+          unit.commonOnly ? "투어 공통 곡만" : "없음",
+        ]),
         rank: index + 1,
       })),
       total: missing.length,
@@ -203,7 +214,7 @@ export function buildStatSummary(input: {
   };
 }
 
-/** 카드에 보이는 줄 수(1위 + 2~5위) — 나머지는 "자세히 보기"에서 stats.json으로. */
+/** 카드에 보이는 줄 수(1위 + 2~5위) — 나머지는 "전체 순위 보기"에서 stats.json으로. */
 export const PREVIEW_ROW_COUNT = 5;
 
 /**
@@ -226,7 +237,11 @@ export function previewSections(sections: StatSection[]): StatSection[] {
 export function fullTables(sections: StatSection[]): Record<string, StatRow[]> {
   return Object.fromEntries(
     sections.flatMap((section) =>
-      section.records.map((record) => [record.id, record.rows]),
+      // 전체 순위표는 설명(note)을 그리지 않는다(1위 note는 페이지 미리보기에 있다).
+      section.records.map((record) => [
+        record.id,
+        record.rows.map((row) => ({ ...row, note: null })),
+      ]),
     ),
   );
 }
@@ -283,17 +298,71 @@ interface Span {
 }
 
 interface Context {
-  /** 세트리스트를 모르는 구간 */
-  unknown: Span[];
+  /** 공연일 → 날짜 순(all) 자리 — 같은 날 여러 회차도 앞뒤를 가린다 */
+  order: Map<string, number>;
+  /** 세트리스트를 모르는 공연일(없거나 투어 공통 곡만 있는 날) */
+  unknownUnits: LiveUnit[];
+  /** 공연일이 하나도 등록되지 않은 (지난) 투어 기간 */
+  emptyTours: Span[];
   /** 공연일이 하나도 등록되지 않은 (지난) 투어 수 */
   emptyTourCount: number;
 }
 
 const minDate = (a: string, b: string) => (a < b ? a : b);
 
-/** from과 to 사이(양 끝 제외)에 모르는 구간이 걸치는지. */
-function unknownBetween(context: Context, from: string, to: string) {
-  return context.unknown.some((span) => span.to > from && span.from < to);
+/**
+ * 두 공연일 사이(양 끝 제외)에 모르는 구간이 있는지 — 공연일은 날짜 순 자리로 판정해
+ * 같은 날의 다른 회차도 잡고, 공연일 없는 투어는 기간으로.
+ */
+function unknownBetween(
+  context: Context,
+  from: LiveUnit,
+  to: LiveUnit,
+  songId: string,
+) {
+  const [a, b] = [context.order.get(from.id)!, context.order.get(to.id)!];
+  return (
+    context.unknownUnits.some((unit) => {
+      if (knowsSong(unit, songId)) return false;
+      const index = context.order.get(unit.id)!;
+      return index > a && index < b;
+    }) ||
+    context.emptyTours.some(
+      (span) => span.to > from.date && span.from < to.date,
+    )
+  );
+}
+
+/** 첫 라이브 판정에서 발매일·첫 라이브 중 이른 날보다 더 거슬러 살피는 기간(일) —
+ * 발매 직전 공연에서 먼저 선보이는 경우가 있어서. */
+const PREMIERE_LOOKBACK_DAYS = 90;
+
+/**
+ * 첫 라이브(first)가 정말 처음인지 모를 때 — 발매일과 첫 라이브 중 이른 날의 90일
+ * 전부터 그 공연일 앞까지, 이 곡을 불렀는지 모르는 공연일·빈 투어가 있으면.
+ */
+function unknownBeforeFirst(
+  context: Context,
+  first: LiveUnit,
+  releaseDate: string,
+  songId: string,
+) {
+  const start = addDays(
+    minDate(first.date, releaseDate),
+    -PREMIERE_LOOKBACK_DAYS,
+  );
+  const index = context.order.get(first.id)!;
+  return (
+    context.unknownUnits.some(
+      (unit) =>
+        !knowsSong(unit, songId) &&
+        unit.date >= start &&
+        context.order.get(unit.id)! < index,
+    ) ||
+    context.emptyTours.some(
+      (span) => span.to >= start && span.from < first.date,
+    )
+  );
 }
 
 /** 공연일이 없는 투어가 있으면 덧붙이는 안내(횟수를 셀 수 없어 빠진다) — 없으면 빈 문자열. */
@@ -331,23 +400,6 @@ function rank<T>(
     previous = value;
     return { ...toRow(item), rank: current };
   });
-}
-
-/**
- * 비율의 95% 신뢰구간 하한(Wilson score) — 표본(whole)이 적을수록 낮게 나와서,
- * 비율로 순위를 매길 때 공연일이 몇 번 안 되는 곡이 100%로 앞서지 않게 한다.
- */
-export function wilsonLowerBound(part: number, whole: number): number {
-  if (whole === 0) return 0;
-  const z = 1.96;
-  const p = part / whole;
-  const z2 = z * z;
-  return (
-    (p +
-      z2 / (2 * whole) -
-      z * Math.sqrt((p * (1 - p)) / whole + z2 / (4 * whole * whole))) /
-    (1 + z2 / whole)
-  );
 }
 
 const percent = (part: number, whole: number) =>
@@ -413,22 +465,27 @@ function isOnline(unit: LiveUnit) {
 
 interface SongStat {
   song: StatSong;
+  /**
+   * 이 곡을 불렀는지 아는 공연일(날짜 순) — 세트리스트를 아는 날 + 이 곡이 투어 공통
+   * 곡인 투어 공통 곡만 있는 날(knowsSong)
+   */
+  known: LiveUnit[];
   /** 부른 공연일(날짜 순) */
   played: LiveUnit[];
-  /** 발매 후 세트리스트가 있는 공연일 수 */
+  /** 발매 후 이 곡을 불렀는지 아는 공연일 수 */
   eligible: number;
   /** 발매 후 부른 횟수 */
   playedSinceRelease: number;
 }
 
-function buildSongStats(songs: StatSong[], known: LiveUnit[]): SongStat[] {
-  const songSets = new Map(
-    known.map((unit) => [unit.id, new Set(unit.songIds)]),
-  );
+/** all은 날짜 순 공연일 전부 — 곡마다 불렀는지 아는 날(knowsSong)만 골라 센다. */
+function buildSongStats(songs: StatSong[], all: LiveUnit[]): SongStat[] {
   return songs.map((song) => {
-    const played = known.filter((unit) => songSets.get(unit.id)!.has(song.id));
+    const known = all.filter((unit) => knowsSong(unit, song.id));
+    const played = known.filter((unit) => unit.songIds.includes(song.id));
     return {
       song,
+      known,
       played,
       eligible: known.filter((unit) => unit.date >= song.releaseDate).length,
       playedSinceRelease: played.filter((unit) => unit.date >= song.releaseDate)
@@ -484,9 +541,8 @@ function songRecords(
     wilsonLowerBound(stat.playedSinceRelease, stat.eligible);
 
   // 오랜 공백 끝 부활 — 연이은 두 라이브 사이. 날짜(일수)로 가장 길었던 때와,
-  // 그 사이 건너뛴 공연일(세트리스트가 있는 공연일) 수로 가장 많았던 때를 따로 잰다
-  // — 공연이 드물던 시기엔 일수만 길어서, 일부러 뺐다가 돌아온 곡은 공연 수로 보인다.
-  const knownIndex = new Map(known.map((unit, index) => [unit.id, index]));
+  // 그 사이 건너뛴 공연일(이 곡을 불렀는지 아는 공연일) 수로 가장 많았던 때를 따로
+  // 잰다 — 공연이 드물던 시기엔 일수만 길어서, 일부러 뺐다가 돌아온 곡은 공연 수로 보인다.
   type Comeback = {
     stat: SongStat;
     from: LiveUnit;
@@ -497,12 +553,15 @@ function songRecords(
   const byDays: Comeback[] = [];
   const byShows: Comeback[] = [];
   for (const stat of played) {
+    const knownIndex = new Map(
+      stat.known.map((unit, index) => [unit.id, index]),
+    );
     let longest: Comeback | null = null;
     let most: Comeback | null = null;
     for (let i = 1; i < stat.played.length; i++) {
       const [from, to] = [stat.played[i - 1], stat.played[i]];
-      // 사이에 세트리스트를 모르는 공연이 있으면 그때 불렀을 수도 있다.
-      if (unknownBetween(context, from.date, to.date)) continue;
+      // 사이에 이 곡을 불렀는지 모르는 공연이 있으면 그때 불렀을 수도 있다.
+      if (unknownBetween(context, from, to, stat.song.id)) continue;
       const item = {
         stat,
         from,
@@ -529,12 +588,14 @@ function songRecords(
       .filter(Boolean)
       .join(" · ");
 
-  // 최근 흐름 — 마지막으로 세트리스트를 아는 공연일부터 1년 안(최근)과 그 전(발매
+  // 최근 흐름 — 세트리스트를 아는 마지막 공연일까지 1년(최근)과 그 전(발매
   // 후)의 참가율을 비교한다. 양쪽 다 공연일이 MIN_TREND_SHOWS회 이상인 곡만.
   const lastKnown = known.at(-1)?.date;
   const recentFrom = lastKnown ? addDays(lastKnown, -364) : "";
   const shifts = played.flatMap((stat) => {
-    const eligible = known.filter((unit) => unit.date >= stat.song.releaseDate);
+    const eligible = stat.known.filter(
+      (unit) => unit.date >= stat.song.releaseDate,
+    );
     const recent = eligible.filter((unit) => unit.date >= recentFrom);
     const before = eligible.filter((unit) => unit.date < recentFrom);
     if (recent.length < MIN_TREND_SHOWS || before.length < MIN_TREND_SHOWS)
@@ -570,15 +631,16 @@ function songRecords(
     );
 
   // 연속 공연일 — 세트리스트가 있는 공연일을 날짜 순으로 이어 볼 때 연달아 부른 최대 횟수.
+  // 이 곡을 불렀는지 아는 공연일만 이어 본다(투어 공통 곡은 공통 곡만 있는 날도).
   const streaks = played.map((stat) => {
     const set = new Set(stat.played.map((unit) => unit.id));
-    let best = { length: 0, from: known[0], to: known[0] };
+    let best = { length: 0, from: stat.known[0], to: stat.known[0] };
     let length = 0;
-    let from = known[0];
+    let from = stat.known[0];
     let previous: LiveUnit | null = null;
-    for (const unit of known) {
-      // 사이에 세트리스트를 모르는 공연이 있으면 연속이 끊긴 것으로 본다.
-      if (previous && unknownBetween(context, previous.date, unit.date))
+    for (const unit of stat.known) {
+      // 사이에 이 곡을 불렀는지 모르는 공연이 있으면 연속이 끊긴 것으로 본다.
+      if (previous && unknownBetween(context, previous, unit, stat.song.id))
         length = 0;
       previous = unit;
       if (set.has(unit.id)) {
@@ -591,16 +653,18 @@ function songRecords(
   });
 
   // 라이브 데뷔 — 발매일부터 첫 라이브까지(음수면 발매 전 선공개).
-  // 발매일(먼저 부른 날이 더 앞이면 그날)부터 첫 라이브 사이에 세트리스트를 모르는
-  // 공연이 있으면 진짜 첫 라이브인지 알 수 없어 뺀다.
+  // 그 앞에 세트리스트를 모르는 공연이 있으면 진짜 첫 라이브인지 알 수 없어 뺀다
+  // (unknownBeforeFirst).
   const debuts = played
-    .filter((stat) => {
-      const first = stat.played[0].date;
-      const start = minDate(stat.song.releaseDate, first);
-      return !context.unknown.some(
-        (span) => span.to >= start && span.from < first,
-      );
-    })
+    .filter(
+      (stat) =>
+        !unknownBeforeFirst(
+          context,
+          stat.played[0],
+          stat.song.releaseDate,
+          stat.song.id,
+        ),
+    )
     .map((stat) => ({
       stat,
       first: stat.played[0],
@@ -627,7 +691,9 @@ function songRecords(
       stat,
       count: withOpening.filter((unit) => unit.openingSongId === stat.song.id)
         .length,
-      base: stat.played.filter((unit) => unit.openingSongId).length,
+      // 첫 곡을 아는 날만(투어 공통 곡만 있는 날은 그날 첫 곡을 모른다)
+      base: stat.played.filter((unit) => hasSetlist(unit) && unit.openingSongId)
+        .length,
     }))
     .filter((item) => item.count > 0);
   const encores = played
@@ -636,7 +702,9 @@ function songRecords(
       count: withEncore.filter((unit) =>
         unit.encoreSongIds!.includes(stat.song.id),
       ).length,
-      base: stat.played.filter((unit) => unit.encoreSongIds?.length).length,
+      base: stat.played.filter(
+        (unit) => hasSetlist(unit) && unit.encoreSongIds?.length,
+      ).length,
     }))
     .filter((item) => item.count > 0);
 
@@ -661,14 +729,17 @@ function songRecords(
       id: "song-highest-rate",
       trendFor: songTrend,
       title: "참가율이 가장 높은 곡",
-      description: "발매 후 공연일 중 부른 비율",
+      description: "발매 후 공연일 중 부른 비율(공연일이 적은 곡은 순위 보정)",
+      // 순위는 보정값, 카드 값은 보정 전 %라 막대 길이가 순위와 어긋난다.
+      bars: false,
       detail:
         "발매 후 세트리스트가 있는 공연일 중 부른 비율 — 그런 공연일이 적은 곡은 순위를 조금 낮게 보정",
       columns: ["참가율", "횟수", "확인된 첫 라이브", "마지막 라이브"],
       rows: rank(
         stats.filter((stat) => stat.eligible > 0),
-        // 보정값을 0.1% 단위로 — 같으면 같은 순위.
-        (stat) => Math.round(rateScore(stat) * 1000),
+        // 보정값 그대로(아주 작은 차이까지) — 보이는 %가 다른 두 곡이 우연히 공동
+        // 순위가 되지 않게.
+        (stat) => Math.round(rateScore(stat) * 1e6),
         "desc",
         (stat) => {
           const [count, pct, first, last] = playCells(stat);
@@ -680,7 +751,7 @@ function songRecords(
     {
       id: "song-least-played",
       title: "라이브에서 가장 적게 불린 곡",
-      description: "발매 후 부른 횟수가 적은 순",
+      description: "부른 횟수가 적은 순",
       detail:
         "발매 후 세트리스트가 있는 공연일이 있는 곡 중 횟수가 적은 순(같으면 발매 후 공연일이 많은 곡 먼저)",
       columns: ["횟수", "발매 후 공연일", "참가율", "마지막 라이브"],
@@ -700,7 +771,7 @@ function songRecords(
                 : "없음",
             ],
             stat.played.length === 0
-              ? `발매 후 공연일 ${stat.eligible}회 동안 한 번도 안 불림`
+              ? `세트리스트를 아는 발매 후 공연일 ${stat.eligible}회 중 0회`
               : playNote(stat),
           ),
         (a, b) => b.eligible - a.eligible,
@@ -710,7 +781,7 @@ function songRecords(
       id: "song-rising",
       title: "최근 1년 사이 부쩍 늘어난 곡",
       description: "최근 1년 참가율이 오른 곡",
-      detail: `마지막으로 세트리스트를 아는 공연일부터 1년 안의 참가율 − 그 전(발매 후) 참가율(양쪽 다 공연일 ${MIN_TREND_SHOWS}회 이상)`,
+      detail: `세트리스트를 아는 마지막 공연일까지 1년(최근 1년)의 참가율 − 그 전(발매 후) 참가율(양쪽 다 공연일 ${MIN_TREND_SHOWS}회 이상)`,
       columns: ["변화", "최근 1년", "그 전"],
       trendFor: songTrend,
       rows: rank(
@@ -725,7 +796,7 @@ function songRecords(
       id: "song-falling",
       title: "최근 1년 사이 뜸해진 곡",
       description: "최근 1년 참가율이 내린 곡",
-      detail: `마지막으로 세트리스트를 아는 공연일부터 1년 안의 참가율 − 그 전(발매 후) 참가율(양쪽 다 공연일 ${MIN_TREND_SHOWS}회 이상)`,
+      detail: `세트리스트를 아는 마지막 공연일까지 1년(최근 1년)의 참가율 − 그 전(발매 후) 참가율(양쪽 다 공연일 ${MIN_TREND_SHOWS}회 이상)`,
       columns: ["변화", "최근 1년", "그 전"],
       trendFor: songTrend,
       rows: rank(
@@ -843,7 +914,7 @@ function songRecords(
       title: "오프닝 단골 곡",
       description: "공연 첫 곡으로 부른 횟수",
       detail: `공연 첫 곡으로 가장 많이 부른 곡(첫 곡을 아는 공연일 ${withOpening.length}회 기준) · "부른 날 중"은 그 곡을 부른 공연일 중 첫 곡이었던 비율`,
-      columns: ["첫 곡 횟수", "비율", "부른 날 중"],
+      columns: ["첫 곡 횟수", "전체 중", "부른 날 중"],
       rows: rank(
         openings,
         (item) => item.count,
@@ -856,7 +927,7 @@ function songRecords(
               percent(item.count, withOpening.length),
               percent(item.count, item.base),
             ],
-            `첫 곡을 아는 공연일 ${withOpening.length}회 중 ${percent(item.count, withOpening.length)} · 부른 날 ${item.base}회 중 ${percent(item.count, item.base)}`,
+            `첫 곡을 아는 공연일 ${withOpening.length}회 중 ${percent(item.count, withOpening.length)} · 그중 부른 날 ${item.base}회 중 ${percent(item.count, item.base)}`,
           ),
         (a, b) => b.count / b.base - a.count / a.base,
       ),
@@ -865,8 +936,8 @@ function songRecords(
       id: "song-encore",
       title: "앵콜 단골 곡",
       description: "앵콜로 부른 횟수",
-      detail: `앵콜로 가장 많이 부른 곡(앵콜이 있었던 공연일 ${withEncore.length}회 기준) · "부른 날 중"은 그 곡을 부른 공연일 중 앵콜이었던 비율`,
-      columns: ["앵콜 횟수", "비율", "부른 날 중"],
+      detail: `앵콜로 가장 많이 부른 곡(앵콜이 있던 공연일 ${withEncore.length}회 기준) · "부른 날 중"은 앵콜이 있던 날 가운데 그 곡을 부른 날 중 앵콜로 부른 비율`,
+      columns: ["앵콜 횟수", "전체 중", "부른 날 중"],
       rows: rank(
         encores,
         (item) => item.count,
@@ -879,7 +950,7 @@ function songRecords(
               percent(item.count, withEncore.length),
               percent(item.count, item.base),
             ],
-            `앵콜이 있었던 공연일 ${withEncore.length}회 중 ${percent(item.count, withEncore.length)} · 부른 날 ${item.base}회 중 ${percent(item.count, item.base)}`,
+            `앵콜이 있던 공연일 ${withEncore.length}회 중 ${percent(item.count, withEncore.length)} · 그중 부른 날 ${item.base}회 중 ${percent(item.count, item.base)}`,
           ),
         (a, b) => b.count / b.base - a.count / a.base,
       ),
@@ -944,23 +1015,25 @@ function setlistRecords(
     return stat ? yearlyTrend("해마다 라이브 횟수", known, stat.played) : null;
   };
 
-  // 자리별 단골 — pick이 고른 곡을 센다. "부른 날 중"은 곡 순서를 아는 공연일 중
-  // 그 곡을 부른 날에서의 비율.
-  const slotItems = (pick: (unit: LiveUnit) => string | undefined) => {
+  // 자리별 단골 — pool(대상 공연일)에서 pick이 고른 곡을 센다. "부른 날 중"은 pool
+  // 중 그 곡을 부른 날에서의 비율. 커버곡 자리("cover:…")는 곡이 아니라 건너뛴다.
+  const slotRows = (
+    pool: LiveUnit[],
+    poolLabel: string,
+    pick: (unit: LiveUnit) => string | undefined,
+  ) => {
+    const inPool = new Set(pool.map((unit) => unit.id));
     const counts = new Map<string, number>();
-    for (const unit of ordered) {
+    for (const unit of pool) {
       const id = pick(unit);
       if (id && statById.has(id)) counts.set(id, (counts.get(id) ?? 0) + 1);
     }
-    return [...counts].map(([id, count]) => {
+    const items = [...counts].map(([id, count]) => {
       const stat = statById.get(id)!;
-      const base = stat.played.filter((unit) => unit.mainOrder?.length).length;
+      const base = stat.played.filter((unit) => inPool.has(unit.id)).length;
       return { stat, count, base };
     });
-  };
-  type SlotItem = ReturnType<typeof slotItems>[number];
-  const slotRows = (items: SlotItem[]) =>
-    rank(
+    return rank(
       items,
       (item) => item.count,
       "desc",
@@ -969,13 +1042,17 @@ function setlistRecords(
           item.stat.song,
           [
             times(item.count),
-            percent(item.count, ordered.length),
+            percent(item.count, pool.length),
             percent(item.count, item.base),
           ],
-          `곡 순서를 아는 공연일 ${ordered.length}회 중 ${percent(item.count, ordered.length)} · 부른 날 ${item.base}회 중 ${percent(item.count, item.base)}`,
+          `${poolLabel} ${pool.length}회 중 ${percent(item.count, pool.length)} · 그중 부른 날 ${item.base}회 중 ${percent(item.count, item.base)}`,
         ),
       (a, b) => b.count / b.base - a.count / a.base,
     );
+  };
+  // 본편 마지막 곡은 앵콜이 있던 공연일만 — 앵콜이 없거나 기록되지 않은 날(페스티벌
+  // 등)의 본편 마지막은 공연 마지막 곡과 같아서.
+  const withEncore = ordered.filter((unit) => unit.encoreOrder?.length);
 
   // 본편 평균 위치 — 첫 곡 0%, 마지막 곡 100%.
   const positions = new Map<string, number[]>();
@@ -997,7 +1074,7 @@ function setlistRecords(
       average: list.reduce((sum, value) => sum + value, 0) / list.length,
       count: list.length,
     }));
-  const positionText = (value: number) => `앞에서 ${Math.round(value * 100)}%`;
+  const positionText = (value: number) => `${Math.round(value * 100)}% 지점`;
   const positionRows = (order: "asc" | "desc") =>
     rank(
       placed,
@@ -1007,7 +1084,7 @@ function setlistRecords(
         songRow(
           item.stat.song,
           [positionText(item.average), times(item.count)],
-          `본편 ${times(item.count)} 평균 ${positionText(item.average)}(첫 곡 0% · 마지막 곡 100%)`,
+          `본편 ${times(item.count)} 평균 ${positionText(item.average)}(첫 곡 0% · 본편 마지막 곡 100%)`,
         ),
       (a, b) => b.count - a.count,
     );
@@ -1070,37 +1147,42 @@ function setlistRecords(
       id: "setlist-closer",
       title: "본편 마지막 곡 단골",
       description: "앵콜 전 마지막 곡",
-      detail:
-        '앵콜 전 본편을 마무리한 곡 · "부른 날 중"은 그 곡을 부른 공연일 중 본편 마지막이었던 비율',
-      columns: ["마지막 곡 횟수", "비율", "부른 날 중"],
+      detail: `앵콜이 있던 공연일(곡 순서를 아는 ${withEncore.length}회)에서 앵콜 전 본편을 마무리한 곡 · "부른 날 중"은 그중 그 곡을 부른 날에서 본편 마지막이었던 비율`,
+      columns: ["마지막 곡 횟수", "전체 중", "부른 날 중"],
       trendFor: songTrend,
-      rows: slotRows(slotItems((unit) => unit.mainOrder!.at(-1))),
+      rows: slotRows(withEncore, "앵콜이 있던 공연일", (unit) =>
+        unit.mainOrder!.at(-1),
+      ),
     },
     {
       id: "setlist-finale",
       title: "공연 마지막 곡 단골",
       description: "그날의 마지막 곡",
       detail:
-        '앵콜이 있으면 앵콜 마지막, 없으면 본편 마지막 곡 · "부른 날 중"은 그 곡을 부른 공연일 중 마지막이었던 비율',
-      columns: ["마지막 곡 횟수", "비율", "부른 날 중"],
+        '앵콜이 있으면 앵콜 마지막, 없거나 기록되지 않았으면 본편 마지막 곡(곡 순서를 아는 공연일) · "부른 날 중"은 그 곡을 부른 날에서 마지막이었던 비율',
+      columns: ["마지막 곡 횟수", "전체 중", "부른 날 중"],
       trendFor: songTrend,
       rows: slotRows(
-        slotItems((unit) => unit.encoreOrder?.at(-1) ?? unit.mainOrder!.at(-1)),
+        ordered,
+        "곡 순서를 아는 공연일",
+        (unit) => unit.encoreOrder?.at(-1) ?? unit.mainOrder!.at(-1),
       ),
     },
     {
       id: "setlist-early",
+      bars: false,
       title: "공연 초반에 주로 부르는 곡",
       description: "본편 평균 위치가 앞인 곡",
-      detail: `본편 평균 위치가 앞인 곡(첫 곡 0% · 마지막 곡 100%, 본편에서 ${MIN_POSITION_PLAYS}회 이상)`,
+      detail: `본편 평균 위치가 앞인 곡(첫 곡 0% · 본편 마지막 곡 100%, 본편에서 ${MIN_POSITION_PLAYS}회 이상)`,
       columns: ["평균 위치", "본편 횟수"],
       rows: positionRows("asc"),
     },
     {
       id: "setlist-late",
+      bars: false,
       title: "공연 후반에 주로 부르는 곡",
       description: "본편 평균 위치가 뒤인 곡",
-      detail: `본편 평균 위치가 뒤인 곡(첫 곡 0% · 마지막 곡 100%, 본편에서 ${MIN_POSITION_PLAYS}회 이상)`,
+      detail: `본편 평균 위치가 뒤인 곡(첫 곡 0% · 본편 마지막 곡 100%, 본편에서 ${MIN_POSITION_PLAYS}회 이상)`,
       columns: ["평균 위치", "본편 횟수"],
       rows: positionRows("desc"),
     },
@@ -1125,7 +1207,7 @@ function setlistRecords(
             image: pair.from.song.cover,
             href: `/zutopia/songs?song=${pair.from.song.slug}`,
             cells: [times(pair.count), percent(pair.count, base)],
-            note: `${songName(pair.from.song)}을(를) 부른 날 ${base}회 중 ${percent(pair.count, base)}`,
+            note: `「${songName(pair.from.song)}」 부른 날 ${base}회 중 ${percent(pair.count, base)}`,
           };
         },
       ),
@@ -1158,7 +1240,7 @@ function setlistRecords(
       title: "가장 많이 부른 커버곡",
       description: "다른 가수의 곡",
       detail: "다른 가수의 곡을 부른 공연일 수(제목이 같으면 하나로)",
-      columns: ["횟수", "원곡 가수", "마지막"],
+      columns: ["횟수", "원곡 가수", "마지막 라이브"],
       rows: rank(
         [...covers.values()],
         (item) => item.units.length,
@@ -1340,7 +1422,7 @@ function albumYearRecords(albums: StatAlbum[], stats: SongStat[]): RawRecord[] {
       title: "해마다 가장 많이 불린 앨범",
       description: "그해 수록곡을 가장 많이 부른 앨범",
       detail:
-        "그해 세트리스트가 있는 공연일에 수록곡을 가장 많이 부른 앨범(최신 해 먼저) · 비중은 그해 앨범 수록곡 라이브 합계 중",
+        "그해 세트리스트가 있는 공연일에 수록곡을 가장 많이 부른 앨범(최신 해 먼저) · 비중은 그해 앨범 수록곡 라이브 합계 중(여러 앨범에 실린 곡은 앨범마다 셈)",
       columns: ["앨범", "비중", "수록곡 라이브"],
       rows: items.map((item, index) => ({
         key: item.year,
@@ -1394,6 +1476,7 @@ function liveRecords(
     upcoming: LiveUnit[];
     tours: StatTour[];
     songs: StatSong[];
+    unreleasedSongs?: StatSong[];
     canceledTourIds?: string[];
   },
   emptyTours: (Span & { tour: StatTour })[],
@@ -1404,11 +1487,8 @@ function liveRecords(
   for (const stat of stats) {
     const first = stat.played[0];
     if (!first) continue;
-    // 발매일부터 그날 사이에 세트리스트를 모르는 공연이 있으면 진짜 첫 공개인지 모른다.
-    const start = minDate(stat.song.releaseDate, first.date);
-    if (
-      context.unknown.some((span) => span.to >= start && span.from < first.date)
-    )
+    // 그 앞에 세트리스트를 모르는 공연이 있으면 진짜 첫 공개인지 모른다.
+    if (unknownBeforeFirst(context, first, stat.song.releaseDate, stat.song.id))
       continue;
     debutsByUnit.set(first.id, [
       ...(debutsByUnit.get(first.id) ?? []),
@@ -1479,8 +1559,12 @@ function liveRecords(
 
   // 투어 비교 — 세트리스트가 있는 공연일만. 고정률 = 그 투어의 확인된 모든 공연일에
   // 부른 곡 수 / 공연일 평균 곡 수, 다른 곡 = 투어에서 부른 곡 중 그 공통 곡이 아닌 곡,
-  // 신곡 비중 = 공연일 기준 발매 1년 안(발매 전 선공개 포함) 곡의 비율.
+  // 신곡 비중 = 공연일 기준 발매 1년 안이거나 아직 발매 전인 곡(미공개곡 포함)의 비율.
   const songById = new Map(input.songs.map((song) => [song.id, song]));
+  // 아직 음원이 없는 곡(미공개곡)은 늘 신곡으로 센다.
+  const unreleasedIds = new Set(
+    (input.unreleasedSongs ?? []).map((song) => song.id),
+  );
   const tourComparisons = input.tours.flatMap((tour) => {
     const units = known.filter((unit) => unit.tourId === tour.id);
     if (units.length === 0) return [];
@@ -1496,6 +1580,11 @@ function liveRecords(
     for (const unit of units)
       for (const id of unit.songIds) {
         const song = songById.get(id);
+        if (unreleasedIds.has(id)) {
+          plays += 1;
+          fresh += 1;
+          continue;
+        }
         if (!song) continue;
         plays += 1;
         if (diffDays(song.releaseDate, unit.date) < 365) fresh += 1;
@@ -1556,7 +1645,7 @@ function liveRecords(
       id: "live-most-debuts",
       title: "라이브 첫 공개가 가장 많았던 공연",
       description: "그날 처음 부른 곡 수",
-      detail: "그날 처음 라이브에서 부른 곡 수",
+      detail: "그날 처음 라이브에서 부른 곡 수(미공개곡 포함)",
       columns: ["첫 공개", "곡"],
       rows: rank(
         debutUnits,
@@ -1659,10 +1748,10 @@ function liveRecords(
     {
       id: "live-tour-fixed",
       title: "세트리스트가 가장 고정된 투어",
-      description: "모든 공연일에 부른 곡 비율",
+      description: "확인된 공연일 모두에서 부른 곡 비율",
       detail:
         "세트리스트를 아는 투어 공연일 모두에서 부른 곡 수 ÷ 공연일 평균 곡 수(확인된 공연일 2회 이상)",
-      columns: ["고정률", "공통 곡", "확인된 공연일"],
+      columns: ["고정률", "매번 부른 곡", "확인된 공연일"],
       rows: rank(
         comparable,
         (item) => Math.round(item.fixed * 100),
@@ -1707,9 +1796,9 @@ function liveRecords(
     {
       id: "live-tour-new",
       title: "신곡 비중이 가장 높은 투어",
-      description: "발매 1년 안 곡의 비율",
+      description: "발매 1년 안·미공개 곡의 비율",
       detail:
-        "세트리스트를 아는 공연일에 부른 곡 중 그날 기준 발매 1년 안 곡(발매 전 선공개 포함)의 비율",
+        "세트리스트를 아는 공연일에 부른 곡 중 그날 기준 발매 1년 안이거나 아직 발매 전인 곡(미공개곡 포함)의 비율",
       columns: ["신곡 비중", "신곡 횟수", "확인된 공연일"],
       rows: rank(
         tourComparisons.filter((item) => item.plays > 0),
@@ -1766,7 +1855,7 @@ function koreaRecords(stats: SongStat[], known: LiveUnit[]): RawRecord[] {
       title: "내한 공연에서 가장 많이 부른 곡",
       description: "한국 공연일 기준",
       detail: `세트리스트가 있는 한국 공연일 ${korea.length}회 기준`,
-      columns: ["횟수", "비율", "마지막"],
+      columns: ["횟수", "비율", "마지막 라이브"],
       rows: rank(
         items,
         (item) => item.units.length,

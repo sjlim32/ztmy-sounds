@@ -4,6 +4,7 @@ import {
   buildStatSections,
   buildStatSummary,
   festivalKey,
+  fullTables,
   venueName,
   wilsonLowerBound,
 } from "./compute";
@@ -443,7 +444,8 @@ describe("세트리스트 구역", () => {
     record(sections, id).rows.map((row) => [row.key, row.cells[0]]);
 
   test("본편 마지막·공연 마지막(앵콜 있으면 앵콜 마지막)", () => {
-    expect(keys("setlist-closer")).toEqual([["c", "5회"]]);
+    // 본편 마지막은 앵콜이 있던 4회만
+    expect(keys("setlist-closer")).toEqual([["c", "4회"]]);
     expect(keys("setlist-finale")).toEqual([
       ["e", "4회"],
       ["c", "1회"],
@@ -451,8 +453,8 @@ describe("세트리스트 구역", () => {
   });
 
   test("본편 평균 위치 — 초반·후반", () => {
-    expect(keys("setlist-early")[0]).toEqual(["a", "앞에서 0%"]);
-    expect(keys("setlist-late")[0]).toEqual(["c", "앞에서 100%"]);
+    expect(keys("setlist-early")[0]).toEqual(["a", "0% 지점"]);
+    expect(keys("setlist-late")[0]).toEqual(["c", "100% 지점"]);
   });
 
   test("이어 부른 두 곡은 본편 안에서만(앵콜 첫 곡과 잇지 않는다)", () => {
@@ -593,5 +595,104 @@ describe("내한·미공개곡·해마다 앨범", () => {
       ["2024년", "앨범B", "67%", "2회"],
       ["2023년", "앨범A", "100%", "1회"],
     ]);
+  });
+});
+
+describe("1차 검토 반영", () => {
+  test("투어 공통 곡만 있는 날은 공통 곡만 아는 날(다른 곡은 모르는 날)", () => {
+    const sections = buildStatSections({
+      units: [
+        unit("c1", "2024-01-01", ["a", "x"]),
+        unit("c2", "2024-01-02", ["a"], { commonOnly: true }),
+        unit("c3", "2024-01-03", ["a", "x"]),
+      ],
+      upcoming: [],
+      songs: [song("a", "2020-01-01"), song("x", "2020-01-01")],
+      albums: [],
+      tours: [],
+    });
+    // 공통 곡 a는 그날도 불렀다 — 3회·3회 연속. x는 2회 중 2회(그날은 모름), 연속은 끊긴다.
+    const rate = record(sections, "song-most-played").rows;
+    expect(rate.find((row) => row.key === "a")!.cells[0]).toBe("3회");
+    expect(rate.find((row) => row.key === "x")!.cells[1]).toBe("100%");
+    const streaks = record(sections, "song-streak").rows;
+    expect(streaks.map((row) => [row.key, row.cells[0]])).toEqual([
+      ["a", "3회 연속"],
+      ["x", "1회 연속"],
+    ]);
+    const summary = buildStatSummary({
+      units: [
+        unit("c1", "2024-01-01", ["a"]),
+        unit("c2", "2024-01-02", ["a"], { commonOnly: true }),
+      ],
+      songs: [song("a", "2020-01-01")],
+    });
+    expect(summary.missing.rows.map((row) => row.cells)).toEqual([
+      ["콘서트", "투어 공통 곡만"],
+    ]);
+  });
+
+  test("같은 날 다른 회차의 모르는 세트리스트도 사이에 있는 것으로 본다", () => {
+    const sections = buildStatSections({
+      units: [
+        unit("d1", "2024-01-01", ["x"], { showNumber: 1 }),
+        unit("d2", "2024-01-01", [], { showNumber: 2 }),
+        unit("d3", "2024-03-01", ["x"]),
+      ],
+      upcoming: [],
+      songs: [song("x", "2020-01-01")],
+      albums: [],
+      tours: [],
+    });
+    expect(record(sections, "song-streak").rows[0].cells[0]).toBe("1회 연속");
+    expect(record(sections, "song-comeback").rows).toHaveLength(0);
+  });
+
+  test("첫 라이브 앞 90일 안에 모르는 공연이 있으면 데뷔 기록에서 뺀다(발매 전후 같은 기준)", () => {
+    const sections = buildStatSections({
+      units: [unit("e1", "2019-07-01", []), unit("e2", "2019-08-05", ["g"])],
+      upcoming: [],
+      songs: [song("g", "2019-10-29")],
+      albums: [],
+      tours: [],
+    });
+    expect(record(sections, "song-fastest-debut").rows).toHaveLength(0);
+  });
+
+  test("전체 순위표(stats.json)엔 설명(note)을 싣지 않는다", () => {
+    const sections = buildStatSections({
+      units: [unit("f1", "2024-01-01", ["a"])],
+      upcoming: [],
+      songs: [song("a", "2020-01-01")],
+      albums: [],
+      tours: [],
+    });
+    const tables = fullTables(sections);
+    expect(tables["song-most-played"][0].note).toBeNull();
+  });
+});
+
+describe("2차 검토 반영", () => {
+  test("발매 후 첫 라이브도 발매 직전 90일 안의 모르는 공연을 살핀다", () => {
+    const sections = buildStatSections({
+      units: [unit("p1", "2023-05-01", []), unit("p2", "2023-08-01", ["n"])],
+      upcoming: [],
+      songs: [song("n", "2023-06-07")],
+      albums: [],
+      tours: [],
+    });
+    expect(record(sections, "song-fastest-debut").rows).toHaveLength(0);
+  });
+
+  test("미공개곡을 처음 부른 날도 라이브 첫 공개에 센다", () => {
+    const sections = buildStatSections({
+      units: [unit("q1", "2024-01-01", ["u"])],
+      upcoming: [],
+      songs: [],
+      unreleasedSongs: [song("u", "2099-01-01")],
+      albums: [],
+      tours: [],
+    });
+    expect(record(sections, "live-most-debuts").rows[0].cells[0]).toBe("1곡");
   });
 });

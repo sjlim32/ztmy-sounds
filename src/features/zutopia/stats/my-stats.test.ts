@@ -66,3 +66,27 @@ describe("summarizeMine", () => {
     expect(summarizeMine(data, new Set()).attended).toBe(0);
   });
 });
+
+describe("세트리스트를 모르는 날", () => {
+  test("체크한 공연에 세트리스트를 아는 날이 없으면 못 들은 곡을 말하지 않는다", () => {
+    const summary = summarizeMine(data, new Set(["u4"]));
+    expect(summary.known).toBe(0);
+    expect(summary.missed).toEqual([]);
+  });
+
+  test("못 들은 인기곡은 표본이 적은 곡을 낮게 보정해 정렬", () => {
+    // y: 발매 후 10회 중 9회(90%), x: 발매 후 2회 중 2회(100%) — 보정하면 y가 앞.
+    const units = Array.from({ length: 10 }, (_, i) =>
+      unit(`w${i}`, `2024-01-${String(i + 1).padStart(2, "0")}`, [
+        ...(i < 9 ? ["y"] : []),
+        ...(i >= 8 ? ["x"] : []),
+      ]),
+    );
+    const small = buildMyStatsData({
+      units: [...units, unit("w10", "2024-01-20", ["z"])],
+      songs: [song("y"), song("x", "2024-01-09"), song("z")],
+    });
+    const summary = summarizeMine(small, new Set(["w10"]));
+    expect(summary.missed.map((item) => item.id)).toEqual(["y", "x"]);
+  });
+});

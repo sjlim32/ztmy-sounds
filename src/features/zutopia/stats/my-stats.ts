@@ -1,4 +1,5 @@
 import type { LiveUnit } from "@/features/zutopia/live-history/types";
+import { hasSetlist, knowsSong, wilsonLowerBound } from "./has-setlist";
 import type { StatSong } from "./types";
 
 /**
@@ -18,11 +19,16 @@ export interface MyStatSong {
   played: number;
   /** 발매 후 세트리스트가 있는 공연일 중 부른 비율(0~1), 그런 공연일이 없으면 null */
   rate: number | null;
+  /** 정렬용 — 표본이 적으면 낮게 보정한 참가율(통계의 참가율 순위와 같은 기준) */
+  score: number;
 }
 
 export interface MyStatsData {
-  /** 현장 공연일 전부(세트리스트 없는 날은 songIds가 빈 배열) */
-  units: { id: string; songIds: string[] }[];
+  /**
+   * 현장 공연일 전부(세트리스트 없는 날은 songIds가 빈 배열). known false는 세트리스트를
+   * 모르는 날(없거나 투어 공통 곡만) — 들은 곡엔 넣되 "못 들은 곡" 판단엔 쓰지 않는다.
+   */
+  units: { id: string; songIds: string[]; known: boolean }[];
   songs: MyStatSong[];
 }
 
@@ -30,12 +36,20 @@ export function buildMyStatsData(input: {
   units: LiveUnit[];
   songs: StatSong[];
 }): MyStatsData {
-  const known = input.units.filter((unit) => unit.songIds.length > 0);
   return {
-    units: input.units.map((unit) => ({ id: unit.id, songIds: unit.songIds })),
+    units: input.units.map((unit) => ({
+      id: unit.id,
+      songIds: unit.songIds,
+      known: hasSetlist(unit),
+    })),
     songs: input.songs.map((song) => {
+      // 곡마다 불렀는지 아는 날로(통계 compute.ts buildSongStats와 같은 기준)
+      const known = input.units.filter((unit) => knowsSong(unit, song.id));
       const eligible = known.filter((unit) => unit.date >= song.releaseDate);
       const played = known.filter((unit) => unit.songIds.includes(song.id));
+      const sinceRelease = played.filter(
+        (unit) => unit.date >= song.releaseDate,
+      ).length;
       return {
         id: song.id,
         name: song.titleKo || song.title,
@@ -43,10 +57,8 @@ export function buildMyStatsData(input: {
         image: song.cover,
         href: `/zutopia/songs?song=${song.slug}`,
         played: played.length,
-        rate: eligible.length
-          ? played.filter((unit) => unit.date >= song.releaseDate).length /
-            eligible.length
-          : null,
+        rate: eligible.length ? sinceRelease / eligible.length : null,
+        score: wilsonLowerBound(sinceRelease, eligible.length),
       };
     }),
   };
@@ -55,14 +67,17 @@ export function buildMyStatsData(input: {
 export interface MySummary {
   /** 체크한 공연일 중 지금 데이터에 있는 것 */
   attended: number;
-  /** 그중 세트리스트가 있는 공연일 — 들은 곡은 이 날들로만 센다 */
+  /** 그중 세트리스트를 아는 공연일 — 0이면 못 들은 곡을 말할 수 없다 */
   known: number;
   /** 라이브로 들은 곡 수 / 통계에 넣는 곡 수 */
   heard: number;
   total: number;
   /** 들은 곡 중 전체 라이브 횟수가 가장 적은 곡(희귀곡) */
   rare: MyStatSong[];
-  /** 못 들은 곡 중 참가율이 가장 높은 곡 */
+  /**
+   * 못 들은 곡 중 참가율(보정)이 가장 높은 곡 — 체크한 공연 중 세트리스트를 아는 날이
+   * 하나도 없으면 빈 배열(그날 들었을 수도 있어서)
+   */
   missed: MyStatSong[];
 }
 
@@ -81,14 +96,16 @@ export function summarizeMine(
   );
   return {
     attended: mine.length,
-    known: mine.filter((unit) => unit.songIds.length > 0).length,
+    known: mine.filter((unit) => unit.known).length,
     heard: heard.length,
     total: data.songs.length,
     rare: [...heard]
       .sort((a, b) => a.played - b.played || a.name.localeCompare(b.name, "ko"))
       .slice(0, MY_LIST_COUNT),
-    missed: missed
-      .sort((a, b) => b.rate! - a.rate! || b.played - a.played)
-      .slice(0, MY_LIST_COUNT),
+    missed: mine.some((unit) => unit.known)
+      ? missed
+          .sort((a, b) => b.score - a.score || b.played - a.played)
+          .slice(0, MY_LIST_COUNT)
+      : [],
   };
 }

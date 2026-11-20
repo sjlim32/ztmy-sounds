@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ThumbImage } from "@/components/ThumbImage";
 import { SidePanel } from "@/components/SidePanel";
@@ -15,7 +15,6 @@ import {
 } from "@/components/button-styles";
 import { SearchIcon } from "@/components/icons/SearchIcon";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
-import { rocknrollOne } from "@/features/zutopia/lives/rocknroll-font";
 import { getFeedbackUrl } from "@/lib/feedback";
 import {
   FilterPanel,
@@ -44,7 +43,7 @@ import {
 
 type SectionFilter = "all" | StatSection["id"];
 
-/** 카드에 1위 아래로 보여 줄 줄 수(2~5위). 나머지는 "자세히 보기" 표에서. */
+/** 카드에 1위 아래로 보여 줄 줄 수(2~5위). 나머지는 "전체 순위 보기" 표에서. */
 const RUNNER_UP_COUNT = 4;
 
 // 전체 순위표 — 빌드 때 만든 /zutopia/stats.json을 처음 열 때 한 번 받는다
@@ -65,7 +64,7 @@ function loadTables() {
 
 /**
  * 통계 페이지 — 곡·앨범·공연·장소 구역마다 기록 카드. 카드는 1위를 크게
- * (그림·이름·대표 값·설명), 그 아래 2~5위를 한 줄씩, 맨 아래 "자세히 보기"를
+ * (그림·이름·대표 값·설명), 그 아래 2~5위를 한 줄씩, 맨 아래 "전체 순위 보기"를
  * 누르면 옆 창(SidePanel)에 전체 순위표가 열린다(stats.json에서 받음). 위 필터
  * 카드(곡·공연 목록과 같은 모양)로 구역을 골라 볼 수 있다. 값은 빌드 때 다
  * 계산돼 내려온다(compute.ts). 창이 닫히며 미끄러지는 동안에도 마지막 기록을
@@ -98,7 +97,11 @@ export function StatsView({
   );
   // 기록마다 공유 주소(/zutopia/stats#기록id) — 열면 주소에 붙이고 닫으면 뗀다.
   // replaceState라 뒤로 가기 기록은 쌓이지 않는다.
+  // 공유 주소(#)로 연 창인지 — 카드 버튼으로 연 창은 닫으면 그 버튼으로 포커스가
+  // 돌아가지만(use-dialog-focus), 주소로 연 창은 돌아갈 곳이 없다.
+  const openedFromHash = useRef(false);
   const openRecord = (record: StatRecord) => {
+    openedFromHash.current = false;
     setShown(record);
     setOpen(true);
     window.history.replaceState(null, "", `#${record.id}`);
@@ -110,6 +113,22 @@ export function StatsView({
       "",
       window.location.pathname + window.location.search,
     );
+    if (!openedFromHash.current || !shown) return;
+    openedFromHash.current = false;
+    // 주소로 연 창을 닫으면 그 카드의 "전체 순위 보기"로 포커스를 두고 보이게 한다 —
+    // 그 사이 위 내용(내 기록)이 늘어 카드가 밀렸을 수 있다.
+    const button = document
+      .getElementById(shown.id)
+      ?.querySelector<HTMLElement>('button[aria-haspopup="dialog"]');
+    if (!button) return;
+    button.focus({ preventScroll: true });
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    button.scrollIntoView({
+      block: "nearest",
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
   };
 
   // 주소에 #기록id가 있으면(공유 링크로 들어왔거나 주소를 고쳤을 때) 그 기록을 연다.
@@ -118,16 +137,27 @@ export function StatsView({
       ...sections.flatMap((section) => section.records),
       summary.missing,
     ];
-    const openFromHash = () => {
-      const id = decodeURIComponent(window.location.hash.slice(1));
-      const record = records.find((item) => item.id === id);
-      if (!record) return;
+    // 기록 id는 ASCII라 디코딩하지 않는다(잘못된 %인코딩 주소에서 오류가 나지 않게).
+    const recordFromHash = () =>
+      records.find((item) => item.id === window.location.hash.slice(1));
+    const record = recordFromHash();
+    if (record) {
+      openedFromHash.current = true;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- 주소(#)는 브라우저에서만 읽을 수 있어 첫 상태를 여기서 맞춘다
       setShown(record);
       setOpen(true);
+    }
+    // 열린 채 주소의 #을 지우거나 없는 기록으로 바꾸면 창을 닫는다.
+    const onHashChange = () => {
+      const next = recordFromHash();
+      if (next) {
+        openedFromHash.current = true;
+        setShown(next);
+      }
+      setOpen(!!next);
     };
-    openFromHash();
-    window.addEventListener("hashchange", openFromHash);
-    return () => window.removeEventListener("hashchange", openFromHash);
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
   }, [sections, summary.missing]);
 
   return (
@@ -187,6 +217,7 @@ export function StatsView({
         title={shown?.title ?? ""}
         subtitle={shown?.detail ?? shown?.description}
         onClose={closeRecord}
+        size="wide"
       >
         <div className="mb-3 flex flex-wrap items-center gap-2">
           {shown?.id === MISSING_SETLIST_RECORD_ID && (
@@ -254,7 +285,7 @@ function SummaryRow({
                 FOCUS_RING,
               )}
             >
-              비어 있는 공연 {summary.missing.total}개
+              세트리스트를 모르는 공연 {summary.missing.total}회
             </button>
           )}
         </li>
@@ -267,7 +298,7 @@ function SummaryRow({
  * 기록 카드 — 위에서부터 제목·짧은 설명(자세한 기준은 옆 창), 1위(그림·이름·대표
  * 값·설명), 연도별 흐름(있는 기록만), 2~5위, 맨 아래 "전체 순위 보기" 줄. 카드는
  * 다단(columns)으로 쌓아 저마다 제 높이를 가진다 — 그래프 있는 카드와 없는 카드가
- * 한 줄에 놓여 빈칸이 생기지 않게. 돋보이는 건 1위 대표 값 하나(로고 서체 숫자).
+ * 한 줄에 놓여 빈칸이 생기지 않게. 돋보이는 건 1위 대표 값 하나(크고 굵은 숫자).
  */
 function RecordCard({
   record,
@@ -279,7 +310,7 @@ function RecordCard({
   const [leader, ...rest] = record.rows;
   const coLeaders = record.leaderCount;
   const runnersUp = rest.slice(0, RUNNER_UP_COUNT);
-  const scale = runnerUpScale(leader, runnersUp);
+  const scale = record.bars === false ? null : runnerUpScale(leader, runnersUp);
 
   return (
     <article
@@ -340,7 +371,7 @@ function RecordCard({
             {runnersUp.map((row, index) => (
               <li key={row.key} className="flex flex-col gap-1 text-sm">
                 <span className="flex items-baseline gap-3">
-                  <span className="w-5 shrink-0 text-right text-white/45 tabular-nums">
+                  <span className="w-5 shrink-0 text-right text-white/55 tabular-nums">
                     {row.rank}
                   </span>
                   <RowName row={row} className="flex-1 text-white/85" />
@@ -413,8 +444,9 @@ function runnerUpScale(
 }
 
 /**
- * 1위 대표 값 — 숫자만 로고 서체(RocknRoll One, 라틴 글자만 불러온다)로 크게,
- * 앞뒤 글자("앞에서", "회", "%p")는 본문 서체로 작게. 숫자가 없으면 글자 그대로.
+ * 1위 대표 값 — 숫자만 크고 굵게, 앞뒤 글자("회", "%p", "지점")는 작게. 숫자가
+ * 없으면 글자 그대로. 본문 서체를 쓴다(로고 서체는 일본어 조각 @font-face가 CSS에
+ * 통째로 실려 이 페이지만을 위해 불러오기엔 무겁다).
  */
 function Figure({ cell }: { cell: StatCell }) {
   const text = typeof cell === "string" ? cell : cell.label;
@@ -434,7 +466,7 @@ function Figure({ cell }: { cell: StatCell }) {
       )}
       <span
         className={cn(
-          rocknrollOne.className,
+          "font-extrabold tracking-tight",
           "tablet:text-5xl text-4xl leading-none tabular-nums",
         )}
       >
@@ -447,7 +479,7 @@ function Figure({ cell }: { cell: StatCell }) {
 
 /**
  * 1위의 연도별 미니 막대 — 한 가지 색(분홍) 세로 막대, 막대 사이 2px, 위 끝만
- * 둥글게. 위 줄엔 평소 가장 많았던 해를, 막대에 마우스를 올리거나(포커스) 누르면
+ * 둥글게. 위 줄엔 평소 가장 많았던 해를, 막대에 마우스를 올리거나 누르면
  * 그 해 값을 보여 준다. 가로축은 첫 해·마지막 해만 글자로. 화면 읽기 프로그램엔
  * 해마다 값을 목록으로 읽어 준다(sr-only).
  */
@@ -509,7 +541,7 @@ function TrendBars({ trend }: { trend: StatTrend }) {
       </div>
       <div
         aria-hidden
-        className="flex justify-between text-sm text-white/45 tabular-nums"
+        className="flex justify-between text-sm text-white/55 tabular-nums"
       >
         <span>{trend.points[0].label}</span>
         <span>{trend.points.at(-1)!.label}</span>
@@ -602,7 +634,7 @@ function CellText({ cell }: { cell: StatCell }) {
   if (typeof cell === "string") return cell;
   return (
     <>
-      <span className="block text-sm text-white/45">{cell.date}</span>
+      <span className="block text-sm text-white/55">{cell.date}</span>
       {cell.href ? (
         <Link
           href={cell.href}
@@ -653,6 +685,18 @@ function RecordTable({
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              // 글자가 있으면 Esc는 글자만 지우고 창은 그대로(use-dialog-focus가
+              // preventDefault를 보고 닫지 않는다).
+              if (
+                event.key === "Escape" &&
+                query &&
+                !event.nativeEvent.isComposing
+              ) {
+                event.preventDefault();
+                setQuery("");
+              }
+            }}
             aria-label={`${record.title} 순위에서 찾기`}
             placeholder="이름으로 찾기"
             className={cn(
@@ -680,13 +724,15 @@ function RecordTable({
         ))}
       </div>
 
-      {query && (
-        <p role="status" className="text-sm text-white/55">
-          {shownRows.length > 0
+      {/* 안내 영역은 늘 두고 글자만 바꾼다 — 검색어와 함께 처음 생기면 화면 읽기
+          프로그램이 첫 안내를 놓친다. */}
+      <p role="status" className="text-sm text-white/55 empty:hidden">
+        {query
+          ? shownRows.length > 0
             ? `${shownRows.length}줄 찾음`
-            : "찾는 이름이 없어요."}
-        </p>
-      )}
+            : "찾는 이름이 없어요."
+          : ""}
+      </p>
 
       {/* 모바일 — 줄마다 카드 */}
       <ol className="tablet:hidden flex flex-col">
@@ -850,6 +896,12 @@ function SortButton({
     >
       {header.label}
       {arrow && <span aria-hidden>{arrow}</span>}
+      {/* 칩은 aria-pressed만으론 방향을 알 수 없어 화면 읽기용으로 덧붙인다(표 머리칸은 aria-sort) */}
+      {chip && active && (
+        <span className="sr-only">
+          {sort.direction === "asc" ? "오름차순" : "내림차순"}
+        </span>
+      )}
     </button>
   );
 }
