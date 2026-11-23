@@ -271,7 +271,7 @@ type FetchedSetlistRow = Omit<SetlistRow, "songs"> & {
  * note.title이 있는 행(커버곡, note.info "cover")은 그 제목으로 가짜 곡을 만들고,
  * 메들리(note.type "medley")는 note.song_ids의 곡들을 담은 한 줄로, 그 밖(비활성 곡
  * 등)은 뺀다. 커버곡 id는 "cover:제목", 메들리는 "medley:제목"이라 같은 공연 안에서
- * 다른 곡과 겹치지 않는다. 라이브 기록·통계(live-history)는 곡 행이 있는 것만 센다.
+ * 다른 곡과 겹치지 않는다. 라이브 기록·통계(live-history)는 곡 행과 메들리 안의 곡을 센다.
  */
 function normalizeSetlistRows(
   rows: FetchedSetlistRow[],

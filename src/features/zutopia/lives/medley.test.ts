@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { parseMedleySongIds, setlistSongCount } from "./medley";
+import {
+  expandMedleyRow,
+  parseMedleySongIds,
+  setlistSongCount,
+} from "./medley";
 
 describe("parseMedleySongIds", () => {
   test("메들리 메모의 곡 id를 순서대로", () => {
@@ -17,6 +21,41 @@ describe("parseMedleySongIds", () => {
     expect(parseMedleySongIds({ type: "cover", song_ids: ["a"] })).toBeNull();
     expect(parseMedleySongIds({ type: "medley", song_ids: [] })).toBeNull();
     expect(parseMedleySongIds({ type: "medley" })).toBeNull();
+  });
+});
+
+describe("expandMedleyRow", () => {
+  const row = (note: Parameters<typeof parseMedleySongIds>[0]) => ({
+    track_number: 3,
+    is_encore: true,
+    note: note ?? null,
+  });
+
+  test("곡마다 한 행, 번호는 그 자리 안에서 순서대로", () => {
+    const rows = expandMedleyRow(
+      row({ type: "medley", song_ids: ["a", "b", "c", "d"] }),
+      () => true,
+    );
+    expect(rows.map((item) => [item.song_id, item.track_number])).toEqual([
+      ["a", 3],
+      ["b", 3.25],
+      ["c", 3.5],
+      ["d", 3.75],
+    ]);
+    expect(rows.every((item) => item.is_encore)).toBe(true);
+  });
+
+  test("비활성 곡은 빼고, 메들리가 아니면 빈 배열", () => {
+    expect(
+      expandMedleyRow(
+        row({ type: "medley", song_ids: ["a", "gone", "b"] }),
+        (id) => id !== "gone",
+      ).map((item) => [item.song_id, item.track_number]),
+    ).toEqual([
+      ["a", 3],
+      ["b", 3.5],
+    ]);
+    expect(expandMedleyRow(row({ type: "cover" }), () => true)).toEqual([]);
   });
 });
 

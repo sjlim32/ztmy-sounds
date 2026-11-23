@@ -8,6 +8,10 @@ import {
   buildSongLiveStats,
 } from "./units";
 import { parseSetlistNote } from "@/features/zutopia/lives/setlist-note";
+import {
+  expandMedleyRow,
+  parseMedleySongIds,
+} from "@/features/zutopia/lives/medley";
 import type { LiveHistory, RawCoverRow } from "./types";
 
 /**
@@ -72,8 +76,8 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
         .order("id")
         .range(from, to),
     ),
-    // 곡이 연결되지 않은 커버곡(note.title) — 곡 기록엔 안 넣고 통계의 커버곡 기록과
-    // 곡 순서(자리 차지)에만.
+    // 곡이 연결되지 않은 행 — 커버곡(note.title)은 곡 기록엔 안 넣고 통계의 커버곡
+    // 기록과 곡 순서(자리 차지)에만, 메들리(note.song_ids)는 곡마다 펴서 곡 기록에.
     fetchAllRows((from, to) =>
       supabase
         .from("setlists")
@@ -118,45 +122,71 @@ export const getLiveHistory = cache(async (): Promise<LiveHistory> => {
     );
   }
 
+  // 메들리에 든 곡 중 활성 곡 — 곡 행과 같이 비활성 곡은 세지 않는다.
+  const medleySongIds = [
+    ...new Set(
+      coversResult.data.flatMap((row) => parseMedleySongIds(row.note) ?? []),
+    ),
+  ];
+  const activeMedleySongs = new Set<string>();
+  if (medleySongIds.length > 0) {
+    const { data, error } = await supabase
+      .from("songs")
+      .select("id")
+      .eq("status", "ACTIVE")
+      .in("id", medleySongIds);
+    if (error) {
+      throw new Error(`메들리 곡을 가져오지 못했습니다: ${error.message}`);
+    }
+    for (const song of data) activeMedleySongs.add(song.id);
+  }
+
   // 한국 날짜 기준(UTC면 한국 아침 9시 전 빌드에서 하루 어긋남).
   const today = koreaDate();
   const input = {
     lives: livesResult.data,
     tours: toursResult.data,
-    // 곡이 연결된 행만(커버곡처럼 song_id가 빈 행은 즛토마요 곡 기록이 아니다).
-    setlists: setlistsResult.data.flatMap(
-      ({
-        live_id,
-        tour_id,
-        version_id,
-        song_id,
-        day_number,
-        show_number,
-        track_number,
-        is_encore,
-        omitted,
-        note,
-      }) =>
-        song_id
-          ? [
-              {
-                live_id,
-                tour_id,
-                version_id,
-                song_id,
-                day_number,
-                show_number,
-                track_number,
-                is_encore,
-                omitted,
-                note,
-              },
-            ]
-          : [],
-    ),
+    // 곡이 연결된 행 + 곡마다 편 메들리(커버곡처럼 song_id가 빈 행은 즛토마요 곡
+    // 기록이 아니다).
+    setlists: [
+      ...setlistsResult.data.flatMap(
+        ({
+          live_id,
+          tour_id,
+          version_id,
+          song_id,
+          day_number,
+          show_number,
+          track_number,
+          is_encore,
+          omitted,
+          note,
+        }) =>
+          song_id
+            ? [
+                {
+                  live_id,
+                  tour_id,
+                  version_id,
+                  song_id,
+                  day_number,
+                  show_number,
+                  track_number,
+                  is_encore,
+                  omitted,
+                  note,
+                },
+              ]
+            : [],
+      ),
+      ...coversResult.data.flatMap((row) =>
+        expandMedleyRow(row, (id) => activeMedleySongs.has(id)),
+      ),
+    ],
     covers: coversResult.data.flatMap((row): RawCoverRow[] => {
       const title = parseSetlistNote(row.note, "title");
-      return title
+      // 메들리는 위에서 곡으로 셌다 — 커버곡 기록에 넣지 않는다.
+      return title && !parseMedleySongIds(row.note)
         ? [
             {
               live_id: row.live_id,
