@@ -15,6 +15,7 @@ import { computeLastModified } from "@/features/zutopia/lives/last-modified";
 import { tourDateFilter } from "@/features/zutopia/lives/tour-dates";
 import { splitTourDateByDay } from "@/features/zutopia/lives/live-days";
 import { parseSetlistNote } from "@/features/zutopia/lives/setlist-note";
+import { parseMedleySongIds } from "@/features/zutopia/lives/medley";
 import {
   versionEndsOn,
   versionForDate,
@@ -26,6 +27,7 @@ import { getSongCoverSrc } from "@/features/zutopia/song-db/song-album-grouping"
 import type {
   Live,
   LiveDetail,
+  LiveMedleySong,
   LiveSetlistEntry,
   TourDetail,
   TourSetlistVersion,
@@ -244,6 +246,8 @@ interface SetlistSong {
   isCover?: boolean;
   /** 커버곡의 원곡 아티스트(note.original_artist) */
   coverArtist?: string | null;
+  /** 메들리 — 곡 행 없이 note.song_ids로 이어 부른 곡들 */
+  medley?: LiveMedleySong[];
 }
 
 interface SetlistRow {
@@ -259,20 +263,43 @@ interface SetlistRow {
 
 /** 조회 결과 그대로 — 곡이 연결되지 않았거나(커버곡) 비활성 곡이면 songs가 null. */
 type FetchedSetlistRow = Omit<SetlistRow, "songs"> & {
-  songs: Omit<SetlistSong, "isCover" | "coverArtist"> | null;
+  songs: Omit<SetlistSong, "isCover" | "coverArtist" | "medley"> | null;
 };
 
 /**
  * 조회한 세트리스트 행을 화면용으로 맞춘다 — 곡이 연결된 행은 그대로, 곡 없이
  * note.title이 있는 행(커버곡, note.info "cover")은 그 제목으로 가짜 곡을 만들고,
- * 둘 다 아니면(비활성 곡 등) 뺀다. 커버곡 id는 "cover:제목"이라 같은 공연 안에서
+ * 메들리(note.type "medley")는 note.song_ids의 곡들을 담은 한 줄로, 그 밖(비활성 곡
+ * 등)은 뺀다. 커버곡 id는 "cover:제목", 메들리는 "medley:제목"이라 같은 공연 안에서
  * 다른 곡과 겹치지 않는다. 라이브 기록·통계(live-history)는 곡 행이 있는 것만 센다.
  */
-function normalizeSetlistRows(rows: FetchedSetlistRow[]): SetlistRow[] {
+function normalizeSetlistRows(
+  rows: FetchedSetlistRow[],
+  songs: Map<string, LiveMedleySong>,
+): SetlistRow[] {
   return rows.flatMap((row) => {
     if (row.songs) return [{ ...row, songs: row.songs }];
     const title = parseSetlistNote(row.note, "title");
     if (!title) return [];
+    const medleyIds = parseMedleySongIds(row.note);
+    if (medleyIds) {
+      const medley = medleyIds.flatMap((id) => songs.get(id) ?? []);
+      if (medley.length === 0) return [];
+      return [
+        {
+          ...row,
+          songs: {
+            id: `medley:${title}`,
+            slug: "",
+            title,
+            title_ko: title,
+            title_en: "",
+            metadata: null,
+            medley,
+          },
+        },
+      ];
+    }
     return [
       {
         ...row,
@@ -323,26 +350,43 @@ function toSetlist(
       isCover: !!entry.songs.isCover,
       coverArtist: entry.songs.coverArtist ?? null,
       cover: null,
+      medley: entry.songs.medley ?? null,
     }));
 }
 
 /**
- * 곡 id → 커버(곡 목록과 같은 getSongCoverSrc 규칙 — 곡 커버, 없으면 첫 앨범 커버).
- * 곡 목록이 쓰는 getSongsWithAlbums(cache)를 그대로 써서 빌드 중 조회가 늘지 않는다.
+ * 곡 id → 세트리스트에 보여줄 곡 정보(커버는 곡 목록과 같은 getSongCoverSrc 규칙 — 곡
+ * 커버, 없으면 첫 앨범 커버). 곡 목록이 쓰는 getSongsWithAlbums(cache)를 그대로 써서
+ * 빌드 중 조회가 늘지 않는다.
  */
-const getSongCovers = cache(async (): Promise<Map<string, string | null>> => {
-  const songs = await getSongsWithAlbums();
-  return new Map(songs.map((song) => [song.id, getSongCoverSrc(song)]));
-});
+const getSetlistSongs = cache(
+  async (): Promise<Map<string, LiveMedleySong>> => {
+    const songs = await getSongsWithAlbums();
+    return new Map(
+      songs.map((song) => [
+        song.id,
+        {
+          songId: song.id,
+          title: song.title,
+          titleKo: song.title_ko,
+          titleEn: song.title_en,
+          guideHref: getGuideHref(song.slug),
+          unreleased: parseSongMetadata(song.metadata).isUnreleased,
+          cover: getSongCoverSrc(song),
+        },
+      ]),
+    );
+  },
+);
 
 /** 세트리스트 줄에 곡 커버를 붙인다(커버곡 "cover:…"·모르는 곡은 null). */
 function withCovers(
   entries: LiveSetlistEntry[],
-  covers: Map<string, string | null>,
+  songs: Map<string, LiveMedleySong>,
 ): LiveSetlistEntry[] {
   return entries.map((entry) => ({
     ...entry,
-    cover: covers.get(entry.songId) ?? null,
+    cover: entry.medley?.[0]?.cover ?? songs.get(entry.songId)?.cover ?? null,
   }));
 }
 
@@ -528,13 +572,18 @@ export const getLiveBySlug = cache(
     if (!data) return null;
 
     const { setlists, ...live } = data;
-    const covers = await getSongCovers();
+    const songs = await getSetlistSongs();
     // "그날만 빠진 곡"(omitted)은 투어 공통 행에 대한 표시라 단독 공연엔 쓰지 않는다.
     return {
       ...live,
       setlist: withCovers(
-        toSetlist(normalizeSetlistRows(setlists.filter((row) => !row.omitted))),
-        covers,
+        toSetlist(
+          normalizeSetlistRows(
+            setlists.filter((row) => !row.omitted),
+            songs,
+          ),
+        ),
+        songs,
       ),
     };
   },
@@ -597,6 +646,7 @@ export const getTourBySlug = cache(
         setlistResult.data.filter(
           (row) => versionId === null || row.version_id === versionId,
         ),
+        songs,
       );
 
     const { data: lives, error: livesError } = await supabase
@@ -617,7 +667,7 @@ export const getTourBySlug = cache(
     }
 
     // 이틀 이상인 공연일은 날마다 한 행으로 나눈다(일정 행·펼침이 그날 것만, live-days.ts).
-    const covers = await getSongCovers();
+    const songs = await getSetlistSongs();
     const dates = lives.flatMap((live) => {
       const { city, original } = splitRegion(live.region);
       const canceled = live.status === "CANCELED";
@@ -651,13 +701,13 @@ export const getTourBySlug = cache(
             : withCovers(
                 mergeTourSetlist(
                   tourRowsOf(version?.id ?? null),
-                  normalizeSetlistRows(live.setlists),
+                  normalizeSetlistRows(live.setlists, songs),
                   Array.from(
                     { length: Math.max(1, dayCount) },
                     (_, i) => i + 1,
                   ),
                 ),
-                covers,
+                songs,
               ),
         },
         live.live_date,
@@ -673,7 +723,7 @@ export const getTourBySlug = cache(
             label: version.label,
             startsOn: version.startsOn,
             endsOn: versionEndsOn(versions, version),
-            entries: withCovers(toSetlist(tourRowsOf(version.id)), covers),
+            entries: withCovers(toSetlist(tourRowsOf(version.id)), songs),
           }))
         : setlistResult.data.length > 0
           ? [
@@ -682,7 +732,7 @@ export const getTourBySlug = cache(
                 label: null,
                 startsOn: tour.start_date,
                 endsOn: null,
-                entries: withCovers(toSetlist(tourRowsOf(null)), covers),
+                entries: withCovers(toSetlist(tourRowsOf(null)), songs),
               },
             ]
           : [];

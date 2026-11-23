@@ -3,14 +3,18 @@
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
-import { SongLink } from "@/features/zutopia/lives/SongLink";
+import { SongLink, songRowTint } from "@/features/zutopia/lives/SongLink";
+import { setlistSongCount } from "@/features/zutopia/lives/medley";
 import { secondaryTitle } from "@/features/zutopia/song-db/song-title";
 import {
   LIVE_SURFACE_CLASS,
   LIVE_TAG_CLASS,
   LIVE_TAG_TONE,
 } from "@/features/zutopia/lives/surface";
-import type { LiveSetlistEntry } from "@/features/zutopia/lives/types";
+import type {
+  LiveMedleySong,
+  LiveSetlistEntry,
+} from "@/features/zutopia/lives/types";
 
 /**
  * 투어 공통 세트리스트의 "선택곡" 자리 — 공연일마다 다른 곡이 들어가는 번호.
@@ -73,7 +77,7 @@ export function Setlist({
       ka.trackNumber - kb.trackNumber
     );
   });
-  const songCount = entries.length + slots.length;
+  const songCount = setlistSongCount(entries) + slots.length;
 
   const heading = (
     <>
@@ -124,7 +128,13 @@ export function Setlist({
       {isOpen && (
         <ul className="flex flex-col divide-y divide-white/10">
           {rows.map((row) =>
-            row.kind === "song" ? (
+            row.kind === "song" && row.entry.medley ? (
+              <li
+                key={`medley-${row.entry.trackNumber}-${row.entry.dayNumber ?? "all"}-${row.entry.showNumber ?? "all"}`}
+              >
+                <MedleyRows entry={row.entry} songs={row.entry.medley} />
+              </li>
+            ) : row.kind === "song" ? (
               <li
                 key={`${row.entry.trackNumber}-${row.entry.dayNumber ?? "all"}-${row.entry.showNumber ?? "all"}-${row.entry.songId}`}
               >
@@ -212,5 +222,57 @@ export function Setlist({
         </ul>
       )}
     </section>
+  );
+}
+
+/**
+ * 메들리 한 번호 — 머리 줄(번호·"메들리"·곡 수·태그) 아래에 이어 부른 곡을 순서대로.
+ * 곡마다 커버와 응원 가이드가 있고, 앙코르·선택곡 바탕은 묶음 전체에 한 번만 칠한다.
+ */
+function MedleyRows({
+  entry,
+  songs,
+}: {
+  entry: LiveSetlistEntry;
+  songs: LiveMedleySong[];
+}) {
+  return (
+    <div
+      className={cn("pb-1.5", songRowTint(entry.isEncore, entry.isSelected))}
+    >
+      <SongLink
+        index={entry.trackNumber}
+        dayNumber={entry.dayNumber}
+        showLabel={entry.showLabel}
+        arrange={entry.arrange}
+        info={entry.info}
+        variation={entry.variation}
+        encore={entry.isEncore}
+        selected={entry.isSelected}
+        medleyPart="head"
+      >
+        <span className="font-semibold">메들리</span>
+        <span className="ml-1.5 text-sm text-white/55">{songs.length}곡</span>
+      </SongLink>
+      <ol>
+        {songs.map((song, index) => (
+          <li key={`${song.songId}-${index}`}>
+            <SongLink
+              href={song.guideHref}
+              index={entry.trackNumber}
+              indexLabel=""
+              artwork={song.cover}
+              subtitle={secondaryTitle(song)}
+              unreleased={song.unreleased}
+              encore={entry.isEncore}
+              selected={entry.isSelected}
+              medleyPart="song"
+            >
+              {song.title}
+            </SongLink>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }

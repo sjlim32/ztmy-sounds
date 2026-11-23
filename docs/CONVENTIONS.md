@@ -347,6 +347,11 @@ src/
                              # 테두리),
                              # 선택곡 자리는 들어간 곡들의 커버를 같은 칸 안에 겹쳐서
                              # (같은 그림은 한 장, 최대 3장 — stackedCovers).
+                             # 메들리(setlists.note의 type "medley", song_id 없이 title +
+                             # song_ids)는 한 번호의 묶음으로 — 머리 줄(번호·"메들리"·곡
+                             # 수·태그) 아래 곡마다 커버·제목·응원 가이드(Setlist MedleyRows,
+                             # lives/medley.ts). 곡 수는 안에 든 곡을 모두 센다
+                             # (setlistSongCount). 활성 곡이 하나도 없으면 줄을 뺀다.
                              # 세트리스트 메모 setlists.note: arrange(편곡)·info(덧붙임,
                              # "Short ver.")는 곡 아래 한 줄(" · "로 이음) — info가
                              # "Live debut"면 대신 제목 앞 마젠타 "[첫 공개]"(투어는

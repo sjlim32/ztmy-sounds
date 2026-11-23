@@ -27,6 +27,7 @@ function entry(
     isCover: false,
     coverArtist: null,
     cover: null,
+    medley: null,
   };
 }
 

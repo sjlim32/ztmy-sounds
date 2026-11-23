@@ -15,6 +15,7 @@ import {
 } from "@/features/zutopia/lives/surface";
 import { formatDayShow } from "@/features/zutopia/lives/shows";
 import { groupTourDates } from "@/features/zutopia/lives/date-groups";
+import { setlistSongCount } from "@/features/zutopia/lives/medley";
 import { FOCUS_RING } from "@/components/button-styles";
 import type {
   LiveSetlistEntry,
@@ -582,7 +583,7 @@ function TourDateRow({
                   : "text-white/50 group-hover:text-white/80",
               )}
             >
-              {date.setlist.length}곡
+              {setlistSongCount(date.setlist)}곡
             </span>
           )}
           <ChevronLeftIcon

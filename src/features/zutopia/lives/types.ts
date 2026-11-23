@@ -3,6 +3,17 @@ import type { Database } from "@/lib/supabase/database.types";
 export type Live = Database["public"]["Tables"]["lives"]["Row"];
 export type Tour = Database["public"]["Tables"]["tours"]["Row"];
 
+// 메들리 안의 곡 한 개 — 곡마다 커버·응원 가이드를 따로 보여준다.
+export interface LiveMedleySong {
+  songId: string;
+  title: string;
+  titleKo: string;
+  titleEn: string;
+  guideHref: string | null;
+  unreleased: boolean;
+  cover: string | null;
+}
+
 export interface LiveSetlistEntry {
   songId: string;
   title: string;
@@ -35,6 +46,8 @@ export interface LiveSetlistEntry {
   coverArtist: string | null;
   // 곡 커버(곡 커버, 없으면 첫 앨범 커버 — 곡 목록과 같은 규칙). 커버곡·모르면 null.
   cover: string | null;
+  // 메들리(note.type "medley")면 한 번호 안에 이어 부른 곡들, 아니면 null.
+  medley: LiveMedleySong[] | null;
 }
 
 export interface LiveDetail extends Live {

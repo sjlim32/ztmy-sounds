@@ -54,6 +54,11 @@ export function variationLabel(variation: string): string {
   return `${variation.trim()} ver.`;
 }
 
+/** 앙코르·선택곡 줄의 바탕 — 메들리는 여러 줄을 감싼 쪽(Setlist)에 한 번만 칠한다. */
+export function songRowTint(encore: boolean, selected: boolean) {
+  return cn(encore && "bg-ztmy-sun/5", selected && "bg-ztmy-sky/15");
+}
+
 export function SongLink({
   href,
   index,
@@ -70,6 +75,7 @@ export function SongLink({
   wrapTitle = false,
   indexLabel,
   artwork,
+  medleyPart,
   children,
 }: {
   href?: string | null;
@@ -98,6 +104,11 @@ export function SongLink({
    * 같은 칸 안에 겹쳐서(선택곡 자리), 주지 않으면(undefined) 칸 자체를 두지 않는다.
    */
   artwork?: string | null | (string | null)[];
+  /**
+   * 메들리 묶음의 한 줄 — "head"는 번호·태그가 있는 머리, "song"은 그 아래 곡 줄(번호와
+   * 일차·선택곡·ENCORE 태그 없이). 바탕은 묶음을 감싼 쪽이 칠한다.
+   */
+  medleyPart?: "head" | "song";
   children: ReactNode;
 }) {
   const number = indexLabel ?? String(index).padStart(2, "0");
@@ -115,9 +126,10 @@ export function SongLink({
       className={cn(
         rowClass,
         encore || selected ? "text-white" : "text-white/90",
-        encore && "bg-ztmy-sun/5",
         // 선택된 곡은 한쪽 막대 대신 행 전체를 옅게 칠한다
-        selected && "bg-ztmy-sky/15",
+        !medleyPart && songRowTint(encore, selected),
+        medleyPart === "head" && "pb-1",
+        medleyPart === "song" && "py-1.5",
       )}
     >
       <span
@@ -177,7 +189,7 @@ export function SongLink({
           미공개
         </span>
       )}
-      {dayLabel && (
+      {dayLabel && medleyPart !== "song" && (
         <span
           className={cn(
             LIVE_TAG_CLASS,
@@ -189,12 +201,12 @@ export function SongLink({
           {dayLabel}
         </span>
       )}
-      {selected && (
+      {selected && medleyPart !== "song" && (
         <span className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.selected)}>
           선택곡
         </span>
       )}
-      {encore && (
+      {encore && medleyPart !== "song" && (
         <span
           className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.encore, "tracking-wide")}
         >
