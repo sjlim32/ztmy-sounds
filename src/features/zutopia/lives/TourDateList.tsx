@@ -130,16 +130,14 @@ export function TourDateList({ dates }: { dates: TourDateEntry[] }) {
     >
       {groupTourDates(dates).map((group) => {
         // 하루 공연도 연달은 공연도 같은 모양 — 도시 머리 하나 + 날짜 줄(하루면 한 줄).
-        const indent = group.some(
+        // 그림은 머리와 첫 날짜 줄 왼쪽에 걸쳐 놓여 묶음 전체가 한 덩어리로 읽힌다.
+        const hasThumbnail = group.some(
           (date) => date.iconImageUrl ?? date.posterImageUrl,
         );
         return (
-          <li key={group[0].id} className="pb-1.5">
-            <TourDateGroupHeader
-              dates={group}
-              isOpen={group.some((date) => date.id === openId)}
-            />
-            {group.map((date) => {
+          <li key={group[0].id} className="relative pb-2">
+            <TourDateGroupHeader dates={group} />
+            {group.map((date, index) => {
               const isOpen = openId === date.id;
               const panelId = `tour-date-${date.id}`;
               return (
@@ -156,7 +154,8 @@ export function TourDateList({ dates }: { dates: TourDateEntry[] }) {
                     isOpen={isOpen}
                     panelId={panelId}
                     onClick={() => toggle(date.id)}
-                    indent={indent}
+                    hasThumbnail={hasThumbnail}
+                    isFirst={index === 0}
                   />
                   {isOpen && <TourDatePanel id={panelId} date={date} />}
                 </div>
@@ -437,8 +436,8 @@ function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
     <div
       id={id}
       className={cn(
-        // 열린 행과 같은 옅은 바탕으로 이어 한 덩어리로(테두리·카드 없이).
-        "flex flex-col gap-3 bg-white/[0.05] px-3 pb-4",
+        // 목록 전체 폭의 옅은 바탕(테두리·카드 없이) — 날짜 줄보다 넓게 펼쳐진다.
+        "mt-1 flex flex-col gap-3 bg-white/[0.05] px-3 pb-4",
         "tablet:px-4",
       )}
     >
@@ -477,8 +476,7 @@ function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
  * 공연 일정의 날짜 줄 — 도시·공연장·그림은 위 머리(TourDateGroupHeader)에 한 번만
  * 두고, 여기엔 날짜(요일·연도·시각)·DAY·취소 태그와 그날의 선택곡만. 머리에 그림이
  * 있으면 머리의 도시 글자와 같은 줄에 맞춰 들인다. 오른쪽 끝은 그날 곡 수 + 꺾쇠
- * (누르면 그 아래 TourDatePanel에 세트리스트). 펼치면 줄과 펼친 영역이 같은 옅은
- * 바탕으로 이어진다.
+ * (누르면 그 아래 TourDatePanel에 세트리스트). 펼친 날은 날짜가 분홍색이다.
  */
 function TourDateRow({
   date,
@@ -486,15 +484,18 @@ function TourDateRow({
   isOpen,
   panelId,
   onClick,
-  indent,
+  hasThumbnail,
+  isFirst,
 }: {
   date: TourDateEntry;
   showYear: boolean;
   isOpen: boolean;
   panelId: string;
   onClick: () => void;
-  /** 묶음 머리에 그림이 있으면 날짜를 머리의 도시 글자 줄에 맞춰 들인다 */
-  indent: boolean;
+  /** 묶음 머리에 그림이 있으면 그 옆으로 들여 도시 글자와 맞춘다 */
+  hasThumbnail: boolean;
+  /** 묶음의 첫 날짜 — 둘째 날부터 위에 얇은 구분선 */
+  isFirst: boolean;
 }) {
   // 그날에만 있는 곡(투어 공통 세트리스트에 없는 선택곡) — 펼치지 않아도 보인다.
   const selectedSongs = date.setlist.filter((entry) => entry.isSelected);
@@ -511,11 +512,9 @@ function TourDateRow({
   // 취소된 공연일 — 회색·빨간 취소선, 펼칠 세트리스트가 없어 누를 수 없다.
   const canceled = !!date.canceled;
   const rowClass = cn(
-    "group flex w-full items-center gap-3 px-3 py-2 text-left transition-colors",
-    "tablet:gap-4 tablet:px-4",
-    // 머리 그림(w-14·w-20) + 간격만큼 들여 도시 글자와 맞춘다.
-    indent && "pl-20 tablet:pl-28",
+    "group flex w-full items-center gap-3 px-2 py-1.5 text-left transition-colors",
   );
+  const dayLabel = formatDayShow(date.dayNumber, date.showLabel);
 
   const content = (
     <>
@@ -528,19 +527,17 @@ function TourDateRow({
             startTime={date.startTime}
             openTime={date.openTime}
             canceled={canceled}
+            isOpen={isOpen}
           />
-          {(date.dayNumber != null || date.showLabel) && (
-            // 세트리스트의 DAY 태그와 같은 색(1일차 분홍, 2일차 보라, 이후 반복)
+          {/* 도시 아래 단계라 색 태그 대신 흐린 글자로 */}
+          {dayLabel && (
             <span
               className={cn(
-                LIVE_TAG_CLASS,
-                LIVE_TAG_TONE.day[
-                  ((date.dayNumber ?? 1) - 1) % LIVE_TAG_TONE.day.length
-                ],
-                canceled && "opacity-50",
+                "text-sm whitespace-nowrap",
+                canceled ? CANCELED_TEXT_CLASS : "text-white/45",
               )}
             >
-              {formatDayShow(date.dayNumber, date.showLabel)}
+              {dayLabel}
             </span>
           )}
           {canceled && (
@@ -552,13 +549,11 @@ function TourDateRow({
 
         {selectedSongs.length > 0 && (
           <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm">
-            <span className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.selected)}>
-              선택곡
-            </span>
+            <span className="text-ztmy-sky/80 whitespace-nowrap">선택곡</span>
             {selectedSongs.map((entry, index) => (
               <span
                 key={`${entry.songId}-${entry.dayNumber ?? "all"}-${entry.showNumber ?? "all"}`}
-                className="whitespace-nowrap text-white/80"
+                className="whitespace-nowrap text-white/65"
               >
                 {entry.titleKo}
                 {/* 구분점은 앞 곡 끝에 붙여 줄바꿈돼도 새 줄 맨 앞에 오지 않게. */}
@@ -580,7 +575,7 @@ function TourDateRow({
                 "text-sm whitespace-nowrap tabular-nums transition-colors",
                 isOpen
                   ? "text-white/80"
-                  : "text-white/50 group-hover:text-white/80",
+                  : "text-white/40 group-hover:text-white/80",
               )}
             >
               {setlistSongCount(date.setlist)}곡
@@ -597,22 +592,30 @@ function TourDateRow({
     </>
   );
 
-  if (canceled) {
-    return <div className={rowClass}>{content}</div>;
-  }
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-expanded={isOpen}
-      aria-controls={panelId}
+    // 줄 전체를 도시 글자 칸에 맞춰 들인다 — 구분선·누르는 영역도 같은 폭(머리 그림
+    // w-12·w-16 + 간격 − 줄 안쪽 여백 px-2).
+    <div
       className={cn(
-        rowClass,
-        isOpen ? "bg-white/[0.05]" : "hover:bg-white/[0.04]",
+        "tablet:mr-2 mr-1",
+        hasThumbnail ? "tablet:ml-22 ml-16" : "tablet:ml-2 ml-1",
+        !isFirst && "border-t border-white/[0.07]",
       )}
     >
-      {content}
-    </button>
+      {canceled ? (
+        <div className={rowClass}>{content}</div>
+      ) : (
+        <button
+          type="button"
+          onClick={onClick}
+          aria-expanded={isOpen}
+          aria-controls={panelId}
+          className={cn(rowClass, "hover:bg-white/[0.04]")}
+        >
+          {content}
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -620,16 +623,10 @@ function TourDateRow({
  * 공연 일정의 도시 머리 — 같은 도시·공연장에서 연달아 열린 공연일 묶음(하루 공연은
  * 한 날짜짜리 묶음)마다 하나. 목록을 훑는 기준이라 도시만 크고 굵게, 그 옆에 원어
  * 이름·내한 태그, 아래 공연장, 왼쪽에 묶음의 첫 그림(아이콘, 없으면 포스터). 누르는
- * 줄이 아니라 그 아래 날짜 줄(TourDateRow)이 그날 세트리스트를 펼친다. 날짜 줄 하나가
- * 열려 있으면 도시가 분홍색, 묶음 전체가 취소면 회색·취소선.
+ * 줄이 아니라 그 아래 날짜 줄(TourDateRow)이 그날 세트리스트를 펼친다. 묶음 전체가
+ * 취소면 회색·취소선. 그림은 묶음(li) 기준으로 띄워 첫 날짜 줄 옆까지 걸친다.
  */
-function TourDateGroupHeader({
-  dates,
-  isOpen,
-}: {
-  dates: TourDateEntry[];
-  isOpen: boolean;
-}) {
+function TourDateGroupHeader({ dates }: { dates: TourDateEntry[] }) {
   const first = dates[0];
   const thumbnail =
     dates
@@ -639,15 +636,16 @@ function TourDateGroupHeader({
   return (
     <div
       className={cn(
-        "flex w-full items-center gap-3 px-3 pt-3 pb-1",
-        "tablet:gap-4 tablet:px-4",
+        "flex w-full px-3 pt-3 pb-1.5",
+        "tablet:px-4",
+        thumbnail && "tablet:pl-24 pl-18",
       )}
     >
       {thumbnail && (
         <span
           className={cn(
-            "relative aspect-[3/4] w-14 shrink-0 overflow-hidden rounded-md bg-white/5",
-            "tablet:w-20",
+            "absolute top-3 left-3 aspect-[3/4] w-12 overflow-hidden rounded-md bg-white/5",
+            "tablet:left-4 tablet:w-16",
           )}
         >
           <ThumbImage
@@ -666,11 +664,7 @@ function TourDateGroupHeader({
             className={cn(
               "text-lg leading-tight font-bold transition-colors",
               "tablet:text-xl",
-              allCanceled
-                ? CANCELED_TEXT_CLASS
-                : isOpen
-                  ? "text-ztmy-pink"
-                  : "text-white",
+              allCanceled ? CANCELED_TEXT_CLASS : "text-white",
             )}
           >
             {first.city}
@@ -711,8 +705,9 @@ function TourDateGroupHeader({
 }
 
 /**
- * 날짜 줄의 날짜 — "03.29"(이틀이면 "03.29–30")를 도시보다 한 단계 작게, 옆에 요일,
- * 해를 넘기는 투어면 연도, 회차가 있으면 개장·시작 시각을 작고 흐리게.
+ * 날짜 줄의 날짜 — "03.29"(이틀이면 "03.29–30")를 도시보다 두 단계 작게, 옆에 요일,
+ * 해를 넘기는 투어면 연도, 회차가 있으면 개장·시작 시각을 흐리게. 펼친 날은 날짜만
+ * 분홍색이라 어느 날을 열었는지 보인다.
  */
 function DateLine({
   label,
@@ -721,6 +716,7 @@ function DateLine({
   startTime,
   openTime,
   canceled = false,
+  isOpen = false,
 }: {
   label: string;
   weekday: string;
@@ -730,22 +726,25 @@ function DateLine({
   openTime?: string;
   /** 취소된 공연일 — 회색·빨간 취소선으로. */
   canceled?: boolean;
+  isOpen?: boolean;
 }) {
-  const muted = canceled ? CANCELED_TEXT_CLASS : "text-white/55";
+  const muted = canceled ? CANCELED_TEXT_CLASS : "text-white/45";
   return (
     <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
       <span
         className={cn(
-          "text-base font-semibold whitespace-nowrap tabular-nums",
-          "tablet:text-lg",
-          canceled ? CANCELED_TEXT_CLASS : "text-white/90",
+          "text-sm font-medium whitespace-nowrap tabular-nums transition-colors",
+          "tablet:text-base",
+          canceled
+            ? CANCELED_TEXT_CLASS
+            : isOpen
+              ? "text-ztmy-pink"
+              : "text-white/85",
         )}
       >
         {label}
       </span>
-      <span className={cn("text-sm font-medium tracking-wider", muted)}>
-        {weekday}
-      </span>
+      <span className={cn("text-sm tracking-wider", muted)}>{weekday}</span>
       {year && (
         <span className={cn("text-sm tabular-nums", muted)}>{year}</span>
       )}
