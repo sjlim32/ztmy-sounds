@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { SongLink, songRowTint } from "@/features/zutopia/lives/SongLink";
 import { setlistSongCount } from "@/features/zutopia/lives/medley";
+import { SetlistPostit } from "@/features/zutopia/lives/SetlistPostit";
+import type { SetlistChangeNote } from "@/features/zutopia/lives/setlist-diff";
 import { secondaryTitle } from "@/features/zutopia/song-db/song-title";
 import {
   LIVE_SURFACE_CLASS,
@@ -47,6 +49,8 @@ type SetlistRow =
  * - slots: 공통 세트리스트의 선택곡 자리 — 곡 사이 번호 순서대로 끼워 넣는다.
  * - toolbar: 펼쳤을 때 제목 줄과 목록 사이에 두는 것(투어 세트리스트 판 고르기 등).
  * - plain: 카드 면·테두리 없이 목록만(이미 어두운 면 안에 놓일 때 — 공연일 펼침).
+ * - changes: 다른 판과 달라진 곡의 포스트잇(그 곡 줄 위). changesKey가 바뀌면 새로
+ *   붙는 움직임이 나온다.
  */
 export function Setlist({
   entries,
@@ -56,6 +60,8 @@ export function Setlist({
   slots = [],
   toolbar = null,
   plain = false,
+  changes = [],
+  changesKey,
 }: {
   entries: LiveSetlistEntry[];
   title?: string;
@@ -64,6 +70,8 @@ export function Setlist({
   slots?: SetlistSlot[];
   toolbar?: ReactNode;
   plain?: boolean;
+  changes?: SetlistChangeNote[];
+  changesKey?: string;
 }) {
   const [isOpen, setOpen] = useState(defaultOpen);
   const rows: SetlistRow[] = [
@@ -78,6 +86,13 @@ export function Setlist({
     );
   });
   const songCount = setlistSongCount(entries) + slots.length;
+  const postitFor = (entry: LiveSetlistEntry) => {
+    const note = changes.find(
+      (item) =>
+        item.songId === entry.songId && item.isEncore === entry.isEncore,
+    );
+    return note ? <SetlistPostit key={changesKey} note={note} /> : null;
+  };
 
   const heading = (
     <>
@@ -132,12 +147,14 @@ export function Setlist({
               <li
                 key={`medley-${row.entry.trackNumber}-${row.entry.dayNumber ?? "all"}-${row.entry.showNumber ?? "all"}`}
               >
+                {postitFor(row.entry)}
                 <MedleyRows entry={row.entry} songs={row.entry.medley} />
               </li>
             ) : row.kind === "song" ? (
               <li
                 key={`${row.entry.trackNumber}-${row.entry.dayNumber ?? "all"}-${row.entry.showNumber ?? "all"}-${row.entry.songId}`}
               >
+                {postitFor(row.entry)}
                 <SongLink
                   href={row.entry.guideHref}
                   index={row.entry.trackNumber}

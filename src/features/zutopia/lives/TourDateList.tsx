@@ -16,6 +16,10 @@ import {
 import { formatDayShow } from "@/features/zutopia/lives/shows";
 import { groupTourDates } from "@/features/zutopia/lives/date-groups";
 import { setlistSongCount } from "@/features/zutopia/lives/medley";
+import {
+  diffSetlistVersions,
+  type SetlistChangeNote,
+} from "@/features/zutopia/lives/setlist-diff";
 import { FOCUS_RING } from "@/components/button-styles";
 import type {
   LiveSetlistEntry,
@@ -173,18 +177,22 @@ export function TourDateList({ dates }: { dates: TourDateEntry[] }) {
  * 눈에 보기") 제목 줄을 눌러 펼친다. 공연일마다 다른 곡이 들어가는 번호엔 "선택곡"
  * 줄을 끼워, 그 자리에 실제로 들어간 곡들(공연일 전체에서 모음)을 보여준다. 공통
  * 곡이 없는 투어(공연일마다 전부 다른 구성이거나 아직 데이터가 없음)면 그리지 않는다.
- * toolbar는 펼쳤을 때 제목 아래(판 고르기).
+ * toolbar는 펼쳤을 때 제목 아래(판 고르기), changes는 다른 판과 달라진 곡의 포스트잇.
  */
 export function TourCommonSetlist({
   entries,
   dates,
   title = "투어 세트리스트 한 눈에 보기",
   toolbar = null,
+  changes,
+  changesKey,
 }: {
   entries: LiveSetlistEntry[];
   dates: TourDateEntry[];
   title?: string;
   toolbar?: ReactNode;
+  changes?: SetlistChangeNote[];
+  changesKey?: string;
 }) {
   if (entries.length === 0) return null;
   return (
@@ -195,6 +203,8 @@ export function TourCommonSetlist({
       collapsible
       defaultOpen={false}
       toolbar={toolbar}
+      changes={changes}
+      changesKey={changesKey}
     />
   );
 }
@@ -204,7 +214,9 @@ export function TourCommonSetlist({
  * 둘 이상이면 펼친 카드 안 제목 아래에 판 고르기 탭(같은 폭으로 나란히: 이름 + 그 판
  * 공연일의 첫–마지막 도시·횟수)을 두고 고른 판의 세트리스트를 보여 준다. 이름은 판에
  * 적은 이름(label), 없으면 versionName의 기본 이름(전반기·후반기). 판을 바꿔도 펼친
- * 상태는 그대로다. 선택곡 자리는 그 판을 따른 공연일로만 모은다.
+ * 상태는 그대로다. 선택곡 자리는 그 판을 따른 공연일로만 모은다. 달라진 곡은 해당
+ * 트랙 위 포스트잇으로 — 그 판에 있는 곡에만. 뒤 판은 앞 판과 비교해 추가됨·순서 변경,
+ * 첫 판은 다음 판과 비교해 "후반기에 빠짐"·"후반기에 순서 변경".
  */
 export function TourSetlistVersions({
   versions,
@@ -219,6 +231,18 @@ export function TourSetlistVersions({
   if (!selected) return null;
   if (versions.length === 1)
     return <TourCommonSetlist entries={selected.entries} dates={dates} />;
+
+  // 바로 앞 판과 비교하고, 앞 판이 없는 첫 판은 다음 판에서 무엇이 바뀌는지 알려 준다.
+  const selectedIndex = versions.indexOf(selected);
+  const previous = versions[selectedIndex - 1];
+  const next = versions[selectedIndex + 1];
+  const changes = previous
+    ? diffSetlistVersions(selected.entries, previous.entries)
+    : diffSetlistVersions(
+        selected.entries,
+        next.entries,
+        next.label ?? versionName(selectedIndex + 1, versions.length),
+      );
 
   const tabs = (
     <div className={cn("border-b border-white/10 px-4 py-3", "tablet:px-5")}>
@@ -281,6 +305,8 @@ export function TourSetlistVersions({
       entries={selected.entries}
       dates={dates.filter((date) => date.versionId === selected.id)}
       toolbar={tabs}
+      changes={changes}
+      changesKey={selected.id}
     />
   );
 }
