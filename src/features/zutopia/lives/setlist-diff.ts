@@ -2,13 +2,11 @@ import type { LiveSetlistEntry } from "@/features/zutopia/lives/types";
 
 type DiffEntry = Pick<LiveSetlistEntry, "songId" | "trackNumber" | "isEncore">;
 
-/** 세트리스트 줄 위에 붙이는 변경 메모 하나 — 고른 판에 있는 곡에만 붙는다. */
+/** 세트리스트 곡 제목 아래 도장 하나 — 고른 판에 있는 곡에만 붙는다. */
 export interface SetlistChangeNote {
-  label: "추가됨" | "빠짐" | "순서 변경";
-  /** 첫 판에서 다음 판의 변화를 알릴 때의 시기("후반기에"). 앞 판과 비교하면 null. */
-  timing: string | null;
-  /** 순서 변경의 "5번 → 8번". 그 밖엔 없다. */
-  detail: string | null;
+  label: "추가" | "제거" | "순서 변경";
+  /** 도장 옆 상세 — 추가·제거는 "후반기부터", 순서 변경은 "전반기 5번 → 후반기 8번". */
+  detail: string;
   songId: string;
   isEncore: boolean;
 }
@@ -40,46 +38,49 @@ function keptPairs(a: DiffEntry[], b: DiffEntry[]): [number, number][] {
   return pairs;
 }
 
-/** "5번 → 8번", 본편·앙코르를 넘나들면 "본편 13번 → 앙코르 17번". */
-function moveText(from: DiffEntry, to: DiffEntry) {
-  const place = (entry: DiffEntry) =>
-    from.isEncore === to.isEncore
-      ? `${entry.trackNumber}번`
-      : `${entry.isEncore ? "앙코르" : "본편"} ${entry.trackNumber}번`;
-  return `${place(from)} → ${place(to)}`;
+/** "전반기 13번 → 후반기 17번" — 앞 판 번호 → 뒤 판 번호(본편·앙코르 구분 없이 번호만). */
+function moveText(
+  from: DiffEntry,
+  to: DiffEntry,
+  earlierName: string,
+  laterName: string,
+) {
+  return `${earlierName} ${from.trackNumber}번 → ${laterName} ${to.trackNumber}번`;
 }
 
 /**
- * 판 사이에 공통 세트리스트가 어떻게 바뀌었나 — 고른 판에 있는 곡에만, 추가됨·빠짐·순서
- * 변경 셋으로. 변화의 방향은 늘 앞 판 → 뒤 판이다.
- * - nextName 없음: other는 바로 앞 판. 새로 들어온 곡은 "추가됨", 옮긴 곡은 "순서 변경".
- * - nextName 있음(첫 판): other는 다음 판. 다음 판에 없는 곡은 "후반기에 빠짐", 옮길 곡은
- *   "후반기에 순서 변경".
+ * 판 사이에 공통 세트리스트가 어떻게 바뀌었나 — 고른 판에 있는 곡에만, 추가·제거·순서
+ * 변경 셋으로. 변화는 늘 앞 판 → 뒤 판이라 상세도 두 탭에서 같은 말로 적는다(추가·제거는
+ * "후반기부터", 순서 변경은 "전반기 13번 → 후반기 17번").
+ * - 기본: other는 바로 앞 판(earlierName). 새로 들어온 곡은 "추가", 옮긴 곡은 "순서 변경".
+ * - compareWithNext(첫 판): other는 다음 판(laterName). 다음 판에 없는 곡은 "제거".
  * 고른 판에 줄이 없는 곡(앞 판에서 빠진 곡, 다음 판에 들어올 곡)은 표시하지 않고, 곡 하나가
  * 끼어들어 번호만 밀린 곡도 표시하지 않는다. 고정곡이 일부 공연의 선택곡이 되면 공통
- * 세트리스트에선 빠진 것으로 본다.
+ * 세트리스트에선 제거된 것으로 본다.
  */
 export function diffSetlistVersions(
   entries: readonly DiffEntry[],
   other: readonly DiffEntry[],
-  nextName: string | null = null,
+  {
+    earlierName,
+    laterName,
+    compareWithNext = false,
+  }: { earlierName: string; laterName: string; compareWithNext?: boolean },
 ): SetlistChangeNote[] {
   const here = inOrder(entries);
   const there = inOrder(other);
   const thereById = new Map(there.map((entry) => [entry.songId, entry]));
   const kept = new Set(keptPairs(here, there).map(([index]) => index));
-  const timing = nextName ? `${nextName}에` : null;
   return here.flatMap((entry, index) => {
     if (kept.has(index)) return [];
     const counterpart = thereById.get(entry.songId);
     const note: SetlistChangeNote = {
-      label: counterpart ? "순서 변경" : nextName ? "빠짐" : "추가됨",
-      timing,
+      label: counterpart ? "순서 변경" : compareWithNext ? "제거" : "추가",
       detail: counterpart
-        ? nextName
-          ? moveText(entry, counterpart)
-          : moveText(counterpart, entry)
-        : null,
+        ? compareWithNext
+          ? moveText(entry, counterpart, earlierName, laterName)
+          : moveText(counterpart, entry, earlierName, laterName)
+        : `${laterName}부터`,
       songId: entry.songId,
       isEncore: entry.isEncore,
     };

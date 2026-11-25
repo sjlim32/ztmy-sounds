@@ -10,6 +10,8 @@ import {
   LIVE_TAG_CLASS,
   LIVE_TAG_TONE,
 } from "@/features/zutopia/lives/surface";
+import { SetlistChangeLine } from "@/features/zutopia/lives/SetlistChangeLine";
+import type { SetlistChangeNote } from "@/features/zutopia/lives/setlist-diff";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
 
@@ -76,6 +78,7 @@ export function SongLink({
   indexLabel,
   artwork,
   medleyPart,
+  change = null,
   children,
 }: {
   href?: string | null;
@@ -109,6 +112,8 @@ export function SongLink({
    * 일차·선택곡·ENCORE 태그 없이). 바탕은 묶음을 감싼 쪽이 칠한다.
    */
   medleyPart?: "head" | "song";
+  /** 투어 세트리스트의 다른 판과 달라졌으면 제목 아래 변동 줄 */
+  change?: SetlistChangeNote | null;
   children: ReactNode;
 }) {
   const number = indexLabel ?? String(index).padStart(2, "0");
@@ -183,6 +188,7 @@ export function SongLink({
               .join(" · ")}
           </span>
         )}
+        {change && <SetlistChangeLine change={change} />}
       </div>
       {unreleased && (
         <span className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.unreleased)}>

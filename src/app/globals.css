@@ -388,6 +388,22 @@ html.custom-cursor-active .custom-cursor {
   animation: content-in 220ms ease-out backwards;
 }
 
+/* 세트리스트 변동 도장 — 크게 떠 있다가 종이에 찍히듯 줄어든다. 기울기(rotate)는
+   클래스의 rotate 속성이 그대로 맡도록 scale·opacity만 움직인다. */
+@keyframes stamp-in {
+  from {
+    opacity: 0;
+    scale: 1.35;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+.animate-stamp-in {
+  animation: stamp-in 180ms cubic-bezier(0.3, 0, 0.2, 1) backwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(*),
   ::view-transition-new(*),
@@ -395,7 +411,8 @@ html.custom-cursor-active .custom-cursor {
     animation-duration: 0s !important;
     animation-delay: 0s !important;
   }
-  .animate-content-in {
+  .animate-content-in,
+  .animate-stamp-in {
     animation: none;
   }
 }
