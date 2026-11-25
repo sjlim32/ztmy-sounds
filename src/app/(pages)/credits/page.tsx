@@ -19,7 +19,7 @@ interface Credit {
   /** 다른 페이지에서 이 항목으로 바로 오는 주소(/credits#id) */
   id?: string;
   role: string;
-  /** 없으면 lines·links만 보인다(모의고사). */
+  /** 없으면 links만 보인다(같은 종류 출처 여러 곳을 한 카드에 — 세트리스트 정보). */
   name?: string;
   nameUrl?: string;
   description?: string;
@@ -46,13 +46,13 @@ const CREDITS: Credit[] = [
   },
   {
     role: "공연 · 세트리스트 정보",
-    name: "setlist.fm",
-    nameUrl: "https://www.setlist.fm/search?query=zutomayo",
-  },
-  {
-    role: "공연 · 세트리스트 정보",
-    name: "LiveFans",
-    nameUrl: "https://www.livefans.jp/artists/122716",
+    links: [
+      {
+        label: "setlist.fm",
+        url: "https://www.setlist.fm/search?query=zutomayo",
+      },
+      { label: "LiveFans", url: "https://www.livefans.jp/artists/122716" },
+    ],
   },
   {
     id: MOCK_EXAM_CREDIT_ID,
@@ -95,7 +95,7 @@ export default function CreditsPage() {
         <ul className="tablet:mt-8 mt-3 space-y-3">
           {CREDITS.map((credit) => (
             <li
-              key={credit.name ?? credit.role}
+              key={credit.role}
               id={credit.id}
               className="scroll-mt-6 rounded-lg bg-black/30 p-4"
             >
@@ -159,8 +159,13 @@ export default function CreditsPage() {
           ))}
         </ul>
 
-        {/* 모바일 푸터는 줄인 문구만 보여줘서 전문을 여기 둔다. */}
-        <p className="mt-6 text-sm break-keep text-white/50">
+        {/* 저작권 전문 — PC만(모바일은 페이지 끝 푸터의 줄인 문구로 대신). */}
+        <p
+          className={cn(
+            "mt-6 hidden text-sm break-keep text-white/50",
+            "tablet:block",
+          )}
+        >
           {COPYRIGHT_NOTICE}
         </p>
       </PageScrollBody>

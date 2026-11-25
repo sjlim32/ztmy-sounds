@@ -70,7 +70,7 @@ export function Footer({ inline = false }: { inline?: boolean } = {}) {
               "tablet:whitespace-normal tablet:break-keep",
             )}
           >
-            {/* 모바일은 화면을 적게 차지하도록 줄인 문구 — 전문은 출처 페이지에도 있다. */}
+            {/* 모바일은 화면을 적게 차지하도록 줄인 문구 */}
             <span className="tablet:hidden">
               비공식 팬 페이지 · © {ARTIST.name.en} ·{" "}
               <Link
