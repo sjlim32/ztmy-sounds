@@ -6,6 +6,7 @@ import { summarizeEntryTypes } from "@/features/zutopia/types";
 import { ZutopiaHubCard } from "@/features/zutopia/components/ZutopiaHubCard";
 import { ZutopiaSectionTitle } from "@/features/zutopia/components/ZutopiaSectionTitle";
 import { MOCK_EXAMS } from "@/features/zutopia/quiz/data";
+import { UNKNOWN_COVER_SRC } from "@/features/zutopia/lives/artwork";
 import {
   getAlbumCounts,
   getReleasedSongCount,
@@ -21,7 +22,8 @@ import { getZutopiaSearchIndex } from "@/features/zutopia/search/data";
 import { ZutopiaSearch } from "@/features/zutopia/search/components/ZutopiaSearch";
 import { getStatSections } from "@/features/zutopia/stats/data";
 
-// 참전 기록·연혁 카드 그림 — 투어 키 비주얼과 최신 정규 앨범 표지(R2, 줄여 받기).
+// 참전 기록·연혁·퀴즈 카드 그림 — 투어 키 비주얼, 최신 정규 앨범 표지, 물음표
+// 우니구리(세트리스트에서 커버 없는 곡에 쓰는 그림). R2에서 줄여 받는다.
 const ATTENDANCE_CARD_IMAGE = thumbSrc(
   "https://assets.ztmy-sounds.fans/concert/2026/zomcra_kv.webp",
   360,
@@ -30,6 +32,7 @@ const TIMELINE_CARD_IMAGE = thumbSrc(
   "https://assets.ztmy-sounds.fans/full-album/04_keisoudo_jk.webp",
   360,
 );
+const QUIZ_CARD_IMAGE = thumbSrc(UNKNOWN_COVER_SRC, 360);
 
 export default async function ZutopiaHubPage() {
   const [
@@ -151,6 +154,7 @@ export default async function ZutopiaHubPage() {
                 href="/zutopia/quiz"
                 title="퀴즈"
                 meta={`연습 · 실전 · 모의고사 ${MOCK_EXAMS.length}회`}
+                imageUrl={QUIZ_CARD_IMAGE}
               />
             </li>
             <li>
