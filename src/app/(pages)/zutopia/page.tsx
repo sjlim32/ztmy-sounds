@@ -4,6 +4,8 @@ import { ARTIST } from "@/data/artist";
 import { ZUTOPIA_CATEGORIES } from "@/features/zutopia/registry";
 import { summarizeEntryTypes } from "@/features/zutopia/types";
 import { ZutopiaHubCard } from "@/features/zutopia/components/ZutopiaHubCard";
+import { ZutopiaSectionTitle } from "@/features/zutopia/components/ZutopiaSectionTitle";
+import { MOCK_EXAMS } from "@/features/zutopia/quiz/data";
 import {
   getAlbumCounts,
   getReleasedSongCount,
@@ -145,7 +147,11 @@ export default async function ZutopiaHubPage() {
               />
             </li>
             <li>
-              <ZutopiaHubCard href={null} title="퀴즈" />
+              <ZutopiaHubCard
+                href="/zutopia/quiz"
+                title="퀴즈"
+                meta={`연습 · 실전 · 모의고사 ${MOCK_EXAMS.length}회`}
+              />
             </li>
             <li>
               <ZutopiaHubCard href={null} title="퀴즈 통계" />
@@ -157,7 +163,7 @@ export default async function ZutopiaHubPage() {
   );
 }
 
-/** 허브 카드 묶음 하나 — 이름 줄(통계 화면 묶음 제목과 같은 모양, 오른쪽 가는 선) + 카드 목록. */
+/** 허브 카드 묶음 하나 — 이름 줄(ZutopiaSectionTitle, 오른쪽 가는 선) + 카드 목록. */
 function HubSection({
   title,
   children,
@@ -167,12 +173,7 @@ function HubSection({
 }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="flex items-center gap-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-        <span className="tablet:text-xl text-lg font-bold text-white">
-          {title}
-        </span>
-        <span aria-hidden className="h-px flex-1 bg-white/15" />
-      </h2>
+      <ZutopiaSectionTitle>{title}</ZutopiaSectionTitle>
       <ul
         className={cn(
           "grid grid-cols-2 gap-3",

@@ -188,6 +188,8 @@ src/
                              # 첫 화면 카드는 두 묶음을 세로로: 아카이브(디스코
                              # 그래피·공연·활동 연혁·통계·블루레이·콜라보) /
                              # 플레이그라운드(라이브 참전 기록·퀴즈·퀴즈 통계).
+                             # 묶음 제목은 components/ZutopiaSectionTitle(퀴즈
+                             # 페이지 묶음 제목도 같은 것).
                              # 한 줄 모바일·태블릿 2장, PC 4장 고정. 준비 중 카드는
                              # ZutopiaHubCard에 href={null}. href가 http(s) 바깥
                              # 주소면 새 창으로 연다(콜라보 → 공식 사이트 콜라보
@@ -438,6 +440,17 @@ src/
                              # getReleasedSongCount), 연혁엔 협업곡을 "협업" 태그로
                              # 남긴다. 어레인지 버전은 원곡의 collab을 물려받는다
                              # (song-db/data.ts resolveDisplaySong).
+      quiz/                 # 퀴즈 허브(/zutopia/quiz) — 위부터 연습하기(난이도
+                             # 4단계 즛응애·즛뉴비·즛청년·즛할배, 막대 네 칸으로
+                             # 단계 표시) / 실전 테스트 / 모의고사(갤러리 구글폼
+                             # 링크, 1회부터 왼쪽, 새 창). 출제자·회차별 공개 글은
+                             # 출처 페이지(/credits#mock-exam, Credit.links)에 두고
+                             # 퀴즈 페이지엔 그리로 가는 "출처" 링크만. 출처 카드는
+                             # "출처 : 즛토마요 마이너 갤러리 - 모의고사" / "출제자 :
+                             # 포재앙아웃" 두 줄 + 회차별 글 링크. 연습·실전은 문제가
+                             # 없어 disabled 버튼 + "준비 중"(QuizSoonChip).
+                             # 난이도·모의고사 목록은 data.ts에 코드로 둔다 —
+                             # 새 모의고사는 MOCK_EXAMS 끝에 더한다.
       stats/                # 통계(/zutopia/stats). data.ts가 빌드 때 공연일
                              # (getLiveHistory)·곡·앨범·투어를 모아 compute.ts
                              # (순수 함수·테스트)로 기록을 다 계산하고, 화면

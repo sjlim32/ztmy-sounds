@@ -17,6 +17,7 @@ const PRIORITY: Record<string, number> = {
   "/zutopia/albums": 0.4,
   "/zutopia/timeline": 0.4,
   "/zutopia/stats": 0.3,
+  "/zutopia/quiz": 0.3,
   "/credits": 0.3,
 };
 
@@ -68,6 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/zutopia/albums",
     "/zutopia/timeline",
     "/zutopia/stats",
+    "/zutopia/quiz",
     // /zutopia/attendance는 넣지 않는다 — 기록이 브라우저(localStorage)에만 있어 정적
     // HTML이 거의 비어 있다(개인용 도구, 링크로만 찾게 둔다).
     "/credits",

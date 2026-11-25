@@ -4,6 +4,11 @@ import { HomeLink } from "@/components/HomeLink";
 import { PageScrollBody } from "@/components/PageScrollBody";
 import { SiteLink } from "@/components/SiteLink";
 import { COPYRIGHT_NOTICE } from "@/lib/seo";
+import {
+  MOCK_EXAM_AUTHOR,
+  MOCK_EXAM_CREDIT_ID,
+  MOCK_EXAMS,
+} from "@/features/zutopia/quiz/data";
 
 export const metadata: Metadata = {
   title: "출처",
@@ -11,11 +16,18 @@ export const metadata: Metadata = {
 };
 
 interface Credit {
+  /** 다른 페이지에서 이 항목으로 바로 오는 주소(/credits#id) */
+  id?: string;
   role: string;
-  name: string;
+  /** 없으면 lines·links만 보인다(모의고사). */
+  name?: string;
   nameUrl?: string;
   description?: string;
   url?: string;
+  /** 이름보다 한 단계 옅고 작은 설명 줄(모의고사 출처·출제자) */
+  lines?: string[];
+  /** 이름 아래 여러 원본 링크(모의고사 회차별 글 등) */
+  links?: { label: string; url: string }[];
 }
 
 const CREDITS: Credit[] = [
@@ -41,6 +53,18 @@ const CREDITS: Credit[] = [
     role: "공연 · 세트리스트 정보",
     name: "LiveFans",
     nameUrl: "https://www.livefans.jp/artists/122716",
+  },
+  {
+    id: MOCK_EXAM_CREDIT_ID,
+    role: "퀴즈 · 모의고사",
+    lines: [
+      "출처 : 즛토마요 마이너 갤러리 - 모의고사",
+      `출제자 : ${MOCK_EXAM_AUTHOR}`,
+    ],
+    links: MOCK_EXAMS.map((exam) => ({
+      label: `제${exam.round}회`,
+      url: exam.postUrl,
+    })),
   },
 ];
 
@@ -70,7 +94,11 @@ export default function CreditsPage() {
 
         <ul className="tablet:mt-8 mt-3 space-y-3">
           {CREDITS.map((credit) => (
-            <li key={credit.name} className="rounded-lg bg-black/30 p-4">
+            <li
+              key={credit.name ?? credit.role}
+              id={credit.id}
+              className="scroll-mt-6 rounded-lg bg-black/30 p-4"
+            >
               <p className="font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
                 {credit.role}
               </p>
@@ -83,9 +111,11 @@ export default function CreditsPage() {
                     {credit.name}
                   </SiteLink>
                 ) : (
-                  <p className="mt-1 text-base font-semibold text-white">
-                    {credit.name}
-                  </p>
+                  credit.name && (
+                    <p className="mt-1 text-base font-semibold text-white">
+                      {credit.name}
+                    </p>
+                  )
                 )}
               </div>
               <div>
@@ -103,6 +133,28 @@ export default function CreditsPage() {
                     </p>
                   ))}
               </div>
+              {credit.lines?.map((line) => (
+                <p
+                  key={line}
+                  className="mt-1 text-sm font-medium text-white/75"
+                >
+                  {line}
+                </p>
+              ))}
+              {credit.links && (
+                <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                  {credit.links.map((link) => (
+                    <li key={link.url}>
+                      <SiteLink
+                        href={link.url}
+                        className="text-base font-semibold"
+                      >
+                        {link.label}
+                      </SiteLink>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
         </ul>
