@@ -621,6 +621,15 @@ describe("투어 세트리스트 판", () => {
     expect(day2.commonOnly).toBeUndefined();
   });
 
+  test("선택곡이 공통 곡과 번호가 겹치면 그날 곡이 그 번호, 공통 곡은 뒤로", () => {
+    // v1 공통: a 1, old 2 — 그날 2번에 선택곡 x만 넣으면 old는 3번
+    const [unit] = units(
+      [live({ id: "A", tour_id: "T", start_date: "2025-04-20" })],
+      [{ ...row("x", { live_id: "A" }), track_number: 2 }],
+    );
+    expect(unit.mainOrder).toEqual(["a", "x", "old"]);
+  });
+
   test("직접 지정한 판이 날짜보다 먼저", () => {
     const [unit] = units([
       live({

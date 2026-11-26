@@ -17,6 +17,10 @@ import { splitTourDateByDay } from "@/features/zutopia/lives/live-days";
 import { parseSetlistNote } from "@/features/zutopia/lives/setlist-note";
 import { parseMedleySongIds } from "@/features/zutopia/lives/medley";
 import {
+  shiftedTrackNumbers,
+  shiftTourRows,
+} from "@/features/zutopia/lives/track-shift";
+import {
   versionEndsOn,
   versionForDate,
   versionsForDays,
@@ -419,11 +423,52 @@ function mergeTourSetlist(
   const liveRows = collapseRepeatedDays(rawLiveRows, tourSongIds);
   const liveSongIds = new Set(liveRows.map((row) => row.songs.id));
   // 공연일에도 있는 공통 곡은 공연일 행으로 대신한다(번호를 공연일 기준으로).
-  const tourOnly = tourRows.filter((row) => !liveSongIds.has(row.songs.id));
+  // 그날 행과 번호가 겹치면 그날 행이 그 번호를, 공통 곡은 뒤로(track-shift.ts).
+  const tourOnly = shiftTourRowsByDay(
+    tourRows.filter((row) => !liveSongIds.has(row.songs.id)),
+    liveRows,
+    days,
+  );
   const selected = new Set(
     liveRows.filter((row) => !tourSongIds.has(row.songs.id)),
   );
   return toSetlist([...tourOnly, ...liveRows], (row) => selected.has(row));
+}
+
+/**
+ * 그날 행과 번호가 겹치는 공통 행을 뒤로 민다(track-shift.ts) — 여러 날 공연은 날마다
+ * 따로 밀고, 날마다 번호가 달라진 공통 행은 날마다 한 줄씩(그날 번호)으로 나눈다
+ * (collapseRepeatedDays가 공통 곡을 날마다 나누는 것과 같은 결). 회차(show)는 나누지
+ * 않는다 — 그날 회차들의 행 번호를 모두 피한다.
+ */
+function shiftTourRowsByDay(
+  tourRows: SetlistRow[],
+  liveRows: SetlistRow[],
+  days: number[],
+): SetlistRow[] {
+  if (days.length < 2) return shiftTourRows(tourRows, liveRows);
+  const onDay = (day: number) => (row: SetlistRow) =>
+    row.day_number == null || row.day_number === day;
+  const perDay = days.map((day) => {
+    const rows = tourRows.filter(onDay(day));
+    const numbers = shiftedTrackNumbers(rows, liveRows.filter(onDay(day)));
+    return new Map(rows.map((row, i) => [row, numbers[i]!]));
+  });
+  const renumber = (row: SetlistRow, number: number) =>
+    number === row.track_number ? row : { ...row, track_number: number };
+  return tourRows.flatMap((row) => {
+    if (row.day_number != null) {
+      const i = days.indexOf(row.day_number);
+      return [i < 0 ? row : renumber(row, perDay[i].get(row)!)];
+    }
+    const numbers = days.map((_, i) => perDay[i].get(row)!);
+    if (new Set(numbers).size === 1) return [renumber(row, numbers[0])];
+    return days.map((day, i) => ({
+      ...row,
+      day_number: day,
+      track_number: numbers[i],
+    }));
+  });
 }
 
 /**

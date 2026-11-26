@@ -5,6 +5,7 @@ import {
 } from "@/features/zutopia/lives/region";
 import { showsForDay } from "@/features/zutopia/lives/shows";
 import { parseSetlistNote } from "@/features/zutopia/lives/setlist-note";
+import { shiftTourRows } from "@/features/zutopia/lives/track-shift";
 import {
   versionForDate,
   type TourVersion,
@@ -135,9 +136,13 @@ function buildAllUnits(input: {
           (row) => originalOf[row.song_id] ?? row.song_id,
         ),
       );
+      // 그날 행과 번호가 겹치는 공통 행은 뒤로(lives/track-shift.ts — 곡 순서 통계용).
       return [
-        ...common.filter(
-          (row) => !skip.has(originalOf[row.song_id] ?? row.song_id),
+        ...shiftTourRows(
+          common.filter(
+            (row) => !skip.has(originalOf[row.song_id] ?? row.song_id),
+          ),
+          mine,
         ),
         ...mine,
       ];
