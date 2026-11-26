@@ -19,6 +19,7 @@ import { parseMedleySongIds } from "@/features/zutopia/lives/medley";
 import {
   versionEndsOn,
   versionForDate,
+  versionsForDays,
   type TourVersion,
 } from "@/features/zutopia/lives/tour-versions";
 import { diffDays } from "@/lib/ymd";
@@ -29,6 +30,7 @@ import type {
   LiveDetail,
   LiveMedleySong,
   LiveSetlistEntry,
+  TourDateEntry,
   TourDetail,
   TourSetlistVersion,
 } from "./types";
@@ -671,46 +673,59 @@ export const getTourBySlug = cache(
     const dates = lives.flatMap((live) => {
       const { city, original } = splitRegion(live.region);
       const canceled = live.status === "CANCELED";
-      // 공연일의 판 — 직접 지정한 판, 아니면 공연 날짜로(tour-versions.ts).
-      const version = versionForDate(
-        versions,
-        live.live_date ?? live.start_date,
-        live.setlist_version_id,
-      );
       const dayCount =
         diffDays(live.start_date, live.end_date ?? live.start_date) + 1;
-      return splitTourDateByDay(
-        {
-          id: live.id,
-          date: formatLiveDateRange(live.start_date, live.end_date),
-          startDate: live.start_date,
-          endDate: live.end_date,
-          country: live.country,
-          city,
-          cityOriginal: original,
-          region: live.region,
-          venue: displayVenue(live.live_venue),
-          iconImageUrl: live.icon_image_url,
-          posterImageUrl: live.poster_image_url,
-          additionalImageUrls: live.additional_image_urls ?? [],
-          canceled,
-          ...(version && { versionId: version.id }),
-          // 취소된 공연일엔 투어 공통 세트리스트도 얹지 않는다(불린 곡이 없다).
-          setlist: canceled
-            ? []
-            : withCovers(
-                mergeTourSetlist(
-                  tourRowsOf(version?.id ?? null),
-                  normalizeSetlistRows(live.setlists, songs),
-                  Array.from(
-                    { length: Math.max(1, dayCount) },
-                    (_, i) => i + 1,
-                  ),
-                ),
-                songs,
-              ),
-        },
-        live.live_date,
+      const days = Array.from(
+        { length: Math.max(1, dayCount) },
+        (_, i) => i + 1,
+      );
+      const liveRows = normalizeSetlistRows(live.setlists, songs);
+      // 판 하나로 만든 공연일 행 — 이틀 이상이면 splitTourDateByDay가 날마다 나눈다.
+      const entryFor = (version: TourVersion | null): TourDateEntry => ({
+        id: live.id,
+        date: formatLiveDateRange(live.start_date, live.end_date),
+        startDate: live.start_date,
+        endDate: live.end_date,
+        country: live.country,
+        city,
+        cityOriginal: original,
+        region: live.region,
+        venue: displayVenue(live.live_venue),
+        iconImageUrl: live.icon_image_url,
+        posterImageUrl: live.poster_image_url,
+        additionalImageUrls: live.additional_image_urls ?? [],
+        canceled,
+        ...(version && { versionId: version.id }),
+        // 취소된 공연일엔 투어 공통 세트리스트도 얹지 않는다(불린 곡이 없다).
+        setlist: canceled
+          ? []
+          : withCovers(
+              mergeTourSetlist(tourRowsOf(version?.id ?? null), liveRows, days),
+              songs,
+            ),
+      });
+      // 공연일의 판 — 직접 지정한 판, 아니면 그날 날짜로(tour-versions.ts). live_date로
+      // 하루만 보이거나 나누지 않는 공연일(취소)은 판 하나.
+      if (live.live_date || canceled || days.length < 2) {
+        const version = versionForDate(
+          versions,
+          live.live_date ?? live.start_date,
+          live.setlist_version_id,
+        );
+        return splitTourDateByDay(entryFor(version), live.live_date);
+      }
+      // 여러 날 공연은 날마다 그날의 판 — 판 경계에 걸친 양일 공연(genso-dodan
+      // 2023-04-20·21)도 날마다 다른 판의 세트리스트·탭에 들어간다.
+      const dayVersions = versionsForDays(
+        versions,
+        live.start_date,
+        days.length,
+        live.setlist_version_id,
+      );
+      if (new Set(dayVersions.map((version) => version?.id)).size === 1)
+        return splitTourDateByDay(entryFor(dayVersions[0]));
+      return dayVersions.map(
+        (version, i) => splitTourDateByDay(entryFor(version))[i],
       );
     });
 

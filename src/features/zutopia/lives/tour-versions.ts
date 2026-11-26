@@ -8,7 +8,8 @@ import { addDays } from "@/lib/ymd";
  * - 공연일의 판: lives.setlist_version_id로 직접 지정했으면 그 판, 아니면 공연 날짜
  *   (live_date가 있으면 그날, 없으면 start_date) 이전에 시작한 판 중 가장 늦은 판.
  *   첫 판보다 앞선 공연일이면 첫 판(투어 시작 전 공연을 공통 곡 없이 두지 않게).
- *   이틀 공연도 시작일 하나로 정한다(공연 행 하나 = 판 하나).
+ *   이틀 이상 공연(live_date 없음)은 날마다 그날 날짜로 고른다 — 같은 도시 양일의
+ *   세트리스트를 판으로 나눌 수 있게(genso-dodan 2023-04-20·21, versionsForDays).
  * - 판이 없는 투어(공통 세트리스트를 안 넣은 투어)는 null.
  */
 export interface TourVersion {
@@ -38,6 +39,22 @@ export function versionForDate<T extends TourVersion>(
   let picked = sorted[0];
   for (const version of sorted) if (version.startsOn <= day) picked = version;
   return picked;
+}
+
+/**
+ * 여러 날 공연의 날마다 판(i번째 = i+1일차) — 날마다 versionForDate. 직접 지정한 판
+ * (explicitId)은 모든 날에 쓴다. dayCount가 1 미만이면 하루로 본다.
+ */
+export function versionsForDays<T extends TourVersion>(
+  versions: readonly T[],
+  startDate: string,
+  dayCount: number,
+  explicitId: string | null = null,
+): (T | null)[] {
+  const start = startDate.slice(0, 10);
+  return Array.from({ length: Math.max(1, dayCount) }, (_, i) =>
+    versionForDate(versions, addDays(start, i), explicitId),
+  );
 }
 
 /** 판이 끝나는 날(다음 판 시작 전날) — 마지막 판이면 null. */

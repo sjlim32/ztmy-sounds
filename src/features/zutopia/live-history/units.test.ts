@@ -606,6 +606,21 @@ describe("투어 세트리스트 판", () => {
     expect(after.songIds).toEqual(["a", "new"]);
   });
 
+  test("이틀 공연이 판 경계에 걸치면 날마다 그날의 판(genso-dodan 4/20·4/21)", () => {
+    const [day1, day2] = units([
+      live({
+        id: "A",
+        tour_id: "T",
+        start_date: "2025-04-27",
+        end_date: "2025-04-28",
+      }),
+    ]).sort((x, y) => x.date.localeCompare(y.date));
+    expect([day1.dayNumber, day1.songIds]).toEqual([1, ["a", "old"]]);
+    expect([day2.dayNumber, day2.songIds]).toEqual([2, ["a", "new"]]);
+    expect(day1.commonOnly).toBe(true);
+    expect(day2.commonOnly).toBeUndefined();
+  });
+
   test("직접 지정한 판이 날짜보다 먼저", () => {
     const [unit] = units([
       live({

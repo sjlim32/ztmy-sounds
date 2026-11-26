@@ -263,7 +263,8 @@ src/
                              # lives.setlist_version_id. fixed 판 = 선택곡 없는 고정
                              # 세트리스트. 공연일의 판은 lives/tour-versions.ts
                              # versionForDate(직접 지정 → 공연 날짜(live_date 우선) 이전에
-                             # 시작한 가장 늦은 판 → 첫 판) — 투어 상세(getTourBySlug)와
+                             # 시작한 가장 늦은 판 → 첫 판, 이틀 이상 공연은 날마다
+                             # versionsForDays — 양일이 다른 판일 수 있다) — 투어 상세(getTourBySlug)와
                              # 라이브 기록(live-history/units.ts)이 같이 쓴다. 공연일
                              # 세트리스트 = 그 판의 공통 행 + 그날 행(omitted는 그 곡을
                              # 빼는 표시라 곡으로 안 셈, 일차가 있으면 그날만), fixed 판은

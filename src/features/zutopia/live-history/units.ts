@@ -67,17 +67,24 @@ function buildAllUnits(input: {
       (live.tour_id ? toursById.get(live.tour_id) : undefined) ??
       (live.slug ? toursBySlug.get(live.slug) : undefined) ??
       null;
-    // 공연일의 판(lives/tour-versions.ts — 투어 상세와 같은 규칙)과 그 판의 공통 행.
-    const version = tour
-      ? versionForDate(
-          versionsByTour.get(tour.id) ?? [],
-          live.live_date ?? live.start_date,
-          live.setlist_version_id ?? null,
-        )
-      : null;
-    const inVersion = (row: { version_id?: string | null }) =>
-      !version || row.version_id === version.id;
-    const common = tour ? (tourRows.get(tour.id) ?? []).filter(inVersion) : [];
+    // 그날의 판(lives/tour-versions.ts — 투어 상세와 같은 규칙)과 그 판의 공통 행.
+    // 여러 날 공연은 날마다 고른다(판 경계에 걸친 양일 공연, genso-dodan 4/20·21).
+    const versionScope = (date: string) => {
+      const version = tour
+        ? versionForDate(
+            versionsByTour.get(tour.id) ?? [],
+            date,
+            live.setlist_version_id ?? null,
+          )
+        : null;
+      const inVersion = (row: { version_id?: string | null }) =>
+        !version || row.version_id === version.id;
+      const common = tour
+        ? (tourRows.get(tour.id) ?? []).filter(inVersion)
+        : [];
+      return { version, inVersion, common };
+    };
+    type VersionScope = ReturnType<typeof versionScope>;
     // 공연일 행 중 "그날만 빠진 곡"(omitted)은 곡이 아니라 판에서 뺄 표시.
     const allOwn = liveRows.get(live.id) ?? [];
     const own = allOwn.filter((row) => !row.omitted);
@@ -117,7 +124,11 @@ function buildAllUnits(input: {
         (show === null || row.show_number == null || row.show_number === show);
     // 같은 곡이 투어 공통·공연일 양쪽에 있으면 공연일 행(그날의 실제 번호)만 쓴다
     // (lives/data.ts mergeTourSetlist와 같은 규칙).
-    const rowsFor = (day: number | null, show: number | null) => {
+    const rowsFor = (
+      { common }: VersionScope,
+      day: number | null,
+      show: number | null,
+    ) => {
       const mine = own.filter(inUnit(day, show));
       const skip = new Set(
         [...mine, ...omits.filter(inUnit(day, show))].map(
@@ -131,7 +142,11 @@ function buildAllUnits(input: {
         ...mine,
       ];
     };
-    const coverRowsFor = (day: number | null, show: number | null) => {
+    const coverRowsFor = (
+      { inVersion }: VersionScope,
+      day: number | null,
+      show: number | null,
+    ) => {
       const ownCovers = liveCovers.get(live.id) ?? [];
       const omittedTitles = new Set(
         ownCovers
@@ -145,8 +160,12 @@ function buildAllUnits(input: {
         ...ownCovers.filter((row) => !row.omitted && inUnit(day, show)(row)),
       ];
     };
-    const coversFor = (day: number | null, show: number | null) => {
-      const rows = coverRowsFor(day, show);
+    const coversFor = (
+      scope: VersionScope,
+      day: number | null,
+      show: number | null,
+    ) => {
+      const rows = coverRowsFor(scope, day, show);
       const seen = new Set<string>();
       const covers = rows.flatMap((row) =>
         seen.has(row.title)
@@ -156,8 +175,13 @@ function buildAllUnits(input: {
       );
       return covers.length ? { covers } : {};
     };
-    const unitFields = (day: number | null, show: number | null) => {
-      const rows = rowsFor(day, show);
+    const unitFields = (
+      scope: VersionScope,
+      day: number | null,
+      show: number | null,
+    ) => {
+      const { version, common } = scope;
+      const rows = rowsFor(scope, day, show);
       // 투어 공통 세트리스트만 있고 그날 행(곡·커버곡)이 하나도 없는 공연일 — 그날의
       // 선택곡을 모른다(통계는 세트리스트를 모르는 날로 친다). 고정 세트리스트 판(fixed)은
       // 선택곡이 없어 그날 행이 없어도 안다.
@@ -169,8 +193,8 @@ function buildAllUnits(input: {
         !(liveCovers.get(live.id) ?? []).some(inUnit(day, show));
       return {
         songIds: uniqueSongIds(rows, originalOf),
-        ...setlistDetails(rows, originalOf, coverRowsFor(day, show)),
-        ...coversFor(day, show),
+        ...setlistDetails(rows, originalOf, coverRowsFor(scope, day, show)),
+        ...coversFor(scope, day, show),
         ...(commonOnly && { commonOnly: true as const }),
         ...(live.live_venue !== undefined && { venue: live.live_venue }),
         ...(live.country !== undefined && { country: live.country }),
@@ -187,6 +211,7 @@ function buildAllUnits(input: {
       dayNumber: number | null,
       rowDay: number | null = dayNumber,
     ) => {
+      const scope = versionScope(date);
       const shows = showsForDay(
         live.metadata,
         rowDay ?? 1,
@@ -205,7 +230,7 @@ function buildAllUnits(input: {
           id: `${live.id}:${date}`,
           date,
           dayNumber,
-          ...unitFields(rowDay, null),
+          ...unitFields(scope, rowDay, null),
         });
         return;
       }
@@ -217,7 +242,7 @@ function buildAllUnits(input: {
           dayNumber,
           showNumber: show,
           showLabel: label,
-          ...unitFields(rowDay, show),
+          ...unitFields(scope, rowDay, show),
         });
       });
     };

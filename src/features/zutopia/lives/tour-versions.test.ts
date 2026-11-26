@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   versionEndsOn,
   versionForDate,
+  versionsForDays,
   type TourVersion,
 } from "./tour-versions";
 
@@ -31,6 +32,31 @@ describe("versionForDate", () => {
   test("공연일에 직접 지정한 판이 날짜보다 먼저(없는 id면 날짜로)", () => {
     expect(versionForDate(versions, "2025-05-01", "v1")?.id).toBe("v1");
     expect(versionForDate(versions, "2025-05-01", "gone")?.id).toBe("v2");
+  });
+});
+
+describe("versionsForDays", () => {
+  const versions = [
+    v("v1", "2023-04-20"),
+    v("v2", "2023-04-21"),
+    v("v3", "2023-04-27"),
+  ];
+
+  test("판 경계에 걸친 이틀 공연은 날마다 그날의 판", () => {
+    expect(
+      versionsForDays(versions, "2023-04-20", 2).map((x) => x?.id),
+    ).toEqual(["v1", "v2"]);
+    expect(
+      versionsForDays(versions, "2023-04-27", 2).map((x) => x?.id),
+    ).toEqual(["v3", "v3"]);
+  });
+
+  test("직접 지정한 판은 모든 날, 판이 없으면 null, 0일은 하루로", () => {
+    expect(
+      versionsForDays(versions, "2023-04-20", 2, "v3").map((x) => x?.id),
+    ).toEqual(["v3", "v3"]);
+    expect(versionsForDays([], "2023-04-20", 2)).toEqual([null, null]);
+    expect(versionsForDays(versions, "2023-04-21", 0)).toHaveLength(1);
   });
 });
 
