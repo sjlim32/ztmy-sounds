@@ -340,7 +340,7 @@ function versionCities(dates: TourDateEntry[]) {
 // 번호만으로는 앞뒤가 틀어진다. 신베이의 저혈볼트는 미러튠(13) 뒤라 14번 자리,
 // 홍콩의 거짓이 아니야는 잔기(15) 뒤라 15번 다음 자리가 된다.
 // 표시 번호: 그 공통 곡과 다음 공통 곡 사이에 빈 번호가 있으면 그 번호, 없으면
-// "15-1"처럼 앞 공통 곡 번호에 순번을 붙인다.
+// "15-1"처럼 앞 공통 곡 번호에 순번을 붙인다(빈 번호가 다 차면 마지막 빈 번호에).
 export function collectSelectedSlots(
   common: LiveSetlistEntry[],
   dates: TourDateEntry[],
@@ -354,7 +354,7 @@ export function collectSelectedSlots(
   // anchor(앞 공통 곡 번호, 맨 앞이면 0) 뒤 자리의 정렬 위치·표시 번호.
   // 그 곡의 공연일 번호가 anchor와 다음 공통 곡 사이의 빈 번호이고 아직 안
   // 쓰였으면 그 번호(서울 둘째날 Ham 9번 → 9번), 아니면 남은 빈 번호 중 첫 번째,
-  // 빈 번호가 다 차면 "15-1"처럼 anchor에 순번을 붙인다.
+  // 빈 번호가 다 차면 "15-1"처럼 anchor(빈 번호가 있었으면 마지막 빈 번호)에 순번을 붙인다.
   const positionOf = (anchor: number, own: number, used: Set<number>) => {
     const next = commonNumbers.find((n) => n > anchor) ?? Infinity;
     const gaps: number[] = [];
@@ -365,12 +365,15 @@ export function collectSelectedSlots(
       used.add(number);
       return { trackNumber: number, label: String(number).padStart(2, "0") };
     }
+    // 빈 번호가 있었는데 다 찼으면 마지막 빈 번호 뒤(빈 2칸에 3곡 → "08-1") — anchor에
+    // 붙이면 앞 빈 번호들보다 먼저 정렬된다.
+    const base = gaps.at(-1) ?? anchor;
     let extra = 1;
-    while (used.has(anchor + extra / 100)) extra += 1;
-    used.add(anchor + extra / 100);
+    while (used.has(base + extra / 100)) extra += 1;
+    used.add(base + extra / 100);
     return {
-      trackNumber: anchor + extra / 100,
-      label: `${String(anchor).padStart(2, "0")}-${extra}`,
+      trackNumber: base + extra / 100,
+      label: `${String(base).padStart(2, "0")}-${extra}`,
     };
   };
 

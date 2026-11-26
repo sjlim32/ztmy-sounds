@@ -1,12 +1,12 @@
 import { describe, expect, test } from "vitest";
 import { collectSelectedSlots } from "./TourDateList";
 import { splitLiveDays } from "./live-days";
-import type { LiveDetail, LiveSetlistEntry } from "./types";
+import type { LiveDetail, LiveSetlistEntry, TourDateEntry } from "./types";
 
 function entry(
   songId: string,
   trackNumber: number,
-  dayNumber: number,
+  dayNumber: number | null,
 ): LiveSetlistEntry {
   return {
     songId,
@@ -59,5 +59,31 @@ describe("collectSelectedSlots", () => {
     expect(
       slots.map((slot) => [slot.label, slot.songs.map((s) => s.title)]),
     ).toEqual([["03", ["c", "x"]]]);
+  });
+});
+
+describe("빈 번호보다 선택곡이 많은 날", () => {
+  test("빈 번호 2칸(7·8)에 3곡을 부르면 세 번째는 마지막 빈 번호 뒤(08-1)", () => {
+    const common = [6, 9].map((n) => entry(`c${n}`, n, null));
+    const date = {
+      id: "D",
+      setlist: [
+        { ...entry("c6", 6, null) },
+        { ...entry("x", 7, null), isSelected: true },
+        { ...entry("y", 8, null), isSelected: true },
+        { ...entry("z", 9, null), isSelected: true },
+        { ...entry("c9", 10, null) },
+      ],
+    } as unknown as TourDateEntry;
+    const slots = collectSelectedSlots(common, [date]);
+    expect(
+      slots
+        .sort((a, b) => a.trackNumber - b.trackNumber)
+        .map((slot) => [slot.label, slot.songs.map((s) => s.title)]),
+    ).toEqual([
+      ["07", ["x"]],
+      ["08", ["y"]],
+      ["08-1", ["z"]],
+    ]);
   });
 });
