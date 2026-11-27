@@ -430,9 +430,14 @@ export function LiveListView({
                 />
               </div>
               {viewMode === "list" ? (
-                <ul className={cn("grid gap-2", "pc:grid-cols-2 pc:gap-x-4")}>
+                // 줄마다 카드 대신 구분선 줄(곡 목록과 같은 모양). PC 두 열은 격자라 같은 줄끼리
+                // 높이가 맞는다.
+                <ul className={cn("grid", "pc:grid-cols-2 pc:gap-x-6")}>
                   {group.entries.map((entry) => (
-                    <li key={entry.slug} className="min-w-0">
+                    <li
+                      key={entry.slug}
+                      className="min-w-0 border-b border-white/10"
+                    >
                       <LiveRow
                         entry={entry}
                         href={`/zutopia/${categorySlug}/${entry.slug}`}
@@ -687,7 +692,8 @@ function EntryDateLine({
 
 /**
  * 리스트 보기 한 줄 — 작은 썸네일 + 제목·날짜, 오른쪽에 종류·내한 태그. 많은
- * 공연을 빠르게 훑는 용도라 포스터는 작게만 둔다.
+ * 공연을 빠르게 훑는 용도라 포스터는 작게만 둔다. 줄마다 카드를 두지 않고 구분선 줄(카드
+ * 최소화) — 내한은 오른쪽 내한 태그로 보인다(테두리 강조 없음).
  */
 function LiveRow({ entry, href, onClick }: LiveItemProps) {
   const canceled = !!entry.canceled;
@@ -697,10 +703,8 @@ function LiveRow({ entry, href, onClick }: LiveItemProps) {
       href={href}
       onClick={onClick}
       className={cn(
-        "group rounded-card flex items-center gap-3 border bg-white/5 p-2 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
-        !canceled && "hover:bg-white/10",
-        // 내한 공연은 카드 보기와 같이 마젠타 테두리로 표시한다.
-        entry.visitOrdinal != null ? "border-ztmy-magenta" : "border-white/10",
+        "group rounded-control flex items-center gap-3 px-1 py-2 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+        !canceled && "hover:bg-white/5",
       )}
     >
       <ViewTransition
@@ -724,25 +728,29 @@ function LiveRow({ entry, href, onClick }: LiveItemProps) {
         </div>
       </ViewTransition>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+      {/* 한국어 제목이 첫 줄(굵게), 원제가 둘째 줄(흐리게), 날짜·도시 — 카드 보기와 같은 순서.
+      카드 면이 없으니 배경 위에서 읽히게 글자 그림자. */}
+      <div className="drop-shadow-legible-sm flex min-w-0 flex-1 flex-col gap-0.5">
         <span
           className={cn(
             "truncate text-sm font-semibold transition-colors",
+            "tablet:text-base",
             canceled
               ? CANCELED_TEXT_CLASS
               : "group-hover:text-ztmy-pink text-white",
           )}
         >
-          {entry.name}
+          {entry.label}
         </span>
         {entry.label !== entry.name && (
           <span
             className={cn(
               "truncate text-xs",
-              canceled ? CANCELED_TEXT_CLASS : "text-white/70",
+              "tablet:text-sm",
+              canceled ? CANCELED_TEXT_CLASS : "text-white/55",
             )}
           >
-            {entry.label}
+            {entry.name}
           </span>
         )}
         <EntryDateLine entry={entry} className="text-xs" />
