@@ -32,7 +32,7 @@ const DETAILS = [
     note: "6,992석 (최대 8,000명)",
     accent: true,
   },
-  { label: "최소 규모", value: "나라 100년 회관", note: "1,476석 (대홀)" },
+  { label: "최소 규모", value: "나라 100년회관", note: "1,476석 (대홀)" },
 ] as const;
 
 /**
