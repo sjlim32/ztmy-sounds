@@ -53,12 +53,8 @@ export function MyStats() {
   if (!ready) return null;
   if (!hasChecks)
     return (
-      <p
-        className={cn(
-          "flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm text-white/70",
-          ZUTOPIA_SURFACE_CLASS,
-        )}
-      >
+      // 안내 한 줄은 카드 없이(카드 최소화) — 배경 위에서 읽히게 글자 그림자.
+      <p className="drop-shadow-legible-sm flex flex-wrap items-center justify-between gap-3 text-sm text-white/75">
         다녀온 공연을 체크하면 내가 들은 곡과 아직 못 들은 곡이 여기에 보여요.
         <Link href={ATTENDANCE_HREF} className={LINK_BUTTON_CLASS}>
           참전 기록 체크하기

@@ -16,11 +16,8 @@ import {
 import { SearchIcon } from "@/components/icons/SearchIcon";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { getFeedbackUrl } from "@/lib/feedback";
-import {
-  FilterPanel,
-  SortFilterBar,
-  type SortFilterOption,
-} from "@/features/zutopia/components/SortFilterBar";
+import { type SortFilterOption } from "@/features/zutopia/components/SortFilterBar";
+import { SectionHeader } from "@/components/SectionHeader";
 import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
 import {
   cellSortKey,
@@ -63,10 +60,11 @@ function loadTables() {
 }
 
 /**
- * 통계 페이지 — 곡·앨범·공연·장소 구역마다 기록 카드. 카드는 1위를 크게
+ * 통계 페이지 — 카드 최소화: 맨 위 요약은 카드 한 장에 칸(지표 띠), 구역 고르기는 밑줄 탭,
+ * 곡·앨범·공연·장소 구역마다 카드 밖 제목 줄(SectionHeader) + 기록마다 카드(각자 독립된 기록이라
+ * 카드로 둔다). 카드는 1위를 크게
  * (그림·이름·대표 값·설명), 그 아래 2~5위를 한 줄씩, 맨 아래 "전체 순위 보기"를
- * 누르면 옆 창(SidePanel)에 전체 순위표가 열린다(stats.json에서 받음). 위 필터
- * 카드(곡·공연 목록과 같은 모양)로 구역을 골라 볼 수 있다. 값은 빌드 때 다
+ * 누르면 옆 창(SidePanel)에 전체 순위표가 열린다(stats.json에서 받음). 값은 빌드 때 다
  * 계산돼 내려온다(compute.ts). 창이 닫히며 미끄러지는 동안에도 마지막 기록을
  * 그대로 보여 주려고 연 기록(shown)과 열림 여부(open)를 따로 둔다.
  */
@@ -169,31 +167,48 @@ export function StatsView({
         onOpenMissing={() => openRecord(summary.missing)}
       />
 
-      <FilterPanel>
-        <SortFilterBar
-          label="구역"
-          groupLabel="통계 구역 고르기"
-          options={options}
-          value={filter}
-          onChange={setFilter}
-        />
-      </FilterPanel>
+      {/* 구역 고르기 — 카드 대신 밑줄 탭(투어 상세 판 탭과 같은 모양), 탭 옆 기록 수 */}
+      <div
+        role="group"
+        aria-label="통계 구역 고르기"
+        className="drop-shadow-legible-sm flex scrollbar-none gap-x-5 overflow-x-auto border-b border-white/15"
+      >
+        {options.map((option) => {
+          const active = option.value === filter;
+          return (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={active}
+              onClick={() => setFilter(option.value)}
+              className={cn(
+                "-mb-px flex shrink-0 items-baseline gap-1.5 border-b-2 py-2 text-sm font-semibold whitespace-nowrap transition-colors",
+                "tablet:text-base",
+                FOCUS_RING,
+                active
+                  ? "border-ztmy-pink text-white"
+                  : "border-transparent text-white/55 hover:text-white",
+              )}
+            >
+              {option.label}
+              <span className="font-mono text-xs font-normal text-white/45 tabular-nums">
+                {option.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
       <div key={filter} className="animate-content-in flex flex-col gap-10">
         {visible.map((section) => (
-          <section key={section.id} className="flex flex-col gap-4">
-            {/* 카드 밖 제목 — 공연 목록 연도 제목과 같은 모양(배경 위 글자 그림자) */}
-            <h2 className="drop-shadow-legible flex items-center gap-3">
-              <span className="tablet:text-2xl text-xl font-bold text-white">
-                {section.title}
-              </span>
-              <span className="text-sm text-white/55 tabular-nums">
-                {section.records.length}
-              </span>
-              <span aria-hidden className="h-px flex-1 bg-white/15" />
-            </h2>
-            {/* 격자 — 모든 줄을 같은 높이로(auto-rows-fr), 카드 안은 고정 틀(RecordCard) */}
-            <ul className="tablet:grid-cols-2 pc:grid-cols-3 grid auto-rows-fr grid-cols-1 gap-4">
+          <section key={section.id} className="flex flex-col gap-3">
+            <SectionHeader
+              title={<h2>{section.title}</h2>}
+              meta={`${section.records.length}개`}
+            />
+            {/* 기록마다 카드 — 같은 줄의 카드는 높이가 같고(격자 기본), 줄마다 높이를 억지로
+                맞추지 않는다(카드 안 빈 자리 없음). */}
+            <ul className="tablet:grid-cols-2 pc:grid-cols-3 grid grid-cols-1 gap-4">
               {section.records.map((record) => (
                 // id — 공유 주소(#기록id)로 들어오면 그 카드로 스크롤된다(헤더에 가리지 않게 여백).
                 <li
@@ -235,7 +250,7 @@ export function StatsView({
         </div>
         {/* 1위의 연도별 흐름 — 카드 높이를 흔들지 않게 카드 대신 여기에 */}
         {shown?.trend && shown.rows[0] && (
-          <div className="rounded-card mb-4 border border-white/10 p-3">
+          <div className="mb-4 border-b border-white/10 pb-4">
             <TrendBars trend={shown.trend} subject={shown.rows[0].name} />
           </div>
         )}
@@ -246,7 +261,7 @@ export function StatsView({
 }
 
 /**
- * 맨 위 요약 줄 — 공연일 수·세트리스트 확보율·라이브로 부른 곡·해외 공연을 타일로.
+ * 맨 위 요약 — 공연일 수·세트리스트 확보율·라이브로 부른 곡·해외 공연을 카드 한 장의 칸으로.
  * 확보율 타일엔 얇은 막대(같은 색 계열의 옅은 바탕 위 채움)와, 세트리스트가 없는
  * 공연 목록을 옆 창으로 여는 버튼을 둔다 — 곡 기록을 얼마나 믿을 수 있는지 보이게.
  */
@@ -258,53 +273,59 @@ function SummaryRow({
   onOpenMissing: () => void;
 }) {
   return (
-    <ul className="tablet:grid-cols-4 grid grid-cols-2 gap-3">
-      {summary.items.map((item) => (
-        <li
-          key={item.label}
-          className={cn("flex flex-col gap-1 p-4", ZUTOPIA_SURFACE_CLASS)}
-        >
-          <p className="text-sm text-white/60">{item.label}</p>
-          <p className="tablet:text-3xl text-2xl font-semibold text-white tabular-nums">
-            {item.value}
-          </p>
-          {item.ratio != null && (
-            <span
-              role="presentation"
-              className="bg-ztmy-pink/20 rounded-tag mt-1 h-2 overflow-hidden"
-            >
+    // 숫자마다 카드 대신 카드 한 장에 칸 — 칸 사이 가는 선(기록 격자와 같은 방법).
+    <div className="surface overflow-hidden">
+      <ul className="tablet:grid-cols-4 -mr-px -mb-px grid grid-cols-2">
+        {summary.items.map((item) => (
+          <li
+            key={item.label}
+            className={cn(
+              "flex flex-col gap-1 border-r border-b border-white/10 p-4",
+              "tablet:p-5",
+            )}
+          >
+            <p className="text-sm text-white/60">{item.label}</p>
+            <p className="tablet:text-3xl text-2xl font-semibold text-white tabular-nums">
+              {item.value}
+            </p>
+            {item.ratio != null && (
               <span
-                className="bg-ztmy-pink rounded-tag block h-full"
-                style={{ width: `${Math.round(item.ratio * 100)}%` }}
-              />
-            </span>
-          )}
-          {item.note && (
-            <p className="text-sm text-white/50 tabular-nums">{item.note}</p>
-          )}
-          {item.ratio != null && summary.missing.total > 0 && (
-            <button
-              type="button"
-              onClick={onOpenMissing}
-              className={cn(
-                "rounded-control mt-auto self-start pt-1 text-sm text-white/75 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white",
-                FOCUS_RING,
-              )}
-            >
-              세트리스트를 모르는 공연 {summary.missing.total}회
-            </button>
-          )}
-        </li>
-      ))}
-    </ul>
+                role="presentation"
+                className="bg-ztmy-pink/20 rounded-tag mt-1 h-2 overflow-hidden"
+              >
+                <span
+                  className="bg-ztmy-pink rounded-tag block h-full"
+                  style={{ width: `${Math.round(item.ratio * 100)}%` }}
+                />
+              </span>
+            )}
+            {item.note && (
+              <p className="text-sm text-white/50 tabular-nums">{item.note}</p>
+            )}
+            {item.ratio != null && summary.missing.total > 0 && (
+              <button
+                type="button"
+                onClick={onOpenMissing}
+                className={cn(
+                  "rounded-control mt-auto self-start pt-1 text-sm text-white/75 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white",
+                  FOCUS_RING,
+                )}
+              >
+                세트리스트를 모르는 공연 {summary.missing.total}회
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
 /**
- * 기록 카드 — 모든 카드가 같은 틀이라 한 줄에 놓여도 높이가 같다: 제목·짧은 설명(각
- * 한 줄), 1위(그림·이름 두 줄 자리·아래 줄·대표 값·설명 한 줄), 2~5위(늘 네 줄
- * 자리 — 모자라면 빈 줄), 맨 아래 "전체 순위 보기" 줄. 넘치는 글자는 말줄임하고
- * 전체는 title·옆 창에서. 연도별 흐름 그래프는 옆 창 위쪽에 둔다(카드엔 없음).
+ * 기록 카드 — 위계: 대표 값(가장 크게, 마젠타) > 1위 이름(굵은 흰 글자) > 기록 제목(작은 흐린
+ * 라벨) > 2~5위(작게) > 덧붙임(흐리게). 기록 설명은 카드에 두지 않는다(옆 창 부제에).
+ * 빈 자리를 미리 잡아 두지 않는다 — 그림·아랫줄·덧붙임·2~5위·막대는 있을 때만. 같은 줄의
+ * 카드는 격자가 높이를 맞추고 "전체 순위 보기"는 맨 아래(mt-auto). 연도별 흐름 그래프는 옆 창.
  */
 function RecordCard({
   record,
@@ -317,7 +338,6 @@ function RecordCard({
   const coLeaders = record.leaderCount;
   const runnersUp = rest.slice(0, RUNNER_UP_COUNT);
   const scale = record.bars === false ? null : runnerUpScale(leader, runnersUp);
-  const emptySlots = RUNNER_UP_COUNT - runnersUp.length;
 
   return (
     <article
@@ -326,108 +346,82 @@ function RecordCard({
         ZUTOPIA_SURFACE_CLASS,
       )}
     >
-      <div className={cn("flex flex-1 flex-col gap-4 p-4", "tablet:p-5")}>
-        <header className="flex min-w-0 flex-col gap-1">
-          <h3
-            className="tablet:text-lg truncate text-base leading-snug font-semibold text-white"
-            title={record.title}
-          >
-            {record.title}
-          </h3>
-          <p
-            className="truncate text-sm text-white/55"
-            title={record.description}
-          >
-            {record.description}
-          </p>
-        </header>
+      <div className={cn("flex flex-col gap-3 p-4", "tablet:p-5")}>
+        <h3 className="text-sm leading-snug font-semibold text-white/60">
+          {record.title}
+        </h3>
 
         {leader ? (
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
-              {leader.image ? (
+              {leader.image && (
                 <ThumbImage
                   src={leader.image}
                   displayWidth={64}
-                  className="rounded-card size-14 shrink-0 bg-black/40 object-cover"
-                />
-              ) : (
-                // 그림이 없어도 같은 자리를 차지해 이름 줄 높이가 같다.
-                <span
-                  aria-hidden
-                  className="rounded-card size-14 shrink-0 bg-white/[0.04]"
+                  className="rounded-card size-12 shrink-0 bg-black/40 object-cover"
                 />
               )}
               <div className="min-w-0 flex-1">
-                {/* 이름은 두 줄 자리(짧아도 비워 둔다), 넘치면 말줄임 + title로 전체 */}
                 <RowName
                   row={leader}
-                  className="line-clamp-2 min-h-[2lh] text-base leading-snug font-bold break-keep whitespace-normal text-white"
-                />
-                <p className="min-h-[1lh] truncate text-sm text-white/55">
-                  {coLeaders > 1 && (
-                    <span className="text-ztmy-pink">
-                      공동 1위 {coLeaders}
-                      {leader.sub && " "}
-                    </span>
+                  className={cn(
+                    "line-clamp-2 text-lg leading-snug font-bold break-keep whitespace-normal text-white",
+                    "tablet:text-xl",
                   )}
-                  {leader.sub}
-                </p>
+                />
+                {(coLeaders > 1 || leader.sub) && (
+                  <p className="truncate text-sm text-white/55">
+                    {coLeaders > 1 && (
+                      <span className="text-ztmy-pink">
+                        공동 1위 {coLeaders}
+                        {leader.sub && " "}
+                      </span>
+                    )}
+                    {leader.sub}
+                  </p>
+                )}
               </div>
             </div>
             <Figure cell={leader.cells[0]} />
-            <p
-              className="min-h-[1lh] truncate text-sm text-white/60"
-              title={leader.note ?? undefined}
-            >
-              {leader.note}
-            </p>
+            {leader.note && (
+              <p className="truncate text-sm text-white/50" title={leader.note}>
+                {leader.note}
+              </p>
+            )}
           </div>
         ) : (
           <p className="text-sm text-white/55">아직 기록이 없어요.</p>
         )}
 
-        <ol className="flex flex-col gap-2 border-t border-white/10 pt-3">
-          {runnersUp.map((row, index) => (
-            <li key={row.key} className="flex flex-col gap-1 text-sm">
-              <span className="flex items-baseline gap-3">
-                <span className="w-5 shrink-0 text-right text-white/55 tabular-nums">
-                  {row.rank}
+        {runnersUp.length > 0 && (
+          <ol className="flex flex-col gap-2 border-t border-white/10 pt-3">
+            {runnersUp.map((row, index) => (
+              <li key={row.key} className="flex flex-col gap-1 text-sm">
+                <span className="flex items-baseline gap-3">
+                  <span className="w-5 shrink-0 text-right text-white/45 tabular-nums">
+                    {row.rank}
+                  </span>
+                  <RowName row={row} className="flex-1 text-white/80" />
+                  <span className="max-w-[45%] shrink-0 truncate font-medium text-white/90 tabular-nums">
+                    <CellText cell={row.cells[0]} />
+                  </span>
                 </span>
-                <RowName row={row} className="flex-1 text-white/85" />
-                <span className="max-w-[45%] shrink-0 truncate font-medium text-white tabular-nums">
-                  <CellText cell={row.cells[0]} />
-                </span>
-              </span>
-              {/* 1위 대비 비율 — 값이 큰 순서인 기록만. 막대가 없어도 같은 높이를 둔다. */}
-              <span
-                aria-hidden
-                className={cn(
-                  "rounded-tag ml-8 h-1 overflow-hidden",
-                  scale && "bg-white/[0.06]",
-                )}
-              >
+                {/* 1위 대비 비율 — 값이 큰 순서인 기록만(없으면 줄도 없음). */}
                 {scale && (
                   <span
-                    className="bg-ztmy-pink/70 rounded-tag block h-full"
-                    style={{ width: `${scale[index] * 100}%` }}
-                  />
+                    aria-hidden
+                    className="rounded-tag ml-8 h-1 overflow-hidden bg-white/[0.06]"
+                  >
+                    <span
+                      className="bg-ztmy-pink/70 rounded-tag block h-full"
+                      style={{ width: `${scale[index] * 100}%` }}
+                    />
+                  </span>
                 )}
-              </span>
-            </li>
-          ))}
-          {/* 2~5위가 모자라면 빈 줄로 자리를 채운다(카드 높이를 맞추려고) */}
-          {Array.from({ length: emptySlots }, (_, index) => (
-            <li
-              key={`empty-${index}`}
-              aria-hidden
-              className="flex flex-col gap-1 text-sm"
-            >
-              <span className="invisible">–</span>
-              <span className="h-1" />
-            </li>
-          ))}
-        </ol>
+              </li>
+            ))}
+          </ol>
+        )}
       </div>
 
       {record.total > 0 ? (
@@ -437,7 +431,7 @@ function RecordCard({
           aria-haspopup="dialog"
           aria-label={`${record.title} 전체 순위 보기 (${record.total}개)`}
           className={cn(
-            "flex w-full items-center justify-between gap-3 border-t border-white/10 px-4 py-3 text-left text-sm font-medium text-white/80 transition-colors hover:bg-white/[0.06] hover:text-white",
+            "mt-auto flex w-full items-center justify-between gap-3 border-t border-white/10 px-4 py-3 text-left text-sm font-medium text-white/80 transition-colors hover:bg-white/[0.06] hover:text-white",
             "tablet:px-5",
             FOCUS_RING,
             "focus-visible:ring-inset",
@@ -453,7 +447,7 @@ function RecordCard({
         // 기록이 없어도 같은 높이의 맨 아래 줄
         <p
           className={cn(
-            "border-t border-white/10 px-4 py-3 text-sm text-white/40",
+            "mt-auto border-t border-white/10 px-4 py-3 text-sm text-white/40",
             "tablet:px-5",
           )}
         >
@@ -510,7 +504,7 @@ function Figure({ cell }: { cell: StatCell }) {
       <span
         className={cn(
           "font-extrabold tracking-tight",
-          "tablet:text-5xl text-4xl leading-none tabular-nums",
+          "text-4xl leading-none tabular-nums",
         )}
       >
         {match[0]}
@@ -710,7 +704,7 @@ const SEARCH_MIN_ROWS = 10;
 /**
  * 전체 순위표 — 위에 검색칸(이름·원제·날짜·도시), 열 이름을 누르면 그 열로 정렬
  * (값 열은 큰 것부터, 다시 누르면 뒤집기 — table-sort.ts). 태블릿 이상은 표(넓지
- * 않으면 표만 가로로 넘김), 모바일은 줄마다 카드(칸 이름: 값). 1~3위 순위는 마젠타.
+ * 않으면 표만 가로로 넘김), 모바일은 구분선 줄마다 칸 이름: 값. 1~3위 순위는 마젠타.
  */
 function RecordTable({
   record,
@@ -786,7 +780,7 @@ function RecordTable({
           : ""}
       </p>
 
-      {/* 모바일 — 줄마다 카드 */}
+      {/* 모바일 — 표 대신 구분선 줄(칸 이름: 값) */}
       <ol className="tablet:hidden flex flex-col">
         {shownRows.map((row) => (
           <li
