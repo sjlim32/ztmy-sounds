@@ -154,8 +154,11 @@ export function TourScheduleTable({
                 <tr
                   key={`${show.dates}-${show.venue}`}
                   aria-current={state === "next" ? "date" : undefined}
+                  // 칸마다 글자 크기가 달라(날짜·인원수 12px 고정폭, 도시·장소 14px)
+                  // 위 맞춤이면 줄이 어긋나 보인다 — 첫 줄 글자 바닥선(baseline)에 맞춘다.
+                  // 날짜 칸 아래 개연 시각·장소 줄바꿈이 있어도 첫 줄끼리 맞는다.
                   className={cn(
-                    "border-b border-white/5 align-top",
+                    "border-b border-white/5 align-baseline",
                     state === "past" && dimPast && "opacity-40",
                     state === "next" && "bg-ztmy-pink/15",
                   )}
