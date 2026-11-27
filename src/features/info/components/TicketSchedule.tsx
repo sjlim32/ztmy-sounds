@@ -84,7 +84,9 @@ export function TicketSchedule() {
                   !isPayment &&
                   !isEnded &&
                   "border-white/10 bg-black/25",
-                isEnded && "border-white/5 bg-black/20 opacity-55",
+                // 끝난 회차는 흐리게 — 당락 확인 버튼 줄(data-result-links)만 또렷하게 둔다.
+                isEnded &&
+                  "border-white/5 bg-black/20 [&>*:not([data-result-links])]:opacity-55",
               )}
             >
               {/* 회차 타이틀 & 상태 뱃지 */}
@@ -202,6 +204,24 @@ export function TicketSchedule() {
                             ? "border border-white/20 bg-white/10 text-white hover:bg-white/20"
                             : "border border-white/10 bg-black/40 text-white/70 hover:text-white",
                       )}
+                    >
+                      {link.name}
+                    </SiteLink>
+                  ))}
+                </div>
+              )}
+
+              {/* 끝난 회차는 신청 버튼 대신 당락 확인 버튼 */}
+              {isEnded && round.resultLinks && round.resultLinks.length > 0 && (
+                <div
+                  data-result-links
+                  className="flex flex-wrap items-center gap-2 border-t border-white/5 pt-2"
+                >
+                  {round.resultLinks.map((link) => (
+                    <SiteLink
+                      key={link.href}
+                      href={link.href}
+                      className="tablet:text-sm rounded-control border border-white/15 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-white/85 transition-colors hover:bg-white/20 hover:text-white"
                     >
                       {link.name}
                     </SiteLink>

@@ -17,6 +17,8 @@ export type InfoEvent = {
     main: string;
     place: string;
     ticket?: Url[];
+    /** 끝난 선행의 당락 확인 페이지(상세 정보 "당락 확인" 줄) */
+    result?: Url[];
     official?: SocialUrl[];
     sub?: Url[];
   };

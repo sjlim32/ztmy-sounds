@@ -4,50 +4,53 @@ import { SiteLink } from "@/components/SiteLink";
 import { TicketStrip } from "@/components/TicketStrip";
 import { SOFT_BUTTON_CLASS } from "@/components/button-styles";
 import { MapPinIcon } from "@/components/icons/MapPinIcon";
-import { SOCIAL_PLATFORM_ICON } from "@/lib/social-platform";
 import { splitParenSuffix } from "@/lib/split-paren-suffix";
+import { groupLinks } from "@/features/info/lib/group-links";
 import type { InfoEvent, Url } from "@/features/info/lib/types";
 
-// 링크 버튼 — 차분한 채움 버튼을 한 단계 작게. 접수 전인 링크(disabled)는 흐리게.
-const LINK_CLASS = cn(
+// 지금 눌러야 하는 링크(티켓 신청·이동 방법) — 차분한 채움 버튼을 한 단계 작게.
+// 접수 전인 링크(disabled)는 흐리게.
+const BUTTON_CLASS = cn(
   SOFT_BUTTON_CLASS,
   "px-2.5 py-1.5",
+  "aria-disabled:pointer-events-none aria-disabled:opacity-40",
+);
+
+// 참고용 링크(당락 확인·공식 링크) — 버튼 대신 밑줄 글자 링크로 간결하게. 모두 같은 모양
+// (글자 + 끝의 새 창 표시 ↗ — SiteLink 기본), 앞에 아이콘은 두지 않는다.
+const TEXT_LINK_CLASS = cn(
+  "rounded-control text-sm text-white/85 underline decoration-white/30 underline-offset-4 transition-colors",
+  "hover:text-white hover:decoration-white",
   "aria-disabled:pointer-events-none aria-disabled:opacity-40",
 );
 
 /**
  * 공연 정보 맨 위 포스터 아래의 공연 정보 카드 — 카드(surface) 하나에 맨 위 보딩 티켓 띠
  * (일시 · 장소 — 장소는 지도 링크, 괄호 안 "총 36공연"은 아래 줄), 아래 줄마다 라벨 + 링크
- * 버튼(티켓 신청 · 이동 방법 · 공식 링크, 줄 사이 구분선). 모바일은 라벨 아래 버튼, 태블릿
- * 이상은 같은 줄.
+ * (줄 사이 구분선). 지금 눌러야 하는 티켓 신청·이동 방법은 버튼, 참고용인 당락 확인·공식
+ * 링크는 밑줄 글자 링크. 같은 회차의 국내·해외처럼 이름이 겹치는 링크는 묶음 이름을 한 번만
+ * ("1차 선행 국내 · 해외" — lib/group-links.ts). 모바일은 라벨 아래 링크, 태블릿 이상은 같은 줄.
  */
 export function EventDetails({ event }: { event: InfoEvent }) {
   const { main: place, suffix: placeNote } = splitParenSuffix(event.place);
-  const rows: { label: string; content: ReactNode }[] = [
+  const rows: { label: string; content: ReactNode; text?: boolean }[] = [
     event.url.ticket && {
       label: "티켓 신청",
-      content: <LinkButtons items={event.url.ticket} />,
+      content: <Links items={event.url.ticket} className={BUTTON_CLASS} />,
+    },
+    event.url.result && {
+      label: "당락 확인",
+      text: true,
+      content: <Links items={event.url.result} className={TEXT_LINK_CLASS} />,
     },
     event.url.sub && {
       label: "이동 방법",
-      content: <LinkButtons items={event.url.sub} />,
+      content: <Links items={event.url.sub} className={BUTTON_CLASS} />,
     },
     event.url.official && {
       label: "공식 링크",
-      content: event.url.official.map((official) => {
-        const Icon = SOCIAL_PLATFORM_ICON[official.platform];
-        return (
-          <SiteLink
-            key={official.href}
-            href={official.href}
-            noIcon
-            className={LINK_CLASS}
-          >
-            <Icon className="size-4" />
-            {official.name}
-          </SiteLink>
-        );
-      }),
+      text: true,
+      content: <Links items={event.url.official} className={TEXT_LINK_CLASS} />,
     },
   ].filter((row) => !!row);
 
@@ -88,7 +91,14 @@ export function EventDetails({ event }: { event: InfoEvent }) {
               >
                 {row.label}
               </dt>
-              <dd className="flex flex-wrap gap-2">{row.content}</dd>
+              <dd
+                className={cn(
+                  "flex flex-wrap",
+                  row.text ? "gap-x-5 gap-y-1" : "gap-x-5 gap-y-2",
+                )}
+              >
+                {row.content}
+              </dd>
             </div>
           ))}
         </dl>
@@ -97,16 +107,25 @@ export function EventDetails({ event }: { event: InfoEvent }) {
   );
 }
 
-function LinkButtons({ items }: { items: Url[] }) {
-  return items.map((item) => (
-    <SiteLink
-      key={item.href}
-      href={item.href}
-      className={LINK_CLASS}
-      disabled={item.disabled}
+/** 링크 묶음 — 묶음 이름(흐린 글자)을 한 번, 뒤에 링크들(괄호 안 글자). */
+function Links({ items, className }: { items: Url[]; className: string }) {
+  return groupLinks(items).map((group) => (
+    <span
+      key={group.links[0].href}
+      className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
     >
-      {item.name}
-    </SiteLink>
+      {group.title && <span className="text-white/60">{group.title}</span>}
+      {group.links.map((link) => (
+        <SiteLink
+          key={link.href}
+          href={link.href}
+          className={className}
+          disabled={link.disabled}
+        >
+          {link.label}
+        </SiteLink>
+      ))}
+    </span>
   ));
 }
 

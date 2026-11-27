@@ -61,6 +61,24 @@ export const INFORMATION: InfoEvent = {
         href: "https://w.pia.jp/v/zutomayo27hall-ogfp-en/",
       },
     ],
+    result: [
+      {
+        name: "1차 선행 (국내)",
+        href: "https://zutomayo.net/apicula-denki_apply_pre/",
+      },
+      {
+        name: "1차 선행 (해외)",
+        href: "https://zutomayo.net/apicula-denki_apply_pre_en/",
+      },
+      {
+        name: "2차 선행 (국내)",
+        href: "https://zutomayo.net/apicula-denki_apply_pre_2nd/",
+      },
+      {
+        name: "2차 선행 (해외)",
+        href: "https://zutomayo.net/apicula-denki_apply_pre_en_2nd/",
+      },
+    ],
     official: [
       {
         name: "공식 홈페이지",

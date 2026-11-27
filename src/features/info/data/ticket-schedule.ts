@@ -15,6 +15,11 @@ export interface TicketScheduleRound {
     name: string;
     href: string;
   }[];
+  /** 당락 확인 페이지 — 끝난 회차에도 버튼으로 남긴다(공연 정보 티켓 탭, 상세 정보 "당락 확인" 줄). */
+  resultLinks?: {
+    name: string;
+    href: string;
+  }[];
 }
 
 export const TICKET_SCHEDULE_NOTE =
@@ -41,6 +46,16 @@ export const TICKET_PRESALE_SCHEDULE: TicketScheduleRound[] = [
         href: "https://zutomayo.net/apicula-denki_apply_pre_en/",
       },
     ],
+    resultLinks: [
+      {
+        name: "당락 확인 (국내)",
+        href: "https://zutomayo.net/apicula-denki_apply_pre/",
+      },
+      {
+        name: "당락 확인 (해외)",
+        href: "https://zutomayo.net/apicula-denki_apply_pre_en/",
+      },
+    ],
   },
   {
     id: "premium-2nd",
@@ -59,6 +74,16 @@ export const TICKET_PRESALE_SCHEDULE: TicketScheduleRound[] = [
       },
       {
         name: "해외 신청",
+        href: "https://zutomayo.net/apicula-denki_apply_pre_en_2nd/",
+      },
+    ],
+    resultLinks: [
+      {
+        name: "당락 확인 (국내)",
+        href: "https://zutomayo.net/apicula-denki_apply_pre_2nd/",
+      },
+      {
+        name: "당락 확인 (해외)",
         href: "https://zutomayo.net/apicula-denki_apply_pre_en_2nd/",
       },
     ],
