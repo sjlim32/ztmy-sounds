@@ -1,5 +1,8 @@
 import { describe, expect, test } from "vitest";
-import { groupSongs } from "@/features/zutopia/song-db/song-album-grouping";
+import {
+  albumTrackLabels,
+  groupSongs,
+} from "@/features/zutopia/song-db/song-album-grouping";
 import type { SongWithAlbums } from "@/features/zutopia/song-db/types";
 import type { SongLiveSummary } from "@/features/zutopia/live-history/summary";
 
@@ -87,5 +90,42 @@ describe("groupSongs 편곡·MV 감독", () => {
   test("내림차순이어도 정보 없음은 맨 뒤", () => {
     const groups = groupSongs(songs, "arranger", "desc");
     expect(groups.at(-1)?.label).toBe("정보 없음");
+  });
+});
+
+describe("albumTrackLabels", () => {
+  const onAlbum = (
+    id: string,
+    refs: { id: string; track_number: number; disc_number: number }[],
+  ) =>
+    ({ ...song(id, "2020-01-01"), albums: refs }) as unknown as SongWithAlbums;
+
+  test("그 앨범의 수록 번호를 두 자리로(다른 앨범 번호는 무시)", () => {
+    const songs = [
+      onAlbum("a", [
+        { id: "x", track_number: 1, disc_number: 1 },
+        { id: "y", track_number: 7, disc_number: 1 },
+      ]),
+      onAlbum("b", [{ id: "x", track_number: 12, disc_number: 1 }]),
+    ];
+    expect(albumTrackLabels(songs, "x")).toEqual(
+      new Map([
+        ["a", "01"],
+        ["b", "12"],
+      ]),
+    );
+  });
+
+  test("2번째 디스크가 있는 앨범은 디스크 번호를 앞에 붙인다", () => {
+    const songs = [
+      onAlbum("a", [{ id: "x", track_number: 3, disc_number: 1 }]),
+      onAlbum("b", [{ id: "x", track_number: 1, disc_number: 2 }]),
+    ];
+    expect(albumTrackLabels(songs, "x")).toEqual(
+      new Map([
+        ["a", "1-03"],
+        ["b", "2-01"],
+      ]),
+    );
   });
 });

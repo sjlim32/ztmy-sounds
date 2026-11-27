@@ -16,7 +16,7 @@ import { useScrollFadeMask } from "@/lib/use-scroll-fade-mask";
  * 페이드 처리.
  */
 // 아래 <main>의 id이자 ScrollToTopButton이 스크롤을 지켜볼 대상.
-const ZUTOPIA_SCROLL_CONTAINER_ID = "zutopia-scroll-container";
+export const ZUTOPIA_SCROLL_CONTAINER_ID = "zutopia-scroll-container";
 
 /**
  * 공연 목록 ↔ 공연 상세 이동인지 — 그 사이엔 포스터가 목록 칸에서 상세 자리로

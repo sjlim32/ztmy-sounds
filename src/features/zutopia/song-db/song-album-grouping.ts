@@ -68,6 +68,28 @@ export function getSongCoverSrc(song: SongWithAlbums): string | null {
   return song.cover_image_url ?? song.albums[0]?.cover_image_url ?? null;
 }
 
+/**
+ * 앨범으로 묶은 곡 목록의 수록 번호 — 곡 id → "01"(그 앨범의 track_number, 두 자리). 커버는
+ * 앨범 띠에 한 번만 두고 곡 줄엔 이 번호를 둔다. 2번째 디스크 이상이 있는 앨범은 "2-01"처럼
+ * 디스크 번호를 앞에 붙인다. 그 앨범에 없는 곡은 빠진다.
+ */
+export function albumTrackLabels(
+  songs: SongWithAlbums[],
+  albumId: string,
+): Map<string, string> {
+  const refs = songs.flatMap((song) => {
+    const ref = song.albums.find((album) => album.id === albumId);
+    return ref ? [{ songId: song.id, ref }] : [];
+  });
+  const multiDisc = refs.some(({ ref }) => (ref.disc_number ?? 1) > 1);
+  return new Map(
+    refs.map(({ songId, ref }) => {
+      const track = String(ref.track_number).padStart(2, "0");
+      return [songId, multiDisc ? `${ref.disc_number ?? 1}-${track}` : track];
+    }),
+  );
+}
+
 function songYear(song: SongWithAlbums): string {
   return song.release_date.slice(0, 4);
 }
