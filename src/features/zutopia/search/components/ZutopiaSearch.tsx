@@ -131,7 +131,7 @@ export function ZutopiaSearch({
             aria-label="곡·앨범·공연 검색 결과"
             className={cn(
               "max-tablet:hidden absolute inset-x-0 top-full z-20 mt-2",
-              "bg-background/95 max-h-[max(15rem,calc(100dvh-21rem))] overflow-y-auto overscroll-contain rounded-xl border border-white/15 p-4 shadow-2xl backdrop-blur-md",
+              "bg-background/95 rounded-card max-h-[max(15rem,calc(100dvh-21rem))] overflow-y-auto overscroll-contain border border-white/15 p-4 shadow-2xl backdrop-blur-md",
             )}
           >
             <SearchResults query={deferredQuery} result={result} />

@@ -97,7 +97,7 @@ export default function CreditsPage() {
             <li
               key={credit.role}
               id={credit.id}
-              className="scroll-mt-6 rounded-lg bg-black/30 p-4"
+              className="rounded-card scroll-mt-6 bg-black/30 p-4"
             >
               <p className="font-mono text-xs tracking-[0.2em] text-white/40 uppercase">
                 {credit.role}

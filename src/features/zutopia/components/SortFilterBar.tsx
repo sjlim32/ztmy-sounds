@@ -51,7 +51,7 @@ export function FilterPanel({
             <button
               type="button"
               onClick={onReset}
-              className="hover:text-ztmy-pink rounded whitespace-nowrap text-white/50 underline underline-offset-4 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
+              className="hover:text-ztmy-pink rounded-control whitespace-nowrap text-white/50 underline underline-offset-4 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
             >
               필터 초기화
             </button>

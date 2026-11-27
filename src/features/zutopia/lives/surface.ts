@@ -12,7 +12,7 @@ export const LIVE_SECTION_TITLE_SHADOW =
 
 /**
  * 공연·투어 상세의 작은 태그(선택곡·DAY 1·DAY 2·ENCORE·내한) — 가이드 곡 목록의
- * 중요도 배지와 같은 모양: 알약·테두리 없이 모서리 살짝 둥근 옅은 면 + 같은
+ * 중요도 배지와 같은 모양: 알약·테두리 없이 각진(rounded-tag) 옅은 면 + 같은
  * 계열 글자. 높이를 20px로 고정해 줄마다 같은 크기로 선다.
  */
 export const LIVE_TAG_CLASS =

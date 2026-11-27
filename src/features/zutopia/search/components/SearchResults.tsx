@@ -121,7 +121,7 @@ function ResultGroup<T extends { slug: string }>({
   if (hits.length === 0) return null;
 
   const renderList = (items: SearchHit<T>[]) => (
-    <ul className="flex flex-col rounded-lg border border-white/10 bg-black/40 p-1.5 backdrop-blur-sm">
+    <ul className="rounded-card flex flex-col border border-white/10 bg-black/40 p-1.5 backdrop-blur-sm">
       {items.map((hit) => (
         <li key={hit.item.slug}>{render(hit)}</li>
       ))}
@@ -194,10 +194,10 @@ function ResultRow({
         <ThumbImage
           src={image}
           displayWidth={48}
-          className="h-12 w-12 shrink-0 rounded-md object-cover"
+          className="rounded-card h-12 w-12 shrink-0 object-cover"
         />
       ) : (
-        <span className="block h-12 w-12 shrink-0 rounded-md bg-white/10" />
+        <span className="rounded-card block h-12 w-12 shrink-0 bg-white/10" />
       )}
       <span className="flex min-w-0 flex-col">
         <span className="truncate text-sm font-semibold text-white">
@@ -228,7 +228,7 @@ function Highlight({ text, query }: { text: string; query: string }) {
   for (const [start, end] of ranges) {
     if (start > cursor) parts.push(text.slice(cursor, start));
     parts.push(
-      <mark key={start} className="bg-ztmy-magenta/35 rounded-sm text-white">
+      <mark key={start} className="bg-ztmy-magenta/35 rounded-tag text-white">
         {text.slice(start, end)}
       </mark>,
     );

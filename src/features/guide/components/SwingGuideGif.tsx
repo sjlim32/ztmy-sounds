@@ -159,7 +159,7 @@ export function SwingGuideGifSlot({ className }: { className?: string }) {
     <section
       aria-label="동작 예시 GIF"
       className={cn(
-        "flex shrink-0 flex-col gap-2 rounded-lg border p-3 backdrop-blur-sm",
+        "rounded-card flex shrink-0 flex-col gap-2 border p-3 backdrop-blur-sm",
         // GIF가 없으면 칸 전체를 비활성처럼 — 옅은 면·점선 테두리·흐린 라벨로
         // "아직 재생 전"(실선, 진한 면)과 확실히 구분한다.
         gif
@@ -181,7 +181,7 @@ export function SwingGuideGifSlot({ className }: { className?: string }) {
           정사각형보다 낮아서 넘치지 않는다 — 아니면 정사각형. */}
       <div
         className={cn(
-          "relative flex items-center justify-center overflow-hidden rounded-md",
+          "rounded-card relative flex items-center justify-center overflow-hidden",
           gif && "bg-white/5",
           GIF_SQUARE_CLASS,
           !gif?.width && "aspect-square",
@@ -211,7 +211,7 @@ export function SwingGuideGifSlot({ className }: { className?: string }) {
           </>
         ) : (
           // 빈 자리 — 빗금 무늬 + 점선 테두리 + 이미지 없음 아이콘
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-md border border-dashed border-white/15 bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.05)_0_6px,transparent_6px_12px)] px-2 text-center">
+          <div className="rounded-card absolute inset-0 flex flex-col items-center justify-center gap-1.5 border border-dashed border-white/15 bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.05)_0_6px,transparent_6px_12px)] px-2 text-center">
             <ImageOffIcon className="h-6 w-6 text-white/30" />
             <span className="text-sm font-medium text-white/45">GIF 없음</span>
             <span className="text-xs break-keep text-white/30">
@@ -352,7 +352,7 @@ function SwingImage({
           : undefined
       }
       className={cn(
-        "rounded-lg object-cover",
+        "rounded-card object-cover",
         fill
           ? // 정사각형 칸이면 칸을 덮도록 가운데만, 원본 비율이면 폭만 맞추고 높이는 비율대로.
             cn("w-full", isSquare ? "h-full" : "h-auto")

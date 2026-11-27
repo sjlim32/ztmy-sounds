@@ -544,7 +544,7 @@ function LiveCard({ entry, href, onClick }: LiveItemProps) {
       entry={entry}
       href={href}
       onClick={onClick}
-      className="group flex flex-col gap-2 rounded-lg focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
+      className="group rounded-card flex flex-col gap-2 focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
     >
       {/* 상세 페이지 포스터와 같은 이름 — 상세로 갈 때 이 그림이 그 자리로 이어지며 커진다. */}
       <ViewTransition
@@ -554,7 +554,7 @@ function LiveCard({ entry, href, onClick }: LiveItemProps) {
       >
         <div
           className={cn(
-            "relative aspect-square overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
+            "rounded-card relative aspect-square overflow-hidden bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
             // 내한 공연은 테두리와 그림 위 태그를 마젠타(홈의 내한 색)로 표시해
             // 목록에서 바로 눈에 띄게 한다.
             entry.visitOrdinal != null && "ring-ztmy-magenta ring-2",
@@ -704,7 +704,7 @@ function LiveRow({ entry, href, onClick }: LiveItemProps) {
       href={href}
       onClick={onClick}
       className={cn(
-        "group flex items-center gap-3 rounded-lg border bg-white/5 p-2 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+        "group rounded-card flex items-center gap-3 border bg-white/5 p-2 transition-colors focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
         !canceled && "hover:bg-white/10",
         // 내한 공연은 카드 보기와 같이 마젠타 테두리로 표시한다.
         entry.visitOrdinal != null ? "border-ztmy-magenta" : "border-white/10",
@@ -715,7 +715,7 @@ function LiveRow({ entry, href, onClick }: LiveItemProps) {
         share="morph"
         default="none"
       >
-        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded bg-black/30">
+        <div className="rounded-card relative h-14 w-14 shrink-0 overflow-hidden bg-black/30">
           {entry.thumbnail ? (
             <ThumbImage
               src={entry.thumbnail}

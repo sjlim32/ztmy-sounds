@@ -30,7 +30,7 @@ export function TicketSchedule() {
     : null;
 
   return (
-    <div className="tablet:p-4 flex flex-col gap-3 rounded-xl border border-white/10 bg-black/35 p-3.5 backdrop-blur-xs">
+    <div className="tablet:p-4 rounded-card flex flex-col gap-3 border border-white/10 bg-black/35 p-3.5 backdrop-blur-xs">
       {/* 카드 상단 헤더 */}
       <div className="tablet:flex-row tablet:items-center tablet:justify-between flex flex-col gap-1.5 border-b border-white/10 pb-3">
         <div>
@@ -45,7 +45,7 @@ export function TicketSchedule() {
 
         {activeRound && (
           <div className="tablet:self-auto flex items-center gap-2 self-start">
-            <span className="border-ztmy-pink/40 bg-ztmy-pink/15 text-ztmy-pink inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold">
+            <span className="border-ztmy-pink/40 bg-ztmy-pink/15 text-ztmy-pink rounded-tag inline-flex items-center gap-1.5 border px-3 py-1 text-xs font-bold">
               <span className="relative flex h-2 w-2">
                 <span className="bg-ztmy-pink absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
                 <span className="bg-ztmy-pink relative inline-flex h-2 w-2 rounded-full" />
@@ -75,7 +75,7 @@ export function TicketSchedule() {
             <div
               key={round.id}
               className={cn(
-                "tablet:p-4 relative flex flex-col gap-2.5 rounded-xl border p-3.5 transition-all",
+                "tablet:p-4 rounded-card relative flex flex-col gap-2.5 border p-3.5 transition-all",
                 isApplying &&
                   "border-ztmy-pink/50 from-ztmy-pink/15 ring-ztmy-pink/40 bg-linear-to-r via-black/40 to-black/30 shadow-[0_0_20px_rgba(255,107,157,0.12)] ring-1",
                 isPayment &&
@@ -103,7 +103,7 @@ export function TicketSchedule() {
 
                   {/* 상태 뱃지 */}
                   {isApplying && (
-                    <span className="bg-ztmy-pink shadow-ztmy-pink/40 inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
+                    <span className="bg-ztmy-pink shadow-ztmy-pink/40 rounded-tag inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
                       <span className="relative flex h-2 w-2">
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
                         <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
@@ -112,22 +112,22 @@ export function TicketSchedule() {
                     </span>
                   )}
                   {isPayment && (
-                    <span className="bg-ztmy-sun rounded-full px-2.5 py-0.5 text-xs font-bold text-black">
+                    <span className="bg-ztmy-sun rounded-tag px-2.5 py-0.5 text-xs font-bold text-black">
                       당락·입금 중
                     </span>
                   )}
                   {isDrawing && (
-                    <span className="rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-xs font-medium text-white/70">
+                    <span className="rounded-tag border border-white/20 bg-white/10 px-2 py-0.5 text-xs font-medium text-white/70">
                       추첨 대기
                     </span>
                   )}
                   {state === "upcoming" && (
-                    <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs font-medium text-white/50">
+                    <span className="rounded-tag border border-white/15 bg-white/5 px-2 py-0.5 text-xs font-medium text-white/50">
                       접수 예정
                     </span>
                   )}
                   {isEnded && (
-                    <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs text-white/40">
+                    <span className="rounded-tag bg-white/5 px-2 py-0.5 text-xs text-white/40">
                       마감
                     </span>
                   )}
@@ -135,7 +135,7 @@ export function TicketSchedule() {
 
                 {/* 진행 중 마감 카운트다운 */}
                 {isApplying && daysLeft !== null && (
-                  <span className="border-ztmy-pink/30 bg-ztmy-pink/10 text-ztmy-pink rounded-md border px-2.5 py-0.5 font-mono text-xs font-semibold">
+                  <span className="border-ztmy-pink/30 bg-ztmy-pink/10 text-ztmy-pink rounded-tag border px-2.5 py-0.5 font-mono text-xs font-semibold">
                     {daysLeft === 0 ? "오늘 마감" : `D-${daysLeft} 마감`}
                   </span>
                 )}
@@ -195,7 +195,7 @@ export function TicketSchedule() {
                       key={link.href}
                       href={link.href}
                       className={cn(
-                        "tablet:text-sm rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all",
+                        "tablet:text-sm rounded-control px-3.5 py-1.5 text-xs font-bold transition-all",
                         isApplying && idx === 0
                           ? "bg-ztmy-pink shadow-ztmy-pink/25 hover:bg-ztmy-pink/90 text-white shadow-md"
                           : isApplying

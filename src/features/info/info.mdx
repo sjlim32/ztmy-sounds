@@ -52,7 +52,7 @@ export const sections = groupImagesBySection(
         {/* 전체 공연 지도 */}
         <div
           id="tour-map"
-          className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-black/30 p-3"
+          className="flex flex-col items-center gap-2 rounded-card border border-white/10 bg-black/30 p-3"
         >
           <div className="flex w-full items-center justify-between px-1">
             <span className="text-sm font-semibold text-white">
@@ -76,7 +76,7 @@ export const sections = groupImagesBySection(
 
         {/* 일정 번역본 & 공식 포스터 */}
         <div className="grid grid-cols-1 tablet:grid-cols-2 gap-4">
-          <div className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-black/30 p-3">
+          <div className="flex flex-col items-center gap-2 rounded-card border border-white/10 bg-black/30 p-3">
             <div className="flex w-full items-center justify-between px-1">
               <span className="text-sm font-semibold text-white">
                 일정 번역본 (홀별 정원수)
@@ -96,7 +96,7 @@ export const sections = groupImagesBySection(
             />
           </div>
 
-          <div className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-black/30 p-3">
+          <div className="flex flex-col items-center gap-2 rounded-card border border-white/10 bg-black/30 p-3">
             <div className="flex w-full items-center justify-between px-1">
               <span className="text-sm font-semibold text-white">
                 공식 스케줄 포스터 (원문)
@@ -119,7 +119,7 @@ export const sections = groupImagesBySection(
       <ImageLabel id="map" label="전체 공연 지도" />
 
       <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between rounded-lg border border-white/10 bg-black/30 px-3.5 py-2.5">
+        <div className="flex items-center justify-between rounded-card border border-white/10 bg-black/30 px-3.5 py-2.5">
           <span className="text-xs tablet:text-sm text-white/80">
             23개 공연장 · 36회 공연 (1/15 ~ 5/23) 전국 배치도
           </span>
@@ -132,14 +132,14 @@ export const sections = groupImagesBySection(
             </SiteLink>
             <SiteLink
               href={INFORMATION.url.place}
-              className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white hover:bg-white/20"
+              className="rounded-control border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white hover:bg-white/20"
             >
               Google Maps 열기
             </SiteLink>
           </div>
         </div>
 
-        <div className="flex items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/40 p-2">
+        <div className="flex items-center justify-center overflow-hidden rounded-card border border-white/10 bg-black/40 p-2">
           <ZoomableImage
             src={sections["map"][0].asset}
             alt={sections["map"][0].name}

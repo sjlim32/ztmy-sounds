@@ -7,4 +7,4 @@
  * "use client" 파일이 아닌 순수 모듈이라 서버 컴포넌트에서 가져와도 문자열 그대로다.
  */
 export const ZUTOPIA_SURFACE_CLASS =
-  "rounded-lg border border-white/10 bg-black/60 shadow-[0_4px_16px_rgba(0,0,0,0.4)] backdrop-blur-md";
+  "rounded-card border border-white/10 bg-black/60 shadow-[0_4px_16px_rgba(0,0,0,0.4)] backdrop-blur-md";

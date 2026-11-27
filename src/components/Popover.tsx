@@ -100,7 +100,7 @@ export function Popover({
       aria-label={label}
       tabIndex={-1}
       className={cn(
-        "bg-background absolute top-full right-0 z-40 mt-2 max-h-[70dvh] overflow-y-auto rounded-lg border border-white/15 p-3 shadow-[0_8px_24px_rgba(0,0,0,0.55)] focus:outline-none",
+        "bg-background rounded-card absolute top-full right-0 z-40 mt-2 max-h-[70dvh] overflow-y-auto border border-white/15 p-3 shadow-[0_8px_24px_rgba(0,0,0,0.55)] focus:outline-none",
         className,
       )}
     >

@@ -146,7 +146,7 @@ export function SharePanel({
         <div
           role="alertdialog"
           aria-label="참전 기록 불러오기"
-          className="border-ztmy-magenta/40 bg-ztmy-magenta/10 flex flex-col gap-3 rounded-md border p-3"
+          className="border-ztmy-magenta/40 bg-ztmy-magenta/10 rounded-card flex flex-col gap-3 border p-3"
         >
           {matched.length === 0 ? (
             <>
@@ -219,7 +219,7 @@ export function SharePanel({
             value={ready ? code : ""}
             aria-label="참전 기록 코드"
             onFocus={(event) => event.target.select()}
-            className="h-10 min-w-0 flex-1 rounded-md border border-white/15 bg-black/30 px-3 font-mono text-sm text-white/90"
+            className="rounded-control h-10 min-w-0 flex-1 border border-white/15 bg-black/30 px-3 font-mono text-sm text-white/90"
           />
           <button
             type="button"
@@ -269,7 +269,7 @@ export function SharePanel({
             onChange={(event) => setInput(event.target.value)}
             placeholder="코드(ZT1…)나 공유 링크 붙여넣기"
             aria-label="코드나 공유 링크"
-            className="focus-visible:outline-ztmy-magenta h-10 min-w-0 flex-1 rounded-md border border-white/15 bg-black/30 px-3 text-sm text-white placeholder:text-white/35 focus-visible:outline-2"
+            className="focus-visible:outline-ztmy-magenta rounded-control h-10 min-w-0 flex-1 border border-white/15 bg-black/30 px-3 text-sm text-white placeholder:text-white/35 focus-visible:outline-2"
           />
           <button
             type="submit"
@@ -295,7 +295,7 @@ export function SharePanel({
             if (file) void importFile(file);
           }}
           className={cn(
-            "rounded-md border border-dashed border-white/25 px-3 py-4 text-sm text-white/70 transition-colors hover:border-white/45 hover:text-white",
+            "rounded-control border border-dashed border-white/25 px-3 py-4 text-sm text-white/70 transition-colors hover:border-white/45 hover:text-white",
             dragging && "border-ztmy-magenta text-white",
           )}
         >

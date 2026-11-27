@@ -18,8 +18,8 @@ export const KIND_LABEL: Record<TimelineKind, string> = {
  */
 export const KIND_DOT_CLASS: Record<TimelineKind, string> = {
   song: "bg-ztmy-sky rounded-full",
-  album: "bg-ztmy-sun rounded-[3px]",
-  live: "bg-ztmy-purple rounded-[3px]",
+  album: "bg-ztmy-sun rounded-tag",
+  live: "bg-ztmy-purple rounded-tag",
 };
 
 /**

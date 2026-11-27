@@ -32,7 +32,7 @@ export function NoticeAccordionItem({
       // 항목과 동일한 톤). tablet 이상: 기존 카드 박스 유지.
       className={cn(
         "w-full overflow-hidden",
-        "tablet:rounded-sm tablet:bg-black/50",
+        "tablet:rounded-card tablet:bg-black/50",
       )}
     >
       <button

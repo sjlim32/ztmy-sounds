@@ -51,9 +51,9 @@ export function ConcertQuickPanelDialog({
         role="dialog"
         aria-label="공연 안내"
         className={cn(
-          "bg-background/95 fixed inset-x-0 bottom-0 z-40 flex max-h-[85dvh] flex-col rounded-t-2xl border-t border-white/15 pb-4 backdrop-blur-md",
+          "bg-background/95 rounded-t-card fixed inset-x-0 bottom-0 z-40 flex max-h-[85dvh] flex-col border-t border-white/15 pb-4 backdrop-blur-md",
           // 태블릿 이상: 왼쪽 열을 가리지 않게 버튼 오른쪽으로, 버튼 아래끝에 맞춰 위로 자란다.
-          "tablet:absolute tablet:inset-x-auto tablet:bottom-0 tablet:left-full tablet:ml-3 tablet:w-104 tablet:max-h-[70dvh] tablet:rounded-lg tablet:border tablet:pb-0",
+          "tablet:absolute tablet:inset-x-auto tablet:bottom-0 tablet:left-full tablet:ml-3 tablet:w-104 tablet:max-h-[70dvh] tablet:rounded-card tablet:border tablet:pb-0",
         )}
       >
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-2.5">
@@ -149,7 +149,7 @@ function PanelBody({
             aria-controls={tableId}
             onClick={() => setTableOpen((open) => !open)}
             className={cn(
-              "text-ztmy-pink flex items-center justify-center gap-1 rounded-md border border-white/15 px-3 py-1.5 text-sm font-bold transition-colors hover:border-white/40",
+              "text-ztmy-pink rounded-control flex items-center justify-center gap-1 border border-white/15 px-3 py-1.5 text-sm font-bold transition-colors hover:border-white/40",
               FOCUS_RING,
             )}
           >
@@ -197,4 +197,3 @@ function PanelSection({
     </section>
   );
 }
-

@@ -105,7 +105,7 @@ export function AttendanceResult({
         <div
           role="group"
           aria-label="목록 고르기"
-          className="tablet:inline-grid tablet:w-auto grid w-full grid-cols-2 gap-1 rounded-lg bg-white/5 p-1"
+          className="tablet:inline-grid tablet:w-auto rounded-card grid w-full grid-cols-2 gap-1 bg-white/5 p-1"
         >
           {modes.map((item) => {
             const active = mode === item.key;
@@ -119,7 +119,7 @@ export function AttendanceResult({
                   setOpenSongId(null);
                 }}
                 className={cn(
-                  "tablet:px-4 flex h-11 items-center justify-center gap-2 rounded-md px-3 transition-colors",
+                  "tablet:px-4 rounded-control flex h-11 items-center justify-center gap-2 px-3 transition-colors",
                   FOCUS_RING,
                   active
                     ? "bg-white/15 text-white shadow-sm"
@@ -235,12 +235,12 @@ function SongRow({
         <ThumbImage
           src={song.coverSrc}
           displayWidth={40}
-          className="size-10 shrink-0 rounded bg-black/40 object-cover"
+          className="rounded-card size-10 shrink-0 bg-black/40 object-cover"
         />
       ) : (
         <span
           aria-hidden
-          className="block size-10 shrink-0 rounded bg-white/5"
+          className="rounded-card block size-10 shrink-0 bg-white/5"
         />
       )}
       <span className="min-w-0 flex-1">
@@ -277,7 +277,7 @@ function SongRow({
         <Link
           href={`/zutopia/songs?song=${song.slug}`}
           className={cn(
-            "flex min-w-0 items-center gap-3 rounded-md py-2 transition-colors hover:bg-white/5",
+            "rounded-control flex min-w-0 items-center gap-3 py-2 transition-colors hover:bg-white/5",
             FOCUS_RING,
           )}
         >
@@ -299,7 +299,7 @@ function SongRow({
         aria-expanded={open}
         onClick={onToggle}
         className={cn(
-          "flex w-full min-w-0 items-center gap-3 rounded-md py-2 text-left transition-colors hover:bg-white/5",
+          "rounded-control flex w-full min-w-0 items-center gap-3 py-2 text-left transition-colors hover:bg-white/5",
           open && "bg-white/10",
           FOCUS_RING,
         )}
@@ -345,7 +345,7 @@ function SongRow({
                   <Link
                     href={unit.href}
                     className={cn(
-                      "block rounded-md px-2 py-1.5 transition-colors hover:bg-white/10",
+                      "rounded-control block px-2 py-1.5 transition-colors hover:bg-white/10",
                       FOCUS_RING,
                     )}
                   >

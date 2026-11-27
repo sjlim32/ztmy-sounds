@@ -124,7 +124,7 @@ function DialogPanel({ open }: { open: boolean }) {
           "focus:outline-none",
           // 모바일은 화면 전체, 태블릿 이상은 위쪽 가운데 창.
           "bg-background flex h-full w-full flex-col",
-          "tablet:h-auto tablet:max-h-[80dvh] tablet:w-[40rem] tablet:rounded-xl tablet:border tablet:border-white/15 tablet:shadow-2xl",
+          "tablet:h-auto tablet:max-h-[80dvh] tablet:w-[40rem] tablet:rounded-card tablet:border tablet:border-white/15 tablet:shadow-2xl",
           "transition-[opacity,translate] duration-200 ease-out motion-reduce:transition-none starting:-translate-y-2 starting:opacity-0",
           !open && "-translate-y-2 opacity-0",
         )}
@@ -161,7 +161,7 @@ function DialogPanel({ open }: { open: boolean }) {
                   setAttempt((value) => value + 1);
                 }}
                 className={cn(
-                  "rounded text-white underline decoration-white/40 underline-offset-4",
+                  "rounded-control text-white underline decoration-white/40 underline-offset-4",
                   FOCUS_RING,
                 )}
               >

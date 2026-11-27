@@ -140,7 +140,7 @@ export function ConcertQuickPanel({
         aria-haspopup="dialog"
         onClick={() => setOpen((open) => !open)}
         className={cn(
-          "flex w-full items-center gap-3 rounded-lg border px-3 py-1.5 text-left backdrop-blur-sm transition-colors",
+          "rounded-control flex w-full items-center gap-3 border px-3 py-1.5 text-left backdrop-blur-sm transition-colors",
           TRIGGER_HEIGHT,
           FOCUS_RING,
           isToday
@@ -149,7 +149,7 @@ export function ConcertQuickPanel({
         )}
       >
         {isToday ? (
-          <span className="bg-ztmy-magenta shrink-0 rounded-md px-2 py-1 text-xs font-bold text-white">
+          <span className="bg-ztmy-magenta rounded-tag shrink-0 px-2 py-1 text-xs font-bold text-white">
             오늘 공연
           </span>
         ) : (

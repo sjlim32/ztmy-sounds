@@ -19,12 +19,15 @@ export function EventThumb({
       src={src}
       displayWidth={displayWidth}
       draggable={false}
-      className={cn("shrink-0 rounded-md bg-black/40 object-cover", className)}
+      className={cn(
+        "rounded-card shrink-0 bg-black/40 object-cover",
+        className,
+      )}
     />
   ) : (
     <span
       aria-hidden
-      className={cn("block shrink-0 rounded-md bg-white/5", className)}
+      className={cn("rounded-card block shrink-0 bg-white/5", className)}
     />
   );
 }

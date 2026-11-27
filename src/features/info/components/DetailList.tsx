@@ -21,7 +21,7 @@ export function DetailList({
   children: ReactNode;
 }) {
   return (
-    <div className="tablet:p-3 flex flex-col gap-2 rounded-lg bg-black/30 px-3 py-2.5">
+    <div className="tablet:p-3 rounded-card flex flex-col gap-2 bg-black/30 px-3 py-2.5">
       {title && <h3 className={cn("font-bold", titleClassName)}>{title}</h3>}
       {/* 모바일은 DetailField가 자기 여백·구분선을 가져서 space-y는 태블릿부터 */}
       <ul className="tablet:space-y-1 text-white">{children}</ul>

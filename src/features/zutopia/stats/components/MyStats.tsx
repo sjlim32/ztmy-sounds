@@ -94,7 +94,7 @@ export function MyStats() {
             type="button"
             onClick={() => setFailed(false)}
             className={cn(
-              "rounded text-white underline decoration-white/40 underline-offset-4",
+              "rounded-control text-white underline decoration-white/40 underline-offset-4",
               FOCUS_RING,
             )}
           >
@@ -148,10 +148,10 @@ function MySummaryView({
           </dd>
           <dd
             aria-hidden
-            className="bg-ztmy-pink/20 mt-1 h-2 overflow-hidden rounded-full"
+            className="bg-ztmy-pink/20 rounded-tag mt-1 h-2 overflow-hidden"
           >
             <span
-              className="bg-ztmy-pink block h-full rounded-full"
+              className="bg-ztmy-pink rounded-tag block h-full"
               style={{ width: `${Math.round(ratio * 100)}%` }}
             />
           </dd>
@@ -212,18 +212,18 @@ function SongList({
                 <ThumbImage
                   src={song.image}
                   displayWidth={32}
-                  className="size-8 shrink-0 rounded bg-black/40 object-cover"
+                  className="rounded-card size-8 shrink-0 bg-black/40 object-cover"
                 />
               ) : (
                 <span
                   aria-hidden
-                  className="size-8 shrink-0 rounded bg-white/5"
+                  className="rounded-card size-8 shrink-0 bg-white/5"
                 />
               )}
               <Link
                 href={song.href}
                 className={cn(
-                  "min-w-0 flex-1 truncate rounded-sm text-white/85 transition-colors hover:text-white hover:underline hover:decoration-white/40 hover:underline-offset-4",
+                  "rounded-control min-w-0 flex-1 truncate text-white/85 transition-colors hover:text-white hover:underline hover:decoration-white/40 hover:underline-offset-4",
                   FOCUS_RING,
                 )}
               >

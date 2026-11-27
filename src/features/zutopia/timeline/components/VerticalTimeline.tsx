@@ -147,7 +147,7 @@ export function VerticalTimeline({
             aria-pressed={level === item}
             onClick={() => changeLevel(item, currentYear())}
             className={cn(
-              "h-9 flex-1 rounded-md text-sm font-medium transition-colors",
+              "rounded-control h-9 flex-1 text-sm font-medium transition-colors",
               FOCUS_RING,
               level === item
                 ? "bg-white/15 text-white"
@@ -262,7 +262,7 @@ function VerticalCard({
       href={event.href}
       title={eventTitle(event)}
       className={cn(
-        "flex items-center gap-3 rounded-lg p-1.5 pr-3 transition-[filter] active:brightness-125",
+        "rounded-card flex items-center gap-3 p-1.5 pr-3 transition-[filter] active:brightness-125",
         KIND_CARD_CLASS[event.kind],
         attended > 0 && ATTENDED_CLASS,
         event.upcoming && UPCOMING_CLASS,

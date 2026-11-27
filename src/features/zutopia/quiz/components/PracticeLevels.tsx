@@ -46,7 +46,7 @@ function LevelBars({ level, total }: { level: number; total: number }) {
         <span
           key={index}
           className={cn(
-            "w-1.5 rounded-[1px]",
+            "rounded-tag w-1.5",
             index < level ? "bg-ztmy-pink/70" : "bg-white/15",
           )}
           style={{ height: `${((index + 1) / total) * 100}%` }}

@@ -52,7 +52,7 @@ export function ZutopiaHubCard({
       <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-transparent" />
 
       {!isReady && (
-        <span className="tablet:top-4 tablet:left-4 absolute top-3 left-3 rounded border border-white/20 bg-black/50 px-1.5 py-0.5 text-xs leading-none font-semibold text-white/70">
+        <span className="tablet:top-4 tablet:left-4 rounded-tag absolute top-3 left-3 border border-white/20 bg-black/50 px-1.5 py-0.5 text-xs leading-none font-semibold text-white/70">
           준비 중
         </span>
       )}
@@ -76,7 +76,7 @@ export function ZutopiaHubCard({
   );
 
   const baseClass = cn(
-    "group relative block aspect-square overflow-hidden rounded-xl border border-white/10 bg-black/30",
+    "group relative block aspect-square overflow-hidden rounded-card border border-white/10 bg-black/30",
     "shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
   );
 

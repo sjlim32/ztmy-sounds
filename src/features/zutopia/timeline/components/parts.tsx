@@ -73,7 +73,7 @@ export function EventCard({
       href={event.href}
       title={eventTitle(event)}
       className={cn(
-        "flex items-center gap-2.5 rounded-lg p-1.5 pr-3 shadow-[0_4px_14px_rgba(0,0,0,0.45)] transition-[filter] hover:brightness-125",
+        "rounded-card flex items-center gap-2.5 p-1.5 pr-3 shadow-[0_4px_14px_rgba(0,0,0,0.45)] transition-[filter] hover:brightness-125",
         KIND_CARD_CLASS[event.kind],
         attended > 0 && ATTENDED_CLASS,
         event.upcoming && UPCOMING_CLASS,

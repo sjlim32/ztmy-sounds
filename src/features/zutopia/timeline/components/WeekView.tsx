@@ -151,7 +151,7 @@ export function WeekView({
             <span
               aria-hidden
               className={cn(
-                "block h-1.5 rounded-sm",
+                "rounded-tag block h-1.5",
                 barWidth > 0 && "bg-ztmy-purple",
               )}
               style={{ width: barWidth, marginLeft: 2 }}

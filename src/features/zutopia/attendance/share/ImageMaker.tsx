@@ -121,7 +121,7 @@ export function ImageMaker({ summary }: { summary: AttendanceSummary }) {
           maxLength={NICKNAME_MAX_LENGTH}
           onChange={(event) => setNickname(event.target.value)}
           placeholder="나의"
-          className="focus-visible:outline-ztmy-magenta h-11 rounded-md border border-white/15 bg-black/30 px-3 text-base text-white placeholder:text-white/35 focus-visible:outline-2"
+          className="focus-visible:outline-ztmy-magenta rounded-control h-11 border border-white/15 bg-black/30 px-3 text-base text-white placeholder:text-white/35 focus-visible:outline-2"
         />
       </label>
       <p className="text-sm text-white/60">
@@ -232,7 +232,7 @@ function ResultView({
       <img
         src={result.url}
         alt="참전 기록 이미지"
-        className="aspect-square w-full rounded-md object-contain"
+        className="rounded-card aspect-square w-full object-contain"
       />
       {touch && (
         <p className="text-sm text-white/60">

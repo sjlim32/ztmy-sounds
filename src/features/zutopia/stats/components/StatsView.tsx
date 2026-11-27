@@ -235,7 +235,7 @@ export function StatsView({
         </div>
         {/* 1위의 연도별 흐름 — 카드 높이를 흔들지 않게 카드 대신 여기에 */}
         {shown?.trend && shown.rows[0] && (
-          <div className="mb-4 rounded-lg border border-white/10 p-3">
+          <div className="rounded-card mb-4 border border-white/10 p-3">
             <TrendBars trend={shown.trend} subject={shown.rows[0].name} />
           </div>
         )}
@@ -271,10 +271,10 @@ function SummaryRow({
           {item.ratio != null && (
             <span
               role="presentation"
-              className="bg-ztmy-pink/20 mt-1 h-2 overflow-hidden rounded-full"
+              className="bg-ztmy-pink/20 rounded-tag mt-1 h-2 overflow-hidden"
             >
               <span
-                className="bg-ztmy-pink block h-full rounded-full"
+                className="bg-ztmy-pink rounded-tag block h-full"
                 style={{ width: `${Math.round(item.ratio * 100)}%` }}
               />
             </span>
@@ -287,7 +287,7 @@ function SummaryRow({
               type="button"
               onClick={onOpenMissing}
               className={cn(
-                "mt-auto self-start rounded-sm pt-1 text-sm text-white/75 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white",
+                "rounded-control mt-auto self-start pt-1 text-sm text-white/75 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white",
                 FOCUS_RING,
               )}
             >
@@ -349,13 +349,13 @@ function RecordCard({
                 <ThumbImage
                   src={leader.image}
                   displayWidth={64}
-                  className="size-14 shrink-0 rounded-md bg-black/40 object-cover"
+                  className="rounded-card size-14 shrink-0 bg-black/40 object-cover"
                 />
               ) : (
                 // 그림이 없어도 같은 자리를 차지해 이름 줄 높이가 같다.
                 <span
                   aria-hidden
-                  className="size-14 shrink-0 rounded-md bg-white/[0.04]"
+                  className="rounded-card size-14 shrink-0 bg-white/[0.04]"
                 />
               )}
               <div className="min-w-0 flex-1">
@@ -403,13 +403,13 @@ function RecordCard({
               <span
                 aria-hidden
                 className={cn(
-                  "ml-8 h-1 overflow-hidden rounded-full",
+                  "rounded-tag ml-8 h-1 overflow-hidden",
                   scale && "bg-white/[0.06]",
                 )}
               >
                 {scale && (
                   <span
-                    className="bg-ztmy-pink/70 block h-full rounded-full"
+                    className="bg-ztmy-pink/70 rounded-tag block h-full"
                     style={{ width: `${scale[index] * 100}%` }}
                   />
                 )}
@@ -521,8 +521,8 @@ function Figure({ cell }: { cell: StatCell }) {
 }
 
 /**
- * 1위의 연도별 미니 막대(전체 순위 창 위쪽) — 한 가지 색(분홍) 세로 막대, 막대 사이 2px, 위 끝만
- * 둥글게. 위 줄엔 평소 가장 많았던 해를, 막대에 마우스를 올리거나 누르면
+ * 1위의 연도별 미니 막대(전체 순위 창 위쪽) — 한 가지 색(분홍) 세로 막대, 막대 사이 2px, 끝은
+ * 각지게(rounded-t-tag). 위 줄엔 평소 가장 많았던 해를, 막대에 마우스를 올리거나 누르면
  * 그 해 값을 보여 준다. 가로축은 첫 해·마지막 해만 글자로. 화면 읽기 프로그램엔
  * 해마다 값을 목록으로 읽어 준다(sr-only).
  */
@@ -575,7 +575,7 @@ function TrendBars({
           >
             <span
               className={cn(
-                "block w-full rounded-t-[4px] transition-opacity",
+                "rounded-t-tag block w-full transition-opacity",
                 point.value === 0 ? "bg-white/10" : "bg-ztmy-pink",
                 active != null && active !== index && "opacity-50",
                 highlightIndex >= 0 &&
@@ -625,7 +625,7 @@ function RowName({ row, className }: { row: StatRow; className?: string }) {
       title={row.name}
       className={cn(
         base,
-        "rounded-sm transition-colors hover:text-white hover:underline hover:decoration-white/40 hover:underline-offset-4",
+        "rounded-control transition-colors hover:text-white hover:underline hover:decoration-white/40 hover:underline-offset-4",
         FOCUS_RING,
       )}
     >
@@ -661,7 +661,7 @@ function FullTable({ record }: { record: StatRecord }) {
             setAttempt((value) => value + 1);
           }}
           className={cn(
-            "rounded text-white underline decoration-white/40 underline-offset-4",
+            "rounded-control text-white underline decoration-white/40 underline-offset-4",
             FOCUS_RING,
           )}
         >
@@ -691,7 +691,7 @@ function CellText({ cell }: { cell: StatCell }) {
         <Link
           href={cell.href}
           className={cn(
-            "block rounded-sm transition-colors hover:text-white hover:underline hover:decoration-white/40 hover:underline-offset-4",
+            "rounded-control block transition-colors hover:text-white hover:underline hover:decoration-white/40 hover:underline-offset-4",
             FOCUS_RING,
           )}
         >
@@ -753,7 +753,7 @@ function RecordTable({
             placeholder="이름으로 찾기"
             className={cn(
               // 모바일 Safari 확대를 막으려고 text-base 이상.
-              "h-11 w-full rounded-lg border border-white/15 bg-black/40 pr-3 pl-10 text-base text-white transition-colors placeholder:text-white/45 hover:border-white/30",
+              "rounded-control h-11 w-full border border-white/15 bg-black/40 pr-3 pl-10 text-base text-white transition-colors placeholder:text-white/45 hover:border-white/30",
               "focus:border-ztmy-magenta/70 focus:ring-ztmy-magenta/15 focus:ring-4 focus:outline-none",
             )}
           />
@@ -896,7 +896,7 @@ function RowHead({ row }: { row: StatRow }) {
         <ThumbImage
           src={row.image}
           displayWidth={32}
-          className="size-8 shrink-0 rounded bg-black/40 object-cover"
+          className="rounded-card size-8 shrink-0 bg-black/40 object-cover"
         />
       )}
       <span className="min-w-0">
@@ -940,7 +940,7 @@ function SortButton({
         chip
           ? cn(FILTER_CHIP_CLASS, active && ACTIVE_FILTER_CHIP_CLASS)
           : cn(
-              "-mx-1 inline-flex items-center gap-1 rounded px-1 py-1 transition-colors hover:text-white",
+              "rounded-control -mx-1 inline-flex items-center gap-1 px-1 py-1 transition-colors hover:text-white",
               active && "text-white",
               FOCUS_RING,
             ),

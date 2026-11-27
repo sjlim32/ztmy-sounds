@@ -122,7 +122,7 @@ function hasClap(text: LyricText): boolean {
 // 응원 단어(또는 강조 단어가 없는 응원 줄 전체) 표시 — 발음 줄은 따라
 // 부를 기준이라 응원 색 형광펜, 나머지(원문·번역·응원 설명)는 장식 없이
 // 응원 색 글자로만.
-const HIGHLIGHT_CLASS = "rounded-sm box-decoration-clone px-0.5 text-white";
+const HIGHLIGHT_CLASS = "rounded-tag box-decoration-clone px-0.5 text-white";
 const EMPHASIS_CLASS = "font-bold";
 
 function emphasisProps(color: string, highlight: boolean) {

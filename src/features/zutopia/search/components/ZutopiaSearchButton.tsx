@@ -30,7 +30,7 @@ export function ZutopiaSearchButton({
           검색
           <kbd
             aria-hidden
-            className="ml-1 flex h-6 min-w-6 items-center justify-center rounded border border-white/20 px-1.5 font-mono text-sm text-white/55"
+            className="rounded-tag ml-1 flex h-6 min-w-6 items-center justify-center border border-white/20 px-1.5 font-mono text-sm text-white/55"
           >
             /
           </kbd>

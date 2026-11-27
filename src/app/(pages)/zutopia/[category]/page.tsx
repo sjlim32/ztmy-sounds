@@ -73,7 +73,7 @@ async function CategoryContent({ category }: { category: ZutopiaCategory }) {
         <li key={entry.slug}>
           <Link
             href={`/zutopia/${category.slug}/${entry.slug}`}
-            className="group relative block aspect-square overflow-hidden rounded-lg bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
+            className="group rounded-card relative block aspect-square overflow-hidden bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
           >
             {entry.thumbnail ? (
               // eslint-disable-next-line @next/next/no-img-element

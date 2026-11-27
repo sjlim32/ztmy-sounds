@@ -82,7 +82,7 @@ export function SiteHeader() {
           <Link
             href="/"
             aria-label="메인으로"
-            className={cn("shrink-0 rounded-md", FOCUS_RING)}
+            className={cn("rounded-control shrink-0", FOCUS_RING)}
           >
             {/* 로고 글자가 남색이라 어두운 배경에 묻혀서 메인 Header처럼 흰
           테두리를 두른다. */}
@@ -117,7 +117,7 @@ export function SiteHeader() {
                   href={page.href}
                   aria-current={pathname === page.href ? "page" : undefined}
                   className={cn(
-                    "rounded-md text-base font-semibold whitespace-nowrap text-white transition-colors hover:text-white/70",
+                    "rounded-control text-base font-semibold whitespace-nowrap text-white transition-colors hover:text-white/70",
                     FOCUS_RING,
                   )}
                 >

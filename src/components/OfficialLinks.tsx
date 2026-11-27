@@ -23,7 +23,7 @@ export function OfficialLinks({ className }: { className?: string }) {
               rel="noopener noreferrer"
               title={name}
               className={cn(
-                "block rounded-sm opacity-80 transition-opacity hover:opacity-100",
+                "rounded-control block opacity-80 transition-opacity hover:opacity-100",
                 FOCUS_RING,
               )}
             >

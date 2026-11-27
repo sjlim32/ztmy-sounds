@@ -45,7 +45,7 @@ export function CallLegend({
     <section
       aria-label="응원 표시 안내"
       className={cn(
-        "rounded-lg border border-white/10 bg-black/40 px-4 py-3 backdrop-blur-sm",
+        "rounded-card border border-white/10 bg-black/40 px-4 py-3 backdrop-blur-sm",
         className,
       )}
     >

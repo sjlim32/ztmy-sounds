@@ -120,7 +120,7 @@ export function ZoomableImage({
     height: resolvedThumbnailHeight,
     style: { width: resolvedThumbnailWidth, height: resolvedThumbnailHeight },
     className: cn(
-      "max-tablet:h-auto! max-tablet:w-full! rounded-lg",
+      "max-tablet:h-auto! max-tablet:w-full! rounded-card",
       cropThumbnail
         ? cn("object-cover", THUMBNAIL_CROP_CLASS[thumbnailCrop])
         : "h-auto w-auto",
@@ -147,7 +147,7 @@ export function ZoomableImage({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-block cursor-zoom-in rounded-lg"
+        className="rounded-card inline-block cursor-zoom-in"
       >
         {resized ? (
           // 휴대폰에선 화면 폭 가득(max-tablet:w-full)이라 화면 폭에 맞는 후보를
@@ -211,7 +211,7 @@ export function ZoomableImage({
                   setZoomedIn((prev) => !prev);
                 }}
                 className={cn(
-                  "rounded-lg object-contain",
+                  "rounded-card object-contain",
                   isZoomedIn
                     ? "w-auto max-w-none cursor-zoom-out"
                     : "max-h-[75vh] w-auto max-w-[90vw] cursor-zoom-in",

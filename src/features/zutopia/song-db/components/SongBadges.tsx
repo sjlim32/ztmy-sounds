@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 const BADGE_CLASS = cn(
-  "shrink-0 rounded border px-1.5 py-0.5 text-xs leading-none font-semibold whitespace-nowrap text-white",
+  "shrink-0 rounded-tag border px-1.5 py-0.5 text-xs leading-none font-semibold whitespace-nowrap text-white",
   "tablet:text-sm",
 );
 

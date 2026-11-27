@@ -33,7 +33,7 @@ export function ShareButton({
         <span
           role="status"
           className={cn(
-            "absolute right-0 bottom-full z-50 mb-2 rounded-lg bg-black/85 px-3 py-1 text-sm whitespace-nowrap text-white",
+            "rounded-control absolute right-0 bottom-full z-50 mb-2 bg-black/85 px-3 py-1 text-sm whitespace-nowrap text-white",
             tooltipClassName,
           )}
         >

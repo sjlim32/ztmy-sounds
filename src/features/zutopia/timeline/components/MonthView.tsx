@@ -61,7 +61,7 @@ export function MonthView({
         <span
           key={`bar:${event.id}`}
           aria-hidden
-          className={cn("absolute z-10 h-1.5 rounded-sm", "bg-ztmy-purple")}
+          className={cn("rounded-tag absolute z-10 h-1.5", "bg-ztmy-purple")}
           style={{
             left: x(event.date),
             width: Math.max(6, x(event.endDate!) - x(event.date)),

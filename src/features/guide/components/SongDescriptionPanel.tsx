@@ -33,7 +33,7 @@ export function SongDescriptionPanel({
     <section
       aria-label="곡 설명"
       className={cn(
-        "rounded-lg border border-white/10 bg-black/40 px-4 py-3 backdrop-blur-sm",
+        "rounded-card border border-white/10 bg-black/40 px-4 py-3 backdrop-blur-sm",
         className,
       )}
     >

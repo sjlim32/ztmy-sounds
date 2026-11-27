@@ -35,7 +35,7 @@ export function SongVersionToggle({ className }: { className?: string }) {
       onClick={() => setSongVersion(isLive ? "studio" : "live")}
       className={cn(
         // 모바일은 영상 아래 한 줄에 응원 안내·오류 제보와 같이 들어가서 작게.
-        "flex h-7 shrink-0 items-center gap-1.5 rounded-lg px-1.5 text-xs whitespace-nowrap transition-colors hover:bg-white/10",
+        "rounded-control flex h-7 shrink-0 items-center gap-1.5 px-1.5 text-xs whitespace-nowrap transition-colors hover:bg-white/10",
         "tablet:h-9 tablet:gap-2 tablet:px-2.5 tablet:text-sm",
         FOCUS_RING,
         className,

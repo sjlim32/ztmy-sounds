@@ -111,7 +111,7 @@ export function TourScheduleTable({
                 type="button"
                 aria-expanded={isPastOpen}
                 onClick={() => setPastOpen((open) => !open)}
-                className="flex w-full items-center justify-center gap-1 rounded-md py-1 text-xs text-white/60 transition-colors hover:bg-white/5 hover:text-white"
+                className="rounded-control flex w-full items-center justify-center gap-1 py-1 text-xs text-white/60 transition-colors hover:bg-white/5 hover:text-white"
               >
                 지난 공연 {pastCount}회 {isPastOpen ? "접기" : "보기"}
                 <ChevronDownIcon
@@ -177,7 +177,7 @@ export function TourScheduleTable({
                   <td className="py-1.5 pr-2 break-keep text-white">
                     {show.venue}
                     {state === "next" && (
-                      <span className="bg-ztmy-pink ml-1.5 inline-block rounded-full px-1.5 py-px align-middle text-[11px] font-bold text-white">
+                      <span className="bg-ztmy-pink rounded-tag ml-1.5 inline-block px-1.5 py-px align-middle text-[11px] font-bold text-white">
                         {nextDate === today ? "오늘" : "다음 공연"}
                       </span>
                     )}

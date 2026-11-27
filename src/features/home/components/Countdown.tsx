@@ -54,13 +54,13 @@ export function Countdown({
     <div
       data-role="countdown"
       className={cn(
-        "flex w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-black/30 py-1 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
+        "rounded-card flex w-full items-center justify-center gap-3 border border-white/10 bg-black/30 py-1 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
         "tablet:gap-4 tablet:p-4",
         // 낮은 화면(700px 이하)에선 홈 왼쪽 열이 넘치지 않게 위아래를 줄인다.
         "tablet:xlow:py-2",
       )}
     >
-      {/* 위쪽 날짜/장소 티켓 스텁과 같은 chrome(둥근 어두운 박스)을 써서 한
+      {/* 위쪽 날짜/장소 티켓 스텁과 같은 chrome(각진 어두운 박스)을 써서 한
       세트처럼 보이도록 맞췄습니다. accent는 따로 띠를 얹지 않고, 이미 그
       자체로 색이 다른 물풍선/달 아이콘이 전달합니다. */}
       {accent === "away" ? (

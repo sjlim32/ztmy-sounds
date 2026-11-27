@@ -19,12 +19,12 @@ function Thumb({ src, size }: { src: string | null; size: "md" | "sm" }) {
     <ThumbImage
       src={src}
       displayWidth={size === "md" ? 48 : 36}
-      className={cn(box, "shrink-0 rounded bg-black/40 object-cover")}
+      className={cn(box, "rounded-card shrink-0 bg-black/40 object-cover")}
     />
   ) : (
     <span
       aria-hidden
-      className={cn(box, "block shrink-0 rounded bg-white/5")}
+      className={cn(box, "rounded-card block shrink-0 bg-white/5")}
     />
   );
 }
@@ -99,7 +99,7 @@ export function AttendPicker({
         type="button"
         onClick={onOpenImport}
         className={cn(
-          "self-start rounded-md text-sm text-white/80 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white",
+          "rounded-control self-start text-sm text-white/80 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white",
           FOCUS_RING,
         )}
       >
@@ -116,7 +116,7 @@ export function AttendPicker({
                 aria-expanded={open}
                 onClick={() => setOpenYears((set) => toggleIn(set, year.year))}
                 className={cn(
-                  "flex w-full items-center gap-2 rounded-md py-2.5 text-left",
+                  "rounded-control flex w-full items-center gap-2 py-2.5 text-left",
                   FOCUS_RING,
                 )}
               >
@@ -190,7 +190,7 @@ function GroupCard({
     attended.has(unit.id),
   ).length;
   return (
-    <div className="overflow-hidden rounded-lg border border-white/10">
+    <div className="rounded-card overflow-hidden border border-white/10">
       <button
         type="button"
         aria-expanded={open}

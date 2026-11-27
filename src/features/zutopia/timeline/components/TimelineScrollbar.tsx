@@ -116,7 +116,7 @@ export function TimelineScrollbar({
     <div
       ref={trackRef}
       onPointerDown={onTrackPointerDown}
-      className="relative h-9 cursor-pointer overflow-hidden rounded-lg bg-white/5 select-none"
+      className="rounded-control relative h-9 cursor-pointer overflow-hidden bg-white/5 select-none"
     >
       {marks.map((mark) => (
         <span
@@ -140,7 +140,7 @@ export function TimelineScrollbar({
           onPointerDown={onThumbPointerDown}
           onKeyDown={onKeyDown}
           className={cn(
-            "absolute top-1 bottom-1 cursor-grab rounded-md border border-white/30 bg-white/15 transition-colors hover:bg-white/25 active:cursor-grabbing",
+            "rounded-control absolute top-1 bottom-1 cursor-grab border border-white/30 bg-white/15 transition-colors hover:bg-white/25 active:cursor-grabbing",
             FOCUS_RING,
           )}
           style={{

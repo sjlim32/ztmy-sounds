@@ -416,16 +416,16 @@ export function SongListView({ songs, liveSummaries }: SongListViewProps) {
                                 "focus-visible:outline-ztmy-magenta focus-visible:outline-2 focus-visible:-outline-offset-2",
                               )}
                             >
-                              <span className="shrink-0 rounded bg-black/40">
+                              <span className="rounded-card shrink-0 bg-black/40">
                                 {coverSrc ? (
                                   <ThumbImage
                                     src={coverSrc}
                                     displayWidth={44}
-                                    className="size-11 rounded object-cover"
+                                    className="rounded-card size-11 object-cover"
                                   />
                                 ) : (
                                   <span
-                                    className="block size-11 rounded bg-white/5"
+                                    className="rounded-card block size-11 bg-white/5"
                                     aria-hidden
                                   />
                                 )}

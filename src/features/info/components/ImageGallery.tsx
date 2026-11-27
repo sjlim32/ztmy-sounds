@@ -56,7 +56,7 @@ export function ImageGallery({
                 type="button"
                 onClick={() => open(index)}
                 className={cn(
-                  "cursor-zoom-in rounded-lg",
+                  "rounded-card cursor-zoom-in",
                   isSwipe && "shrink-0 snap-center",
                   itemClassNames?.[index],
                 )}
@@ -67,7 +67,7 @@ export function ImageGallery({
                   alt={image.alt}
                   loading="lazy"
                   className={cn(
-                    "rounded-lg",
+                    "rounded-card",
                     isSwipe
                       ? // max-w-none: Preflight의 img max-width:100%가 가로 줄 안에서 폭을 눌러버림
                         cn("w-auto max-w-none", swipeHeightClassName)

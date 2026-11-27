@@ -133,7 +133,7 @@ export function AlbumDetailPanel({
                         type="button"
                         onClick={() => onGalleryIndexChange(previewIndex)}
                         aria-label={`다음 이미지로 이동: ${previewImage.alt}`}
-                        className="h-8 w-8 overflow-hidden rounded opacity-80 ring-1 ring-white/50 transition-opacity hover:opacity-100"
+                        className="rounded-card h-8 w-8 overflow-hidden opacity-80 ring-1 ring-white/50 transition-opacity hover:opacity-100"
                       >
                         <ThumbImage
                           src={previewImage.src}

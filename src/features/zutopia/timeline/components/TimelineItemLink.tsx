@@ -17,7 +17,7 @@ export function TimelineItemLink({
   style?: CSSProperties;
   children: ReactNode;
 }) {
-  const classes = cn("group rounded", FOCUS_RING, className);
+  const classes = cn("group rounded-control", FOCUS_RING, className);
   return href ? (
     <Link href={href} title={title} className={classes} style={style}>
       {children}

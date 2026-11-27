@@ -302,7 +302,7 @@ export function HorizontalTimeline({
         <div
           role="group"
           aria-label="확대 단계"
-          className="flex items-center gap-1 rounded-lg border border-white/10 bg-black/60 p-1 shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
+          className="rounded-card flex items-center gap-1 border border-white/10 bg-black/60 p-1 shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
         >
           {ZOOM_ORDER.map((item) => (
             <button
@@ -311,7 +311,7 @@ export function HorizontalTimeline({
               aria-pressed={level === item}
               onClick={() => changeLevelAtCenter(item)}
               className={cn(
-                "h-8 min-w-9 rounded-md px-2.5 text-sm font-medium transition-colors",
+                "rounded-control h-8 min-w-9 px-2.5 text-sm font-medium transition-colors",
                 FOCUS_RING,
                 level === item
                   ? "bg-white/15 text-white"
@@ -330,7 +330,7 @@ export function HorizontalTimeline({
         id={scrollerId}
         ref={scrollRef}
         className={cn(
-          "relative cursor-grab overflow-x-auto overflow-y-auto rounded-xl bg-white/[0.02] select-none data-[dragging]:cursor-grabbing",
+          "rounded-card relative cursor-grab overflow-x-auto overflow-y-auto bg-white/[0.02] select-none data-[dragging]:cursor-grabbing",
           "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         )}
         style={{ height }}
@@ -370,7 +370,7 @@ export function HorizontalTimeline({
                 )}
                 style={{ left, width: x(`${Number(year) + 1}-01-01`) - left }}
               >
-                <span className="bg-background/60 absolute top-2 left-2 z-30 rounded-md px-2 py-0.5 font-mono text-xl font-semibold tracking-wider text-white/90 backdrop-blur-sm">
+                <span className="bg-background/60 rounded-tag absolute top-2 left-2 z-30 px-2 py-0.5 font-mono text-xl font-semibold tracking-wider text-white/90 backdrop-blur-sm">
                   {year}
                 </span>
               </div>

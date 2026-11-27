@@ -14,7 +14,7 @@ export function AutoScrollToggle({ className }: { className?: string }) {
       aria-pressed={autoScroll}
       title="자동 스크롤"
       className={cn(
-        "flex items-center gap-2 rounded-full bg-black/40 py-1.5 pr-1.5 pl-3 backdrop-blur-sm transition-colors hover:bg-black/60 focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+        "rounded-control flex items-center gap-2 bg-black/40 py-1.5 pr-1.5 pl-3 backdrop-blur-sm transition-colors hover:bg-black/60 focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
         className,
       )}
     >

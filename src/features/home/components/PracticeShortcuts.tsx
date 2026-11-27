@@ -50,7 +50,7 @@ function PracticeShortcutsComponent({
       <section
         aria-label="바로 연습하기"
         className={cn(
-          "flex w-64 flex-col gap-1 rounded-lg border border-white/15 bg-black/45 p-2 shadow-[0_8px_32px_rgba(0,0,0,0.45)] backdrop-blur-md",
+          "rounded-card flex w-64 flex-col gap-1 border border-white/15 bg-black/45 p-2 shadow-[0_8px_32px_rgba(0,0,0,0.45)] backdrop-blur-md",
           // 화면 높이가 모자라면 카드가 줄어들고 카드 안 전체(묶음 제목 포함)가
           // 스크롤된다. 곡이 두 줄쯤은 보이도록 최소 높이를 둔다.
           "min-h-36 overflow-y-auto overscroll-contain",
@@ -148,10 +148,10 @@ function CoverRow({
           <ThumbImage
             src={song.cover}
             displayWidth={40}
-            className="h-10 w-10 rounded-md object-cover shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+            className="rounded-card h-10 w-10 object-cover shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
           />
         ) : (
-          <span className="block h-10 w-10 rounded-md bg-white/10" />
+          <span className="rounded-card block h-10 w-10 bg-white/10" />
         )}
         {isContinue && (
           <span className="bg-ztmy-magenta absolute -right-1 -bottom-1 flex h-4.5 w-4.5 items-center justify-center rounded-full ring-2 ring-black/60">

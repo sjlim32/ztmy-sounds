@@ -125,7 +125,7 @@ export function SongDetailPanel({
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-              "border-ztmy-purple/40 bg-ztmy-purple/15 hover:bg-ztmy-purple/25 mt-3 flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold text-white transition-colors",
+              "border-ztmy-purple/40 bg-ztmy-purple/15 hover:bg-ztmy-purple/25 rounded-control mt-3 flex items-center justify-center gap-2 border px-4 py-2.5 text-sm font-semibold text-white transition-colors",
               "tablet:text-base",
             )}
           >
@@ -153,7 +153,7 @@ export function SongDetailPanel({
               );
             }
             return (
-              <div className="mt-3 aspect-video w-full overflow-hidden rounded-lg">
+              <div className="rounded-card mt-3 aspect-video w-full overflow-hidden">
                 <iframe
                   src={embedUrl}
                   title={`${song.title} 뮤직비디오`}
@@ -205,7 +205,7 @@ function AlbumList({
                 <Link
                   href={`/zutopia/albums?album=${album.slug}`}
                   className={cn(
-                    "flex items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-white/5",
+                    "rounded-control flex items-center gap-3 px-2 py-2 transition-colors hover:bg-white/5",
                     "focus-visible:outline-ztmy-magenta focus-visible:outline-2",
                   )}
                 >
@@ -213,12 +213,12 @@ function AlbumList({
                     <ThumbImage
                       src={album.cover_image_url}
                       displayWidth={44}
-                      className="size-11 shrink-0 rounded bg-black/40 object-cover"
+                      className="rounded-card size-11 shrink-0 bg-black/40 object-cover"
                     />
                   ) : (
                     <span
                       aria-hidden
-                      className="block size-11 shrink-0 rounded bg-white/5"
+                      className="rounded-card block size-11 shrink-0 bg-white/5"
                     />
                   )}
                   <span className="min-w-0 flex-1">

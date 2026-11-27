@@ -118,7 +118,7 @@ function NextEventCardComponent({
           className={cn(
             "group cursor-pointer",
             isDone ? "tablet:flex hidden" : "flex",
-            "h-10 w-full items-center justify-center gap-1.5 rounded-t-md bg-black/40 font-mono text-xs tracking-[0.3em] text-white/70 uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] transition-colors duration-300 hover:bg-black/55 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+            "rounded-t-card h-10 w-full items-center justify-center gap-1.5 bg-black/40 font-mono text-xs tracking-[0.3em] text-white/70 uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] transition-colors duration-300 hover:bg-black/55 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
             "tablet:h-auto tablet:bg-transparent tablet:justify-start tablet:text-sm tablet:hover:bg-transparent tablet:font-semibold",
           )}
         >
@@ -142,7 +142,7 @@ function NextEventCardComponent({
             id={contentId}
             inert={!isOpen}
             className={cn(
-              "grid rounded-b-md bg-black/40 transition-[grid-template-rows] duration-300 ease-out",
+              "rounded-b-card grid bg-black/40 transition-[grid-template-rows] duration-300 ease-out",
               isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
               "tablet:bg-transparent",
             )}
@@ -214,8 +214,8 @@ function BoardingTicket({
   return (
     <div
       className={cn(
-        // 위는 각지게(색 띠가 붙는 쪽), 아래만 둥글게.
-        "relative flex flex-col gap-2.5 overflow-hidden rounded-b-lg border border-white/10 bg-black/45 bg-linear-to-br to-transparent p-3 shadow-[0_4px_16px_rgba(0,0,0,0.45)] backdrop-blur-sm",
+        // 위아래 모두 각지게(rounded-card) — 위에 색 띠가 붙는다.
+        "rounded-card relative flex flex-col gap-2.5 overflow-hidden border border-white/10 bg-black/45 bg-linear-to-br to-transparent p-3 shadow-[0_4px_16px_rgba(0,0,0,0.45)] backdrop-blur-sm",
         accentTint[event.accent],
         className,
       )}

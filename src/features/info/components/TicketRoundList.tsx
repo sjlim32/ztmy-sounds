@@ -55,7 +55,7 @@ export function TicketRoundList({ nowMs }: { nowMs: number }) {
           <li
             key={round.id}
             className={cn(
-              "flex flex-col gap-1 rounded-lg border px-3 py-2",
+              "rounded-card flex flex-col gap-1 border px-3 py-2",
               isApplying &&
                 "border-ztmy-pink/50 bg-ztmy-pink/10 ring-ztmy-pink/40 ring-1",
               isPayment && "border-ztmy-sun/50 bg-ztmy-sun/10",
@@ -69,7 +69,7 @@ export function TicketRoundList({ nowMs }: { nowMs: number }) {
               </span>
               <span
                 className={cn(
-                  "shrink-0 rounded-full px-2 py-0.5 text-xs font-bold",
+                  "rounded-tag shrink-0 px-2 py-0.5 text-xs font-bold",
                   isApplying && "bg-ztmy-pink text-white",
                   isPayment && "bg-ztmy-sun text-black",
                   !isApplying &&

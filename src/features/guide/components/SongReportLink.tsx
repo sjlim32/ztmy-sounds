@@ -36,8 +36,8 @@ export function SongReportLink({
         "inline-flex items-center transition-colors",
         FOCUS_RING,
         variant === "floating"
-          ? "h-8 gap-1.5 rounded-lg bg-black/40 px-3 text-sm font-medium text-white/80 backdrop-blur-sm hover:bg-black/60 hover:text-white"
-          : "h-8 w-8 justify-center rounded-lg text-white/60 hover:bg-white/10 hover:text-white",
+          ? "rounded-control h-8 gap-1.5 bg-black/40 px-3 text-sm font-medium text-white/80 backdrop-blur-sm hover:bg-black/60 hover:text-white"
+          : "rounded-control h-8 w-8 justify-center text-white/60 hover:bg-white/10 hover:text-white",
         className,
       )}
     >

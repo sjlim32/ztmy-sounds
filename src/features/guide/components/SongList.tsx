@@ -36,10 +36,10 @@ const wrapperStyles = cva(
       // 좌우 여백은 래퍼에 두지 않는다 — 곡 항목의 hover·선택 면이 패널
       // 좌우 끝까지 꽉 차도록(글자 여백은 Link의 px-4). 위아래는 곡이
       // 선택되면 제목 한 줄만 남으므로 여백 없이 배경이 딱 맞게 밀착되도록.
-      // 목록 패널만 모서리를 둥글게 — 곡 상세의 제목 칸은 각지게.
+      // 목록 패널은 카드 모서리(rounded-card), 곡 상세의 제목 칸은 모서리 없이.
       compact: {
         true: "mb-3",
-        false: "tablet:flex-[0_1_auto] tablet:rounded-lg tablet:py-3",
+        false: "tablet:flex-[0_1_auto] tablet:rounded-card tablet:py-3",
       },
     },
   },
@@ -231,7 +231,7 @@ export function SongList({ selectedSongId, visible }: SongListProps) {
                                   // 글꼴의 글자가 아래로 치우쳐 보여서, 높이를
                                   // 19px로 고정하고 아래만 1px 띄워 글자를
                                   // 배지 세로 가운데에 맞춘다(실측 차이 0.5px 이내).
-                                  "inline-flex h-4.75 items-center rounded px-1.5 pb-px text-xs leading-none font-bold",
+                                  "rounded-tag inline-flex h-4.75 items-center px-1.5 pb-px text-xs leading-none font-bold",
                                   item.importance === "essential"
                                     ? "bg-ztmy-magenta/30 text-ztmy-pink"
                                     : "bg-white/10 text-white/70",

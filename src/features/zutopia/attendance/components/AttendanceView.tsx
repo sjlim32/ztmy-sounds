@@ -51,7 +51,7 @@ const TONE_CLASS = {
   plain: SOFT_BUTTON_CLASS,
   pink: SOFT_PRIMARY_BUTTON_CLASS,
   purple: SOFT_PURPLE_BUTTON_CLASS,
-  link: `inline-flex items-center rounded text-sm font-medium whitespace-nowrap text-white/80 underline decoration-white/35 underline-offset-4 transition-colors hover:text-white hover:decoration-white disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING}`,
+  link: `inline-flex items-center rounded-control text-sm font-medium whitespace-nowrap text-white/80 underline decoration-white/35 underline-offset-4 transition-colors hover:text-white hover:decoration-white disabled:pointer-events-none disabled:opacity-40 ${FOCUS_RING}`,
 };
 /** 열려 있으면 한 단계 진하게(링크는 글자·밑줄을 흰색으로). */
 const ACTIVE_TONE_CLASS = {
@@ -235,7 +235,7 @@ export function AttendanceView({
         className={cn(
           "relative z-10 flex flex-col gap-3",
           "tablet:flex-row tablet:flex-wrap tablet:items-center tablet:gap-x-5 tablet:px-4 tablet:py-2.5",
-          "tablet:rounded-lg tablet:border tablet:border-white/10 tablet:bg-black/60 tablet:shadow-[0_4px_16px_rgba(0,0,0,0.4)] tablet:backdrop-blur-md",
+          "tablet:rounded-card tablet:border tablet:border-white/10 tablet:bg-black/60 tablet:shadow-[0_4px_16px_rgba(0,0,0,0.4)] tablet:backdrop-blur-md",
         )}
       >
         <dl
@@ -326,7 +326,7 @@ export function AttendanceView({
 
       {/* 알림 줄 — 앱 안 브라우저 경고, 불러오기 되돌리기, 백업 안내(하나씩) */}
       {inApp ? (
-        <p className="rounded-lg bg-black/60 px-3 py-2.5 text-sm text-white/80">
+        <p className="rounded-card bg-black/60 px-3 py-2.5 text-sm text-white/80">
           {inApp} 안에서 열린 페이지예요. 여기서 체크한 기록은 {inApp} 안에만
           남아요.{" "}
           {openExternalUrl(
@@ -346,7 +346,7 @@ export function AttendanceView({
       ) : undo ? (
         <p
           role="status"
-          className="rounded-lg bg-black/60 px-3 py-2.5 text-sm text-white/80"
+          className="rounded-card bg-black/60 px-3 py-2.5 text-sm text-white/80"
         >
           {undo.text}{" "}
           <button
@@ -356,7 +356,7 @@ export function AttendanceView({
               setUndo(null);
             }}
             className={cn(
-              "rounded text-white underline decoration-white/40 underline-offset-4",
+              "rounded-control text-white underline decoration-white/40 underline-offset-4",
               FOCUS_RING,
             )}
           >
@@ -372,7 +372,7 @@ export function AttendanceView({
               type="button"
               onClick={() => setPanel("share")}
               className={cn(
-                "rounded text-white/85 underline decoration-white/30 underline-offset-4 hover:text-white",
+                "rounded-control text-white/85 underline decoration-white/30 underline-offset-4 hover:text-white",
                 FOCUS_RING,
               )}
             >

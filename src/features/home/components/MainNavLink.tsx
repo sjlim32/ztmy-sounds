@@ -77,7 +77,7 @@ function MainNavLinkComponent({
     <Link
       href={href}
       className={cn(
-        "group flex items-center gap-3 rounded-lg border border-white/10 bg-black/45 px-4 py-1.5 transition-colors hover:bg-black/55 focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+        "group rounded-control flex items-center gap-3 border border-white/10 bg-black/45 px-4 py-1.5 transition-colors hover:bg-black/55 focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
         "tablet:px-4 tablet:py-2 tablet:min-w-48 tablet:border-0 tablet:bg-transparent tablet:hover:bg-transparent",
       )}
     >

@@ -77,7 +77,7 @@ function ExternalRow({
       rel="noopener noreferrer"
       aria-disabled={disabled || undefined}
       className={cn(
-        "flex items-center justify-between gap-2 rounded-lg border px-3 py-2 font-medium transition-colors",
+        "rounded-control flex items-center justify-between gap-2 border px-3 py-2 font-medium transition-colors",
         FOCUS_RING,
         accent
           ? "border-ztmy-pink/40 bg-ztmy-pink/10 hover:border-ztmy-pink/70 hover:bg-ztmy-pink/20 text-white"

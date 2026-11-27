@@ -34,7 +34,7 @@ export function ScheduleTimeline({
             key={`${item.start}-${item.label}`}
             aria-current={state === "now" ? "time" : undefined}
             className={cn(
-              "flex items-baseline gap-2 rounded-md px-2 py-1.5",
+              "rounded-control flex items-baseline gap-2 px-2 py-1.5",
               state === "now" && "ring-ztmy-magenta/60 bg-white/10 ring-1",
               state === "past" && "opacity-45",
             )}
@@ -45,7 +45,7 @@ export function ScheduleTimeline({
             </span>
             <span
               className={cn(
-                "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold",
+                "rounded-tag shrink-0 px-2 py-0.5 text-[11px] font-bold",
                 KIND_CHIP[item.kind],
               )}
             >
@@ -55,12 +55,12 @@ export function ScheduleTimeline({
               {item.label}
             </span>
             {state === "now" && (
-              <span className="bg-ztmy-magenta shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold text-white">
+              <span className="bg-ztmy-magenta rounded-tag shrink-0 px-2 py-0.5 text-[11px] font-bold text-white">
                 지금
               </span>
             )}
             {isNext && (
-              <span className="shrink-0 rounded-full border border-white/40 px-2 py-0.5 text-[11px] font-bold text-white/80">
+              <span className="rounded-tag shrink-0 border border-white/40 px-2 py-0.5 text-[11px] font-bold text-white/80">
                 다음
               </span>
             )}

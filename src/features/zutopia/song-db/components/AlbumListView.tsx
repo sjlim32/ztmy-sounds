@@ -210,7 +210,7 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
                           displayWidth={256}
                           alt={album.title}
                           className={cn(
-                            "h-28 w-28 rounded object-cover shadow-lg ring-1 ring-white/10",
+                            "rounded-card h-28 w-28 object-cover shadow-lg ring-1 ring-white/10",
                             "transition-shadow duration-500 ease-in-out",
                             "tablet:h-44 tablet:w-44",
                             "pc:h-64 pc:w-64",
@@ -222,7 +222,7 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
                       ) : (
                         <div
                           className={cn(
-                            "h-28 w-28 rounded bg-white/5 ring-1 ring-white/10",
+                            "rounded-card h-28 w-28 bg-white/5 ring-1 ring-white/10",
                             "tablet:h-44 tablet:w-44",
                             "pc:h-64 pc:w-64",
                           )}
@@ -232,7 +232,7 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
                       <span
                         className={cn(
                           "pointer-events-none absolute top-full left-1/2 z-10 mt-3 flex w-max max-w-60 -translate-x-1/2 translate-y-1 flex-col items-center opacity-0",
-                          "rounded-lg bg-black/85 px-3 py-1.5 text-xs text-white",
+                          "rounded-control bg-black/85 px-3 py-1.5 text-xs text-white",
                           "tablet:text-sm",
                           "transition-[opacity,transform] duration-300 ease-out",
                           // 모바일엔 hover가 없어 터치 중(group-active)
