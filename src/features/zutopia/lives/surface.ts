@@ -16,7 +16,7 @@ export const LIVE_SECTION_TITLE_SHADOW =
  * 계열 글자. 높이를 20px로 고정해 줄마다 같은 크기로 선다.
  */
 export const LIVE_TAG_CLASS =
-  "inline-flex h-5 shrink-0 items-center rounded px-1.5 text-xs leading-none font-bold whitespace-nowrap";
+  "inline-flex h-5 shrink-0 items-center rounded-tag px-1.5 text-xs leading-none font-bold whitespace-nowrap";
 
 export const LIVE_TAG_TONE = {
   /** 선택곡 — 선택곡 줄은 행도 옅은 하늘색이라 면을 조금 더 진하게. */

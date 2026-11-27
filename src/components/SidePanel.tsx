@@ -78,8 +78,8 @@ export function SidePanel({
         tabIndex={-1}
         className={cn(
           "focus:outline-none",
-          "bg-background flex max-h-[85dvh] w-full flex-col rounded-t-xl border-t border-white/15 shadow-[0_-8px_32px_rgba(0,0,0,0.5)]",
-          "tablet:max-h-none tablet:rounded-none tablet:border-t-0 tablet:border-l",
+          "bg-background flex max-h-[85dvh] w-full flex-col rounded-t-card border-t border-white/15 shadow-[0_-8px_32px_rgba(0,0,0,0.5)]",
+          "tablet:max-h-none tablet:border-t-0 tablet:border-l",
           size === "wide"
             ? "tablet:w-xl pc:w-176 wide:w-208"
             : "tablet:w-136 pc:w-160",

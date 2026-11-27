@@ -74,7 +74,7 @@ export function DefaultLiveContent({ live }: { live: LiveDetail }) {
             loading="eager"
             alt={live.title}
             className={cn(
-              "max-h-[60vh] max-w-full rounded-lg object-contain",
+              "max-h-[60vh] max-w-full rounded-card object-contain",
               "tablet:max-h-[65vh]",
             )}
           />

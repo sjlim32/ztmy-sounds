@@ -35,6 +35,13 @@
   --breakpoint-tablet: 50rem; /* 800px */
   --breakpoint-pc: 67.5rem; /* 1080px */
   --breakpoint-wide: 90rem; /* 1440px */
+
+  /* 반지름 — 각진 디자인. 카드·패널·시트·그림·목록 상자는 rounded-card(0), 누르는
+     요소(버튼·칩·고르기 상자·고른 줄·툴팁)는 rounded-control(2px), 태그·도장은
+     rounded-tag(0). 원 모양(점·스크롤바·동그란 아이콘)만 rounded-full. */
+  --radius-card: 0;
+  --radius-control: 0.125rem; /* 2px */
+  --radius-tag: 0;
 }
 
 /* 모바일에서 NavButton 및 NextVisit 레이아웃 정렬용 (680px 이하에선 flex 적용) */

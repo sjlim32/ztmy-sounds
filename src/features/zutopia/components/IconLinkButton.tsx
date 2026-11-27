@@ -78,7 +78,7 @@ export function IconLinkButton({
   const linkClass = cn(
     "inline-flex items-center justify-center transition-all duration-200",
     "focus-visible:outline-ztmy-magenta focus-visible:outline-2 focus-visible:outline-offset-2",
-    "rounded-md",
+    "rounded-control",
     sizing.square,
     colorClass,
   );
@@ -102,7 +102,7 @@ export function IconLinkButton({
           // 아이콘이 행 우측 끝에 있어 중앙 정렬(left-1/2)하면 뷰포트
           // 밖으로 넘어가 잘린다 — 아이콘 오른쪽 끝(right-0)에 맞춰 왼쪽
           // 으로만 펼친다.
-          "pointer-events-none absolute right-0 bottom-full z-50 mb-1.5 translate-y-1 rounded-md bg-black/90 px-2.5 py-1.5 text-sm whitespace-nowrap text-white opacity-0 shadow-lg",
+          "pointer-events-none absolute right-0 bottom-full z-50 mb-1.5 translate-y-1 rounded-control bg-black/90 px-2.5 py-1.5 text-sm whitespace-nowrap text-white opacity-0 shadow-lg",
           "transition-[opacity,transform] duration-150",
           "group-active/tip:translate-y-0 group-active/tip:opacity-100",
           "group-focus-within/tip:translate-y-0 group-focus-within/tip:opacity-100",

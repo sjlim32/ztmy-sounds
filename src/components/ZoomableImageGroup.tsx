@@ -210,7 +210,7 @@ export function ZoomableImageGroup({
               triggerRef.current = event.currentTarget;
               setOpenIndex(index);
             }}
-            className="inline-block cursor-zoom-in rounded-lg"
+            className="inline-block cursor-zoom-in rounded-card"
           >
             {/* 원본(포스터·지도 수백 KB) 대신 줄인 이미지 — 크롭(object-cover)하면
                 가로로 긴 그림은 칸보다 넓게 그려지므로 긴 변의 4배 폭으로 받는다(위 thumbnailRequestWidth). */}
@@ -226,7 +226,7 @@ export function ZoomableImageGroup({
                 height: resolvedThumbnailHeight,
               }}
               className={cn(
-                "rounded-lg",
+                "rounded-card",
                 cropThumbnail
                   ? cn("object-cover", THUMBNAIL_CROP_CLASS[thumbnailCrop])
                   : "h-auto w-auto",
@@ -349,7 +349,7 @@ export function ZoomableImageGroup({
                 // 부모(다이얼로그)의 overflow-auto가 실제로 스크롤하도록
                 // 네이티브 터치/휠 처리를 그대로 둔다.
                 style={{ touchAction: isZoomedIn ? "auto" : "none" }}
-                className="block rounded-lg border-0 bg-transparent p-0"
+                className="block rounded-card border-0 bg-transparent p-0"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- width/height가 없으면 이미지 자체의 크기를 그대로 써야 해서 next/image의 필수 width/height 제약을 피함 (어차피 output:export라 next/image 최적화는 꺼져있음) */}
                 <img
@@ -358,7 +358,7 @@ export function ZoomableImageGroup({
                   width={current.width}
                   height={current.height}
                   className={cn(
-                    "rounded-lg object-contain",
+                    "rounded-card object-contain",
                     isZoomedIn
                       ? "w-auto max-w-none cursor-zoom-out"
                       : "tablet:max-w-[90vw] max-h-[75vh] w-auto max-w-[50vw] cursor-zoom-in",
@@ -402,7 +402,7 @@ export function ZoomableImageGroup({
                           setOpenIndex(previewIndex);
                         }}
                         aria-label={`다음 이미지로 이동: ${previewImage.alt}`}
-                        className="overflow-hidden rounded-md opacity-60 ring-1 ring-white/20 transition-opacity hover:opacity-100"
+                        className="overflow-hidden rounded-card opacity-60 ring-1 ring-white/20 transition-opacity hover:opacity-100"
                       >
                         <ThumbImage
                           src={previewImage.src}
