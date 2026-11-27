@@ -616,29 +616,29 @@ function LiveCard({ entry, href, onClick }: LiveItemProps) {
         </div>
       </ViewTransition>
 
-      {/* 글자는 그림 아래에 세 줄로만 — 원제, 한글 제목, 날짜·도시.
-      겹쳐 놓으면 포스터 무늬에 묻혀 잘 안 읽힌다. */}
+      {/* 글자는 그림 아래에 세 줄로만 — 한국어 제목(가장 굵게, 두 줄까지), 원제(흐리게),
+      날짜·도시. 겹쳐 놓으면 포스터 무늬에 묻혀 잘 안 읽힌다. */}
       <div className="flex min-w-0 flex-col gap-0.5 px-0.5">
         <span
           className={cn(
-            "truncate text-xs font-semibold transition-colors",
-            "tablet:text-sm",
+            "line-clamp-2 text-sm leading-snug font-semibold break-keep transition-colors",
+            "tablet:text-base",
             canceled
               ? CANCELED_TEXT_CLASS
               : "group-hover:text-ztmy-pink text-white",
           )}
         >
-          {entry.name}
+          {entry.label}
         </span>
         {entry.label !== entry.name && (
           <span
             className={cn(
               "truncate text-xs",
               "tablet:text-sm",
-              canceled ? CANCELED_TEXT_CLASS : "text-white/70",
+              canceled ? CANCELED_TEXT_CLASS : "text-white/55",
             )}
           >
-            {entry.label}
+            {entry.name}
           </span>
         )}
         {/* 날짜는 숫자 폭을 맞춰 또렷하게, 도시는 자리가 모자라면
