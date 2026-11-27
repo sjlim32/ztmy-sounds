@@ -31,7 +31,7 @@ export function TourPoster({
           onClick={() => open(0)}
           aria-label={`${alt} 포스터 크게 보기`}
           className={cn(
-            "relative block aspect-[3/4] w-21 shrink-0 cursor-zoom-in overflow-hidden rounded-card bg-white/5",
+            "rounded-card relative block aspect-[3/4] w-21 shrink-0 cursor-zoom-in overflow-hidden bg-white/5",
             "pc:w-24",
             FOCUS_RING,
           )}

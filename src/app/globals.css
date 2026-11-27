@@ -54,6 +54,13 @@
 }
 
 /* 모바일에서 NavButton 및 NextVisit 레이아웃 정렬용 (680px 이하에선 flex 적용) */
+/* 카드 면 — 배경 그림 위에서 글자가 읽히게 어두운 면(검정 55%) + 흐림 + 그림자. 구역마다
+   카드 하나에만 쓴다(안의 묶음은 여백·구분선으로). 한 줄씩 덮어쓰는 클래스(테두리 색 등)가
+   이긴다. */
+@utility surface {
+  @apply rounded-card shadow-card border border-white/10 bg-black/55 backdrop-blur-md;
+}
+
 @custom-variant short (@media (max-height: 880px));
 /* 더 낮은 화면(노트북 브라우저 창 등)용 — short보다 뒤에 선언해야 겹칠 때 이긴다. */
 @custom-variant low (@media (max-height: 800px));

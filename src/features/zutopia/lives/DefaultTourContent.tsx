@@ -1,7 +1,7 @@
 import { ARTIST } from "@/data/artist";
 import { cn } from "@/lib/utils";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
-import { LiveSectionHeader } from "@/features/zutopia/lives/LiveSectionHeader";
+import { SectionHeader } from "@/components/SectionHeader";
 import { parseStreamingMetadata } from "@/features/zutopia/lives/live-metadata";
 import { LIVE_SURFACE_CLASS } from "@/features/zutopia/lives/surface";
 import { IconLinkButton } from "@/features/zutopia/components/IconLinkButton";
@@ -131,7 +131,7 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
             LIVE_SURFACE_CLASS,
             // 항목은 한 줄씩, 글자는 줄바꿈 없이 — PC는 기본 폭을 넉넉히(20rem) 주고 글자가
             // 길면 카드가 그만큼 넓어진다(제목 칸이 줄어든다). 모바일은 전체 폭.
-            "flex flex-col gap-1.5 rounded-card px-4 py-3 whitespace-nowrap",
+            "rounded-card flex flex-col gap-1.5 px-4 py-3 whitespace-nowrap",
             "pc:w-auto pc:min-w-80 pc:shrink-0",
           )}
         >
@@ -161,7 +161,7 @@ export function DefaultTourContent({ tour }: { tour: TourDetail }) {
 
       {(variation || images.length > 0) && (
         <section className="flex w-full flex-col gap-3">
-          <LiveSectionHeader title="공연 정보" />
+          <SectionHeader title="공연 정보" />
           {variation && (
             <p className="text-sm break-keep text-white/80">
               <span className="mr-2 font-mono text-sm tracking-[0.2em] text-white/50 uppercase">

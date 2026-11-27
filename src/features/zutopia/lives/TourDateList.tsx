@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { Setlist, type SetlistSlot } from "@/features/zutopia/lives/Setlist";
-import { LiveSectionHeader } from "@/features/zutopia/lives/LiveSectionHeader";
+import { SectionHeader } from "@/components/SectionHeader";
 import { TourSpanTicket } from "@/features/zutopia/lives/TourDateTicket";
 import {
   CANCELED_TEXT_CLASS,
@@ -64,7 +64,7 @@ export function LiveSchedule({ dates }: { dates: TourDateEntry[] }) {
   return (
     <section className="w-full">
       {/* 취소된 공연일은 세지 않는다(일정엔 취소선으로 남는다). */}
-      <LiveSectionHeader
+      <SectionHeader
         title="공연 일정"
         meta={`${dates.filter((date) => !date.canceled).length}회`}
       />
@@ -162,7 +162,7 @@ export function TourDateList({ dates }: { dates: TourDateEntry[] }) {
 
 /**
  * 투어 공통 세트리스트 — 투어 상세(TourOverview)에 펼친 채로 한 번만. 카드 밖 제목 줄
- * (LiveSectionHeader "투어 세트리스트 · n곡") 아래에 toolbar(판 탭), 카드 안엔 맨 위 ticket
+ * (SectionHeader "투어 세트리스트 · n곡") 아래에 toolbar(판 탭), 카드 안엔 맨 위 ticket
  * (투어 상세 — 기간·공연·지역 보딩 티켓 띠, TourSpanTicket)과 목록.
  * 공연일마다 다른 곡이 들어가는 번호엔 "선택곡" 줄을 끼워, 그 자리에 실제로 들어간
  * 곡들(공연일 전체에서 모음)을 보여준다. 공통 곡이 없는 투어면 그리지 않는다. changes는
@@ -189,7 +189,7 @@ export function TourCommonSetlist({
   const slots = collectSelectedSlots(entries, dates);
   return (
     <section className="flex w-full flex-col gap-3">
-      <LiveSectionHeader
+      <SectionHeader
         title={title}
         meta={`${setlistSongCount(entries) + slots.length}곡`}
       />
@@ -447,7 +447,7 @@ export function TourDatePanelBody({
 }: {
   date: TourDateEntry;
   thumbnails?: boolean;
-  /** false면 세트리스트 제목 줄("SETLIST · n songs") 없이 — 제목은 밖(LiveSectionHeader·시트 머리) */
+  /** false면 세트리스트 제목 줄("SETLIST · n songs") 없이 — 제목은 밖(SectionHeader·시트 머리) */
   heading?: boolean;
   /** 촘촘한 세트리스트(커버 없이 — 투어 상세) */
   dense?: boolean;

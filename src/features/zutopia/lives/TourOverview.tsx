@@ -5,7 +5,7 @@ import { FOCUS_RING } from "@/components/button-styles";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { cn } from "@/lib/utils";
 import { LIVE_SURFACE_CLASS } from "@/features/zutopia/lives/surface";
-import { LiveSectionHeader } from "@/features/zutopia/lives/LiveSectionHeader";
+import { SectionHeader } from "@/components/SectionHeader";
 import { setlistSongCount } from "@/features/zutopia/lives/medley";
 import { defaultComparePair } from "@/features/zutopia/lives/tour-compare";
 import { defaultSelectedId } from "@/features/zutopia/lives/tour-nav";
@@ -76,7 +76,7 @@ export function TourOverview({ tour }: { tour: TourDetail }) {
     <section className="flex w-full flex-col gap-3">
       {/* 제목은 왼쪽 "투어 세트리스트"와 짝, 그날 정보(날짜·도시·공연장·시각)는 카드 맨 위
       보딩 티켓 띠(TourDateTicket)에 한 번만. */}
-      <LiveSectionHeader
+      <SectionHeader
         title="공연 세트리스트"
         meta={
           selected.setlist.length > 0
@@ -99,7 +99,7 @@ export function TourOverview({ tour }: { tour: TourDetail }) {
       <div
         className={cn(
           LIVE_SURFACE_CLASS,
-          "flex flex-col gap-2 overflow-hidden rounded-card",
+          "rounded-card flex flex-col gap-2 overflow-hidden",
         )}
       >
         <TourDateTicket date={selected} />
@@ -126,7 +126,7 @@ export function TourOverview({ tour }: { tour: TourDetail }) {
       >
         {/* 일정을 길게 내려도 목록이 화면에 남게(스크롤 상자는 ZutopiaScrollArea). */}
         <section className="pc:sticky pc:top-4 flex w-full min-w-0 flex-col gap-3">
-          <LiveSectionHeader
+          <SectionHeader
             title="공연 일정"
             meta={`${dates.filter((date) => !date.canceled).length}회`}
             // PC 왼쪽 칸은 좁아(15rem) 비교 버튼을 목록 아래로, 그 미만은 제목 줄에.

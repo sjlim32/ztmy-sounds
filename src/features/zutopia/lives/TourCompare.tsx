@@ -80,7 +80,7 @@ export function TourCompare({
           onPairChange(next);
         }}
         className={cn(
-          "w-full min-w-0 rounded-control border border-white/15 bg-white/[0.04] px-2 py-1.5 text-sm text-white",
+          "rounded-control w-full min-w-0 border border-white/15 bg-white/[0.04] px-2 py-1.5 text-sm text-white",
           FOCUS_RING,
         )}
       >

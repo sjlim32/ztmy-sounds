@@ -11,6 +11,8 @@ import { TicketSchedule } from "@/features/info/components/TicketSchedule";
 import { groupImagesBySection } from "@/features/info/lib/group-images";
 import { INFORMATION, INFO_TAB_ANCHOR_ID } from "@/features/info/info";
 import { SiteLink } from "@/components/SiteLink";
+import { SectionHeader } from "@/components/SectionHeader";
+import { CaptionedFigure } from "@/features/info/components/CaptionedFigure";
 
 export const sections = groupImagesBySection(
   INFORMATION.img.sub,
@@ -46,25 +48,20 @@ export const sections = groupImagesBySection(
 
       <TourSchedule />
 
-      <h3 className="mt-8 mb-3 text-center font-semibold text-white">공연 지도 및 일정 포스터</h3>
-
-      <div className="flex flex-col gap-4">
-        {/* 전체 공연 지도 */}
-        <div
+      <section className="mt-8 flex flex-col gap-3">
+        <SectionHeader title={<h3>지도 및 포스터</h3>} />
+        <CaptionedFigure
           id="tour-map"
-          className="flex flex-col items-center gap-2 rounded-card border border-white/10 bg-black/30 p-3"
-        >
-          <div className="flex w-full items-center justify-between px-1">
-            <span className="text-sm font-semibold text-white">
-              전체 공연 지도 (전국 23개 도시 배치도)
-            </span>
+          caption="전체 공연 지도 (전국 23개 도시 배치도)"
+          aside={
             <SiteLink
               href="https://gall.dcinside.com/mgallery/board/view/?id=zuttomayo&no=490204"
-              className="text-xs text-white/55 hover:text-ztmy-pink"
+              className="hover:text-ztmy-pink"
             >
               출처: 즛토마요 갤러리
             </SiteLink>
-          </div>
+          }
+        >
           <ZoomableImage
             src={sections["schedule"][0].asset}
             alt={sections["schedule"][0].name}
@@ -72,37 +69,29 @@ export const sections = groupImagesBySection(
             thumbnailCrop="top"
             resized
           />
-        </div>
+        </CaptionedFigure>
 
-        {/* 일정 번역본 & 공식 포스터 */}
         <div className="grid grid-cols-1 tablet:grid-cols-2 gap-4">
-          <div className="flex flex-col items-center gap-2 rounded-card border border-white/10 bg-black/30 p-3">
-            <div className="flex w-full items-center justify-between px-1">
-              <span className="text-sm font-semibold text-white">
-                일정 번역본 (홀별 정원수)
-              </span>
+          <CaptionedFigure
+            caption="일정 번역본 (홀별 정원수)"
+            aside={
               <SiteLink
                 href="https://gall.dcinside.com/mgallery/board/view/?id=zuttomayo&no=490116"
-                className="text-xs text-white/55 hover:text-ztmy-pink"
+                className="hover:text-ztmy-pink"
               >
                 출처: 즛토마요 갤러리
               </SiteLink>
-            </div>
+            }
+          >
             <ZoomableImage
               src={sections["schedule"][1].asset}
               alt={sections["schedule"][1].name}
               thumbnailWidth={500}
               thumbnailCrop="top"
             />
-          </div>
+          </CaptionedFigure>
 
-          <div className="flex flex-col items-center gap-2 rounded-card border border-white/10 bg-black/30 p-3">
-            <div className="flex w-full items-center justify-between px-1">
-              <span className="text-sm font-semibold text-white">
-                공식 스케줄 포스터 (원문)
-              </span>
-              <span className="text-xs text-white/40">공식 안내문</span>
-            </div>
+          <CaptionedFigure caption="공식 스케줄 포스터 (원문)" aside="공식 안내문">
             <ZoomableImage
               src={sections["schedule"][2].asset}
               alt={sections["schedule"][2].name}
@@ -110,20 +99,20 @@ export const sections = groupImagesBySection(
               thumbnailCrop="top"
               resized
             />
-          </div>
+          </CaptionedFigure>
         </div>
-      </div>
+      </section>
     </TabSection>
 
     <TabSection id="map">
       <ImageLabel id="map" label="전체 공연 지도" />
 
       <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between rounded-card border border-white/10 bg-black/30 px-3.5 py-2.5">
+        <div className="drop-shadow-legible-sm flex items-center justify-between gap-3">
           <span className="text-xs tablet:text-sm text-white/80">
             23개 공연장 · 36회 공연 (1/15 ~ 5/23) 전국 배치도
           </span>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-3">
             <SiteLink
               href="https://gall.dcinside.com/mgallery/board/view/?id=zuttomayo&no=490204"
               className="text-xs text-white/55 hover:text-ztmy-pink"
@@ -139,7 +128,7 @@ export const sections = groupImagesBySection(
           </div>
         </div>
 
-        <div className="flex items-center justify-center overflow-hidden rounded-card border border-white/10 bg-black/40 p-2">
+        <div className="flex justify-center">
           <ZoomableImage
             src={sections["map"][0].asset}
             alt={sections["map"][0].name}

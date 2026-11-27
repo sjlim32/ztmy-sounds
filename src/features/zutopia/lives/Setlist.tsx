@@ -50,7 +50,7 @@ type SetlistRow =
  * - toolbar: 펼쳤을 때 제목 줄과 목록 사이에 두는 것(투어 세트리스트 판 고르기 등).
  * - plain: 카드 면·테두리 없이 목록만(이미 어두운 면 안에 놓일 때 — 공연일 펼침).
  * - changes: 다른 판과 달라진 곡 — 그 곡 제목 아래 변동 줄로 보여 준다.
- * - showHeading: false면 제목 줄 없이 목록만(제목은 카드 밖 LiveSectionHeader — 투어 상세).
+ * - showHeading: false면 제목 줄 없이 목록만(제목은 카드 밖 SectionHeader — 투어 상세).
  * - dense: 촘촘하게(투어 상세 — 한 화면에 많이) — 두 줄·커버는 그대로, 줄 여백만 4px(SongLink dense).
  */
 export function Setlist({

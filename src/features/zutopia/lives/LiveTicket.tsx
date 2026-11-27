@@ -144,7 +144,7 @@ export function LiveTicket({
               target="_blank"
               rel="noopener noreferrer"
               className={cn(
-                "inline-flex min-w-0 items-center gap-1.5 rounded-control text-sm text-white underline decoration-white/35 underline-offset-4 transition-colors hover:decoration-white",
+                "rounded-control inline-flex min-w-0 items-center gap-1.5 text-sm text-white underline decoration-white/35 underline-offset-4 transition-colors hover:decoration-white",
                 "tablet:text-base",
                 FOCUS_RING,
               )}

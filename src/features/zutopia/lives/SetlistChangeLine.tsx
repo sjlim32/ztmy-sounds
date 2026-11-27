@@ -20,7 +20,7 @@ export function SetlistChangeLine({ change }: { change: SetlistChangeNote }) {
       <span
         key={change.label}
         className={cn(
-          "animate-stamp-in inline-flex -rotate-2 items-center rounded-tag border-2 border-current px-1.5 text-sm leading-5 font-bold tracking-wide whitespace-nowrap",
+          "animate-stamp-in rounded-tag inline-flex -rotate-2 items-center border-2 border-current px-1.5 text-sm leading-5 font-bold tracking-wide whitespace-nowrap",
           STAMP_TONE[change.label],
         )}
       >

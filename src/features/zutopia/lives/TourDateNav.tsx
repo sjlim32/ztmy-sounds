@@ -75,7 +75,7 @@ export function TourDateNav({
         aria-label="공연 일정"
         className={cn(
           LIVE_SURFACE_CLASS,
-          "pc:flex hidden flex-col gap-0.5 overflow-y-auto rounded-card p-1.5",
+          "pc:flex rounded-card hidden flex-col gap-0.5 overflow-y-auto p-1.5",
           "max-h-[calc(100dvh-12rem)]",
         )}
       >
