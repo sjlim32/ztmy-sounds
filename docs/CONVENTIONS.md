@@ -245,7 +245,7 @@ src/
                              # 접어 두고 누르면 곡·불린 곳(Setlist SlotSongs). 투어 상세의 세트리스트는 촘촘하게
                              # (Setlist dense — 커버·두 줄은 그대로, 줄 위아래 여백만 py-1(4px), 메들리 곡 줄도
                              # 같게). 공연 세트리스트(Setlist·비교 창)는 한국어 제목이 첫 줄, 원제 · 영어가 둘째
-                             # 줄(song-db/song-title.ts setlistTitles — 곡 목록도 같음, 참전 기록 곡 목록만 원제가 첫 줄). 고른 것은 주소 해시(#2023-04-21,
+                             # 줄(song-db/song-title.ts setlistTitles — 곡 목록·곡 상세·앨범 수록곡·참전 기록도 같음). 고른 것은 주소 해시(#2023-04-21,
                              # 같은 날짜 둘째부터 -2 — lives/date-hash.ts, use-hash-selection.ts): 공유·
                              # 새로고침·뒤로 가기, 닫으면 고르기 전 기록까지 한 번에 뒤로(historyStep), 취소일·
                              # 모르는 해시는 무시. 해시가 없으면 공통 세트리스트, 공통이 없으면 첫 공연일
@@ -1009,6 +1009,8 @@ src/
   **높이**가 낮은 경우를 위한 커스텀 variant `short`(max-height: 880px) / `low`(800px) /
   `xlow`(700px)도 있습니다(겹치면 뒤에 선언된 쪽이 이기도록 이 순서로 선언).
   모바일 화면에 영향을 주지 않으려면 `tablet:xlow:`처럼 너비 variant와 함께 씁니다.
+- 뒤가 비치면 안 되는 불투명 면은 `bg-raised`(배경 + 흰빛 7%) / `bg-raised-strong`(9%) /
+  `bg-raised-sun` / `bg-raised-purple` 토큰(`globals.css`) — `bg-[color-mix(...)]`를 새로 쓰지 않습니다.
 - 사이트 전용 색상은 `ztmy-dark` / `ztmy-purple` / `ztmy-magenta` / `ztmy-pink` 토큰을
   씁니다 (`globals.css`에 정의). 하드코딩된 hex(`bg-[#8d3cd4]` 등)를 새로 추가하지
   마세요 — 이미 있는 값이라면 토큰이 없는지 먼저 확인합니다.

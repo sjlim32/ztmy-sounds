@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { cn } from "@/lib/utils";
+import { setlistTitles } from "@/features/zutopia/song-db/song-title";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { MicIcon } from "@/components/icons/MicIcon";
 import { YouTubeIcon } from "@/components/icons/YouTubeIcon";
@@ -193,7 +194,26 @@ export function AlbumDetailPanel({
                   <span className="w-5 shrink-0 font-mono text-xs text-white/40 tabular-nums">
                     {String(song.track_number).padStart(2, "0")}
                   </span>
-                  <span>{song.title}</span>
+                  {/* 한국어 제목이 첫 줄, 원제 · 영어는 아래 흐린 줄(곡 목록과 같게) */}
+                  <span className="flex min-w-0 flex-col">
+                    {(() => {
+                      const titles = setlistTitles({
+                        title: song.title,
+                        titleKo: song.title_ko,
+                        titleEn: song.title_en,
+                      });
+                      return (
+                        <>
+                          <span className="break-keep">{titles.primary}</span>
+                          {titles.secondary && (
+                            <span className="text-sm break-keep text-white/55">
+                              {titles.secondary}
+                            </span>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </span>
                   {song.music_video_url && (
                     <IconLinkButton
                       href={song.music_video_url}
@@ -226,12 +246,7 @@ export function AlbumDetailPanel({
         </ul>
 
         {imageSource && (
-          <p
-            className={cn(
-              "mt-4 flex gap-1 truncate text-[10px] text-white/40",
-              "tablet:text-xs",
-            )}
-          >
+          <p className={cn("mt-4 flex gap-1 truncate text-xs text-white/40")}>
             <span>이미지 출처 :</span>
             <a
               href={imageSource}

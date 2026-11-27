@@ -39,6 +39,11 @@ export function SongDetailPanel({
     song.metadata,
   );
 
+  const primaryTitle = song.title_ko.trim() || song.title;
+  const en = song.title_en.trim();
+  const englishTitle =
+    en && en !== song.title && en !== primaryTitle ? en : null;
+
   return (
     <>
       <div
@@ -63,28 +68,36 @@ export function SongDetailPanel({
 
       <div className="min-w-0 flex-1 p-4 pt-0">
         <div className="flex items-start justify-between gap-4">
-          {/* 제목은 원어 → 한국어 → 영어 순으로, 아래로 갈수록 흐리게. */}
+          {/* 제목은 한국어 → 원어 → 영어 순으로(곡 목록·세트리스트와 같게), 아래로 갈수록
+          흐리게. 한국어 제목이 비면 원어가 첫 줄, 겹치는 제목은 한 번만. */}
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <p
                 className={cn(
-                  "text-xl font-semibold text-white",
+                  "text-xl font-semibold break-keep text-white",
                   "tablet:text-2xl",
                 )}
               >
-                {song.title}
+                {primaryTitle}
               </p>
               {isUnreleased && <UnreleasedBadge />}
               {collab && <CollabBadge />}
             </div>
-            <p
-              className={cn("mt-0.5 text-base text-white/80", "tablet:text-lg")}
-            >
-              {song.title_ko}
-            </p>
-            <p className={cn("text-sm text-white/50", "tablet:text-base")}>
-              {song.title_en}
-            </p>
+            {primaryTitle !== song.title && (
+              <p
+                className={cn(
+                  "mt-0.5 text-base text-white/80",
+                  "tablet:text-lg",
+                )}
+              >
+                {song.title}
+              </p>
+            )}
+            {englishTitle && (
+              <p className={cn("text-sm text-white/50", "tablet:text-base")}>
+                {englishTitle}
+              </p>
+            )}
           </div>
         </div>
 

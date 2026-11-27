@@ -20,6 +20,16 @@
   --color-ztmy-pink: var(--ztmy-pink);
   --color-ztmy-sky: var(--ztmy-sky);
   --color-ztmy-sun: var(--ztmy-sun);
+  /* 불투명 면 — 배경색에 흰빛·종류 색을 섞은 면(뒤의 선이 비치지 않아야 하는 곳: 타임라인
+     연도 카드·종류별 칸). raised: 기본, raised-strong: 조금 더 밝게, -sun/-purple: 종류 색. */
+  --color-raised: color-mix(in oklab, white 7%, var(--background));
+  --color-raised-strong: color-mix(in oklab, white 9%, var(--background));
+  --color-raised-sun: color-mix(in oklab, var(--ztmy-sun) 16%, var(--background));
+  --color-raised-purple: color-mix(
+    in oklab,
+    var(--ztmy-purple) 30%,
+    var(--background)
+  );
   --font-sans:
     var(--font-line-seed-kr-stack), "LINE Seed JP", ui-sans-serif, system-ui,
     sans-serif;

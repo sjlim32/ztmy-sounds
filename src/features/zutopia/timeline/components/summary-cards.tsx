@@ -46,7 +46,7 @@ export function YearSummaryCard({
       onClick={onOpen}
       title="눌러서 이 해 확대"
       className={cn(
-        "rounded-card shadow-card flex w-full flex-col gap-3 overflow-hidden bg-[color-mix(in_oklab,white_7%,var(--color-background))] p-3 text-left transition-[filter] hover:brightness-125",
+        "rounded-card shadow-card bg-raised flex w-full flex-col gap-3 overflow-hidden p-3 text-left transition-[filter] hover:brightness-125",
         FOCUS_RING,
         attended && ATTENDED_CLASS,
         className,

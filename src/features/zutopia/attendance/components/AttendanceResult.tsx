@@ -16,7 +16,7 @@ import { formatDateWithWeekday } from "./date-format";
 import { formatDayShow } from "@/features/zutopia/lives/shows";
 import { ExternalLinkIcon } from "@/components/icons/ExternalLinkIcon";
 import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
-import { secondaryTitle } from "@/features/zutopia/song-db/song-title";
+import { setlistTitles } from "@/features/zutopia/song-db/song-title";
 import type {
   AttendanceSong,
   AttendanceSummary,
@@ -229,6 +229,7 @@ function SongRow({
       popover.style.right = "0";
     }
   }, [open]);
+  const titles = setlistTitles(song);
   const body = (
     <>
       {song.coverSrc ? (
@@ -243,13 +244,16 @@ function SongRow({
           className="rounded-card block size-10 shrink-0 bg-white/5"
         />
       )}
+      {/* 한국어 제목이 첫 줄, 원제 · 영어가 둘째 줄 — 곡 목록과 같은 순서, 자르지 않고 줄바꿈 */}
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-base font-medium text-white">
-          {song.title}
+        <span className="block text-base font-medium break-keep text-white">
+          {titles.primary}
         </span>
-        <span className="block truncate text-sm text-white/70">
-          {secondaryTitle(song)}
-        </span>
+        {titles.secondary && (
+          <span className="block text-sm break-keep text-white/60">
+            {titles.secondary}
+          </span>
+        )}
       </span>
       {count === null && (
         <span className="shrink-0 text-sm text-white/55">

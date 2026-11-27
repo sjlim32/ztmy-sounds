@@ -23,14 +23,13 @@ export const KIND_DOT_CLASS: Record<TimelineKind, string> = {
 };
 
 /**
- * 카드 면 — 테두리 없이 배경색에 종류 색을 섞은 불투명 면으로만 구분한다(곡은
+ * 카드 면 — 테두리 없이 배경색에 종류 색을 섞은 불투명 면(globals.css의 raised 색 토큰)으로만 구분한다(곡은
  * 옅은 흰빛, 앨범은 해 색, 공연은 보라). 불투명이라 뒤의 연결선이 비치지 않는다.
  */
 export const KIND_CARD_CLASS: Record<TimelineKind, string> = {
-  song: "bg-[color-mix(in_oklab,white_9%,var(--color-background))]",
-  album:
-    "bg-[color-mix(in_oklab,var(--color-ztmy-sun)_16%,var(--color-background))]",
-  live: "bg-[color-mix(in_oklab,var(--color-ztmy-purple)_30%,var(--color-background))]",
+  song: "bg-raised-strong",
+  album: "bg-raised-sun",
+  live: "bg-raised-purple",
 };
 
 /** 내 참전(참전 기록에서 체크한 공연) 표시 — 마젠타 테두리 하나만(글자·색 변화 없음). */
