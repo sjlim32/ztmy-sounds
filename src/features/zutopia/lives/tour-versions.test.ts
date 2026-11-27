@@ -3,6 +3,7 @@ import {
   versionEndsOn,
   versionForDate,
   versionsForDays,
+  versionSpan,
   type TourVersion,
 } from "./tour-versions";
 
@@ -65,5 +66,41 @@ describe("versionEndsOn", () => {
     const versions = [v("v1", "2025-03-29"), v("v2", "2025-04-28")];
     expect(versionEndsOn(versions, versions[0])).toBe("2025-04-27");
     expect(versionEndsOn(versions, versions[1])).toBeNull();
+  });
+});
+
+describe("versionSpan", () => {
+  const date = (
+    city: string,
+    startDate: string,
+    endDate: string | null = null,
+    canceled = false,
+  ) => ({ city, startDate, endDate, canceled });
+
+  test("첫 공연일 ~ 마지막 공연의 끝날, 도시는 날짜 순서대로 한 번씩, 횟수는 이틀 공연을 2회로 — 취소일은 빼고", () => {
+    expect(
+      versionSpan([
+        date("도쿄", "2023-05-30", "2023-05-31"),
+        date("가나가와", "2023-04-20", "2023-04-21"),
+        date("삿포로", "2023-06-02", null, true),
+        date("도쿄", "2023-05-01"),
+        date("아이치", "2023-04-27"),
+      ]),
+    ).toEqual({
+      start: "2023-04-20",
+      end: "2023-05-31",
+      cities: ["가나가와", "아이치", "도쿄"],
+      shows: 6,
+    });
+  });
+
+  test("하루 공연이면 끝날은 그날, 공연일이 없으면 null", () => {
+    expect(versionSpan([date("오사카", "2023-04-20")])).toEqual({
+      start: "2023-04-20",
+      end: "2023-04-20",
+      cities: ["오사카"],
+      shows: 1,
+    });
+    expect(versionSpan([date("오사카", "2023-04-20", null, true)])).toBeNull();
   });
 });

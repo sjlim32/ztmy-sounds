@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { diffSetlistVersions } from "./setlist-diff";
+import { diffSetlistVersions, matchSetlists } from "./setlist-diff";
 
 const e = (songId: string, trackNumber: number, isEncore = false) => ({
   songId,
@@ -74,5 +74,53 @@ describe("diffSetlistVersions", () => {
 
   test("같은 세트리스트면 메모 없음", () => {
     expect(diff([e("a", 1), e("b", 2)], [e("a", 1), e("b", 2)])).toEqual([]);
+  });
+});
+
+describe("matchSetlists", () => {
+  const ids = (list: { songId: string }[]) => list.map((x) => x.songId);
+  const match = (a: ReturnType<typeof e>[], b: ReturnType<typeof e>[]) => {
+    const { removed, added, moved } = matchSetlists(a, b);
+    return {
+      removed: ids(removed),
+      added: ids(added),
+      moved: moved.map(({ from, to }) => [
+        from.songId,
+        from.trackNumber,
+        to.trackNumber,
+      ]),
+    };
+  };
+
+  test("B에만 있는 곡은 추가, 번호만 밀린 곡은 없음", () => {
+    expect(
+      match(
+        [e("a", 1), e("b", 2), e("c", 3)],
+        [e("a", 1), e("x", 2), e("b", 3), e("c", 4)],
+      ),
+    ).toEqual({ removed: [], added: ["x"], moved: [] });
+  });
+
+  test("A에만 있는 곡은 빠짐", () => {
+    expect(
+      match([e("a", 1), e("gone", 2), e("c", 3)], [e("a", 1), e("c", 2)]),
+    ).toEqual({ removed: ["gone"], added: [], moved: [] });
+  });
+
+  test("순서가 실제로 바뀐 곡은 A 번호 → B 번호", () => {
+    expect(
+      match(
+        [e("a", 1), e("b", 2), e("c", 3)],
+        [e("b", 1), e("c", 2), e("a", 3)],
+      ),
+    ).toEqual({ removed: [], added: [], moved: [["a", 1, 3]] });
+  });
+
+  test("앙코르 번호만 밀리거나 같은 세트리스트면 차이 없음", () => {
+    const none = { removed: [], added: [], moved: [] };
+    expect(
+      match([e("a", 1), e("e", 9, true)], [e("a", 1), e("e", 10, true)]),
+    ).toEqual(none);
+    expect(match([e("a", 1), e("b", 2)], [e("a", 1), e("b", 2)])).toEqual(none);
   });
 });

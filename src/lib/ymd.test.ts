@@ -5,6 +5,7 @@ import {
   diffDays,
   formatDotDate,
   weekdayIndex,
+  formatKoreanMonthDay,
 } from "@/lib/ymd";
 
 describe("ymd", () => {
@@ -28,5 +29,20 @@ describe("ymd", () => {
   });
   test("formatDotDate", () => {
     expect(formatDotDate("2026-03-14T00:00:00+09:00")).toBe("2026.03.14");
+  });
+});
+
+describe("formatKoreanMonthDay", () => {
+  test("월·일(앞 0 없이), 요일·연도는 고를 때만", () => {
+    expect(formatKoreanMonthDay("2023-04-21")).toBe("4월 21일");
+    expect(formatKoreanMonthDay("2023-04-21", { weekday: true })).toBe(
+      "4월 21일 (금)",
+    );
+    expect(
+      formatKoreanMonthDay("2023-04-21T00:00:00+00:00", {
+        year: true,
+        weekday: true,
+      }),
+    ).toBe("2023년 4월 21일 (금)");
   });
 });

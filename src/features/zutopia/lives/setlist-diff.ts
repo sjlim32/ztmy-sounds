@@ -1,6 +1,9 @@
 import type { LiveSetlistEntry } from "@/features/zutopia/lives/types";
 
-type DiffEntry = Pick<LiveSetlistEntry, "songId" | "trackNumber" | "isEncore">;
+export type DiffEntry = Pick<
+  LiveSetlistEntry,
+  "songId" | "trackNumber" | "isEncore"
+>;
 
 /** 세트리스트 곡 제목 아래 도장 하나 — 고른 판에 있는 곡에만 붙는다. */
 export interface SetlistChangeNote {
@@ -67,23 +70,57 @@ export function diffSetlistVersions(
     compareWithNext = false,
   }: { earlierName: string; laterName: string; compareWithNext?: boolean },
 ): SetlistChangeNote[] {
-  const here = inOrder(entries);
-  const there = inOrder(other);
-  const thereById = new Map(there.map((entry) => [entry.songId, entry]));
-  const kept = new Set(keptPairs(here, there).map(([index]) => index));
-  return here.flatMap((entry, index) => {
-    if (kept.has(index)) return [];
-    const counterpart = thereById.get(entry.songId);
+  // 앞(a) → 뒤(b). 기본은 다른 판이 앞, compareWithNext면 고른 판이 앞.
+  const { removed, added, moved } = compareWithNext
+    ? matchSetlists(entries, other)
+    : matchSetlists(other, entries);
+  const gone = new Set<DiffEntry>(compareWithNext ? removed : added);
+  const moves = new Map<DiffEntry, { from: DiffEntry; to: DiffEntry }>(
+    moved.map((move) => [compareWithNext ? move.from : move.to, move]),
+  );
+  return inOrder(entries).flatMap((entry) => {
+    const move = moves.get(entry);
+    if (!move && !gone.has(entry)) return [];
     const note: SetlistChangeNote = {
-      label: counterpart ? "순서 변경" : compareWithNext ? "제거" : "추가",
-      detail: counterpart
-        ? compareWithNext
-          ? moveText(entry, counterpart, earlierName, laterName)
-          : moveText(counterpart, entry, earlierName, laterName)
+      label: move ? "순서 변경" : compareWithNext ? "제거" : "추가",
+      detail: move
+        ? moveText(move.from, move.to, earlierName, laterName)
         : `${laterName}부터`,
       songId: entry.songId,
       isEncore: entry.isEncore,
     };
     return [note];
   });
+}
+
+/**
+ * 세트리스트 두 개(a = 앞·A, b = 뒤·B)의 차이 — 양쪽 순서가 유지된 곡(keptPairs, 곡 id의
+ * 최장 공통 부분열) 밖의 곡 중 b에도 있으면 순서 변경(moved), a에만 있으면 빠짐(removed),
+ * b에만 있으면 추가(added). 곡 하나가 끼어들어 번호만 밀린 곡은 어디에도 없다. 각 목록은
+ * 자기 쪽 순서(본편 → 앙코르, 번호 순), moved는 b 순서. 판 도장(diffSetlistVersions)과
+ * 공연일 비교(TourCompare)가 같이 쓴다.
+ */
+export function matchSetlists<T extends DiffEntry>(
+  a: readonly T[],
+  b: readonly T[],
+): { removed: T[]; added: T[]; moved: { from: T; to: T }[] } {
+  const before = inOrder(a);
+  const after = inOrder(b);
+  const pairs = keptPairs(before, after);
+  const keptA = new Set(pairs.map(([i]) => i));
+  const keptB = new Set(pairs.map(([, j]) => j));
+  const aById = new Map(before.map((entry) => [entry.songId, entry]));
+  const bIds = new Set(after.map((entry) => entry.songId));
+  return {
+    removed: before.filter(
+      (entry, i) => !keptA.has(i) && !bIds.has(entry.songId),
+    ),
+    added: after.filter(
+      (entry, j) => !keptB.has(j) && !aById.has(entry.songId),
+    ),
+    moved: after.flatMap((entry, j) => {
+      const from = aById.get(entry.songId);
+      return !keptB.has(j) && from ? [{ from, to: entry }] : [];
+    }),
+  };
 }

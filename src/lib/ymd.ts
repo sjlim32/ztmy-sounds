@@ -33,3 +33,18 @@ export function weekdayIndex(date: string): number {
 export function formatDotDate(date: string): string {
   return date.slice(0, 10).replaceAll("-", ".");
 }
+
+const KOREAN_WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+
+/**
+ * "2023-04-21" → "4월 21일"(앞 0 없이) — weekday면 "4월 21일 (금)", year면 앞에 "2023년 ".
+ * 투어 상세(공연 일정 목록·티켓·판 요약·비교 창)가 날짜를 한국어로 쓸 때.
+ */
+export function formatKoreanMonthDay(
+  date: string,
+  { year = false, weekday = false }: { year?: boolean; weekday?: boolean } = {},
+): string {
+  const [y, m, d] = date.slice(0, 10).split("-").map(Number);
+  const text = `${year ? `${y}년 ` : ""}${m}월 ${d}일`;
+  return weekday ? `${text} (${KOREAN_WEEKDAYS[weekdayIndex(date)]})` : text;
+}

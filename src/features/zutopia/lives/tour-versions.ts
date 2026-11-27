@@ -1,4 +1,5 @@
 import { addDays } from "@/lib/ymd";
+import { countTourShows } from "@/features/zutopia/lives/tour-shows";
 
 /**
  * 투어 세트리스트 판(tour_setlist_versions) — 투어 상세(lives/data.ts)와 라이브 기록·
@@ -66,4 +67,30 @@ export function versionEndsOn(
     .sort(byStart)
     .find((item) => item.startsOn > version.startsOn);
   return next ? addDays(next.startsOn, -1) : null;
+}
+
+/**
+ * 공통 셋리 티켓(TourSpanTicket)의 값 — 그 판(또는 투어 전체)을 따른 공연일의 기간(첫 공연일 ~
+ * 마지막 공연의 끝날), 거친 도시(날짜 순서대로 한 번씩), 공연 횟수(이틀 공연은 2회 —
+ * countTourShows). 취소된 공연일은 빼고, 남는 공연일이 없으면 null.
+ */
+export function versionSpan(
+  dates: readonly {
+    city: string;
+    startDate: string;
+    endDate: string | null;
+    canceled?: boolean;
+  }[],
+): { start: string; end: string; cities: string[]; shows: number } | null {
+  const held = dates
+    .filter((date) => !date.canceled)
+    .sort((a, b) => a.startDate.localeCompare(b.startDate));
+  if (held.length === 0) return null;
+  const last = held.at(-1)!;
+  return {
+    start: held[0].startDate,
+    end: last.endDate ?? last.startDate,
+    cities: [...new Set(held.map((date) => date.city))],
+    shows: countTourShows(held),
+  };
 }
