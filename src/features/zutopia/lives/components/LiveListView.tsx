@@ -6,6 +6,10 @@ import type { MouseEvent, ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
+  FilterToolbar,
+  ToolbarSelect,
+} from "@/features/zutopia/components/FilterToolbar";
+import {
   FilterPanel,
   FilterToggleRow,
   SortFilterBar,
@@ -328,54 +332,14 @@ export function LiveListView({
 
   return (
     <div ref={rootRef} className="flex flex-col gap-6">
-      <FilterPanel
-        onReset={
-          isFiltered
-            ? () => {
-                setFormatFilter("all");
-                setYearFilter(ALL_YEAR);
-                setHideOnline(false);
-              }
-            : undefined
-        }
-        filters={
+      {/* 곡 목록과 같은 한 줄 툴바 — 묶기·보기는 밖에, 형식·연도·온라인은 "필터 n"으로 펼친다. */}
+      <FilterToolbar
+        controls={
           <>
-            <SortFilterBar
-              label="형식"
-              options={formatOptions}
-              value={formatFilter}
-              onChange={setFormatFilter}
-              compact
-            />
-            <SortFilterBar
-              label="연도"
-              options={yearOptions}
-              value={yearFilter}
-              onChange={setYearFilter}
-              compact
-            />
-            {onlineCount > 0 && (
-              // 누르면 온라인 공연을 결과에서 뺀다(형식·연도 개수도).
-              <FilterToggleRow
-                label="온라인"
-                toggles={[
-                  {
-                    label: "제외",
-                    active: hideOnline,
-                    onToggle: () => setHideOnline(!hideOnline),
-                    count: onlineCount,
-                  },
-                ]}
-              />
-            )}
-          </>
-        }
-        display={
-          <>
-            <SortFilterBar
-              label="정렬"
-              options={SORT_OPTIONS}
+            <ToolbarSelect
+              label="묶기"
               value={sortBy}
+              options={SORT_OPTIONS}
               onChange={setSortBy}
             />
             <SortFilterBar
@@ -386,6 +350,57 @@ export function LiveListView({
               onChange={setViewMode}
             />
           </>
+        }
+        changedCount={
+          Number(formatFilter !== "all") +
+          Number(yearFilter !== ALL_YEAR) +
+          Number(hideOnline)
+        }
+        summary={`${filtered.length}개`}
+        panel={
+          <FilterPanel
+            onReset={
+              isFiltered
+                ? () => {
+                    setFormatFilter("all");
+                    setYearFilter(ALL_YEAR);
+                    setHideOnline(false);
+                  }
+                : undefined
+            }
+            filters={
+              <>
+                <SortFilterBar
+                  label="형식"
+                  options={formatOptions}
+                  value={formatFilter}
+                  onChange={setFormatFilter}
+                  compact
+                />
+                <SortFilterBar
+                  label="연도"
+                  options={yearOptions}
+                  value={yearFilter}
+                  onChange={setYearFilter}
+                  compact
+                />
+                {onlineCount > 0 && (
+                  // 누르면 온라인 공연을 결과에서 뺀다(형식·연도 개수도).
+                  <FilterToggleRow
+                    label="온라인"
+                    toggles={[
+                      {
+                        label: "제외",
+                        active: hideOnline,
+                        onToggle: () => setHideOnline(!hideOnline),
+                        count: onlineCount,
+                      },
+                    ]}
+                  />
+                )}
+              </>
+            }
+          />
         }
       />
 

@@ -10,9 +10,10 @@ import { DIRECTION_OPTIONS } from "@/features/zutopia/song-db/sort";
 import { AlbumDetailPanel } from "@/features/zutopia/song-db/components/AlbumDetailPanel";
 import { SongDbDrawer } from "@/features/zutopia/song-db/components/SongDbDrawer";
 import {
-  FilterPanel,
-  SortFilterBar,
-} from "@/features/zutopia/components/SortFilterBar";
+  FilterToolbar,
+  ToolbarSelect,
+} from "@/features/zutopia/components/FilterToolbar";
+import { FILTER_CHIP_CLASS } from "@/components/button-styles";
 import type {
   AlbumGroupBy,
   AlbumWithSongs,
@@ -103,32 +104,41 @@ export function AlbumListView({ albums }: AlbumListViewProps) {
   }
 
   const groups = groupAlbums(albums, groupBy, sortDirection);
+  const directionLabel =
+    DIRECTION_OPTIONS.find((option) => option.value === sortDirection)?.label ??
+    "";
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 앨범은 거를 것 없이 보여 주는 방식(정렬·순서·커버)만 — 곡·공연과 같은 자리. */}
-      <FilterPanel
-        display={
+      {/* 곡·공연 목록과 같은 한 줄 툴바 — 앨범은 거를 것이 없어 보여 주는 방식(묶기·순서·커버)만. */}
+      <FilterToolbar
+        controls={
           <>
-            <SortFilterBar
-              options={SORT_OPTIONS}
+            <ToolbarSelect
+              label="묶기"
               value={groupBy}
+              options={SORT_OPTIONS}
               onChange={setGroupBy}
             />
-            <SortFilterBar
-              label="순서"
-              options={DIRECTION_OPTIONS}
-              value={sortDirection}
-              onChange={setSortDirection}
-            />
-            <SortFilterBar
-              label="앨범 커버"
-              options={COVER_VERSION_OPTIONS}
+            <button
+              type="button"
+              onClick={() =>
+                setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+              }
+              aria-label={`순서: ${directionLabel} (누르면 바뀜)`}
+              className={FILTER_CHIP_CLASS}
+            >
+              {sortDirection === "asc" ? "↑" : "↓"} {directionLabel}
+            </button>
+            <ToolbarSelect
+              label="커버"
               value={coverVersion}
+              options={COVER_VERSION_OPTIONS}
               onChange={setCoverVersion}
             />
           </>
         }
+        summary={`${albums.length}장`}
       />
 
       {albums.length === 0 ? (

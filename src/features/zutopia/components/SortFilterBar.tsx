@@ -6,9 +6,8 @@ import { FilterChip, FilterRow } from "@/components/FilterChips";
 import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
 
 /**
- * 정렬/필터 줄(SortFilterBar)들을 감싸는 카드 — 곡·앨범·공연·참전·연혁·통계가
- * 모두 이걸 써서 생김새·여백·줄 간격이 같다(FilterPanel). 면은 공통
- * ZUTOPIA_SURFACE_CLASS(surface.ts).
+ * 정렬/필터 줄(SortFilterBar)들을 감싸는 카드 — 곡·공연 목록 툴바(FilterToolbar)의 "필터 n"
+ * 버튼을 누르면 펼쳐지는 패널(FilterPanel). 면은 공통 ZUTOPIA_SURFACE_CLASS(surface.ts).
  */
 const SORT_FILTER_CARD_CLASS = `${ZUTOPIA_SURFACE_CLASS} flex flex-col gap-2 px-3 py-2.5 tablet:px-4 tablet:py-3`;
 

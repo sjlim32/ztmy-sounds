@@ -17,12 +17,13 @@ import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
  */
 export function FilterToolbar({
   controls,
-  panel,
+  panel = null,
   changedCount = 0,
   summary = null,
 }: {
   controls: ReactNode;
-  panel: ReactNode;
+  /** 펼칠 필터 패널 — 없으면(거를 것이 없는 목록 — 앨범) "필터" 버튼도 없다. */
+  panel?: ReactNode;
   /** 기본값에서 바꾼 필터·보기 옵션 수 — "필터" 버튼에 숫자로 */
   changedCount?: number;
   summary?: ReactNode;
@@ -33,34 +34,36 @@ export function FilterToolbar({
     <div className="flex flex-col gap-3">
       <div className="drop-shadow-legible-sm flex flex-wrap items-center gap-x-3 gap-y-2">
         {controls}
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={() => setOpen((value) => !value)}
-          className={cn(
-            FILTER_CHIP_CLASS,
-            (open || changedCount > 0) && ACTIVE_FILTER_CHIP_CLASS,
-          )}
-        >
-          필터
-          {changedCount > 0 && (
-            <span className="font-mono tabular-nums">{changedCount}</span>
-          )}
-          <ChevronDownIcon
+        {panel && (
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls={panelId}
+            onClick={() => setOpen((value) => !value)}
             className={cn(
-              "size-3.5 transition-transform",
-              open && "rotate-180",
+              FILTER_CHIP_CLASS,
+              (open || changedCount > 0) && ACTIVE_FILTER_CHIP_CLASS,
             )}
-          />
-        </button>
+          >
+            필터
+            {changedCount > 0 && (
+              <span className="font-mono tabular-nums">{changedCount}</span>
+            )}
+            <ChevronDownIcon
+              className={cn(
+                "size-3.5 transition-transform",
+                open && "rotate-180",
+              )}
+            />
+          </button>
+        )}
         {summary && (
           <span className="ml-auto font-mono text-sm text-white/60 tabular-nums">
             {summary}
           </span>
         )}
       </div>
-      {open && (
+      {panel && open && (
         <div id={panelId} className="animate-content-in">
           {panel}
         </div>

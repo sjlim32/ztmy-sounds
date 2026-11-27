@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { FilterChip, FilterRow } from "@/components/FilterChips";
-import { FilterPanel } from "@/features/zutopia/components/SortFilterBar";
 import { useAttendedUnits } from "@/features/zutopia/attendance/useAttendedUnits";
 import {
   liveSummary,
@@ -23,8 +22,7 @@ import {
 /**
  * 활동 연혁 — 곡·앨범 발매와 공연을 실제 시간 간격대로 한 줄 축에 놓는다.
  * 태블릿 이상은 가로 축, 모바일은 세로 축. 정적 HTML과 첫 렌더가 같도록 둘 다
- * 그리고 CSS로 하나만 보인다. 위 필터 카드(FilterPanel, 곡·공연 목록과 같은 모양)의
- * 종류 칩을 눌러 종류별로 켜고 끈다. 참전 기록에서
+ * 그리고 CSS로 하나만 보인다. 위 칩 한 줄(카드 없음)의 종류 칩을 눌러 종류별로 켜고 끈다. 참전 기록에서
  * 체크한 공연은 마젠타 테두리(브라우저 저장값이라 읽은 뒤에만).
  * 축 범위는 전체 일정 기준이라 종류를 꺼도 위치가 바뀌지 않는다.
  */
@@ -78,47 +76,47 @@ export function TimelineView({ events }: { events: TimelineEvent[] }) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* 곡·앨범·공연 목록과 같은 필터 카드 — 종류는 여러 개를 켜고 끄는 칩 */}
-      <FilterPanel
-        summary={
-          attendedCounts.size > 0 && (
-            <span className="inline-flex items-center gap-2">
+      {/* 거를 것이 종류 하나뿐이라 카드 없이 칩 한 줄(곡·공연 목록 툴바와 같은 자리) — 오른쪽에
+          내가 간 공연, 아래 총 공연 내역. 배경 위에서 읽히게 글자 그림자. */}
+      <div className="drop-shadow-legible-sm flex flex-col gap-1.5">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <FilterRow role="group" aria-label="종류 필터" label="종류">
+            {KIND_ORDER.map((kind) => (
+              <FilterChip
+                key={kind}
+                active={!hidden.has(kind)}
+                onClick={() => toggle(kind)}
+                count={counts[kind]}
+              >
+                <span
+                  aria-hidden
+                  className={cn(
+                    "size-2.5 shrink-0",
+                    KIND_DOT_CLASS[kind],
+                    hidden.has(kind) && "opacity-30",
+                  )}
+                />
+                {KIND_LABEL[kind]}
+              </FilterChip>
+            ))}
+          </FilterRow>
+          {attendedCounts.size > 0 && (
+            <span className="inline-flex items-center gap-2 text-sm text-white/60">
               <span
                 aria-hidden
                 className={cn("size-3", KIND_DOT_CLASS.live, ATTENDED_CLASS)}
               />
               내가 간 공연 {attendedShows}회
             </span>
-          )
-        }
-      >
-        <FilterRow role="group" aria-label="종류 필터" label="종류">
-          {KIND_ORDER.map((kind) => (
-            <FilterChip
-              key={kind}
-              active={!hidden.has(kind)}
-              onClick={() => toggle(kind)}
-              count={counts[kind]}
-            >
-              <span
-                aria-hidden
-                className={cn(
-                  "size-2.5 shrink-0",
-                  KIND_DOT_CLASS[kind],
-                  hidden.has(kind) && "opacity-30",
-                )}
-              />
-              {KIND_LABEL[kind]}
-            </FilterChip>
-          ))}
-        </FilterRow>
+          )}
+        </div>
         {/* 총 공연 횟수의 묶음별 내역 — 단콘 = 투어 + 단독 콘서트 */}
         <p className="text-sm text-white/60">
           총 공연 {lives.total}회 · 단콘 {lives.concert} · 페스티벌{" "}
           {lives.festival} · 이벤트 {lives.event}
           {lives.upcoming > 0 && ` · 예정 ${lives.upcoming}회`}
         </p>
-      </FilterPanel>
+      </div>
 
       <div className="tablet:block hidden">
         <HorizontalTimeline
