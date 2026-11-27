@@ -174,6 +174,9 @@ src/
                              # "투어 규모"(큰 숫자 셋 + 구분선 목록 한 장 — TourSchedule), "전체 일정"
                              # (표 한 장, 제목 줄 오른쪽에 전체 지도 이동·구글 지도 버튼, 각주는 면 없이),
                              # "지도 및 포스터"(액자 없이 그림 + 아래 캡션 — CaptionedFigure).
+                             # 맨 위 포스터 아래 공연 정보(EventDetails)는 카드 하나: 위 보딩 티켓 띠
+                             # (components/TicketStrip — 일시 · 장소(지도 링크, 괄호 안은 아래 줄)) + 아래
+                             # 줄마다 라벨 + 링크 버튼(티켓 신청·이동 방법·공식 링크, 구분선, 접수 전 링크는 흐리게).
                              # DetailField/DetailList(라벨: 값 카드)는
                              # 티켓/굿즈 안내처럼 반복되는 목록에 재사용한다.
                              # ImageGallery는 이미지 묶음을 태블릿 이상에선
@@ -235,7 +238,7 @@ src/
                              # 카드 밖 같은 제목 줄(components/SectionHeader — 제목 · 오른쪽 개수·버튼 · 밑줄) +
                              # 카드 하나. 판 탭은 밑줄 탭만, 공통 셋리 카드 맨 위엔 같은 모양의 티켓 띠 TourSpanTicket
                              # (기간 · 공연 n회 · 지역 — 그 판을 따른 공연일, 도시는 날짜 순서대로 한 번씩 + 아래
-                             # "n개 도시", tour-versions.ts versionSpan; 두 티켓 모두 TourDateTicket.tsx의 TicketStrip). 선택곡 자리는 두 곡 이상이면 "n곡 ▾"로
+                             # "n개 도시", tour-versions.ts versionSpan; 두 티켓 모두 components/TicketStrip — 칸 수 자유, 마지막 칸이 남는 폭). 선택곡 자리는 두 곡 이상이면 "n곡 ▾"로
                              # 접어 두고 누르면 곡·불린 곳(Setlist SlotSongs). 투어 상세의 세트리스트는 촘촘하게
                              # (Setlist dense — 커버·두 줄은 그대로, 줄 위아래 여백만 py-1(4px), 메들리 곡 줄도
                              # 같게). 공연 세트리스트(Setlist·비교 창)는 한국어 제목이 첫 줄, 원제 · 영어가 둘째
@@ -631,6 +634,8 @@ src/
   components/               # 여러 기능이 공유하는 전역 컴포넌트
     mobile/                 # 모바일 전용 전역 컴포넌트
     icons/                  # 커스텀 SVG 아이콘 (외부 아이콘 라이브러리 미사용)
+    TicketStrip.tsx          # 보딩 티켓 띠 — 위 색 띠 + 점선 칸(라벨 · 값 · 아래 흐린 줄) + 아래 절취선.
+                             # 카드 맨 위에(투어 상세 세트리스트, 공연 정보 머리). 칸마다 최소 100px.
     SectionHeader.tsx        # 구역 제목 줄 — 카드 밖 제목(왼쪽) · 흐린 개수·버튼(오른쪽) · 밑줄,
                              # 글자 그림자. 구역마다 "이 줄 + 카드 하나"(투어 상세, 공연 정보).
     SiteHeader.tsx           # 하위 페이지(guide·slam·info·zutopia) 공용 헤더.

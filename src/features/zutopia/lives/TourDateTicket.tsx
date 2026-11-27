@@ -1,60 +1,10 @@
-import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { TicketStrip } from "@/components/TicketStrip";
 import { formatKoreanMonthDay } from "@/lib/ymd";
 import { formatDayShow } from "@/features/zutopia/lives/shows";
-import { splitParenSuffix } from "@/features/zutopia/lives/split-paren-suffix";
+import { splitParenSuffix } from "@/lib/split-paren-suffix";
 import { formatTourPeriod } from "@/features/zutopia/lives/tour-period";
 import { versionSpan } from "@/features/zutopia/lives/tour-versions";
 import type { TourDateEntry } from "@/features/zutopia/lives/types";
-
-const DASHED = "border-ztmy-purple/40 border-dashed";
-
-type TicketCell = {
-  label: string;
-  value: ReactNode;
-  /** 값 아래 흐린 한 줄 */
-  sub?: string | null;
-  /** 말줄임될 때 마우스를 올리면 보이는 전체 글자 */
-  title?: string;
-};
-
-/**
- * 투어 상세 세트리스트 카드 맨 위의 보딩 티켓 띠 — 공연 상세 티켓(LiveTicket)과 같은 모티프
- * (위 색 띠, 점선으로 나뉜 칸, 아래 가로 점선 절취선). 칸 셋을 한 줄에: 앞 두 칸은 글자
- * 폭만큼, 마지막 칸이 남는 폭을 쓰고 넘치면 말줄임 — 칸마다 최소 100px. 글자는 줄바꿈 없이, 라벨은 한국어.
- */
-function TicketStrip({
-  cells,
-}: {
-  cells: [TicketCell, TicketCell, TicketCell];
-}) {
-  const cellClass = cn("min-w-0 px-3 py-2.5 whitespace-nowrap", "tablet:px-5");
-  return (
-    <div className="relative">
-      <div className="from-ztmy-magenta to-ztmy-purple absolute inset-x-0 top-0 h-0.5 bg-linear-to-r" />
-      <div className="grid grid-cols-[minmax(100px,auto)_minmax(100px,auto)_minmax(100px,1fr)]">
-        {cells.map((cell, index) => (
-          <div
-            key={cell.label}
-            className={cn(cellClass, index > 0 && cn(DASHED, "border-l"))}
-          >
-            <p className="text-sm text-white/50">{cell.label}</p>
-            <p
-              className="mt-0.5 truncate text-sm font-medium text-white"
-              title={cell.title}
-            >
-              {cell.value}
-            </p>
-            {cell.sub && (
-              <p className="truncate text-sm text-white/55">{cell.sub}</p>
-            )}
-          </div>
-        ))}
-      </div>
-      <div className={cn(DASHED, "border-t")} />
-    </div>
-  );
-}
 
 /** 모바일은 연도를 빼 한 줄에 들어가게(연도는 위 머리의 기간에 있다). */
 function YearOnWide({ year }: { year: string }) {

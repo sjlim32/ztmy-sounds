@@ -1,5 +1,5 @@
 import { addDays, diffDays, formatDotDate } from "@/lib/ymd";
-import { splitParenSuffix } from "@/features/zutopia/lives/split-paren-suffix";
+import { splitParenSuffix } from "@/lib/split-paren-suffix";
 import { isOnlineText, ONLINE_LABEL } from "@/features/zutopia/lives/region";
 import { formatDayShow } from "@/features/zutopia/lives/shows";
 import type { LiveUnit } from "@/features/zutopia/live-history/types";

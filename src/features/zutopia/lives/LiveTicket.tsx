@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { splitParenSuffix } from "@/features/zutopia/lives/split-paren-suffix";
+import { splitParenSuffix } from "@/lib/split-paren-suffix";
 import { LIVE_SURFACE_CLASS } from "@/features/zutopia/lives/surface";
 import {
   LiveTypeBadge,

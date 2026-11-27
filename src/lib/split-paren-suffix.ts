@@ -1,4 +1,4 @@
-// 공연 티켓(LiveTicket)과 통계(stats/compute.ts)가 같이 쓰는 순수 함수 — UI 파일에
+// 공연 티켓(LiveTicket)·통계(stats/compute.ts)·공연 정보(EventDetails)가 같이 쓰는 순수 함수 — UI 파일에
 // 두면 빌드 시점 계산·테스트가 아이콘·컴포넌트까지 끌어와서 따로 둔다.
 
 /**
