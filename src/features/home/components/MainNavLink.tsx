@@ -14,7 +14,7 @@ interface MainNavLinkProps {
 }
 
 const badgeStyles = cva(
-  "flex h-6 w-6 tablet:h-9 tablet:w-9 shrink-0 items-center justify-center rounded-full text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)] transition-transform duration-300 group-hover:scale-110",
+  "flex h-6 w-6 tablet:h-9 tablet:w-9 shrink-0 items-center justify-center rounded-full text-white drop-shadow-legible transition-transform duration-300 group-hover:scale-110",
   {
     variants: {
       accent: {
@@ -85,7 +85,7 @@ function MainNavLinkComponent({
         <Icon className={cn("h-3 w-3", "tablet:h-4 tablet:w-4")} />
       </span>
 
-      <span className="flex flex-col drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
+      <span className="drop-shadow-legible flex flex-col">
         <span
           className={cn(
             "font-mono text-[10px] font-medium tracking-[0.3em] text-white/55 uppercase",

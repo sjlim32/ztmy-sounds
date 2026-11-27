@@ -183,7 +183,7 @@ export function StatsView({
         {visible.map((section) => (
           <section key={section.id} className="flex flex-col gap-4">
             {/* 카드 밖 제목 — 공연 목록 연도 제목과 같은 모양(배경 위 글자 그림자) */}
-            <h2 className="flex items-center gap-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+            <h2 className="drop-shadow-legible flex items-center gap-3">
               <span className="tablet:text-2xl text-xl font-bold text-white">
                 {section.title}
               </span>

@@ -554,7 +554,7 @@ function LiveCard({ entry, href, onClick }: LiveItemProps) {
       >
         <div
           className={cn(
-            "rounded-card relative aspect-square overflow-hidden bg-black/30 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
+            "rounded-card shadow-card relative aspect-square overflow-hidden bg-black/30",
             // 내한 공연은 테두리와 그림 위 태그를 마젠타(홈의 내한 색)로 표시해
             // 목록에서 바로 눈에 띄게 한다.
             entry.visitOrdinal != null && "ring-ztmy-magenta ring-2",
@@ -600,22 +600,15 @@ function LiveCard({ entry, href, onClick }: LiveItemProps) {
                   "transition-opacity duration-200 group-hover:opacity-0",
               )}
             >
-              {canceled && (
-                <CanceledTag className="shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
-              )}
+              {canceled && <CanceledTag className="shadow-thumb" />}
               {entry.type && !entry.online && (
-                <EntryTypeTag
-                  type={entry.type}
-                  className="shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
-                />
+                <EntryTypeTag type={entry.type} className="shadow-thumb" />
               )}
-              {entry.online && (
-                <OnlineTag className="shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
-              )}
+              {entry.online && <OnlineTag className="shadow-thumb" />}
               {entry.visitOrdinal != null && (
                 <VisitBadge
                   ordinal={entry.visitOrdinal}
-                  className="shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+                  className="shadow-thumb"
                 />
               )}
             </div>

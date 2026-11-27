@@ -37,7 +37,7 @@ export default function ZutopiaQuizPage() {
         {/* 출제자·공개 글은 출처 페이지의 모의고사 항목에 */}
         <Link
           href={`/credits#${MOCK_EXAM_CREDIT_ID}`}
-          className="self-start text-sm text-white/60 underline underline-offset-2 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] transition-colors hover:text-white"
+          className="drop-shadow-legible self-start text-sm text-white/60 underline underline-offset-2 transition-colors hover:text-white"
         >
           출처
         </Link>

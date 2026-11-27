@@ -65,7 +65,7 @@ export function Footer({ inline = false }: { inline?: boolean } = {}) {
         <div className="flex min-w-0 items-center gap-4">
           <p
             className={cn(
-              "min-w-0 truncate text-xs text-white/60 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]",
+              "drop-shadow-legible-sm min-w-0 truncate text-xs text-white/60",
               // 태블릿 폭에선 전문이 한 줄에 안 들어가서 줄바꿈을 허용한다.
               "tablet:whitespace-normal tablet:break-keep",
             )}

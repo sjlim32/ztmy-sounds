@@ -46,7 +46,7 @@ export function YearSummaryCard({
       onClick={onOpen}
       title="눌러서 이 해 확대"
       className={cn(
-        "rounded-card flex w-full flex-col gap-3 overflow-hidden bg-[color-mix(in_oklab,white_7%,var(--color-background))] p-3 text-left shadow-[0_6px_20px_rgba(0,0,0,0.45)] transition-[filter] hover:brightness-125",
+        "rounded-card shadow-card flex w-full flex-col gap-3 overflow-hidden bg-[color-mix(in_oklab,white_7%,var(--color-background))] p-3 text-left transition-[filter] hover:brightness-125",
         FOCUS_RING,
         attended && ATTENDED_CLASS,
         className,
@@ -126,7 +126,7 @@ export function ClusterCard({
       onClick={onOpen}
       title="눌러서 이 달 확대"
       className={cn(
-        "rounded-card flex flex-col gap-1.5 p-1.5 text-left shadow-[0_4px_14px_rgba(0,0,0,0.45)] transition-[filter] hover:brightness-125",
+        "rounded-card shadow-card flex flex-col gap-1.5 p-1.5 text-left transition-[filter] hover:brightness-125",
         FOCUS_RING,
         KIND_CARD_CLASS[
           events.length === 1

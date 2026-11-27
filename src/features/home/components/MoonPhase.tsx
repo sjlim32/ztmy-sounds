@@ -55,7 +55,7 @@ export function MoonPhase({
   const fireGradientId = `moon-fire-gradient-${uid}`;
 
   return (
-    <div className="tablet:h-24 tablet:w-24 tablet:xlow:h-20 tablet:xlow:w-20 relative h-16 w-16 shrink-0 overflow-visible drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
+    <div className="tablet:h-24 tablet:w-24 tablet:xlow:h-20 tablet:xlow:w-20 drop-shadow-legible relative h-16 w-16 shrink-0 overflow-visible">
       <svg
         viewBox="0 0 100 100"
         className="relative h-full w-full overflow-visible"
@@ -124,15 +124,15 @@ export function MoonPhase({
       다 찼을 땐 노란 달빛 위에 짙은 보라 테두리가 각각 대비를 담당합니다. */}
       <div className="absolute inset-0 flex flex-col items-center justify-center [-webkit-text-stroke:0.1px_var(--ztmy-dark)]">
         {isDone ? (
-          <span className="tablet:text-3xl font-mono text-lg font-extrabold text-white/60 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="tablet:text-3xl drop-shadow-legible-sm font-mono text-lg font-extrabold text-white/60">
             -
           </span>
         ) : isToday ? (
-          <span className="tablet:text-2xl font-mono text-sm font-extrabold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="tablet:text-2xl drop-shadow-legible-sm font-mono text-sm font-extrabold text-white">
             D-DAY
           </span>
         ) : (
-          <span className="tablet:text-2xl font-mono text-sm font-extrabold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="tablet:text-2xl drop-shadow-legible-sm font-mono text-sm font-extrabold text-white">
             D-{daysUntilEvent}
           </span>
         )}

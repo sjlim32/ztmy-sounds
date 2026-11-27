@@ -11,7 +11,7 @@ export function TourSchedule() {
   return (
     <div className="flex flex-col gap-5">
       {/* 구글 지도 배너 */}
-      <div className="from-ztmy-sky/15 to-ztmy-magenta/15 rounded-card relative overflow-hidden border border-white/15 bg-linear-to-r via-black/40 p-4 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+      <div className="from-ztmy-sky/15 to-ztmy-magenta/15 rounded-card shadow-card relative overflow-hidden border border-white/15 bg-linear-to-r via-black/40 p-4">
         <div className="tablet:flex-row tablet:items-center tablet:justify-between flex flex-col gap-3">
           <div className="flex items-center gap-2.5">
             <span className="bg-ztmy-sky/20 text-ztmy-sky rounded-card flex h-9 w-9 shrink-0 items-center justify-center">

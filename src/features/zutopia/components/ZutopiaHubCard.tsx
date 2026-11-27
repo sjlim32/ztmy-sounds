@@ -60,7 +60,7 @@ export function ZutopiaHubCard({
       <div className="tablet:p-4 absolute inset-x-0 bottom-0 p-3">
         <p
           className={cn(
-            "tablet:text-lg text-base leading-snug font-semibold drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] transition-colors",
+            "tablet:text-lg drop-shadow-legible text-base leading-snug font-semibold transition-colors",
             isReady ? "group-hover:text-ztmy-pink text-white" : "text-white/60",
           )}
         >
@@ -77,7 +77,7 @@ export function ZutopiaHubCard({
 
   const baseClass = cn(
     "group relative block aspect-square overflow-hidden rounded-card border border-white/10 bg-black/30",
-    "shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
+    "shadow-card",
   );
 
   if (!isReady) {

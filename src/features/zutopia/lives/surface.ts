@@ -4,11 +4,10 @@
  * 세트리스트(Setlist), 투어 공연일 행(TourDateList)이 같이 쓴다.
  */
 export const LIVE_SURFACE_CLASS =
-  "border border-white/10 bg-black/55 backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.4)]";
+  "border border-white/10 bg-black/55 backdrop-blur-md shadow-card";
 
 /** 카드 밖 섹션 제목(공연 일정 등) — 배경 위에서도 읽히게 글자 그림자. */
-export const LIVE_SECTION_TITLE_SHADOW =
-  "drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]";
+export const LIVE_SECTION_TITLE_SHADOW = "drop-shadow-legible";
 
 /**
  * 공연·투어 상세의 작은 태그(선택곡·DAY 1·DAY 2·ENCORE·내한) — 가이드 곡 목록의

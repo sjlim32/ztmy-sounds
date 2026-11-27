@@ -12,3 +12,13 @@ describe("cn — 사이트 반지름 토큰(rounded-card/control/tag)", () => {
     expect(cn("rounded-t-xl", "rounded-t-card")).toBe("rounded-t-card");
   });
 });
+
+describe("cn — 사이트 그림자 토큰(shadow-card/float/thumb, drop-shadow-legible)", () => {
+  it("뒤에 온 그림자가 앞의 토큰 그림자를 덮는다", () => {
+    expect(cn("shadow-card", "shadow-none")).toBe("shadow-none");
+    expect(cn("shadow-thumb", "shadow-float")).toBe("shadow-float");
+    expect(cn("drop-shadow-legible", "drop-shadow-legible-sm")).toBe(
+      "drop-shadow-legible-sm",
+    );
+  });
+});

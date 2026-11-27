@@ -118,7 +118,7 @@ function NextEventCardComponent({
           className={cn(
             "group cursor-pointer",
             isDone ? "tablet:flex hidden" : "flex",
-            "rounded-t-card h-10 w-full items-center justify-center gap-1.5 bg-black/40 font-mono text-xs tracking-[0.3em] text-white/70 uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)] transition-colors duration-300 hover:bg-black/55 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
+            "rounded-t-card drop-shadow-legible h-10 w-full items-center justify-center gap-1.5 bg-black/40 font-mono text-xs tracking-[0.3em] text-white/70 uppercase transition-colors duration-300 hover:bg-black/55 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none",
             "tablet:h-auto tablet:bg-transparent tablet:justify-start tablet:text-sm tablet:hover:bg-transparent tablet:font-semibold",
           )}
         >
@@ -215,7 +215,7 @@ function BoardingTicket({
     <div
       className={cn(
         // 위아래 모두 각지게(rounded-card) — 위에 색 띠가 붙는다.
-        "rounded-card relative flex flex-col gap-2.5 overflow-hidden border border-white/10 bg-black/45 bg-linear-to-br to-transparent p-3 shadow-[0_4px_16px_rgba(0,0,0,0.45)] backdrop-blur-sm",
+        "rounded-card shadow-card relative flex flex-col gap-2.5 overflow-hidden border border-white/10 bg-black/45 bg-linear-to-br to-transparent p-3 backdrop-blur-sm",
         accentTint[event.accent],
         className,
       )}
@@ -264,7 +264,7 @@ function BoardingTicket({
               displayWidth={96}
               alt={event.tourName}
               className={cn(
-                "aspect-3/4 w-20 object-cover shadow-[0_2px_10px_rgba(0,0,0,0.55)] ring-1 ring-white/15 transition-opacity hover:opacity-80",
+                "shadow-thumb aspect-3/4 w-20 object-cover ring-1 ring-white/15 transition-opacity hover:opacity-80",
                 "pc:w-24",
                 // 낮은 화면(700px 이하)에선 홈 왼쪽 열이 넘치지 않게 작게.
                 "tablet:xlow:w-16 pc:xlow:w-20",

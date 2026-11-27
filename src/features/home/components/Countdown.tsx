@@ -54,7 +54,7 @@ export function Countdown({
     <div
       data-role="countdown"
       className={cn(
-        "rounded-card flex w-full items-center justify-center gap-3 border border-white/10 bg-black/30 py-1 shadow-[0_4px_16px_rgba(0,0,0,0.4)]",
+        "rounded-card shadow-card flex w-full items-center justify-center gap-3 border border-white/10 bg-black/30 py-1",
         "tablet:gap-4 tablet:p-4",
         // 낮은 화면(700px 이하)에선 홈 왼쪽 열이 넘치지 않게 위아래를 줄인다.
         "tablet:xlow:py-2",
@@ -79,7 +79,7 @@ export function Countdown({
         />
       )}
 
-      <div className="tablet:space-y-1 space-y-0.5 drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
+      <div className="tablet:space-y-1 drop-shadow-legible space-y-0.5">
         {remaining.isPast ? (
           !isDone ? (
             <p className="tablet:text-sm text-xs font-medium text-white">
@@ -196,7 +196,7 @@ function WaterBalloon({
   const fireGradientId = `fire-gradient-${uid}`;
 
   return (
-    <div className="tablet:h-24 tablet:w-24 tablet:xlow:h-20 tablet:xlow:w-20 relative h-16 w-16 shrink-0 overflow-visible drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
+    <div className="tablet:h-24 tablet:w-24 tablet:xlow:h-20 tablet:xlow:w-20 drop-shadow-legible relative h-16 w-16 shrink-0 overflow-visible">
       <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible">
         <defs>
           <clipPath id={balloonClipId}>
@@ -262,15 +262,15 @@ function WaterBalloon({
 
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         {isDone ? (
-          <span className="tablet:text-2xl font-mono text-base font-bold text-white/60 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="tablet:text-2xl drop-shadow-legible-sm font-mono text-base font-bold text-white/60">
             -
           </span>
         ) : isToday ? (
-          <span className="tablet:text-xl font-mono text-xs font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="tablet:text-xl drop-shadow-legible-sm font-mono text-xs font-bold text-white">
             D-DAY
           </span>
         ) : (
-          <span className="tablet:text-xl font-mono text-xs font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+          <span className="tablet:text-xl drop-shadow-legible-sm font-mono text-xs font-bold text-white">
             D-{daysUntilEvent}
           </span>
         )}

@@ -235,7 +235,7 @@ export function AttendanceView({
         className={cn(
           "relative z-10 flex flex-col gap-3",
           "tablet:flex-row tablet:flex-wrap tablet:items-center tablet:gap-x-5 tablet:px-4 tablet:py-2.5",
-          "tablet:rounded-card tablet:border tablet:border-white/10 tablet:bg-black/60 tablet:shadow-[0_4px_16px_rgba(0,0,0,0.4)] tablet:backdrop-blur-md",
+          "tablet:rounded-card tablet:border tablet:border-white/10 tablet:bg-black/60 tablet:shadow-card tablet:backdrop-blur-md",
         )}
       >
         <dl

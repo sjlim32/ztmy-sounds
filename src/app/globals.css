@@ -42,6 +42,15 @@
   --radius-card: 0;
   --radius-control: 0.125rem; /* 2px */
   --radius-tag: 0;
+
+  /* 그림자 — 배경 그림 위에 뜬 면. shadow-card: 카드·목록 상자, shadow-float: 팝오버·
+     드롭다운처럼 더 떠 있는 창, shadow-thumb: 작은 그림(앨범 커버 등). drop-shadow-legible
+     (-sm): 배경 그림 위 글자·아이콘이 읽히게 까는 그림자(큰 글자·아이콘 / 작은 글자). */
+  --shadow-card: 0 4px 16px rgb(0 0 0 / 0.4);
+  --shadow-float: 0 8px 32px rgb(0 0 0 / 0.5);
+  --shadow-thumb: 0 2px 8px rgb(0 0 0 / 0.5);
+  --drop-shadow-legible: 0 2px 8px rgb(0 0 0 / 0.8);
+  --drop-shadow-legible-sm: 0 1px 2px rgb(0 0 0 / 0.8);
 }
 
 /* 모바일에서 NavButton 및 NextVisit 레이아웃 정렬용 (680px 이하에선 flex 적용) */

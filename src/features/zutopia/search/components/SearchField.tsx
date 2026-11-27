@@ -66,7 +66,7 @@ export function SearchField({
         placeholder={SEARCH_PLACEHOLDER}
         className={cn(
           // 모바일 Safari는 16px 미만 입력란에 포커스하면 화면을 확대해서 text-base 이상.
-          "tablet:text-lg rounded-control h-14 w-full border-2 border-white/15 bg-black/60 pr-14 pl-13 text-base text-white shadow-[0_4px_16px_rgba(0,0,0,0.4)] backdrop-blur-md transition-colors placeholder:text-white/45 hover:border-white/30",
+          "tablet:text-lg rounded-control shadow-card h-14 w-full border-2 border-white/15 bg-black/60 pr-14 pl-13 text-base text-white backdrop-blur-md transition-colors placeholder:text-white/45 hover:border-white/30",
           "focus:border-ztmy-magenta/70 focus:ring-ztmy-magenta/15 focus:ring-4 focus:outline-none",
           // 브라우저 기본 지우기(×) 버튼 대신 아래 버튼을 쓴다.
           "[&::-webkit-search-cancel-button]:appearance-none",

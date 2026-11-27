@@ -10,10 +10,7 @@ export function ZutopiaSectionTitle({
   id?: string;
 }) {
   return (
-    <h2
-      id={id}
-      className="flex items-center gap-3 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
-    >
+    <h2 id={id} className="drop-shadow-legible flex items-center gap-3">
       <span className="tablet:text-xl text-lg font-bold text-white">
         {children}
       </span>

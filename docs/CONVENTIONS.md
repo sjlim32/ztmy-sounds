@@ -916,6 +916,13 @@ src/
   - 예외: 설치 배너의 앱 아이콘은 홈 화면 아이콘 모양을 따라 `rounded-xl`
   - 토큰을 새로 만들면 `src/lib/utils.ts`의 tailwind-merge `radius`에도 이름을 등록합니다
     (안 하면 `cn`이 겹친 반지름을 지우지 못함).
+- 그림자도 `@theme` 토큰만 씁니다(`shadow-[...]` 임의 값은 새로 쓰지 않음):
+  - `shadow-card`: 배경 그림 위에 뜬 카드·목록 상자, `shadow-float`: 팝오버·드롭다운처럼 더 떠 있는 창,
+    `shadow-thumb`: 작은 그림(앨범 커버·공연 포스터 썸네일)
+  - `drop-shadow-legible`: 배경 그림 위 큰 글자·아이콘·제목이 읽히게, `drop-shadow-legible-sm`: 작은 글자용
+  - 예외(한 곳뿐이라 그대로): 옆 패널·드로어의 방향 있는 그림자(SidePanel·SongDbDrawer), 분홍 빛 효과
+    (LyricLine·TicketSchedule·ZutopiaHubCard)
+  - 새 그림자 토큰도 `src/lib/utils.ts`의 tailwind-merge(`shadow`·`drop-shadow`)에 등록합니다
 - 디자인 방향은 모던·심플: 버튼은 각진 사각형(`rounded-control`), 상태는 단색
   면과 테두리로만 구분합니다. **알약 모양, 그라데이션 채움, 한쪽 면만 강조하는 막대
   (왼쪽 띠·밑줄 띠 등)는 쓰지 않습니다** — 선택 상태도 칸 전체의 면으로 표시합니다.
