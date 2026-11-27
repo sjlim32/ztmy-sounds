@@ -73,6 +73,16 @@ export const TICKET_PRESALE_SCHEDULE: TicketScheduleRound[] = [
     paymentEnd: "2026-12-08T23:59:59+09:00",
     paymentLabel: "12/5(토) 18:00 ~ 12/8(화) 23:59",
     limit: "1공연당 4매까지",
+    links: [
+      {
+        name: "신청 (일본 국내)",
+        href: "https://w.pia.jp/v/zutomayo27hall-is/",
+      },
+      {
+        name: "신청 (해외)",
+        href: "https://w.pia.jp/v/zutomayo27hall-ogfp-en/",
+      },
+    ],
   },
   {
     id: "premium-upgrade",

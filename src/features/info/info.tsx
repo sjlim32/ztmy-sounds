@@ -53,20 +53,12 @@ export const INFORMATION: InfoEvent = {
     place: "https://maps.app.goo.gl/6JdViGdHH1Vwn6hX9",
     ticket: [
       {
-        name: "PREMIUM 2차 선행 (국내)",
-        href: "https://zutomayo.net/apicula-denki_apply_pre_2nd/",
+        name: "일반 최속 선행 (국내)",
+        href: "https://w.pia.jp/v/zutomayo27hall-is/",
       },
       {
-        name: "PREMIUM 2차 선행 (해외)",
-        href: "https://zutomayo.net/apicula-denki_apply_pre_en_2nd/",
-      },
-      {
-        name: "1차 당락 확인·지불 (국내)",
-        href: "https://zutomayo.net/apicula-denki_apply_pre/",
-      },
-      {
-        name: "1차 당락 확인·지불 (해외)",
-        href: "https://zutomayo.net/apicula-denki_apply_pre_en/",
+        name: "일반 최속 선행 (해외)",
+        href: "https://w.pia.jp/v/zutomayo27hall-ogfp-en/",
       },
     ],
     official: [
