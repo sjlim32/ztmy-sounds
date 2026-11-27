@@ -79,6 +79,7 @@ export function SongLink({
   artwork,
   medleyPart,
   change = null,
+  dense = false,
   children,
 }: {
   href?: string | null;
@@ -114,6 +115,11 @@ export function SongLink({
   medleyPart?: "head" | "song";
   /** 투어 세트리스트의 다른 판과 달라졌으면 제목 아래 변동 줄 */
   change?: SetlistChangeNote | null;
+  /**
+   * 촘촘한 줄(투어 상세 — 한 화면에 많이) — 두 줄(제목·둘째 줄)과 커버는 그대로, 위아래
+   * 여백만 4px로 줄인다.
+   */
+  dense?: boolean;
   children: ReactNode;
 }) {
   const number = indexLabel ?? String(index).padStart(2, "0");
@@ -135,6 +141,8 @@ export function SongLink({
         !medleyPart && songRowTint(encore, selected),
         medleyPart === "head" && "pb-1",
         medleyPart === "song" && "py-1.5",
+        // 촘촘한 줄은 메들리 곡 줄까지 위아래 4px로 맞춘다.
+        dense && "py-1",
       )}
     >
       <span
@@ -255,7 +263,7 @@ function Artwork({ artwork }: { artwork: string | null | (string | null)[] }) {
         src={covers[0]}
         displayWidth={44}
         className={cn(
-          "size-8 shrink-0 rounded object-cover",
+          "rounded-card size-8 shrink-0 object-cover",
           "tablet:size-9",
           covers[0] === UNKNOWN_COVER_SRC && UNKNOWN_COVER_BORDER,
         )}
@@ -275,7 +283,7 @@ function Artwork({ artwork }: { artwork: string | null | (string | null)[] }) {
           src={cover}
           displayWidth={44}
           className={cn(
-            "absolute rounded-sm object-cover",
+            "rounded-card absolute object-cover",
             cover === UNKNOWN_COVER_SRC
               ? UNKNOWN_COVER_BORDER
               : "ring-1 ring-black/60",

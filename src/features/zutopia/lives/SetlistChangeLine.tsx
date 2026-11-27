@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import type { SetlistChangeNote } from "@/features/zutopia/lives/setlist-diff";
 
 // 잉크 색 — DAY·선택곡·ENCORE가 쓰는 분홍·보라·하늘·노랑과 겹치지 않게.
-const STAMP_TONE: Record<SetlistChangeNote["label"], string> = {
+export const STAMP_TONE: Record<SetlistChangeNote["label"], string> = {
   추가: "text-emerald-400",
   제거: "text-red-400",
   "순서 변경": "text-white/80",

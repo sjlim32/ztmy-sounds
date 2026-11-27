@@ -6,9 +6,10 @@ import { cn } from "@/lib/utils";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ZoomableImageGroup } from "@/components/ZoomableImageGroup";
 import { Setlist, type SetlistSlot } from "@/features/zutopia/lives/Setlist";
+import { LiveSectionHeader } from "@/features/zutopia/lives/LiveSectionHeader";
+import { TourSpanTicket } from "@/features/zutopia/lives/TourDateTicket";
 import {
   CANCELED_TEXT_CLASS,
-  LIVE_SECTION_TITLE_SHADOW,
   LIVE_SURFACE_CLASS,
   LIVE_TAG_CLASS,
   LIVE_TAG_TONE,
@@ -62,24 +63,11 @@ function formatTourDateLabel(
 export function LiveSchedule({ dates }: { dates: TourDateEntry[] }) {
   return (
     <section className="w-full">
-      {/* 카드 밖 제목이라 배경 그림 위에서도 읽히게 글자 그림자 */}
-      <div
-        className={cn(
-          "flex items-baseline justify-between gap-3 border-b border-white/15 pb-2",
-          "tablet:pb-3",
-          LIVE_SECTION_TITLE_SHADOW,
-        )}
-      >
-        <p
-          className={cn("text-base font-semibold text-white", "tablet:text-lg")}
-        >
-          공연 일정
-        </p>
-        {/* 취소된 공연일은 세지 않는다(일정엔 취소선으로 남는다). */}
-        <p className={cn("font-mono text-sm text-white/60")}>
-          {dates.filter((date) => !date.canceled).length} dates
-        </p>
-      </div>
+      {/* 취소된 공연일은 세지 않는다(일정엔 취소선으로 남는다). */}
+      <LiveSectionHeader
+        title="공연 일정"
+        meta={`${dates.filter((date) => !date.canceled).length}회`}
+      />
 
       {dates.length > 0 ? (
         <TourDateList dates={dates} />
@@ -127,7 +115,7 @@ export function TourDateList({ dates }: { dates: TourDateEntry[] }) {
     // 읽히게) — 공연일 사이는 얇은 구분선만.
     <ul
       className={cn(
-        "mt-3 flex flex-col divide-y divide-white/10 overflow-hidden rounded-lg",
+        "rounded-card mt-3 flex flex-col divide-y divide-white/10 overflow-hidden",
         "tablet:mt-4",
         LIVE_SURFACE_CLASS,
       )}
@@ -173,61 +161,87 @@ export function TourDateList({ dates }: { dates: TourDateEntry[] }) {
 }
 
 /**
- * 투어 공통 세트리스트 — 투어 상세에 한 번만, 처음엔 접어 두고("투어 세트리스트 한
- * 눈에 보기") 제목 줄을 눌러 펼친다. 공연일마다 다른 곡이 들어가는 번호엔 "선택곡"
- * 줄을 끼워, 그 자리에 실제로 들어간 곡들(공연일 전체에서 모음)을 보여준다. 공통
- * 곡이 없는 투어(공연일마다 전부 다른 구성이거나 아직 데이터가 없음)면 그리지 않는다.
- * toolbar는 펼쳤을 때 제목 아래(판 고르기), changes는 다른 판과 달라진 곡.
+ * 투어 공통 세트리스트 — 투어 상세(TourOverview)에 펼친 채로 한 번만. 카드 밖 제목 줄
+ * (LiveSectionHeader "투어 세트리스트 · n곡") 아래에 toolbar(판 탭), 카드 안엔 맨 위 ticket
+ * (투어 상세 — 기간·공연·지역 보딩 티켓 띠, TourSpanTicket)과 목록.
+ * 공연일마다 다른 곡이 들어가는 번호엔 "선택곡" 줄을 끼워, 그 자리에 실제로 들어간
+ * 곡들(공연일 전체에서 모음)을 보여준다. 공통 곡이 없는 투어면 그리지 않는다. changes는
+ * 다른 판과 달라진 곡(도장).
  */
 export function TourCommonSetlist({
   entries,
   dates,
-  title = "투어 세트리스트 한 눈에 보기",
+  title = "투어 세트리스트",
   toolbar = null,
+  ticket = null,
   changes,
 }: {
   entries: LiveSetlistEntry[];
   dates: TourDateEntry[];
+  /** 제목 줄 문구 — 이틀 이상 단독 공연 상세는 "세트리스트 한 눈에 보기" */
   title?: string;
   toolbar?: ReactNode;
+  /** 카드 맨 위(목록 위)에 두는 것 — 투어 상세의 보딩 티켓 띠 */
+  ticket?: ReactNode;
   changes?: SetlistChangeNote[];
 }) {
   if (entries.length === 0) return null;
+  const slots = collectSelectedSlots(entries, dates);
   return (
-    <Setlist
-      title={title}
-      entries={entries}
-      slots={collectSelectedSlots(entries, dates)}
-      collapsible
-      defaultOpen={false}
-      toolbar={toolbar}
-      changes={changes}
-    />
+    <section className="flex w-full flex-col gap-3">
+      <LiveSectionHeader
+        title={title}
+        meta={`${setlistSongCount(entries) + slots.length}곡`}
+      />
+      {toolbar}
+      <Setlist
+        entries={entries}
+        slots={slots}
+        changes={changes}
+        toolbar={ticket}
+        showHeading={false}
+        dense
+      />
+    </section>
   );
 }
 
 /**
- * 투어 공통 세트리스트를 판(tour_setlist_versions)마다 — 판이 하나면 지금처럼 하나,
- * 둘 이상이면 펼친 카드 안 제목 아래에 판 고르기 탭(같은 폭으로 나란히: 이름 + 그 판
- * 공연일의 첫–마지막 도시·횟수)을 두고 고른 판의 세트리스트를 보여 준다. 이름은 판에
- * 적은 이름(label), 없으면 versionName의 기본 이름(전반기·후반기). 판을 바꿔도 펼친
- * 상태는 그대로다. 선택곡 자리는 그 판을 따른 공연일로만 모은다. 달라진 곡은 해당
- * 곡 제목 아래 도장으로 — 그 판에 있는 곡에만. 뒤 판은 앞 판과 비교해 추가·순서 변경,
- * 첫 판은 다음 판과 비교해 제거·순서 변경. 옆에 시기("후반기부터", "전반기 13번 → 후반기 17번").
+ * 투어 공통 세트리스트를 판(tour_setlist_versions)마다 — 판이 하나면 하나, 둘 이상이면
+ * 제목 줄 아래에 밑줄 탭(판 이름)을 두고 고른 판의 세트리스트를 보여 준다. 카드 맨 위엔
+ * 그 판을 따른 공연일의 기간·공연 횟수·지역 보딩 티켓 띠(TourSpanTicket — 판 하나면 투어 전체). 이름은 판에 적은 이름(label), 없으면
+ * versionName의 기본 이름(전반기·후반기). 고른 판은 selectedVersionId·onSelectVersion으로
+ * 밖에서 쥘 수 있다(TourOverview — 날짜를 골라 이 구역이 빠졌다 돌아와도 탭 유지), 없으면
+ * 자체 상태. 선택곡 자리는 그 판을 따른 공연일로만 모은다. 달라진 곡은 해당 곡 제목 아래
+ * 도장으로 — 그 판에 있는 곡에만. 뒤 판은 앞 판과 비교해 추가·순서 변경, 첫 판은 다음 판과
+ * 비교해 제거·순서 변경. 옆에 시기("후반기부터", "전반기 13번 → 후반기 17번").
  */
 export function TourSetlistVersions({
   versions,
   dates,
+  selectedVersionId,
+  onSelectVersion,
 }: {
   versions: TourSetlistVersion[];
   dates: TourDateEntry[];
+  selectedVersionId?: string | null;
+  onSelectVersion?: (id: string) => void;
 }) {
-  const [selectedId, setSelectedId] = useState(versions[0]?.id ?? null);
+  const [ownSelectedId, setOwnSelectedId] = useState(versions[0]?.id ?? null);
+  const selectedId =
+    selectedVersionId !== undefined ? selectedVersionId : ownSelectedId;
+  const setSelectedId = onSelectVersion ?? setOwnSelectedId;
   const selected =
     versions.find((version) => version.id === selectedId) ?? versions[0];
   if (!selected) return null;
   if (versions.length === 1)
-    return <TourCommonSetlist entries={selected.entries} dates={dates} />;
+    return (
+      <TourCommonSetlist
+        entries={selected.entries}
+        dates={dates}
+        ticket={<TourSpanTicket dates={dates} />}
+      />
+    );
 
   // 바로 앞 판과 비교하고, 앞 판이 없는 첫 판은 다음 판에서 무엇이 바뀌는지 알려 준다.
   const selectedIndex = versions.indexOf(selected);
@@ -246,65 +260,43 @@ export function TourSetlistVersions({
         compareWithNext: true,
       });
 
+  const versionDates = dates.filter((date) => date.versionId === selected.id);
   const tabs = (
-    <div className={cn("border-b border-white/10 px-4 py-3", "tablet:px-5")}>
-      <div
-        role="group"
-        aria-label="세트리스트 시기 고르기"
-        className={cn(
-          "grid gap-2",
-          versions.length === 2
-            ? "grid-cols-2"
-            : "tablet:grid-cols-3 grid-cols-1",
-        )}
-      >
-        {versions.map((version) => {
-          const active = version.id === selected.id;
-          const versionDates = dates.filter(
-            (date) => date.versionId === version.id && !date.canceled,
-          );
-          const cities = versionCities(versionDates);
-          return (
-            <button
-              key={version.id}
-              type="button"
-              aria-pressed={active}
-              onClick={() => setSelectedId(version.id)}
-              className={cn(
-                "flex min-w-0 flex-col items-start rounded-lg border px-3 py-2 text-left transition-colors",
-                FOCUS_RING,
-                active
-                  ? "border-ztmy-magenta/80 bg-ztmy-magenta/15 text-white"
-                  : "border-white/15 bg-white/[0.03] text-white/75 hover:border-white/35 hover:text-white",
-              )}
-            >
-              <span className="text-base font-semibold">{nameOf(version)}</span>
-              <span
-                className={cn(
-                  "w-full truncate text-sm",
-                  active ? "text-white/80" : "text-white/55",
-                )}
-              >
-                {[
-                  cities,
-                  versionDates.length ? `${versionDates.length}회` : null,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+    <div
+      role="group"
+      aria-label="세트리스트 시기 고르기"
+      className="flex flex-wrap gap-x-5 border-b border-white/10"
+    >
+      {versions.map((version) => {
+        const active = version.id === selected.id;
+        return (
+          <button
+            key={version.id}
+            type="button"
+            aria-pressed={active}
+            onClick={() => setSelectedId(version.id)}
+            className={cn(
+              "-mb-px border-b-2 py-1.5 text-sm font-semibold transition-colors",
+              "tablet:text-base",
+              FOCUS_RING,
+              active
+                ? "border-ztmy-pink text-white"
+                : "border-transparent text-white/55 hover:text-white",
+            )}
+          >
+            {nameOf(version)}
+          </button>
+        );
+      })}
     </div>
   );
 
-  // key 없이 — 판을 바꿔도 펼친 상태(Setlist의 isOpen)를 그대로 둔다.
   return (
     <TourCommonSetlist
       entries={selected.entries}
-      dates={dates.filter((date) => date.versionId === selected.id)}
+      dates={versionDates}
       toolbar={tabs}
+      ticket={<TourSpanTicket dates={versionDates} />}
       changes={changes}
     />
   );
@@ -315,20 +307,6 @@ function versionName(index: number, count: number) {
   if (count === 2) return ["전반기", "후반기"][index];
   if (count === 3) return ["전반기", "중반기", "후반기"][index];
   return `${index + 1}기`;
-}
-
-/**
- * 판을 따른 공연일의 첫 도시–마지막 도시(취소된 공연일은 빼고, 날짜 순). 도시가 하나면
- * 그 도시, 공연일이 없으면 null.
- */
-function versionCities(dates: TourDateEntry[]) {
-  const held = dates
-    .filter((date) => !date.canceled)
-    .sort((a, b) => a.startDate.localeCompare(b.startDate));
-  if (held.length === 0) return null;
-  const first = held[0].city;
-  const last = held.at(-1)!.city;
-  return first === last ? first : `${first}–${last}`;
 }
 
 // 공연일들의 선택곡을 투어 공통 세트리스트의 "선택곡 자리"별로 모은다. 곡마다
@@ -441,11 +419,47 @@ export function collectSelectedSlots(
  * 세트리스트.
  */
 function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
+  return (
+    <div
+      id={id}
+      className={cn(
+        // 목록 전체 폭의 옅은 바탕(테두리·카드 없이) — 날짜 줄보다 넓게 펼쳐진다.
+        "mt-1 flex flex-col gap-3 bg-white/[0.05] px-3 pb-4",
+        "tablet:px-4",
+      )}
+    >
+      <TourDatePanelBody date={date} />
+    </div>
+  );
+}
+
+/**
+ * 공연일 하나의 포스터·이미지·세트리스트 — 아코디언 펼침(TourDatePanel)과 투어 상세의
+ * 그날 세트리스트(TourOverview 왼쪽 패널·모바일 시트)가 같이 쓴다. 감싸는 면 없이.
+ * thumbnails면 포스터도 크게 두지 않고 다른 그림과 같은 작은 썸네일 줄 맨 앞에(눌러서
+ * 크게) — 세트리스트가 바로 보이게.
+ */
+export function TourDatePanelBody({
+  date,
+  thumbnails = false,
+  heading = true,
+  dense = false,
+}: {
+  date: TourDateEntry;
+  thumbnails?: boolean;
+  /** false면 세트리스트 제목 줄("SETLIST · n songs") 없이 — 제목은 밖(LiveSectionHeader·시트 머리) */
+  heading?: boolean;
+  /** 촘촘한 세트리스트(커버 없이 — 투어 상세) */
+  dense?: boolean;
+}) {
   const showIcon =
     !!date.iconImageUrl &&
     date.iconImageUrl !== date.posterImageUrl &&
     !date.additionalImageUrls.includes(date.iconImageUrl);
   const images = [
+    ...(thumbnails && date.posterImageUrl
+      ? [{ src: date.posterImageUrl, alt: `${date.date} ${date.venue} 포스터` }]
+      : []),
     ...(showIcon && date.iconImageUrl
       ? [
           {
@@ -461,15 +475,8 @@ function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
   ];
 
   return (
-    <div
-      id={id}
-      className={cn(
-        // 목록 전체 폭의 옅은 바탕(테두리·카드 없이) — 날짜 줄보다 넓게 펼쳐진다.
-        "mt-1 flex flex-col gap-3 bg-white/[0.05] px-3 pb-4",
-        "tablet:px-4",
-      )}
-    >
-      {date.posterImageUrl && (
+    <>
+      {!thumbnails && date.posterImageUrl && (
         // 화면 폭별로 줄인 포스터(srcset) — 원본보다 큰 후보는 원본 크기로 온다.
         <ThumbImage
           src={date.posterImageUrl}
@@ -477,11 +484,19 @@ function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
           sizes={"(max-width: 49.99rem) 100vw, 800px"}
           alt={`${date.date} ${date.venue} 포스터`}
           loading="lazy"
-          className="max-h-[50vh] max-w-full self-center rounded-lg object-contain"
+          className="rounded-card max-h-[50vh] max-w-full self-center object-contain"
         />
       )}
       {images.length > 0 && (
-        <div className="flex flex-wrap items-center justify-center gap-2">
+        <div
+          className={cn(
+            "flex flex-wrap items-center gap-2",
+            // 썸네일 줄(투어 상세 카드 안)은 목록 줄과 같은 안쪽 여백으로
+            thumbnails
+              ? "tablet:px-4 justify-start px-3 pt-3"
+              : "justify-center",
+          )}
+        >
           <ZoomableImageGroup
             images={images}
             thumbnailWidth={72}
@@ -490,13 +505,24 @@ function TourDatePanel({ id, date }: { id: string; date: TourDateEntry }) {
         </div>
       )}
       {date.setlist.length > 0 ? (
-        <Setlist entries={date.setlist} plain />
+        <Setlist
+          entries={date.setlist}
+          plain
+          showHeading={heading}
+          dense={dense}
+        />
       ) : (
-        <p className={cn("text-sm text-white/50", "tablet:text-base")}>
+        <p
+          className={cn(
+            "text-sm text-white/50",
+            "tablet:text-base",
+            thumbnails && "tablet:px-4 px-3 py-3",
+          )}
+        >
           세트리스트가 곧 업데이트됩니다.
         </p>
       )}
-    </div>
+    </>
   );
 }
 
@@ -672,7 +698,7 @@ function TourDateGroupHeader({ dates }: { dates: TourDateEntry[] }) {
       {thumbnail && (
         <span
           className={cn(
-            "absolute top-3 left-3 aspect-[3/4] w-12 overflow-hidden rounded-md bg-white/5",
+            "rounded-card absolute top-3 left-3 aspect-[3/4] w-12 overflow-hidden bg-white/5",
             "tablet:left-4 tablet:w-16",
           )}
         >

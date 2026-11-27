@@ -170,3 +170,14 @@
 - [ ] **Step 6: 문서** — README `### 26.11.27` 아래 한 줄(예: "투어 상세를 PC 좌우 2단(세트리스트·공연 일정)으로 바꾸고, 날짜를 누르면 그날 세트리스트(모바일은 시트)·두 공연일 비교 창·공유 가능한 날짜 주소(#날짜)를 둠"), docs/CONVENTIONS.md 투어 상세 설명(접힌 "한 눈에 보기"·아코디언 서술)을 새 구조로 고침.
 - [ ] **Step 7: 확인** — `pnpm exec tsc --noEmit -p .`, `pnpm exec eslint src/features/zutopia/lives`, `pnpm exec vitest run` 전체 PASS, `pnpm build` 성공. Review Focus 4: 빌드 결과(`out/zutopia/lives/<slug>.html`)에서 공통 세트리스트 없는 투어·공연일 없는 투어 페이지가 생성되는지 확인(slug는 Supabase에서 조회).
 - [ ] **Step 8: 커밋**(허락 후) — Task 5·6·7 파일 + README·CONVENTIONS · `feat: 투어 상세를 PC 좌우 2단으로 바꾸고 날짜별 세트리스트(모바일 시트)·두 공연일 비교·날짜 주소 공유를 추가`
+
+---
+
+## 개편 2 (스펙 "개편 2") — 작업
+
+- [ ] R1 `tour-nav.ts`(+test): `defaultSelectedId(hasCommon: boolean, dates, hashId: string | null): string | null`(해시 우선, 없으면 공통 있으면 null, 없으면 첫 비취소 id), `stripLabels(dates): Map<id, string>`(같은 도시가 이어지면 "04.21", 바뀌면 "오사카 04.20", 취소일 제외)
+- [ ] R2 LiveTicket `strip`: 한 줄(종류 · 칸 · 아이콘), Variation·Official·Listen·Post 줄 없음(아이콘은 줄 끝)
+- [ ] R3 TourHeader(포스터 3:4 고정 + 제목 + strip 티켓), DefaultTourContent의 "공연 정보" 구역(Variation·추가 이미지)
+- [ ] R4 TourDateNav(PC 세로 목록 / 모바일 가로 밑줄 탭), TourOverview 재구성(시트 제거, 기본 선택 R1)
+- [ ] R5 Setlist 선택곡 자리 접기("선택곡 · n곡 ▾")
+- [ ] R6 README·CONVENTIONS, tsc·eslint·vitest·build

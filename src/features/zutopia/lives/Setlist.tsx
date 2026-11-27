@@ -2,11 +2,12 @@
 
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { FOCUS_RING } from "@/components/button-styles";
 import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { SongLink, songRowTint } from "@/features/zutopia/lives/SongLink";
 import { setlistSongCount } from "@/features/zutopia/lives/medley";
 import type { SetlistChangeNote } from "@/features/zutopia/lives/setlist-diff";
-import { secondaryTitle } from "@/features/zutopia/song-db/song-title";
+import { setlistTitles } from "@/features/zutopia/song-db/song-title";
 import {
   LIVE_SURFACE_CLASS,
   LIVE_TAG_CLASS,
@@ -49,6 +50,8 @@ type SetlistRow =
  * - toolbar: 펼쳤을 때 제목 줄과 목록 사이에 두는 것(투어 세트리스트 판 고르기 등).
  * - plain: 카드 면·테두리 없이 목록만(이미 어두운 면 안에 놓일 때 — 공연일 펼침).
  * - changes: 다른 판과 달라진 곡 — 그 곡 제목 아래 변동 줄로 보여 준다.
+ * - showHeading: false면 제목 줄 없이 목록만(제목은 카드 밖 LiveSectionHeader — 투어 상세).
+ * - dense: 촘촘하게(투어 상세 — 한 화면에 많이) — 두 줄·커버는 그대로, 줄 여백만 4px(SongLink dense).
  */
 export function Setlist({
   entries,
@@ -59,6 +62,8 @@ export function Setlist({
   toolbar = null,
   plain = false,
   changes = [],
+  showHeading = true,
+  dense = false,
 }: {
   entries: LiveSetlistEntry[];
   title?: string;
@@ -68,6 +73,8 @@ export function Setlist({
   toolbar?: ReactNode;
   plain?: boolean;
   changes?: SetlistChangeNote[];
+  showHeading?: boolean;
+  dense?: boolean;
 }) {
   const [isOpen, setOpen] = useState(defaultOpen);
   const rows: SetlistRow[] = [
@@ -119,9 +126,9 @@ export function Setlist({
 
   return (
     <section
-      className={cn("w-full", !plain && cn(LIVE_SURFACE_CLASS, "rounded-lg"))}
+      className={cn("w-full", !plain && cn(LIVE_SURFACE_CLASS, "rounded-card"))}
     >
-      {collapsible ? (
+      {!showHeading ? null : collapsible ? (
         <button
           type="button"
           onClick={() => setOpen((open) => !open)}
@@ -145,6 +152,7 @@ export function Setlist({
                   entry={row.entry}
                   songs={row.entry.medley}
                   change={changeFor(row.entry)}
+                  dense={dense}
                 />
               </li>
             ) : row.kind === "song" ? (
@@ -163,23 +171,25 @@ export function Setlist({
                   unreleased={row.entry.unreleased}
                   cover={row.entry.isCover}
                   artwork={row.entry.cover}
+                  dense={dense}
                   // 커버곡은 제목 하나뿐이라 둘째 줄에 원곡 아티스트를.
                   subtitle={
                     row.entry.isCover
                       ? row.entry.coverArtist
                         ? `원곡 ${row.entry.coverArtist}`
                         : null
-                      : secondaryTitle(row.entry)
+                      : setlistTitles(row.entry).secondary
                   }
                   encore={row.entry.isEncore}
                   selected={row.entry.isSelected}
                 >
-                  {row.entry.title}
-                  {/* 커버곡은 한글 제목이 아래 줄이 아니라 제목 오른쪽 괄호에 */}
+                  {/* 한국어 제목이 첫 줄, 원제·영어는 둘째 줄(song-title.ts setlistTitles).
+                  커버곡은 둘째 줄이 원곡 아티스트라 원제를 제목 오른쪽 괄호에. */}
+                  {setlistTitles(row.entry).primary}
                   {row.entry.isCover &&
                     row.entry.titleKo !== row.entry.title && (
                       <span className="ml-1.5 font-normal text-white/70">
-                        ({row.entry.titleKo})
+                        ({row.entry.title})
                       </span>
                     )}
                 </SongLink>
@@ -195,40 +205,14 @@ export function Setlist({
                   selected
                   // 그 자리에 들어간 곡들의 커버를 겹쳐서
                   artwork={row.slot.songs.map((song) => song.cover)}
+                  dense={dense}
                   // 곡이 하나뿐인 자리면 "미공개"도 오른쪽 태그 자리에(선택곡과 나란히).
                   unreleased={
                     row.slot.songs.length === 1 && row.slot.songs[0].unreleased
                   }
                   wrapTitle
                 >
-                  <span className="flex flex-col gap-1 py-0.5">
-                    {row.slot.songs.map((song) => (
-                      <span key={song.title} className="flex flex-col">
-                        <span className="flex flex-wrap items-center gap-1.5">
-                          {song.title}
-                          {/* 여러 곡이 들어간 자리는 곡마다 이름 옆에 */}
-                          {song.unreleased && row.slot.songs.length > 1 && (
-                            <span
-                              className={cn(
-                                LIVE_TAG_CLASS,
-                                LIVE_TAG_TONE.unreleased,
-                              )}
-                            >
-                              미공개
-                            </span>
-                          )}
-                        </span>
-                        <span
-                          className={cn(
-                            "text-xs font-normal text-white/60",
-                            "tablet:text-sm",
-                          )}
-                        >
-                          {song.places.join(" · ")}
-                        </span>
-                      </span>
-                    ))}
-                  </span>
+                  <SlotSongs slot={row.slot} />
                 </SongLink>
               </li>
             ),
@@ -240,6 +224,59 @@ export function Setlist({
 }
 
 /**
+ * 선택곡 자리에 들어간 곡들 — 곡마다 불린 곳(도시·일차). 두 곡 이상이면 처음엔 "n곡 ▾"로
+ * 접어 두고 누르면 펼친다(투어 세트리스트를 짧게 — 한 화면 정보량을 줄이려고). 한 곡뿐이면
+ * 접지 않고 바로.
+ */
+function SlotSongs({ slot }: { slot: SetlistSlot }) {
+  const [open, setOpen] = useState(false);
+  const many = slot.songs.length > 1;
+  const list = (
+    <span className="flex flex-col gap-1 py-0.5">
+      {slot.songs.map((song) => (
+        <span key={song.title} className="flex flex-col">
+          <span className="flex flex-wrap items-center gap-1.5">
+            {song.title}
+            {/* 여러 곡이 들어간 자리는 곡마다 이름 옆에 */}
+            {song.unreleased && many && (
+              <span className={cn(LIVE_TAG_CLASS, LIVE_TAG_TONE.unreleased)}>
+                미공개
+              </span>
+            )}
+          </span>
+          <span className="text-sm font-normal text-white/60">
+            {song.places.join(" · ")}
+          </span>
+        </span>
+      ))}
+    </span>
+  );
+  if (!many) return list;
+  return (
+    <span className="flex flex-col gap-1">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        className={cn(
+          "rounded-control inline-flex w-fit items-center gap-1 py-0.5 text-sm font-normal text-white/75 transition-colors hover:text-white",
+          FOCUS_RING,
+        )}
+      >
+        {slot.songs.length}곡
+        <ChevronLeftIcon
+          className={cn(
+            "size-3.5 transition-transform",
+            open ? "rotate-90" : "-rotate-90",
+          )}
+        />
+      </button>
+      {open && list}
+    </span>
+  );
+}
+
+/**
  * 메들리 한 번호 — 머리 줄(번호·"메들리"·곡 수·태그) 아래에 이어 부른 곡을 순서대로.
  * 곡마다 커버와 응원 가이드가 있고, 앙코르·선택곡 바탕은 묶음 전체에 한 번만 칠한다.
  */
@@ -247,10 +284,12 @@ function MedleyRows({
   entry,
   songs,
   change,
+  dense = false,
 }: {
   entry: LiveSetlistEntry;
   songs: LiveMedleySong[];
   change: SetlistChangeNote | null;
+  dense?: boolean;
 }) {
   return (
     <div
@@ -267,6 +306,7 @@ function MedleyRows({
         selected={entry.isSelected}
         medleyPart="head"
         change={change}
+        dense={dense}
       >
         <span className="font-semibold">메들리</span>
         <span className="ml-1.5 text-sm text-white/55">{songs.length}곡</span>
@@ -279,13 +319,14 @@ function MedleyRows({
               index={entry.trackNumber}
               indexLabel=""
               artwork={song.cover}
-              subtitle={secondaryTitle(song)}
+              dense={dense}
+              subtitle={setlistTitles(song).secondary}
               unreleased={song.unreleased}
               encore={entry.isEncore}
               selected={entry.isSelected}
               medleyPart="song"
             >
-              {song.title}
+              {setlistTitles(song).primary}
             </SongLink>
           </li>
         ))}
