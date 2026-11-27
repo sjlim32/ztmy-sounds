@@ -443,13 +443,11 @@ describe("세트리스트 구역", () => {
   const keys = (id: string) =>
     record(sections, id).rows.map((row) => [row.key, row.cells[0]]);
 
-  test("본편 마지막·공연 마지막(앵콜 있으면 앵콜 마지막)", () => {
-    // 본편 마지막은 앵콜이 있던 4회만
-    expect(keys("setlist-closer")).toEqual([["c", "4회"]]);
-    expect(keys("setlist-finale")).toEqual([
-      ["e", "4회"],
-      ["c", "1회"],
-    ]);
+  test("정규 셋리 막곡은 곡 순서를 아는 모든 공연일, 앵콜 막곡은 앵콜이 있던 공연일만", () => {
+    // 정규 셋리(앵콜 전) 마지막은 앵콜이 없던 첫날도 센다 — 5회
+    expect(keys("setlist-closer")).toEqual([["c", "5회"]]);
+    // 앵콜 마지막은 앵콜이 있던 4회만(앵콜 없는 날의 정규 셋리 막곡은 넣지 않는다)
+    expect(keys("setlist-finale")).toEqual([["e", "4회"]]);
   });
 
   test("본편 평균 위치 — 초반·후반", () => {

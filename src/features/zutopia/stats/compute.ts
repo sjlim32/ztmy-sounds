@@ -996,7 +996,7 @@ const MIN_TREND_SHOWS = 5;
 const MIN_POSITION_PLAYS = 5;
 
 /**
- * 세트리스트 안의 자리·흐름 — 본편 마지막 곡, 공연 마지막 곡, 본편 평균 위치(초반·
+ * 세트리스트 안의 자리·흐름 — 정규 셋리 막곡(앵콜 전 마지막, 모든 공연일), 앵콜 막곡(앵콜이 있던 날만), 본편 평균 위치(초반·
  * 후반), 이어 부른 두 곡, 다른 버전, 커버곡. 순서는 공연일의 mainOrder·encoreOrder
  * (곡 순서를 아는 공연일만).
  */
@@ -1047,8 +1047,8 @@ function setlistRecords(
       (a, b) => b.count / b.base - a.count / a.base,
     );
   };
-  // 본편 마지막 곡은 앵콜이 있던 공연일만 — 앵콜이 없거나 기록되지 않은 날(페스티벌
-  // 등)의 본편 마지막은 공연 마지막 곡과 같아서.
+  // 앵콜 막곡은 앵콜이 있던 공연일만(앵콜이 없거나 기록되지 않은 날 — 페스티벌 등 — 은
+  // 정규 셋리 막곡에만 들어간다).
   const withEncore = ordered.filter((unit) => unit.encoreOrder?.length);
 
   // 본편 평균 위치 — 첫 곡 0%, 마지막 곡 100%.
@@ -1081,7 +1081,7 @@ function setlistRecords(
         songRow(
           item.stat.song,
           [positionText(item.average), times(item.count)],
-          `본편 ${times(item.count)} 평균 ${positionText(item.average)}(첫 곡 0% · 본편 마지막 곡 100%)`,
+          `정규 셋리 ${times(item.count)} · 평균 위치 ${positionText(item.average)}(첫 곡 0% · 막곡 100%)`,
         ),
       (a, b) => b.count - a.count,
     );
@@ -1150,45 +1150,42 @@ function setlistRecords(
   return [
     {
       id: "setlist-closer",
-      title: "본편 마지막 곡 단골",
-      description: "앵콜 전 마지막 곡",
-      detail: `앵콜이 있던 공연일(곡 순서를 아는 ${withEncore.length}회)에서 앵콜 전 본편을 마무리한 곡 · "부른 날 중"은 그중 그 곡을 부른 날에서 본편 마지막이었던 비율`,
-      columns: ["마지막 곡 횟수", "전체 중", "부른 날 중"],
+      title: "정규 셋리 막곡",
+      description: "앵콜 전 정규 세트리스트의 마지막 곡",
+      detail: `앵콜 전 정규 세트리스트의 마지막 곡(곡 순서를 아는 공연일 ${ordered.length}회 — 앵콜이 없던 날도) · "부른 날 중"은 그 곡을 부른 날 가운데 막곡이었던 비율`,
+      columns: ["막곡 횟수", "전체 중", "부른 날 중"],
       trendFor: songTrend,
-      rows: slotRows(withEncore, "앵콜이 있던 공연일", (unit) =>
+      rows: slotRows(ordered, "곡 순서를 아는 공연일", (unit) =>
         unit.mainOrder!.at(-1),
       ),
     },
     {
       id: "setlist-finale",
-      title: "공연 마지막 곡 단골",
-      description: "그날의 마지막 곡",
-      detail:
-        '앵콜이 있으면 앵콜 마지막, 없거나 기록되지 않았으면 본편 마지막 곡(곡 순서를 아는 공연일) · "부른 날 중"은 그 곡을 부른 날에서 마지막이었던 비율',
-      columns: ["마지막 곡 횟수", "전체 중", "부른 날 중"],
+      title: "앵콜 막곡",
+      description: "앵콜의 마지막 곡",
+      detail: `앵콜의 마지막 곡(앵콜이 있던 공연일 ${withEncore.length}회) · "부른 날 중"은 그 곡을 부른 날 가운데 앵콜 막곡이었던 비율`,
+      columns: ["막곡 횟수", "전체 중", "부른 날 중"],
       trendFor: songTrend,
-      rows: slotRows(
-        ordered,
-        "곡 순서를 아는 공연일",
-        (unit) => unit.encoreOrder?.at(-1) ?? unit.mainOrder!.at(-1),
+      rows: slotRows(withEncore, "앵콜이 있던 공연일", (unit) =>
+        unit.encoreOrder!.at(-1),
       ),
     },
     {
       id: "setlist-early",
       bars: false,
       title: "공연 초반에 주로 부르는 곡",
-      description: "본편 평균 위치가 앞인 곡",
-      detail: `본편 평균 위치가 앞인 곡(첫 곡 0% · 본편 마지막 곡 100%, 본편에서 ${MIN_POSITION_PLAYS}회 이상)`,
-      columns: ["평균 위치", "본편 횟수"],
+      description: "정규 셋리에서 평균 위치가 앞인 곡",
+      detail: `정규 셋리(앵콜 전)에서 평균 위치가 앞인 곡(첫 곡 0% · 막곡 100%, 정규 셋리에서 ${MIN_POSITION_PLAYS}회 이상)`,
+      columns: ["평균 위치", "정규 셋리 횟수"],
       rows: positionRows("asc"),
     },
     {
       id: "setlist-late",
       bars: false,
       title: "공연 후반에 주로 부르는 곡",
-      description: "본편 평균 위치가 뒤인 곡",
-      detail: `본편 평균 위치가 뒤인 곡(첫 곡 0% · 본편 마지막 곡 100%, 본편에서 ${MIN_POSITION_PLAYS}회 이상)`,
-      columns: ["평균 위치", "본편 횟수"],
+      description: "정규 셋리에서 평균 위치가 뒤인 곡",
+      detail: `정규 셋리(앵콜 전)에서 평균 위치가 뒤인 곡(첫 곡 0% · 막곡 100%, 정규 셋리에서 ${MIN_POSITION_PLAYS}회 이상)`,
+      columns: ["평균 위치", "정규 셋리 횟수"],
       rows: positionRows("desc"),
     },
     {
@@ -1196,7 +1193,7 @@ function setlistRecords(
       title: "가장 자주 이어 부른 두 곡",
       description: "여러 투어·공연에 걸쳐 바로 이어 부른 두 곡",
       detail:
-        '본편·앵콜 안에서 바로 이어 부른 투어·공연 수(투어는 하나로, 2곳 이상) · "앞 곡 부른 날 중"은 앞 곡을 부른 공연일 중 이어진 비율',
+        '정규 셋리·앵콜 안에서 각각 바로 이어 부른 투어·공연 수(투어는 하나로, 2곳 이상) · "앞 곡 부른 날 중"은 앞 곡을 부른 공연일 중 이어진 비율',
       columns: ["투어·공연", "공연일", "앞 곡 부른 날 중"],
       rows: rank(
         [...pairs.values()].filter((pair) => pair.groups.size >= 2),
