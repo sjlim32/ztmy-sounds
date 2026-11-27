@@ -99,13 +99,13 @@ export function AttendanceResult({
   return (
     // 팝오버가 카드 밖으로 나갈 수 있게 overflow는 두지 않는다.
     <div className={ZUTOPIA_SURFACE_CLASS}>
-      {/* 카드 머리 — 두 칸 탭(이름 + 큰 숫자), 옆에 지금 목록 설명과 바로가기.
-          태블릿 이상은 한 줄, 모바일은 탭이 폭을 채우고 그 아래 한 줄. */}
+      {/* 카드 머리 — 밑줄 탭 둘(이름 + 큰 숫자 — 카드 안에 면을 또 깔지 않는다), 옆에 지금
+          목록 설명과 바로가기. 태블릿 이상은 한 줄, 모바일은 탭 아래 한 줄. */}
       <div className="tablet:flex-row tablet:items-center tablet:gap-4 tablet:px-4 flex flex-col gap-2 border-b border-white/10 px-3 py-3">
         <div
           role="group"
           aria-label="목록 고르기"
-          className="tablet:inline-grid tablet:w-auto rounded-card grid w-full grid-cols-2 gap-1 bg-white/5 p-1"
+          className="flex shrink-0 gap-6"
         >
           {modes.map((item) => {
             const active = mode === item.key;
@@ -119,11 +119,11 @@ export function AttendanceResult({
                   setOpenSongId(null);
                 }}
                 className={cn(
-                  "tablet:px-4 rounded-control flex h-11 items-center justify-center gap-2 px-3 transition-colors",
+                  "flex h-11 items-center gap-2 border-b-2 transition-colors",
                   FOCUS_RING,
                   active
-                    ? "bg-white/15 text-white shadow-sm"
-                    : "text-white/55 hover:bg-white/5 hover:text-white",
+                    ? "border-ztmy-pink text-white"
+                    : "border-transparent text-white/55 hover:text-white",
                 )}
               >
                 <span className="text-base font-semibold whitespace-nowrap">
