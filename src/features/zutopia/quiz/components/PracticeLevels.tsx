@@ -1,36 +1,39 @@
 import { cn } from "@/lib/utils";
+import { ChevronLeftIcon } from "@/components/icons/ChevronLeftIcon";
 import { ZUTOPIA_SURFACE_CLASS } from "@/features/zutopia/surface";
 import { QUIZ_LEVELS } from "@/features/zutopia/quiz/data";
-import { QuizSoonChip } from "@/features/zutopia/quiz/components/QuizSoonChip";
 
 /**
- * 연습하기 난이도 고르기 — 4단계를 한 줄에(모바일 2×2). 단계는 왼쪽 위 막대 네 칸
- * 중 채운 칸 수로 보여 준다. 문제가 생기기 전까지는 누를 수 없다.
+ * 연습하기 난이도 고르기 — 카드 한 장에 단계마다 한 줄(구분선) — 단계마다 카드를 따로 두지
+ * 않는다(카드 최소화). 줄 앞 막대 네 칸 중 채운 칸 수로 단계를 보여 준다. 문제가 생기기
+ * 전까지는 누를 수 없다("준비 중"은 구역 제목 줄 오른쪽에 한 번).
  */
 export function PracticeLevels() {
   return (
-    <ul className={cn("grid grid-cols-2 gap-3", "tablet:gap-4 pc:grid-cols-4")}>
+    <ul className={cn(ZUTOPIA_SURFACE_CLASS, "divide-y divide-white/10")}>
       {QUIZ_LEVELS.map((level, index) => (
         <li key={level.id}>
           <button
             type="button"
             disabled
             className={cn(
-              ZUTOPIA_SURFACE_CLASS,
-              "flex w-full cursor-not-allowed flex-col items-start gap-4 p-4 text-left",
-              "tablet:p-5",
+              "flex w-full cursor-not-allowed items-center gap-3 px-4 py-3.5 text-left",
+              "tablet:px-5",
             )}
           >
-            <span className="flex w-full items-center justify-between">
-              <LevelBars level={index + 1} total={QUIZ_LEVELS.length} />
-              <QuizSoonChip />
-            </span>
-            <span className="tablet:text-xl text-lg font-bold text-white/75">
+            <LevelBars level={index + 1} total={QUIZ_LEVELS.length} />
+            <span
+              className={cn(
+                "flex-1 text-base font-bold text-white/75",
+                "tablet:text-lg",
+              )}
+            >
               {level.label}
             </span>
             <span className="sr-only">
               {`난이도 ${index + 1}/${QUIZ_LEVELS.length}`}
             </span>
+            <ChevronLeftIcon className="size-4 rotate-180 text-white/25" />
           </button>
         </li>
       ))}
@@ -41,7 +44,7 @@ export function PracticeLevels() {
 /** 난이도 막대 — 오른쪽으로 갈수록 높아지는 네 칸, 단계만큼 분홍으로 채운다. */
 function LevelBars({ level, total }: { level: number; total: number }) {
   return (
-    <span aria-hidden className="flex h-4 items-end gap-0.5">
+    <span aria-hidden className="flex h-4 shrink-0 items-end gap-0.5">
       {Array.from({ length: total }, (_, index) => (
         <span
           key={index}

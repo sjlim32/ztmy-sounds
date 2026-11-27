@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ZutopiaSectionTitle } from "@/features/zutopia/components/ZutopiaSectionTitle";
+import { SectionHeader } from "@/components/SectionHeader";
+import { QuizSoonChip } from "@/features/zutopia/quiz/components/QuizSoonChip";
 import { MockExamLinks } from "@/features/zutopia/quiz/components/MockExamLinks";
 import { PracticeLevels } from "@/features/zutopia/quiz/components/PracticeLevels";
 import { RealTestCard } from "@/features/zutopia/quiz/components/RealTestCard";
@@ -14,7 +15,8 @@ export const metadata: Metadata = {
 
 /**
  * 퀴즈 허브 — 위에서부터 연습하기(난이도 4단계) / 실전 테스트 / 모의고사(갤러리
- * 구글폼 링크). 연습·실전은 아직 문제가 없어 누를 수 없는 "준비 중" 상태다.
+ * 구글폼 링크). 구역마다 제목 줄(SectionHeader) + 카드 한 장(안은 구분선 줄). 연습·실전은
+ * 아직 문제가 없어 누를 수 없는 "준비 중" 상태 — 표시는 제목 줄 오른쪽에 한 번.
  */
 export default function ZutopiaQuizPage() {
   return (
@@ -22,17 +24,26 @@ export default function ZutopiaQuizPage() {
       <h1 className="sr-only">즛토마요 퀴즈</h1>
 
       <section aria-labelledby="quiz-practice" className="flex flex-col gap-3">
-        <ZutopiaSectionTitle id="quiz-practice">연습하기</ZutopiaSectionTitle>
+        <SectionHeader
+          title={<h2 id="quiz-practice">연습하기</h2>}
+          action={<QuizSoonChip />}
+        />
         <PracticeLevels />
       </section>
 
       <section aria-labelledby="quiz-test" className="flex flex-col gap-3">
-        <ZutopiaSectionTitle id="quiz-test">실전 테스트</ZutopiaSectionTitle>
+        <SectionHeader
+          title={<h2 id="quiz-test">실전 테스트</h2>}
+          action={<QuizSoonChip />}
+        />
         <RealTestCard />
       </section>
 
       <section aria-labelledby="quiz-mock" className="flex flex-col gap-3">
-        <ZutopiaSectionTitle id="quiz-mock">모의고사</ZutopiaSectionTitle>
+        <SectionHeader
+          title={<h2 id="quiz-mock">모의고사</h2>}
+          meta="구글폼 · 새 창"
+        />
         <MockExamLinks />
         {/* 출제자·공개 글은 출처 페이지의 모의고사 항목에 */}
         <Link
